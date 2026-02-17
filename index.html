@@ -3,143 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ScriptNova AI — Write scripts faster</title>
-  <meta name="description" content="ScriptNova AI helps you brainstorm, outline, and polish scripts for videos, reels, podcasts, and ads." />
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <title>ScriptNova AI</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --border:rgba(255,255,255,.12);
+      --accent:#7c5cff;
+      --accent2:#19d3ff;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(850px 600px at 85% 20%, rgba(25,211,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 40% 95%, rgba(124,92,255,.14), transparent 60%),
+        var(--bg);
+      display:grid;
+      place-items:center;
+      padding:22px;
+    }
+    .card{
+      max-width: 900px;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      padding: 28px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size: clamp(34px, 5vw, 64px);
+      letter-spacing: -1px;
+      line-height: 1.05;
+    }
+    p{
+      margin:0;
+      color:var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .dot{
+      display:inline-block;
+      width:10px;height:10px;
+      border-radius:999px;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      margin-right:10px;
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="container nav">
-      <a class="brand" href="index.html" aria-label="ScriptNova AI home">
-        <span class="logo" aria-hidden="true"></span>
-        <span>ScriptNova AI</span>
-      </a>
-
-      <nav class="navlinks" data-nav>
-        <a href="features.html" data-nav-link>Features</a>
-        <a href="pricing.html" data-nav-link>Pricing</a>
-        <a href="about.html" data-nav-link>About</a>
-        <a href="contact.html" data-nav-link>Contact</a>
-      </nav>
-
-      <div class="actions">
-        <button class="btn small mobile-toggle" data-nav-toggle aria-label="Open menu">Menu</button>
-        <a class="btn" href="pricing.html">See plans</a>
-        <a class="btn primary" href="contact.html">Get a demo</a>
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="hero">
-      <div class="hero-grid">
-        <div class="card hero-left">
-          <span class="badge">✨ AI scriptwriting • outlines • hooks • rewrites</span>
-          <h1>Turn ideas into scripts your audience actually watches.</h1>
-          <p class="lead">
-            ScriptNova AI helps creators and teams brainstorm, structure, and refine scripts for YouTube,
-            TikTok, podcasts, ads, and more — without the blank-page struggle.
-          </p>
-          <div class="hero-ctas">
-            <a class="btn primary" href="pricing.html">Start with a plan</a>
-            <a class="btn" href="features.html">Explore features</a>
-          </div>
-
-          <div class="kpis">
-            <div class="kpi">
-              <strong>Hooks</strong>
-              <span>Openers that keep viewers</span>
-            </div>
-            <div class="kpi">
-              <strong>Outlines</strong>
-              <span>Clear structure in minutes</span>
-            </div>
-            <div class="kpi">
-              <strong>Polish</strong>
-              <span>Rewrite & tone control</span>
-            </div>
-          </div>
-        </div>
-
-        <aside class="card hero-right">
-          <div class="feature">
-            <div class="icon">⚡</div>
-            <h3>Fast first drafts</h3>
-            <p>Generate a complete script from a topic, goal, and length.</p>
-          </div>
-          <div class="feature">
-            <div class="icon">🎯</div>
-            <h3>Audience-aware</h3>
-            <p>Adjust tone for education, entertainment, or conversion.</p>
-          </div>
-          <div class="feature">
-            <div class="icon">🧩</div>
-            <h3>Format presets</h3>
-            <p>Short-form, long-form, podcast segments, and ad scripts.</p>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>What you can do</h2>
-      <div class="grid3">
-        <div class="feature">
-          <div class="icon">🪝</div>
-          <h3>Hooks that land</h3>
-          <p>Generate multiple hook options with different angles and pacing.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">🧠</div>
-          <h3>Outline & beats</h3>
-          <p>Build a clear narrative: setup → tension → payoff → CTA.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">✍️</div>
-          <h3>Rewrite on demand</h3>
-          <p>Shorten, expand, simplify, or match a specific voice.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="card panel">
-        <h2>Ready to ship better scripts?</h2>
-        <p class="lead">Pick a plan, or contact us for partnerships and team access.</p>
-        <div class="hero-ctas">
-          <a class="btn primary" href="pricing.html">View pricing</a>
-          <a class="btn" href="contact.html">Contact</a>
-        </div>
-      </div>
-    </section>
+  <main class="card">
+    <h1><span class="dot" aria-hidden="true"></span>whats up</h1>
+    <p>hows it going</p>
+    <p>nothing to see here</p>
   </main>
-
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <div class="brand">
-          <span class="logo" aria-hidden="true"></span>
-          <span>ScriptNova AI</span>
-        </div>
-        <p>Create scripts faster with outlines, hooks, and rewrites.</p>
-        <small>© <span id="year"></span> ScriptNova AI. All rights reserved.</small>
-      </div>
-      <div>
-        <p><strong>Pages</strong></p>
-        <p><a href="features.html">Features</a><br/>
-           <a href="pricing.html">Pricing</a><br/>
-           <a href="about.html">About</a><br/>
-           <a href="contact.html">Contact</a></p>
-      </div>
-      <div>
-        <p><strong>Legal</strong></p>
-        <p><a href="privacy.html">Privacy</a><br/>
-           <a href="terms.html">Terms</a></p>
-      </div>
-    </div>
-  </footer>
-
-  <script src="assets/js/main.js"></script>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
