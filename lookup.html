@@ -582,7 +582,20 @@
     }
 
     function renderResults(){
-      const query = $q.value;
+      const query = $q.value.trim();
+
+      // Hide all names until user searches
+      if(!query){
+        $results.innerHTML = `
+          <div style="padding:40px 20px; text-align:center; color:var(--muted); font-size:14px; border:1px dashed var(--border); border-radius:14px;">
+            Start typing a name to search opted-in profiles.<br>
+            <span style="font-size:12px; opacity:0.7;">(e.g., Conner Pangelinan or Emy Girgis)</span>
+          </div>
+        `;
+        $empty.style.display = "none";
+        return;
+      }
+
       const filtered = PEOPLE.filter(p => matches(p, query));
       const lookup = getLookupParam();
       const selectedId = lookup ? lookup.id : null;
@@ -601,6 +614,7 @@
           <span class="tag ${p.locked ? "locked" : ""}">${p.locked ? "Locked" : "Available"}</span>
         `;
         row.addEventListener("click", () => {
+          $q.value = `${p.first} ${p.last}`; // Auto-fill search when clicking
           updateUrlForPerson(p);
           runLookup(p);
           renderResults();
@@ -750,6 +764,7 @@
       if(lookup){
         const person = findById(lookup.id);
         if(person){
+          $q.value = `${person.first} ${person.last}`; // Auto-fill search for URL loads
           $selectedPill.textContent = `${person.first} ${person.last}`;
           runLookup(person);
         } else {
@@ -767,6 +782,7 @@
       const person = lookup ? findById(lookup.id) : null;
       if(person) {
         $selectedPill.textContent = `${person.first} ${person.last}`;
+        $q.value = `${person.first} ${person.last}`; // Sync search on history
       } else {
         $selectedPill.textContent = "None selected";
         $profilePanel.innerHTML = `<div class="placeholder">Select a person on the left to view details here.</div>`;
