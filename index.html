@@ -4,67 +4,49 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ScriptNova AI</title>
-  <style>
-    :root{
-      --bg:#0b0f19;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --border:rgba(255,255,255,.12);
-      --accent:#7c5cff;
-      --accent2:#19d3ff;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:var(--font);
-      color:var(--text);
-      background:
-        radial-gradient(900px 600px at 15% 10%, rgba(124,92,255,.25), transparent 60%),
-        radial-gradient(850px 600px at 85% 20%, rgba(25,211,255,.18), transparent 55%),
-        radial-gradient(900px 700px at 40% 95%, rgba(124,92,255,.14), transparent 60%),
-        var(--bg);
-      display:grid;
-      place-items:center;
-      padding:22px;
-    }
-    .card{
-      max-width: 900px;
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      background: rgba(255,255,255,.06);
-      backdrop-filter: blur(10px);
-      padding: 28px;
-    }
-    h1{
-      margin:0 0 8px;
-      font-size: clamp(34px, 5vw, 64px);
-      letter-spacing: -1px;
-      line-height: 1.05;
-    }
-    p{
-      margin:0;
-      color:var(--muted);
-      font-size: 18px;
-      line-height: 1.6;
-    }
-    .dot{
-      display:inline-block;
-      width:10px;height:10px;
-      border-radius:999px;
-      background: linear-gradient(135deg,var(--accent),var(--accent2));
-      margin-right:10px;
-      transform: translateY(-1px);
-    }
-  </style>
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <main class="card">
-    <h1><span class="dot" aria-hidden="true"></span>whats up</h1>
-    <p>hows it going</p>
-    <p>nothing to see here</p>
+  <header class="nav">
+    <div class="brand">ScriptNova AI</div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="developers.html">Developers</a>
+      <a href="privacyterms.html">Policy</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>ScriptNova AI</h1>
+      <p>Build with your own keys, your own rules, and memory that you control.</p>
+      <div class="buttons">
+        <a class="btn primary" href="developers.html">For Developers</a>
+        <a class="btn" href="about.html">Learn More</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Policy-first</h2>
+        <p>Clear rules and safety controls built into the platform.</p>
+      </div>
+      <div class="card">
+        <h2>Memory + knowledge</h2>
+        <p>Personal memory and document-based answers (RAG) without changing the model live.</p>
+      </div>
+      <div class="card">
+        <h2>Developer API</h2>
+        <p>Simple endpoints, predictable pricing, and usage dashboards.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <a href="privacyterms.html">Policy</a>
+      <span>•</span>
+      <a href="contact.html">Contact</a>
+    </footer>
   </main>
 </body>
 </html>

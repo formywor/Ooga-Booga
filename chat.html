@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ScriptNova Chat</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">ScriptNova AI</div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="chat.html">Chat</a>
+      <a href="developers.html">Developers</a>
+      <a href="privacyterms.html">Policy</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card" style="margin-top:16px;">
+      <h2 style="margin:0 0 8px;">Chat</h2>
+      <p style="margin:0; opacity:.9;">
+        This is a preview UI. Once the ScriptNova API is online, it will respond here.
+      </p>
+    </section>
+
+    <section class="card" style="margin-top:14px;">
+      <div id="messages" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+      <form id="chatForm" style="margin-top:14px; display:flex; gap:10px;">
+        <input id="prompt" class="input" placeholder="Ask ScriptNova…" autocomplete="off" />
+        <button class="btn primary" type="submit">Send</button>
+      </form>
+
+      <div id="status" style="margin-top:10px; opacity:.8;"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "https://api.scriptnovaa.com"; // we’ll set this up
+    const messagesEl = document.getElementById("messages");
+    const statusEl = document.getElementById("status");
+    const promptEl = document.getElementById("prompt");
+    const form = document.getElementById("chatForm");
+
+    const chat = []; // local session history (later we’ll do real accounts + memory)
+
+    function addMessage(role, text) {
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + role;
+      bubble.textContent = text;
+      messagesEl.appendChild(bubble);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = promptEl.value.trim();
+      if (!text) return;
+
+      addMessage("user", text);
+      promptEl.value = "";
+      statusEl.textContent = "Thinking…";
+
+      chat.push({ role: "user", content: text });
+
+      try {
+        const res = await fetch(API_BASE + "/v1/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: chat,
+            // later: user_id, memory_enabled, etc.
+          })
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(errText || "Request failed");
+        }
+
+        const data = await res.json();
+        const reply = data.reply || "(No reply)";
+        addMessage("assistant", reply);
+        chat.push({ role: "assistant", content: reply });
+        statusEl.textContent = "";
+      } catch (err) {
+        statusEl.textContent = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
