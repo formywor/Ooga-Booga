@@ -2,51 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ScriptNova AI</title>
-  <link rel="stylesheet" href="assets/style.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ScriptNova — Browser Launcher</title>
+  <style>
+    :root{
+      --bg:#0b0f16; --panel:#101828; --panel2:#0f1726; --border:#22314a;
+      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --accent2:#7c4dff;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:Segoe UI,Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .wrap{ max-width:980px; margin:0 auto; padding:22px; }
+    .hero{ border:1px solid var(--border); background:var(--panel); border-radius:18px; padding:18px; box-shadow:0 0 18px rgba(0,229,255,.08); }
+    .title{ font-size:22px; font-weight:900; letter-spacing:.3px; }
+    .title b{ color:var(--accent); }
+    .sub{ margin-top:6px; color:var(--muted); line-height:1.4; }
+    .grid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; }
+    @media(min-width:860px){ .grid{ grid-template-columns: 1.2fr .8fr; } }
+    .card{ border:1px solid var(--border); background:var(--panel2); border-radius:18px; padding:14px; }
+    .card h3{ margin:0 0 8px 0; font-size:12px; letter-spacing:.9px; text-transform:uppercase; color:var(--muted); }
+    .btnrow{ display:flex; flex-wrap:wrap; gap:10px; }
+    .btn{
+      appearance:none; border:1px solid rgba(0,229,255,.45); background:#0e2a3a; color:var(--text);
+      padding:12px 14px; border-radius:14px; font-weight:900; letter-spacing:.7px; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block;
+    }
+    .btn:hover{ background:#103146; }
+    .btn2{ border:1px solid rgba(124,77,255,.45); background:#1a1840; }
+    .btn2:hover{ background:#211f55; }
+    .note{ color:var(--muted); font-size:12px; line-height:1.4; }
+    code{ background:#070b12; border:1px solid var(--border); padding:2px 6px; border-radius:8px; }
+    .footer{ margin-top:16px; color:var(--muted); font-size:12px; text-align:center; }
+    .pill{ display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#0c1422; color:var(--muted); font-size:12px; }
+  </style>
 </head>
 <body>
-  <header class="nav">
-    <div class="brand">ScriptNova AI</div>
-    <nav>
-      <a href="/">Home</a>
-      <a href="developers.html">Developers</a>
-      <a href="privacyterms.html">Policy</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </header>
+  <div class="wrap">
+    <div class="hero">
+      <div class="title"><b>ScriptNova</b> — Browser Launcher</div>
+      <div class="sub">
+        Download the launcher, verify your license, and launch Chrome with server-controlled flags.
+        Need a free trial key? Use the FREE key generator.
+      </div>
+    </div>
 
-  <main class="container">
-    <section class="hero">
-      <h1>ScriptNova AI</h1>
-      <p>Build with your own keys, your own rules, and memory that you control.</p>
-      <div class="buttons">
-        <a class="btn primary" href="developers.html">For Developers</a>
-        <a class="btn" href="about.html">Learn More</a>
+    <div class="grid">
+      <div class="card">
+        <h3>Download</h3>
+        <div class="btnrow">
+          <!-- Change these hrefs to your real hosted files -->
+          <a class="btn" href="/downloads/ScriptNova-Launcher.hta" download>Download Launcher (HTA)</a>
+          <a class="btn btn2" href="/freekey/">Get FREE Key (15 min)</a>
+        </div>
+        <p class="note" style="margin-top:10px;">
+          Launcher requirements: Windows + Google Chrome installed.<br/>
+          Tip: If your browser blocks <code>.hta</code> downloads, use a zip download instead and extract.
+        </p>
       </div>
-    </section>
 
-    <section class="grid">
       <div class="card">
-        <h2>Policy-first</h2>
-        <p>Clear rules and safety controls built into the platform.</p>
+        <h3>Support</h3>
+        <div class="note">
+          Email: <b>gomegaassist@gmail.com</b><br/>
+          Discord: <a href="https://discord.gg/gscGTMVsWE" style="color:var(--accent)" target="_blank" rel="noreferrer">Join server</a>
+        </div>
+        <div style="margin-top:10px;">
+          <span class="pill">Hello </span>
+          <span class="pill">bound licenses</span>
+          <span class="pill">FREE keys</span>
+        </div>
       </div>
-      <div class="card">
-        <h2>Memory + knowledge</h2>
-        <p>Personal memory and document-based answers (RAG) without changing the model live.</p>
-      </div>
-      <div class="card">
-        <h2>Developer API</h2>
-        <p>Simple endpoints, predictable pricing, and usage dashboards.</p>
-      </div>
-    </section>
+    </div>
 
-    <footer class="footer">
-      <a href="privacyterms.html">Policy</a>
-      <span>•</span>
-      <a href="contact.html">Contact</a>
-    </footer>
-  </main>
+    <div class="footer">
+      © <span id="yr"></span> ScriptNova • <a href="/freekey/" style="color:var(--muted)">FREE Keys</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("yr").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

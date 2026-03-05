@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ScriptNova — FREE Key Generator</title>
+  <style>
+    :root{
+      --bg:#0b0f16; --panel:#101828; --panel2:#0f1726; --border:#22314a;
+      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --danger:#ff5a5a;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:Segoe UI,Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .wrap{ max-width:780px; margin:0 auto; padding:22px; }
+    .hero{ border:1px solid var(--border); background:var(--panel); border-radius:18px; padding:18px; box-shadow:0 0 18px rgba(0,229,255,.08); }
+    .title{ font-size:20px; font-weight:900; }
+    .title b{ color:var(--accent); }
+    .sub{ margin-top:6px; color:var(--muted); line-height:1.4; }
+    .card{ margin-top:12px; border:1px solid var(--border); background:var(--panel2); border-radius:18px; padding:14px; }
+    .card h3{ margin:0 0 8px 0; font-size:12px; letter-spacing:.9px; text-transform:uppercase; color:var(--muted); }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .btn{
+      appearance:none; border:1px solid rgba(0,229,255,.45); background:#0e2a3a; color:var(--text);
+      padding:12px 14px; border-radius:14px; font-weight:900; letter-spacing:.7px; text-transform:uppercase;
+      cursor:pointer;
+    }
+    .btn:hover{ background:#103146; }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
+    .box{
+      width:100%; padding:12px; border-radius:14px; border:1px solid var(--border);
+      background:#070b12; color:var(--text); font-size:16px; font-family:Consolas, monospace;
+    }
+    .note{ color:var(--muted); font-size:12px; line-height:1.4; margin-top:8px; }
+    .err{ color:#ffd2d2; background:rgba(255,90,90,.10); border:1px solid rgba(255,90,90,.55); padding:10px; border-radius:14px; display:none; white-space:pre-wrap; }
+    .ok{ color:#c9ffe2; background:rgba(0,255,170,.08); border:1px solid rgba(0,255,170,.35); padding:10px; border-radius:14px; display:none; white-space:pre-wrap; }
+    a{ color:var(--accent); }
+    .chk{ display:flex; gap:10px; align-items:flex-start; margin:10px 0; }
+    .chk input{ margin-top:3px; }
+    .small{ font-size:12px; color:var(--muted); }
+    .danger{ color:var(--danger); }
+    .turnstileWrap{ display:none; margin-top:10px; }
+  </style>
+
+  <!-- OPTIONAL Turnstile: enable by uncommenting below + set your sitekey -->
+  <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="title"><b>ScriptNova</b> — FREE Key Generator</div>
+      <div class="sub">
+        FREE keys last <b>15 minutes</b> and allow <b>1 session</b>. Licenses are HWID-bound to reduce abuse.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Step Checklist</h3>
+
+      <div class="chk">
+        <input id="c1" type="checkbox"/>
+        <div>
+          <div>I agree to use ScriptNova responsibly.</div>
+          <div class="small">No misuse. Violations may be blocked.</div>
+        </div>
+      </div>
+
+      <div class="chk">
+        <input id="c2" type="checkbox"/>
+        <div>
+          <div>I understand FREE keys expire after 15 minutes.</div>
+          <div class="small">After expiry, new sessions require a new key.</div>
+        </div>
+      </div>
+
+      <div class="chk">
+        <input id="c3" type="checkbox"/>
+        <div>
+          <div>I understand FREE keys are limited to 1 session.</div>
+          <div class="small">If too many sessions are active, launch will be blocked.</div>
+        </div>
+      </div>
+
+      <!-- OPTIONAL Turnstile placeholder -->
+      <div class="turnstileWrap" id="turnstileWrap">
+        <div class="small">Verification</div>
+        <!-- replace YOUR_SITE_KEY -->
+        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY" data-callback="onTsOk"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button id="btnGen" class="btn" onclick="generateKey()" disabled>Generate FREE Key</button>
+        <a class="btn" href="/" style="text-decoration:none; display:inline-block;">Back Home</a>
+      </div>
+
+      <div id="err" class="err" style="margin-top:10px;"></div>
+      <div id="ok" class="ok" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <h3>Your FREE Key</h3>
+      <input id="keyBox" class="box" type="text" value="" placeholder="Click Generate..." readonly />
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" onclick="copyKey()">Copy</button>
+        <div class="note">Expires in: <b id="ttl">—</b></div>
+      </div>
+      <div class="note">
+        Open the launcher, paste the key, click <b>Save</b>, then <b>Launch</b>.
+      </div>
+    </div>
+
+    <div class="note" style="text-align:center; margin-top:14px;">
+      Support: <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a> •
+      <a href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Discord</a>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://api.scriptnovaa.com/api/freekey";
+
+    let expEpoch = 0;
+    let timer = null;
+
+    function showErr(msg){
+      const el = document.getElementById("err");
+      const ok = document.getElementById("ok");
+      ok.style.display = "none";
+      el.style.display = "block";
+      el.textContent = String(msg || "Unknown error");
+    }
+    function showOk(msg){
+      const el = document.getElementById("ok");
+      const err = document.getElementById("err");
+      err.style.display = "none";
+      el.style.display = "block";
+      el.textContent = String(msg || "");
+    }
+
+    function canGenerate(){
+      const c1 = document.getElementById("c1").checked;
+      const c2 = document.getElementById("c2").checked;
+      const c3 = document.getElementById("c3").checked;
+
+      // If you enable Turnstile, also require window.__tsOk === true
+      return c1 && c2 && c3; 
+    }
+
+    function refreshBtn(){
+      document.getElementById("btnGen").disabled = !canGenerate();
+    }
+
+    document.getElementById("c1").addEventListener("change", refreshBtn);
+    document.getElementById("c2").addEventListener("change", refreshBtn);
+    document.getElementById("c3").addEventListener("change", refreshBtn);
+
+    // OPTIONAL Turnstile callback if you enable it
+    window.__tsToken = "";
+    window.onTsOk = function(token){
+      window.__tsToken = token || "";
+      refreshBtn();
+    };
+
+    async function generateKey(){
+      try{
+        document.getElementById("btnGen").disabled = true;
+        showOk("Generating key...");
+
+        // If Turnstile enabled, send token to API
+        const body = {
+          // turnstileToken: window.__tsToken
+          proof: "" // keep empty unless you enable FREEKEY_PROOF_SECRET logic on API
+        };
+
+        const r = await fetch(API, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(body)
+        });
+
+        const j = await r.json().catch(() => null);
+        if(!j || j.ok !== true){
+          const err = (j && j.error) ? j.error : ("http_" + r.status);
+          showErr("Failed: " + err);
+          refreshBtn();
+          return;
+        }
+
+        document.getElementById("keyBox").value = j.key;
+        expEpoch = Number(j.exp || 0);
+        showOk("Done. Key created.");
+        startCountdown();
+        refreshBtn();
+      }catch(e){
+        showErr("Failed: api_offline");
+        refreshBtn();
+      }
+    }
+
+    function startCountdown(){
+      if(timer) clearInterval(timer);
+      timer = setInterval(updateCountdown, 500);
+      updateCountdown();
+    }
+
+    function updateCountdown(){
+      const ttlEl = document.getElementById("ttl");
+      if(!expEpoch){
+        ttlEl.textContent = "—";
+        return;
+      }
+      const now = Math.floor(Date.now()/1000);
+      let left = expEpoch - now;
+      if(left < 0) left = 0;
+
+      const m = Math.floor(left/60);
+      const s = left % 60;
+      ttlEl.textContent = m + ":" + (s<10 ? "0"+s : s);
+
+      if(left === 0){
+        showErr("Expired. Generate a new FREE key.");
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    async function copyKey(){
+      const v = document.getElementById("keyBox").value;
+      if(!v){ showErr("No key to copy."); return; }
+      try{
+        await navigator.clipboard.writeText(v);
+        showOk("Copied.");
+      }catch(e){
+        // fallback
+        const box = document.getElementById("keyBox");
+        box.focus(); box.select();
+        try{ document.execCommand("copy"); showOk("Copied."); }
+        catch(e2){ showErr("Copy failed."); }
+      }
+    }
+
+    refreshBtn();
+  </script>
+</body>
+</html>
