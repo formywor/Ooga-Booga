@@ -39,17 +39,25 @@
     .small{ font-size:12px; color:var(--muted); }
     .danger{ color:var(--danger); }
     .turnstileWrap{ display:none; margin-top:10px; }
+    .pill{
+      display:inline-block; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12); background:#0c1422; color:var(--muted); font-size:12px;
+      margin-right:8px; margin-top:8px;
+    }
   </style>
-
-  <!-- OPTIONAL Turnstile: enable by uncommenting below + set your sitekey -->
-  <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
 </head>
 <body>
   <div class="wrap">
     <div class="hero">
       <div class="title"><b>ScriptNova</b> — FREE Key Generator</div>
       <div class="sub">
-        FREE keys last <b>15 minutes</b> and allow <b>1 session</b>. Licenses are saved to reduce abuse.
+        FREE keys last <b>15 minutes</b> and allow <b>1 session</b>.
+        If you already generated a key, it will be shown here even after refresh.
+      </div>
+      <div>
+        <span class="pill">Saved key recovery</span>
+        <span class="pill">15 min expiry</span>
+        <span class="pill">1 session</span>
       </div>
     </div>
 
@@ -76,15 +84,8 @@
         <input id="c3" type="checkbox"/>
         <div>
           <div>I understand FREE keys are limited to 1 session.</div>
-          <div class="small">If too many sessions are active, launch will be blocked.</div>
+          <div class="small">If too many sessions are active, launch may be blocked.</div>
         </div>
-      </div>
-
-      <!-- OPTIONAL Turnstile placeholder -->
-      <div class="turnstileWrap" id="turnstileWrap">
-        <div class="small">Verification</div>
-        <!-- replace YOUR_SITE_KEY -->
-        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY" data-callback="onTsOk"></div>
       </div>
 
       <div class="row" style="margin-top:10px;">
@@ -103,7 +104,7 @@
         <button class="btn" onclick="copyKey()">Copy</button>
         <div class="note">Expires in: <b id="ttl">—</b></div>
       </div>
-      <div class="note">
+      <div class="note" id="statusNote">
         Open the launcher, paste the key, click <b>Save</b>, then <b>Launch</b>.
       </div>
     </div>
@@ -116,9 +117,12 @@
 
   <script>
     const API = "https://api.scriptnovaa.com/api/freekey";
+    const LS_KEY = "sn_freekey_v1"; // stores {key, exp}
+    const CLICK_COOLDOWN_MS = 4000;
 
     let expEpoch = 0;
     let timer = null;
+    let cooldownUntil = 0;
 
     function showErr(msg){
       const el = document.getElementById("err");
@@ -135,45 +139,102 @@
       el.textContent = String(msg || "");
     }
 
+    function nowSec(){ return Math.floor(Date.now()/1000); }
+
+    function readSaved(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return null;
+        const j = JSON.parse(raw);
+        if(!j || !j.key || !j.exp) return null;
+        return { key: String(j.key), exp: Number(j.exp) };
+      }catch(e){
+        return null;
+      }
+    }
+
+    function saveKey(key, exp){
+      try{
+        localStorage.setItem(LS_KEY, JSON.stringify({ key, exp }));
+      }catch(e){}
+    }
+
+    function clearSaved(){
+      try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    }
+
+    function hasActiveKey(){
+      const s = readSaved();
+      if(!s) return false;
+      return s.exp > nowSec();
+    }
+
     function canGenerate(){
       const c1 = document.getElementById("c1").checked;
       const c2 = document.getElementById("c2").checked;
       const c3 = document.getElementById("c3").checked;
 
-      // If you enable Turnstile, also require window.__tsOk === true
-      return c1 && c2 && c3; 
+      // Don’t allow generating another key if one is still active (on this browser)
+      if(hasActiveKey()) return false;
+
+      // local cooldown to stop spam clicking
+      if(Date.now() < cooldownUntil) return false;
+
+      return c1 && c2 && c3;
     }
 
     function refreshBtn(){
-      document.getElementById("btnGen").disabled = !canGenerate();
+      const btn = document.getElementById("btnGen");
+      btn.disabled = !canGenerate();
+      if(hasActiveKey()){
+        btn.textContent = "Key already generated";
+      } else {
+        btn.textContent = "Generate FREE Key";
+      }
     }
 
     document.getElementById("c1").addEventListener("change", refreshBtn);
     document.getElementById("c2").addEventListener("change", refreshBtn);
     document.getElementById("c3").addEventListener("change", refreshBtn);
 
-    // OPTIONAL Turnstile callback if you enable it
-    window.__tsToken = "";
-    window.onTsOk = function(token){
-      window.__tsToken = token || "";
-      refreshBtn();
-    };
+    function setKeyUi(key, exp){
+      document.getElementById("keyBox").value = key || "";
+      expEpoch = Number(exp || 0);
+      startCountdown();
+    }
+
+    function loadExistingKeyIntoUi(){
+      const s = readSaved();
+      if(!s) return;
+      setKeyUi(s.key, s.exp);
+
+      if(s.exp > nowSec()){
+        showOk("You already generated a FREE key. Use it until it expires.");
+        document.getElementById("statusNote").textContent =
+          "You already have a FREE key saved on this device. Use it until it expires, then you can generate a new one.";
+      } else {
+        // expired saved key
+        clearSaved();
+      }
+    }
 
     async function generateKey(){
+      // Extra guard
+      if(hasActiveKey()){
+        showErr("You already have a FREE key. Use it until it expires.");
+        refreshBtn();
+        return;
+      }
+
+      cooldownUntil = Date.now() + CLICK_COOLDOWN_MS;
+      refreshBtn();
+
       try{
-        document.getElementById("btnGen").disabled = true;
         showOk("Generating key...");
-
-        // If Turnstile enabled, send token to API
-        const body = {
-          // turnstileToken: window.__tsToken
-          proof: "" // keep empty unless you enable FREEKEY_PROOF_SECRET logic on API
-        };
-
         const r = await fetch(API, {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify(body)
+          body: JSON.stringify({ proof: "" })
         });
 
         const j = await r.json().catch(() => null);
@@ -184,10 +245,12 @@
           return;
         }
 
-        document.getElementById("keyBox").value = j.key;
-        expEpoch = Number(j.exp || 0);
-        showOk("Done. Key created.");
-        startCountdown();
+        saveKey(j.key, Number(j.exp || 0));
+        setKeyUi(j.key, Number(j.exp || 0));
+
+        showOk("Done. Key created and saved to this browser.");
+        document.getElementById("statusNote").textContent =
+          "This key is saved on this device. If you refresh or go offline, it will still be here until it expires.";
         refreshBtn();
       }catch(e){
         showErr("Failed: api_offline");
@@ -207,7 +270,8 @@
         ttlEl.textContent = "—";
         return;
       }
-      const now = Math.floor(Date.now()/1000);
+
+      const now = nowSec();
       let left = expEpoch - now;
       if(left < 0) left = 0;
 
@@ -216,7 +280,15 @@
       ttlEl.textContent = m + ":" + (s<10 ? "0"+s : s);
 
       if(left === 0){
-        showErr("Expired. Generate a new FREE key.");
+        // key expired
+        const saved = readSaved();
+        if(saved && saved.exp <= now){
+          clearSaved();
+        }
+        showErr("Expired. You can generate a new FREE key now.");
+        document.getElementById("statusNote").textContent =
+          "Your FREE key expired. You can generate a new one.";
+        refreshBtn();
         clearInterval(timer);
         timer = null;
       }
@@ -229,7 +301,6 @@
         await navigator.clipboard.writeText(v);
         showOk("Copied.");
       }catch(e){
-        // fallback
         const box = document.getElementById("keyBox");
         box.focus(); box.select();
         try{ document.execCommand("copy"); showOk("Copied."); }
@@ -237,7 +308,12 @@
       }
     }
 
+    // init
+    loadExistingKeyIntoUi();
     refreshBtn();
+
+    // Update button state during cooldown
+    setInterval(refreshBtn, 500);
   </script>
 </body>
 </html>
