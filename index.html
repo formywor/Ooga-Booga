@@ -4,77 +4,425 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ScriptNova — Browser Launcher</title>
+  <meta name="description" content="ScriptNova Browser Launcher — download, get FREE keys, and join Discord for BASIC/PRO." />
   <style>
     :root{
-      --bg:#0b0f16; --panel:#101828; --panel2:#0f1726; --border:#22314a;
-      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --accent2:#7c4dff;
+      --bg:#0b0f16;
+      --panel:#101828;
+      --panel2:#0f1726;
+      --border:#22314a;
+      --text:#eaf2ff;
+      --muted:#9fb2d6;
+      --accent:#00e5ff;
+      --accent2:#7c4dff;
+      --good:#00ffb0;
+      --warn:#ffaa00;
     }
     *{ box-sizing:border-box; }
-    body{ margin:0; font-family:Segoe UI,Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text); }
-    .wrap{ max-width:980px; margin:0 auto; padding:22px; }
-    .hero{ border:1px solid var(--border); background:var(--panel); border-radius:18px; padding:18px; box-shadow:0 0 18px rgba(0,229,255,.08); }
-    .title{ font-size:22px; font-weight:900; letter-spacing:.3px; }
-    .title b{ color:var(--accent); }
-    .sub{ margin-top:6px; color:var(--muted); line-height:1.4; }
-    .grid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; }
-    @media(min-width:860px){ .grid{ grid-template-columns: 1.2fr .8fr; } }
-    .card{ border:1px solid var(--border); background:var(--panel2); border-radius:18px; padding:14px; }
-    .card h3{ margin:0 0 8px 0; font-size:12px; letter-spacing:.9px; text-transform:uppercase; color:var(--muted); }
-    .btnrow{ display:flex; flex-wrap:wrap; gap:10px; }
-    .btn{
-      appearance:none; border:1px solid rgba(0,229,255,.45); background:#0e2a3a; color:var(--text);
-      padding:12px 14px; border-radius:14px; font-weight:900; letter-spacing:.7px; text-transform:uppercase;
-      cursor:pointer; text-decoration:none; display:inline-block;
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:Segoe UI,Tahoma,Arial,sans-serif;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(0,229,255,.12), transparent 60%),
+        radial-gradient(900px 500px at 85% 15%, rgba(124,77,255,.10), transparent 60%),
+        radial-gradient(900px 500px at 40% 90%, rgba(0,255,176,.06), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
     }
-    .btn:hover{ background:#103146; }
-    .btn2{ border:1px solid rgba(124,77,255,.45); background:#1a1840; }
-    .btn2:hover{ background:#211f55; }
-    .note{ color:var(--muted); font-size:12px; line-height:1.4; }
-    code{ background:#070b12; border:1px solid var(--border); padding:2px 6px; border-radius:8px; }
-    .footer{ margin-top:16px; color:var(--muted); font-size:12px; text-align:center; }
-    .pill{ display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#0c1422; color:var(--muted); font-size:12px; }
+    a{ color:var(--accent); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .wrap{ max-width:1060px; margin:0 auto; padding:22px; }
+
+    /* Top nav */
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:rgba(16,24,40,.72);
+      border-radius:16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 18px rgba(0,229,255,.06);
+      transform: translateY(-6px);
+      opacity:0;
+      animation: fadeUp .55s ease forwards;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:900; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:12px;
+      border:1px solid rgba(0,229,255,.35);
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(0,229,255,.9), rgba(0,229,255,0) 60%),
+        radial-gradient(14px 14px at 70% 70%, rgba(124,77,255,.8), rgba(124,77,255,0) 60%),
+        rgba(12,20,34,.9);
+      box-shadow: 0 0 18px rgba(0,229,255,.14);
+    }
+    .brand b{ color:var(--accent); }
+    .navlinks{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+    /* Hero */
+    .hero{
+      margin-top:12px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(16,24,40,.92), rgba(15,23,38,.92));
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 0 22px rgba(0,229,255,.08);
+      position:relative;
+      overflow:hidden;
+      transform: translateY(-6px);
+      opacity:0;
+      animation: fadeUp .65s ease .05s forwards;
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(600px 220px at 20% 15%, rgba(0,229,255,.14), transparent 60%),
+        radial-gradient(520px 220px at 85% 30%, rgba(124,77,255,.12), transparent 60%);
+      pointer-events:none;
+      filter: blur(0px);
+    }
+    .heroTop{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:14px; flex-wrap:wrap;
+      position:relative;
+    }
+    .title{
+      font-size:26px;
+      font-weight:1000;
+      letter-spacing:.3px;
+      line-height:1.15;
+    }
+    .title b{ color:var(--accent); }
+    .sub{
+      margin-top:8px;
+      color:var(--muted);
+      line-height:1.5;
+      max-width:820px;
+      position:relative;
+    }
+    .ctaRow{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:14px;
+      position:relative;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    @media(min-width:900px){
+      .grid{ grid-template-columns: 1.25fr .75fr; }
+    }
+
+    .card{
+      border:1px solid var(--border);
+      background: rgba(15,23,38,.92);
+      border-radius:20px;
+      padding:14px;
+      box-shadow: 0 0 14px rgba(0,0,0,.18);
+      transform: translateY(-6px);
+      opacity:0;
+      animation: fadeUp .65s ease .12s forwards;
+    }
+    .card h3{
+      margin:0 0 10px 0;
+      font-size:12px;
+      letter-spacing:.9px;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    /* Buttons */
+    .btn{
+      appearance:none;
+      border:1px solid rgba(0,229,255,.45);
+      background: rgba(14,42,58,.92);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+      text-decoration:none;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn:hover{
+      background: rgba(16,49,70,.95);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(0,229,255,.06);
+      text-decoration:none;
+    }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    .btn2{
+      border:1px solid rgba(124,77,255,.45);
+      background: rgba(26,24,64,.86);
+    }
+    .btn2:hover{
+      background: rgba(33,31,85,.92);
+      box-shadow: 0 10px 26px rgba(124,77,255,.08);
+    }
+
+    .btnGhost{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(12,20,34,.75);
+      color: var(--muted);
+    }
+    .btnGhost:hover{
+      background: rgba(12,20,34,.92);
+      color: var(--text);
+      box-shadow: 0 10px 26px rgba(255,255,255,.04);
+    }
+
+    .icon{
+      width:18px; height:18px;
+      display:inline-block;
+      flex: 0 0 auto;
+      opacity:.95;
+    }
+
+    /* Pills + feature list */
+    .pillrow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(12,20,34,.85);
+      color:var(--muted);
+      font-size:12px;
+      transition: transform .12s ease;
+    }
+    .pill:hover{ transform: translateY(-1px); }
+    .note{ color:var(--muted); font-size:12px; line-height:1.5; }
+    code{ background:#070b12; border:1px solid var(--border); padding:2px 6px; border-radius:8px; color:var(--text); }
+
+    .steps{ margin:0; padding-left:18px; color:var(--muted); font-size:13px; line-height:1.55; }
+    .steps li{ margin:6px 0; }
+
+    .split{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    @media(min-width:900px){
+      .split{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .priceBox{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(12,20,34,.65);
+      border-radius:18px;
+      padding:12px;
+      margin-top:10px;
+    }
+    .priceTitle{ font-weight:900; color:var(--text); }
+    .priceLine{ margin-top:6px; color:var(--muted); font-size:13px; line-height:1.5; }
+    .priceLine b{ color:var(--text); }
+
+    .footer{
+      margin-top:16px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+      opacity:.9;
+      transform: translateY(-6px);
+      opacity:0;
+      animation: fadeUp .65s ease .18s forwards;
+    }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0px); }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      .nav,.hero,.card,.footer{ opacity:1 !important; transform:none !important; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="hero">
-      <div class="title"><b>ScriptNova</b> — Browser Launcher</div>
-      <div class="sub">
-        Download the launcher, verify your license, and launch Chrome.
-        Need a free trial key? Use the FREE key generator.
+    <!-- NAV -->
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div><b>ScriptNova</b> <span style="color:var(--muted);font-weight:800;">// Browser Launcher</span></div>
+      </div>
+      <div class="navlinks">
+        <a class="btn btnGhost" href="/download">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3v10"></path><path d="M7 11l5 5 5-5"></path><path d="M5 21h14"></path>
+            </svg>
+          </span>
+          Download
+        </a>
+        <a class="btn btnGhost" href="/freekey/">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l2.5 6.5L21 9l-5 4 1.5 7L12 17l-5.5 3 1.5-7-5-4 6.5-.5L12 2z"></path>
+            </svg>
+          </span>
+          FREE Key
+        </a>
+        <a class="btn btnGhost" href="/buykeys">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 7h12"></path><path d="M6 12h12"></path><path d="M6 17h12"></path>
+            </svg>
+          </span>
+          Plans
+        </a>
+        <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8z"></path>
+            </svg>
+          </span>
+          Discord
+        </a>
       </div>
     </div>
 
+    <!-- HERO -->
+    <div class="hero">
+      <div class="heroTop">
+        <div>
+          <div class="title"><b>ScriptNova</b> Browser Launcher</div>
+          <div class="sub">
+            Download the launcher, get a key, and launch Chrome in minutes.
+            Start with a FREE key, or join Discord to purchase BASIC/PRO.
+          </div>
+
+          <div class="ctaRow">
+            <a class="btn" href="/download">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3v10"></path><path d="M7 11l5 5 5-5"></path><path d="M5 21h14"></path>
+                </svg>
+              </span>
+              Go to Download
+            </a>
+            <a class="btn btn2" href="/freekey/">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 7l-8 8-4-4"></path><path d="M4 7h6"></path>
+                </svg>
+              </span>
+              Get FREE Key (15 min)
+            </a>
+            <a class="btn btnGhost" href="/buykeys">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1v22"></path><path d="M17 5H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6"></path>
+                </svg>
+              </span>
+              View Plans
+            </a>
+          </div>
+
+          <div class="pillrow">
+            <span class="pill">ScriptNova Hardware</span>
+            <span class="pill">Clean HTA UI</span>
+            <span class="pill">Fast setup</span>
+            <span class="pill">Works on managed laptops</span>
+            <span class="pill">FREE keys</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
     <div class="grid">
       <div class="card">
-        <h3>Download</h3>
-        <div class="btnrow">
-          <!-- Change these hrefs to your real hosted files -->
-          <a class="btn" href="/downloads/ScriptNova-Launcher.hta" download>Download Launcher (HTA)</a>
-          <a class="btn btn2" href="/freekey">Get FREE Key (15 min)</a>
+        <h3>How it works</h3>
+        <ol class="steps">
+          <li>Go to <a href="/download">scriptnovaa.com/download</a> and download the launcher.</li>
+          <li>Get a key:
+            <ul class="steps">
+              <li><b>FREE key:</b> <a href="/freekey/">scriptnovaa.com/freekey</a> (15 minutes)</li>
+              <li><b>BASIC / PRO:</b> join Discord and open a ticket (<a href="/buykeys">see plans</a>)</li>
+            </ul>
+          </li>
+          <li>Open the launcher, paste your key, press <code>Save</code>, then press <code>Launch</code>.</li>
+        </ol>
+
+        <div class="split" style="margin-top:12px;">
+          <div class="priceBox">
+            <div class="priceTitle">Need a FREE key?</div>
+            <div class="priceLine">Generate one here: <a href="/freekey/">scriptnovaa.com/freekey</a></div>
+            <div class="btnrow" style="margin-top:10px;">
+              <a class="btn btn2" href="/freekey/">Generate FREE Key</a>
+            </div>
+          </div>
+
+          <div class="priceBox">
+            <div class="priceTitle">Want BASIC or PRO?</div>
+            <div class="priceLine"><b>BASIC:</b> $2 / month • <b>PRO:</b> $11 / month</div>
+            <div class="priceLine">Buy by joining Discord and opening a ticket.</div>
+            <div class="btnrow" style="margin-top:10px;">
+              <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join Discord</a>
+              <a class="btn" href="/buykeys">Compare Plans</a>
+            </div>
+          </div>
         </div>
-        <p class="note" style="margin-top:10px;">
-          Launcher requirements: Windows + Google Chrome installed.<br/>
-          Tip: If your browser blocks <code>.hta</code> downloads, use a zip download instead and extract.
+
+        <p class="note" style="margin-top:12px;">
+          Requirements: Windows + Google Chrome installed. If your browser blocks <code>.hta</code> downloads, use the ZIP option on the download page.
         </p>
       </div>
 
       <div class="card">
         <h3>Support</h3>
-        <div class="note">
+        <p class="note">
           Email: <b>gomegaassist@gmail.com</b><br/>
-          Discord: <a href="https://discord.gg/gscGTMVsWE" style="color:var(--accent)" target="_blank" rel="noreferrer">Join server</a>
+          Discord: <a href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join server</a>
+        </p>
+
+        <div class="pillrow">
+          <span class="pill">Help in Discord</span>
+          <span class="pill">Free keys</span>
+          <span class="pill">BASIC / PRO</span>
         </div>
-        <div style="margin-top:10px;">
-          <span class="pill">Hello </span>
-          <span class="pill">bound licenses</span>
-          <span class="pill">FREE keys</span>
+
+        <div class="priceBox" style="margin-top:12px;">
+          <div class="priceTitle">Quick links</div>
+          <div class="btnrow" style="margin-top:10px;">
+            <a class="btn" href="/download">Download</a>
+            <a class="btn btn2" href="/freekey/">FREE Key</a>
+            <a class="btn btnGhost" href="/buykeys">Plans</a>
+          </div>
         </div>
+
+        <p class="note" style="margin-top:12px;">
+          Tip: For BASIC/PRO purchases, open a ticket in Discord and include which plan you want.
+        </p>
       </div>
     </div>
 
     <div class="footer">
-      © <span id="yr"></span> ScriptNova • <a href="/freekey/" style="color:var(--muted)">FREE Keys</a>
+      © <span id="yr"></span> ScriptNova • <a href="/download" style="color:var(--muted)">Download</a> •
+      <a href="/freekey/" style="color:var(--muted)">FREE Keys</a> •
+      <a href="/buykeys" style="color:var(--muted)">Buy Keys</a>
     </div>
   </div>
 
