@@ -31,6 +31,8 @@
       --accent:#00e5ff;
       --accent2:#7c4dff;
       --good:#00ffb0;
+      --warn:#ffb84d;
+      --danger:#ff6f91;
     }
 
     *{ box-sizing:border-box; }
@@ -170,7 +172,7 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease, opacity .15s ease;
     }
 
     .btn:hover{
@@ -194,6 +196,15 @@
       border:1px solid rgba(255,255,255,.14);
       background:rgba(12,20,34,.75);
       color:var(--muted);
+    }
+
+    .btn.disabled,
+    .btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      pointer-events:none;
+      transform:none;
+      box-shadow:none;
     }
 
     .stats{
@@ -267,6 +278,64 @@
       font-size:13px;
       line-height:1.55;
       margin-top:10px;
+    }
+
+    .agreeBox{
+      margin-top:16px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,184,77,.28);
+      background:rgba(255,184,77,.06);
+    }
+
+    .agreeTitle{
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:#ffd79b;
+      margin:0 0 8px 0;
+      font-weight:800;
+    }
+
+    .agreeText{
+      color:var(--text);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .agreeRow{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .agreeRow input{
+      margin-top:3px;
+      transform:scale(1.15);
+      accent-color:#00e5ff;
+    }
+
+    .agreeLabel{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    .statusMsg{
+      display:none;
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.5;
+      border:1px solid rgba(255,111,145,.25);
+      background:rgba(255,111,145,.08);
+      color:#ffd6df;
+    }
+
+    .statusMsg.show{
+      display:block;
     }
 
     code{
@@ -348,14 +417,40 @@
             <span class="pill">Search-friendly content</span>
           </div>
 
+          <div class="agreeBox">
+            <div class="agreeTitle">Before you download</div>
+            <div class="agreeText">
+              Before downloading ScriptNova Browser Launcher, you must agree to the ScriptNova terms and privacy rules.
+              Please read the full page here:
+              <a href="https://scriptnovaa.com/browserterms" target="_blank" rel="noreferrer">scriptnovaa.com/browserterms</a>
+            </div>
+
+            <div class="agreeRow">
+              <input type="checkbox" id="termsAgree" />
+              <label class="agreeLabel" for="termsAgree">
+                I have read and agree to the ScriptNova Terms and Privacy page at
+                <a href="https://scriptnovaa.com/browserterms" target="_blank" rel="noreferrer">scriptnovaa.com/browserterms</a>.
+                I understand that I must agree before downloading the launcher.
+              </label>
+            </div>
+
+            <div id="downloadBlockedMsg" class="statusMsg">
+              You must agree to the ScriptNova Terms and Privacy page before you can download the launcher.
+            </div>
+          </div>
+
           <div class="btnrow">
-            <a class="btn" id="downloadHtaBtn" href="/downloads/ScriptNova-Launcher.hta" download>Download .HTA</a>
-            <a class="btn btn2" id="downloadZipBtn" href="/downloads/ScriptNova-Launcher.zip" download>Download .ZIP</a>
+            <a class="btn disabled" id="downloadHtaBtn" href="/downloads/ScriptNova-Launcher.hta" download aria-disabled="true">Download .HTA</a>
+            <a class="btn btn2 disabled" id="downloadZipBtn" href="/downloads/ScriptNova-Launcher.zip" download aria-disabled="true">Download .ZIP</a>
             <a class="btn btnGhost" href="/freekey">Get FREE Key</a>
           </div>
 
           <div class="note">
             If your browser blocks HTA downloads, use the ZIP download and extract it first.
+          </div>
+
+          <div class="note">
+            Downloads stay locked until you agree to the terms and privacy page linked above.
           </div>
         </div>
 
@@ -383,6 +478,7 @@
       <div class="card">
         <h2 class="sectionTitle">Quick start</h2>
         <ol class="steps">
+          <li>Read and agree to the ScriptNova Terms and Privacy page before downloading.</li>
           <li>Download the launcher using the button above.</li>
           <li>Choose your access method:
             <ul class="steps">
@@ -502,6 +598,35 @@
       return n.toLocaleString();
     }
 
+    function setDownloadState(enabled){
+      var hta = document.getElementById("downloadHtaBtn");
+      var zip = document.getElementById("downloadZipBtn");
+
+      if(enabled){
+        hta.classList.remove("disabled");
+        zip.classList.remove("disabled");
+        hta.setAttribute("aria-disabled", "false");
+        zip.setAttribute("aria-disabled", "false");
+      }else{
+        hta.classList.add("disabled");
+        zip.classList.add("disabled");
+        hta.setAttribute("aria-disabled", "true");
+        zip.setAttribute("aria-disabled", "true");
+      }
+    }
+
+    function showBlockedMessage(){
+      document.getElementById("downloadBlockedMsg").classList.add("show");
+    }
+
+    function hideBlockedMessage(){
+      document.getElementById("downloadBlockedMsg").classList.remove("show");
+    }
+
+    function hasAgreed(){
+      return document.getElementById("termsAgree").checked;
+    }
+
     async function loadStats(){
       try{
         const res = await fetch(API.stats, { headers: { "Accept": "application/json" } });
@@ -545,14 +670,32 @@
       }
     }
 
-    document.getElementById("downloadHtaBtn").addEventListener("click", function(){
-      trackDownload("hta");
+    function handleDownloadClick(type, event){
+      if(!hasAgreed()){
+        event.preventDefault();
+        showBlockedMessage();
+        return false;
+      }
+
+      hideBlockedMessage();
+      trackDownload(type);
+      return true;
+    }
+
+    document.getElementById("termsAgree").addEventListener("change", function(){
+      setDownloadState(this.checked);
+      if(this.checked) hideBlockedMessage();
     });
 
-    document.getElementById("downloadZipBtn").addEventListener("click", function(){
-      trackDownload("zip");
+    document.getElementById("downloadHtaBtn").addEventListener("click", function(event){
+      handleDownloadClick("hta", event);
     });
 
+    document.getElementById("downloadZipBtn").addEventListener("click", function(event){
+      handleDownloadClick("zip", event);
+    });
+
+    setDownloadState(false);
     loadStats();
   </script>
 </body>
