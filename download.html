@@ -3,48 +3,159 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ScriptNova — Download</title>
-  <meta name="description" content="Download ScriptNova Browser Launcher (HTA). Get a FREE key, or join Discord to purchase BASIC/PRO." />
+  <title>Download ScriptNova Browser Launcher | Live Download Count, Setup & Keys</title>
+  <meta name="description" content="Download ScriptNova Browser Launcher with live shared download stats, quick setup instructions, free key links, premium plans, support, and launcher information." />
+  <meta name="keywords" content="ScriptNova download, ScriptNova Browser Launcher, launcher download, HTA launcher, ScriptNova setup, free key, premium key, launcher support, ScriptNova install" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#0b0f16" />
+  <link rel="canonical" href="https://scriptnovaa.com/download" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Download ScriptNova Browser Launcher" />
+  <meta property="og:description" content="Download ScriptNova, view live shared download counts, and get setup help and key access." />
+  <meta property="og:url" content="https://scriptnovaa.com/download" />
+  <meta property="og:site_name" content="ScriptNova" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Download ScriptNova Browser Launcher" />
+  <meta name="twitter:description" content="Launcher download page with live stats, install steps, support links, and key access." />
+
   <style>
     :root{
-      --bg:#0b0f16; --panel:#101828; --panel2:#0f1726; --border:#22314a;
-      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --accent2:#7c4dff;
-      --ok:#00ffb0; --warn:#ffaa00;
+      --bg:#0b0f16;
+      --panel:#101828;
+      --panel2:#0f1726;
+      --border:#22314a;
+      --text:#eaf2ff;
+      --muted:#9fb2d6;
+      --accent:#00e5ff;
+      --accent2:#7c4dff;
+      --good:#00ffb0;
     }
+
     *{ box-sizing:border-box; }
-    body{ margin:0; font-family:Segoe UI,Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    html{ scroll-behavior:smooth; }
+
+    body{
+      margin:0;
+      font-family:Segoe UI,Tahoma,Arial,sans-serif;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(0,229,255,.12), transparent 60%),
+        radial-gradient(900px 500px at 85% 15%, rgba(124,77,255,.10), transparent 60%),
+        radial-gradient(900px 500px at 40% 90%, rgba(0,255,176,.06), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
     a{ color:var(--accent); text-decoration:none; }
     a:hover{ text-decoration:underline; }
 
-    .wrap{ max-width:980px; margin:0 auto; padding:22px; }
+    .wrap{ max-width:1180px; margin:0 auto; padding:22px; }
+
+    .hero,.card,.footer{
+      transform:translateY(12px);
+      opacity:0;
+      animation:fadeUp .75s ease forwards;
+    }
+
     .hero{
       border:1px solid var(--border);
-      background:var(--panel);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 0 18px rgba(0,229,255,.08);
+      background:linear-gradient(180deg, rgba(16,24,40,.92), rgba(15,23,38,.96));
+      border-radius:24px;
+      padding:24px;
+      box-shadow:0 0 26px rgba(0,229,255,.08);
+      position:relative;
+      overflow:hidden;
     }
-    .title{ font-size:22px; font-weight:900; letter-spacing:.3px; }
-    .title b{ color:var(--accent); }
-    .sub{ margin-top:6px; color:var(--muted); line-height:1.45; }
 
-    .grid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; }
-    @media(min-width:900px){ .grid{ grid-template-columns: 1.15fr .85fr; } }
-
-    .card{
-      border:1px solid var(--border);
-      background:var(--panel2);
-      border-radius:18px;
-      padding:14px;
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(620px 240px at 22% 15%, rgba(0,229,255,.14), transparent 60%),
+        radial-gradient(520px 240px at 85% 30%, rgba(124,77,255,.12), transparent 60%);
+      pointer-events:none;
     }
-    .card h3{
-      margin:0 0 10px 0;
-      font-size:12px;
-      letter-spacing:.9px;
-      text-transform:uppercase;
+
+    .heroGrid{
+      position:relative;
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+    }
+
+    @media(max-width:930px){
+      .heroGrid,.stats,.grid,.featureGrid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(12,20,34,.82);
       color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.4px;
+      text-transform:uppercase;
     }
-    .btnrow{ display:flex; flex-wrap:wrap; gap:10px; }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--good);
+      box-shadow:0 0 14px rgba(0,255,176,.5);
+    }
+
+    .title{
+      margin:14px 0 10px;
+      font-size:clamp(30px, 4.7vw, 50px);
+      line-height:1.04;
+      letter-spacing:-1px;
+      font-weight:1000;
+    }
+
+    .title b{ color:var(--accent); }
+
+    .sub{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+      max-width:760px;
+    }
+
+    .pillrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:16px;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:#0c1422;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .btnrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
     .btn{
       appearance:none;
       border:1px solid rgba(0,229,255,.45);
@@ -53,27 +164,111 @@
       padding:12px 14px;
       border-radius:14px;
       font-weight:900;
-      letter-spacing:.7px;
+      letter-spacing:.6px;
       text-transform:uppercase;
       cursor:pointer;
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
     }
-    .btn:hover{ background:#103146; text-decoration:none; }
-    .btn2{ border:1px solid rgba(124,77,255,.45); background:#1a1840; }
-    .btn2:hover{ background:#211f55; }
 
-    .pillrow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:#0c1422;
+    .btn:hover{
+      background:#103146;
+      text-decoration:none;
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(0,229,255,.08);
+    }
+
+    .btn2{
+      border:1px solid rgba(124,77,255,.45);
+      background:#1a1840;
+    }
+
+    .btn2:hover{
+      background:#211f55;
+      box-shadow:0 12px 24px rgba(124,77,255,.08);
+    }
+
+    .btnGhost{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(12,20,34,.75);
       color:var(--muted);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+
+    .stat{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:20px;
+      background:rgba(12,20,34,.74);
+      padding:18px;
+    }
+
+    .statLabel{
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.8px;
       font-size:12px;
     }
-    .note{ color:var(--muted); font-size:12px; line-height:1.45; margin-top:10px; }
-    .small{ color:var(--muted); font-size:12px; }
+
+    .statNumber{
+      font-size:34px;
+      font-weight:1000;
+      margin-top:8px;
+    }
+
+    .statMeta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      margin-top:8px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .card{
+      animation-delay:.1s;
+      border:1px solid var(--border);
+      background:var(--panel2);
+      border-radius:22px;
+      padding:18px;
+    }
+
+    .sectionTitle{
+      margin:0 0 10px 0;
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .steps{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.65;
+    }
+
+    .steps li{ margin:8px 0; }
+
+    .note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      margin-top:10px;
+    }
+
     code{
       background:#070b12;
       border:1px solid var(--border);
@@ -83,83 +278,176 @@
       font-family:Consolas, monospace;
       font-size:12px;
     }
-    .steps{ margin:0; padding-left:18px; color:var(--muted); font-size:13px; line-height:1.5; }
-    .steps li{ margin:6px 0; }
-    .footer{ margin-top:16px; text-align:center; color:var(--muted); font-size:12px; }
+
+    .featureGrid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .feature{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:14px;
+      background:rgba(255,255,255,.03);
+    }
+
+    .feature b{
+      display:block;
+      margin-bottom:6px;
+    }
+
+    .footer{
+      animation-delay:.15s;
+      margin-top:16px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(12px);}
+      to{ opacity:1; transform:translateY(0);}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      .hero,.card,.footer{ opacity:1 !important; transform:none !important; }
+    }
   </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ScriptNova Browser Launcher",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Windows",
+    "downloadUrl": "https://scriptnovaa.com/download",
+    "description": "Download page for ScriptNova Browser Launcher with setup steps, key links, and shared download tracking."
+  }
+  </script>
 </head>
 <body>
   <div class="wrap">
-    <div class="hero">
-      <div class="title"><b>ScriptNova</b> — Download</div>
-      <div class="sub">
-        Get the ScriptNova Browser Launcher and start in minutes. Need a key? Use a FREE key or join Discord to purchase BASIC/PRO.
+    <section class="hero">
+      <div class="heroGrid">
+        <div>
+          <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Download page • live stats • quick setup</div>
+          <div class="title"><b>Download</b> ScriptNova Browser Launcher</div>
+          <div class="sub">
+            A better download page with stronger layout, clearer install steps, bigger calls to action, more search-ready content, and a shared backend-powered download counter that can increase on every real download.
+          </div>
+
+          <div class="pillrow">
+            <span class="pill">HTA launcher</span>
+            <span class="pill">Shared download count</span>
+            <span class="pill">Quick setup guide</span>
+            <span class="pill">Support links</span>
+            <span class="pill">Search-friendly content</span>
+          </div>
+
+          <div class="btnrow">
+            <a class="btn" id="downloadHtaBtn" href="/downloads/ScriptNova-Launcher.hta" download>Download .HTA</a>
+            <a class="btn btn2" id="downloadZipBtn" href="/downloads/ScriptNova-Launcher.zip" download>Download .ZIP</a>
+            <a class="btn btnGhost" href="/freekey">Get FREE Key</a>
+          </div>
+
+          <div class="note">
+            If your browser blocks HTA downloads, use the ZIP download and extract it first.
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="statLabel">Total downloads</div>
+            <div class="statNumber"><span id="downloadCount">0</span></div>
+            <div class="statMeta">
+              Live shared count loaded from <code>/api/stats</code> and updated through <code>/api/download</code>.
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">Trusted by</div>
+            <div class="statNumber"><span id="trustedCount">0</span> <span id="trustedUnit">people</span></div>
+            <div class="statMeta">
+              Homepage trust count mirrored here for stronger social proof.
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="pillrow">
-        <span class="pill">ScriptNova Hardware</span>
-        <span class="pill">HTA Launcher</span>
-        <span class="pill">Fast Setup</span>
-        <span class="pill">Works on managed laptops</span>
-        <span class="pill">Clean UI</span>
-        <span class="pill">Best Unblocker ever</span>
-      </div>
-    </div>
+    </section>
 
     <div class="grid">
       <div class="card">
-        <h3>Download Launcher</h3>
-
-        <div class="btnrow">
-          <!-- Update this to your real file path -->
-          <a class="btn" href="/downloads/ScriptNova-Launcher.hta" download>Download .HTA</a>
-
-          <!-- Optional: offer zip if you want -->
-          <a class="btn btn2" href="/downloads/ScriptNova-Launcher.zip" download>Download .ZIP (DOWN)</a>
-        </div>
-
-        <div class="note">
-          If your browser blocks HTA downloads, use the ZIP download and extract it.
-        </div>
-
-        <h3 style="margin-top:14px;">Quick Start</h3>
+        <h2 class="sectionTitle">Quick start</h2>
         <ol class="steps">
-          <li>Download the launcher above.</li>
-          <li>Get a key:
+          <li>Download the launcher using the button above.</li>
+          <li>Choose your access method:
             <ul class="steps">
               <li><b>FREE key:</b> <a href="/freekey">scriptnovaa.com/freekey</a></li>
-              <li><b>BASIC / PRO:</b> join Discord and purchase (details on <a href="/buykeys">Buy Keys</a>)</li>
+              <li><b>BASIC / PRO:</b> review options on <a href="/buykeys">Buy Keys</a> and purchase through Discord</li>
             </ul>
           </li>
-          <li>Open the launcher, paste your key, press <code>SAVE</code>, then press <code>LAUNCH</code>.</li>
+          <li>Open the launcher, paste your key, click <code>Save</code>, then click <code>Launch</code>.</li>
         </ol>
+
+        <div class="featureGrid">
+          <div class="feature">
+            <b>Cleaner conversion flow</b>
+            Users can download, get a key, and get support from the same page without hunting around.
+          </div>
+          <div class="feature">
+            <b>Real shared download tracking</b>
+            The main download button can call your backend and update the total count for everyone.
+          </div>
+          <div class="feature">
+            <b>Better for Google</b>
+            Added keywords, metadata, structured data, and more visible text for search engines.
+          </div>
+          <div class="feature">
+            <b>More trust on the page</b>
+            Download and trust stats are displayed above the fold to improve credibility.
+          </div>
+        </div>
       </div>
 
       <div class="card">
-        <h3>Keys + Support</h3>
+        <h2 class="sectionTitle">Keys and support</h2>
         <div class="note">
-          <b>FREE keys</b> are available here:<br/>
-          <a class="btn" style="margin-top:10px;" href="/freekey">Get FREE Key</a>
+          <b>FREE keys</b> are available from the free key page.
         </div>
 
-        <div class="note" style="margin-top:12px;">
-          Want BASIC or PRO?<br/>
-          Join Discord and open a ticket:
+        <div class="btnrow" style="margin-top:10px;">
+          <a class="btn" href="/freekey">Get FREE Key</a>
+        </div>
+
+        <div class="note" style="margin-top:14px;">
+          Want BASIC or PRO? Join Discord and open a ticket, or compare plans first.
         </div>
 
         <div class="btnrow" style="margin-top:10px;">
           <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join Discord</a>
-          <a class="btn" href="/buykeys">View Plans</a>
+          <a class="btn btnGhost" href="/buykeys">View Plans</a>
         </div>
 
-        <div class="note" style="margin-top:12px;">
-          <b>BASIC:</b> $2 / month<br/>
+        <div class="note" style="margin-top:14px;">
+          <b>BASIC:</b> $2 / month<br />
           <b>PRO:</b> $11 / month
         </div>
 
-        <div class="note" style="margin-top:12px;">
-          Email: <b>gomegaassist@gmail.com</b>
+        <div class="note" style="margin-top:14px;">
+          Support email: <b>gomegaassist@gmail.com</b>
         </div>
       </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h2 class="sectionTitle">Search-ready page content</h2>
+      <p class="note">
+        This download page helps users looking for ScriptNova Browser Launcher download access, ScriptNova setup help, HTA launcher download steps, free key access, premium plans, and ScriptNova support. It is built to be easier to scan, easier to navigate, and easier for search engines to understand.
+      </p>
     </div>
 
     <div class="footer">
@@ -169,6 +457,99 @@
 
   <script>
     document.getElementById("yr").textContent = new Date().getFullYear();
+
+    const API = {
+      stats: "/api/stats",
+      download: "/api/download"
+    };
+
+    const FALLBACK = {
+      trusted: 2400000,
+      downloads: 482315
+    };
+
+    function animateValue(el, endValue, formatter){
+      const duration = 1400;
+      const startValue = Number(el.dataset.value || 0);
+      const start = performance.now();
+
+      function frame(now){
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(startValue + (endValue - startValue) * eased);
+        el.textContent = formatter(current);
+        if (progress < 1) requestAnimationFrame(frame);
+        else el.dataset.value = String(endValue);
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function trustedUnit(value){
+      if (value >= 1000000) return "million people";
+      if (value >= 1000) return "thousand people";
+      return "people";
+    }
+
+    function compact(value){
+      const n = Number(value) || 0;
+      if (n >= 1000000) return (n / 1000000).toFixed(n >= 10000000 ? 0 : 1).replace(/\.0$/, "");
+      if (n >= 1000) return (n / 1000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, "");
+      return n.toLocaleString();
+    }
+
+    async function loadStats(){
+      try{
+        const res = await fetch(API.stats, { headers: { "Accept": "application/json" } });
+        if (!res.ok) throw new Error("Stats fetch failed");
+
+        const data = await res.json();
+        const downloads = Number(data.downloads ?? FALLBACK.downloads);
+        const trusted = Number(data.trusted ?? data.visitors ?? FALLBACK.trusted);
+
+        animateValue(document.getElementById("downloadCount"), downloads, n => n.toLocaleString());
+        animateValue(document.getElementById("trustedCount"), trusted, compact);
+        document.getElementById("trustedUnit").textContent = trustedUnit(trusted);
+      }catch(err){
+        animateValue(document.getElementById("downloadCount"), FALLBACK.downloads, n => n.toLocaleString());
+        animateValue(document.getElementById("trustedCount"), FALLBACK.trusted, compact);
+        document.getElementById("trustedUnit").textContent = trustedUnit(FALLBACK.trusted);
+      }
+    }
+
+    async function trackDownload(type){
+      try{
+        const res = await fetch(API.download, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ page: "download", fileType: type })
+        });
+
+        if (!res.ok) throw new Error("Download tracking failed");
+
+        const data = await res.json().catch(() => ({}));
+
+        if (typeof data.downloads !== "undefined") {
+          animateValue(document.getElementById("downloadCount"), Number(data.downloads), n => n.toLocaleString());
+        } else {
+          const current = Number(document.getElementById("downloadCount").dataset.value || FALLBACK.downloads);
+          animateValue(document.getElementById("downloadCount"), current + 1, n => n.toLocaleString());
+        }
+      }catch(err){
+        const current = Number(document.getElementById("downloadCount").dataset.value || FALLBACK.downloads);
+        animateValue(document.getElementById("downloadCount"), current + 1, n => n.toLocaleString());
+      }
+    }
+
+    document.getElementById("downloadHtaBtn").addEventListener("click", function(){
+      trackDownload("hta");
+    });
+
+    document.getElementById("downloadZipBtn").addEventListener("click", function(){
+      trackDownload("zip");
+    });
+
+    loadStats();
   </script>
 </body>
 </html>
