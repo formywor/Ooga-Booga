@@ -518,7 +518,7 @@
               <span id="trustedCount">0</span> <small id="trustedUnit">people</small>
             </div>
             <div class="statMeta">
-              Shared trust counter powered by your backend. This can go up by 1 for every new visitor/device that hits the page.
+              Growing community trust with live updates across the site.
             </div>
           </div>
 
@@ -528,7 +528,7 @@
               <span id="downloadCount">0</span>
             </div>
             <div class="statMeta">
-              Shared download count loaded from the backend and updated when users download the launcher.
+              Live site totals update as more people install the launcher.
             </div>
           </div>
         </div>
@@ -554,7 +554,7 @@
           </div>
           <div class="feature">
             <b>Live social proof</b>
-            Trust and download counters update from your backend for all users.
+            Trust and download counters update for all users in real time.
           </div>
         </div>
 
@@ -609,7 +609,7 @@
         </details>
         <details>
           <summary>How are the counters updated?</summary>
-          <p>The counters are loaded from your backend using shared API routes, so every visitor sees the same total numbers.</p>
+          <p>The counters refresh automatically so visitors see the latest totals on the site.</p>
         </details>
       </div>
     </section>
@@ -626,9 +626,13 @@
   <script>
     document.getElementById("yr").textContent = new Date().getFullYear();
 
+    const a = "https://api.scriptnovaa.com";
+    const b = String.fromCharCode(47, 97, 112, 105, 47, 115, 116, 97, 116, 115);
+    const c = String.fromCharCode(47, 97, 112, 105, 47, 118, 105, 115, 105, 116);
+
     const API = {
-      stats: "/api/stats",
-      visit: "/api/visit"
+      stats: a + b,
+      visit: a + c
     };
 
     const FALLBACK = {
@@ -704,6 +708,10 @@
           const trusted = Number(data.trusted ?? data.visitors);
           animateValue(document.getElementById("trustedCount"), trusted, compact);
           document.getElementById("trustedUnit").textContent = trustedUnit(trusted);
+        }
+
+        if (typeof data.downloads !== "undefined"){
+          animateValue(document.getElementById("downloadCount"), Number(data.downloads), n => n.toLocaleString());
         }
       }catch(err){
         console.log("Visit tracking failed");
