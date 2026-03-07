@@ -3,252 +3,778 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ScriptNova — Buy Keys</title>
-  <meta name="description" content="Compare FREE vs BASIC vs PRO keys for ScriptNova. Purchase through Discord ticket." />
+  <title>Buy ScriptNova Keys | Free vs BASIC vs PRO vs EXPRESS</title>
+  <meta name="description" content="Compare ScriptNova Free, BASIC, PRO, and EXPRESS plans. View pricing, sessions, total time, eligibility, and key details in one clean comparison page." />
+  <meta name="keywords" content="ScriptNova buy keys, ScriptNova plans, ScriptNova Free, ScriptNova BASIC, ScriptNova PRO, ScriptNova EXPRESS, ScriptNova pricing, buy ScriptNova key" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#0b0f16" />
+  <link rel="canonical" href="https://scriptnovaa.com/buykeys" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Buy ScriptNova Keys | Free vs BASIC vs PRO vs EXPRESS" />
+  <meta property="og:description" content="Compare ScriptNova key plans, see feature differences, and find the right option for your budget and usage." />
+  <meta property="og:url" content="https://scriptnovaa.com/buykeys" />
+  <meta property="og:site_name" content="ScriptNova" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Buy ScriptNova Keys" />
+  <meta name="twitter:description" content="Compare Free, BASIC, PRO, and EXPRESS plans with sessions, time, pricing, and eligibility." />
+
   <style>
     :root{
-      --bg:#0b0f16; --panel:#101828; --panel2:#0f1726; --border:#22314a;
-      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --accent2:#7c4dff;
-      --ok:#00ffb0; --warn:#ffaa00;
+      --bg:#0b0f16;
+      --panel:#101828;
+      --panel2:#0f1726;
+      --border:#22314a;
+      --text:#eaf2ff;
+      --muted:#9fb2d6;
+      --accent:#00e5ff;
+      --accent2:#7c4dff;
+      --good:#00ffb0;
+      --warn:#ffbc42;
+      --soft:rgba(255,255,255,.05);
     }
+
     *{ box-sizing:border-box; }
-    body{ margin:0; font-family:Segoe UI,Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    html{ scroll-behavior:smooth; }
+
+    body{
+      margin:0;
+      font-family:Segoe UI,Tahoma,Arial,sans-serif;
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(0,229,255,.12), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(124,77,255,.11), transparent 60%),
+        radial-gradient(900px 500px at 45% 95%, rgba(0,255,176,.05), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
     a{ color:var(--accent); text-decoration:none; }
     a:hover{ text-decoration:underline; }
-    .wrap{ max-width:980px; margin:0 auto; padding:22px; }
-    .hero{
-      border:1px solid var(--border);
-      background:var(--panel);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 0 18px rgba(0,229,255,.08);
-    }
-    .title{ font-size:22px; font-weight:900; letter-spacing:.3px; }
-    .title b{ color:var(--accent); }
-    .sub{ margin-top:6px; color:var(--muted); line-height:1.45; }
 
-    .card{
-      border:1px solid var(--border);
-      background:var(--panel2);
-      border-radius:18px;
-      padding:14px;
-      margin-top:12px;
-    }
-    .card h3{
-      margin:0 0 10px 0;
-      font-size:12px;
-      letter-spacing:.9px;
-      text-transform:uppercase;
-      color:var(--muted);
+    .wrap{
+      max-width:1240px;
+      margin:0 auto;
+      padding:22px;
     }
 
-    .btnrow{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+    .nav,.hero,.card,.plan,.footer{
+      opacity:0;
+      transform:translateY(14px);
+      animation:fadeUp .75s ease forwards;
+    }
+
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:12px 14px;
+      border:1px solid var(--border);
+      background:rgba(16,24,40,.76);
+      border-radius:18px;
+      backdrop-filter:blur(10px);
+      box-shadow:0 0 22px rgba(0,229,255,.06);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+
+    .logo{
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      border:1px solid rgba(0,229,255,.35);
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(0,229,255,.95), rgba(0,229,255,0) 60%),
+        radial-gradient(14px 14px at 70% 70%, rgba(124,77,255,.85), rgba(124,77,255,0) 60%),
+        rgba(12,20,34,.9);
+      box-shadow:0 0 18px rgba(0,229,255,.14);
+    }
+
+    .navlinks{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .btn{
       appearance:none;
       border:1px solid rgba(0,229,255,.45);
-      background:#0e2a3a;
+      background:rgba(14,42,58,.92);
       color:var(--text);
       padding:12px 14px;
       border-radius:14px;
       font-weight:900;
-      letter-spacing:.7px;
+      letter-spacing:.5px;
       text-transform:uppercase;
       cursor:pointer;
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+      text-decoration:none;
     }
-    .btn:hover{ background:#103146; text-decoration:none; }
-    .btn2{ border:1px solid rgba(124,77,255,.45); background:#1a1840; }
-    .btn2:hover{ background:#211f55; }
 
-    .note{ color:var(--muted); font-size:12px; line-height:1.45; margin-top:8px; }
-
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border:1px solid var(--border);
-      border-radius:16px;
-      background:#0b1220;
-      margin-top:10px;
+    .btn:hover{
+      background:rgba(16,49,70,.95);
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(0,229,255,.08);
+      text-decoration:none;
     }
-    th, td{
-      padding:12px;
-      border-bottom:1px solid var(--border);
-      vertical-align:top;
-      font-size:13px;
+
+    .btn2{
+      border:1px solid rgba(124,77,255,.45);
+      background:rgba(26,24,64,.86);
+    }
+
+    .btn2:hover{
+      background:rgba(33,31,85,.92);
+      box-shadow:0 12px 24px rgba(124,77,255,.08);
+    }
+
+    .btnGhost{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(12,20,34,.75);
       color:var(--muted);
     }
-    th{
-      text-transform:uppercase;
-      letter-spacing:.8px;
-      font-size:12px;
-      color:var(--text);
-      background:#101a2b;
-    }
-    tr:last-child td{ border-bottom:none; }
-    .price{
-      font-size:18px;
-      font-weight:900;
+
+    .btnGhost:hover{
+      background:rgba(12,20,34,.92);
       color:var(--text);
     }
-    .tag{
-      display:inline-block;
-      padding:4px 8px;
+
+    .hero{
+      animation-delay:.06s;
+      margin-top:14px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(16,24,40,.92), rgba(15,23,38,.96));
+      border-radius:24px;
+      padding:26px;
+      box-shadow:0 0 26px rgba(0,229,255,.08);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(600px 220px at 18% 15%, rgba(0,229,255,.14), transparent 60%),
+        radial-gradient(520px 220px at 85% 30%, rgba(124,77,255,.12), transparent 60%);
+      pointer-events:none;
+    }
+
+    .heroInner{
+      position:relative;
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
-      background:#0c1422;
+      background:rgba(12,20,34,.82);
       color:var(--muted);
       font-size:12px;
-      margin-right:6px;
-      margin-top:6px;
+      font-weight:800;
+      letter-spacing:.4px;
+      text-transform:uppercase;
     }
 
-    .grid2{ display:grid; grid-template-columns:1fr; gap:12px; }
-    @media(min-width:900px){ .grid2{ grid-template-columns:1fr 1fr; } }
-
-    .proGlow{
-      border:1px solid rgba(124,77,255,.45);
-      box-shadow:0 0 20px rgba(124,77,255,.10);
-      background: linear-gradient(180deg, rgba(26,24,64,0.55), rgba(15,23,38,1));
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--good);
+      box-shadow:0 0 14px rgba(0,255,176,.5);
     }
-    .bullet{ margin:0; padding-left:18px; }
-    .bullet li{ margin:7px 0; }
-    .footer{ margin-top:16px; text-align:center; color:var(--muted); font-size:12px; }
-    .hi{ color:var(--text); font-weight:800; }
+
+    h1{
+      margin:14px 0 10px;
+      font-size:clamp(34px, 5vw, 58px);
+      line-height:1.02;
+      letter-spacing:-1px;
+    }
+
+    h1 b{ color:var(--accent); }
+
+    .sub{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.65;
+      max-width:780px;
+    }
+
+    .ctaRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .miniStats{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+
+    .miniStat{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(12,20,34,.72);
+      border-radius:20px;
+      padding:18px;
+    }
+
+    .miniStat .label{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.8px;
+    }
+
+    .miniStat .value{
+      font-size:30px;
+      font-weight:1000;
+      margin-top:8px;
+    }
+
+    .miniStat .text{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .plans{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .plan{
+      animation-delay:.12s;
+      border:1px solid var(--border);
+      background:rgba(15,23,38,.94);
+      border-radius:24px;
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 0 16px rgba(0,0,0,.18);
+    }
+
+    .plan.popular{
+      border-color:rgba(124,77,255,.45);
+      box-shadow:0 0 30px rgba(124,77,255,.12);
+    }
+
+    .plan.comingsoon{
+      border-color:rgba(255,188,66,.45);
+      box-shadow:0 0 30px rgba(255,188,66,.10);
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+    }
+
+    .tag.popular{
+      color:#fff;
+      border-color:rgba(124,77,255,.45);
+      background:rgba(124,77,255,.18);
+    }
+
+    .tag.warn{
+      color:#fff0d1;
+      border-color:rgba(255,188,66,.45);
+      background:rgba(255,188,66,.18);
+    }
+
+    .planName{
+      margin:14px 0 4px;
+      font-size:28px;
+      font-weight:1000;
+      letter-spacing:-.5px;
+    }
+
+    .price{
+      font-size:30px;
+      font-weight:1000;
+      margin:6px 0 4px;
+    }
+
+    .price small{
+      font-size:14px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .planSub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      min-height:56px;
+    }
+
+    .specs{
+      margin:16px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+
+    .specs li{
+      border:1px solid rgba(255,255,255,.08);
+      background:var(--soft);
+      border-radius:14px;
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .specs b{ color:var(--text); }
+
+    .planActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .compareWrap,
+    .infoGrid{
+      display:grid;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .card{
+      animation-delay:.18s;
+      border:1px solid var(--border);
+      background:rgba(15,23,38,.92);
+      border-radius:22px;
+      padding:18px;
+    }
+
+    .sectionTitle{
+      margin:0 0 12px 0;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--muted);
+    }
+
+    .compare{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:16px;
+    }
+
+    .compare th,
+    .compare td{
+      border:1px solid rgba(255,255,255,.08);
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    .compare th{
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      font-size:13px;
+    }
+
+    .compare td{
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .infoGrid{
+      grid-template-columns:repeat(3, minmax(0,1fr));
+    }
+
+    .infoBox{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:16px;
+      background:rgba(255,255,255,.03);
+    }
+
+    .infoBox h3{
+      margin:0 0 8px;
+      font-size:18px;
+    }
+
+    .infoBox p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .faq{
+      display:grid;
+      gap:10px;
+    }
+
+    details{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      background:rgba(255,255,255,.03);
+      padding:14px 16px;
+    }
+
+    summary{
+      cursor:pointer;
+      font-weight:800;
+    }
+
+    details p{
+      color:var(--muted);
+      line-height:1.6;
+      margin:10px 0 0;
+      font-size:14px;
+    }
+
+    .footer{
+      animation-delay:.24s;
+      margin:16px 0 6px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(14px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+
+    @media(max-width:1100px){
+      .plans{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+      }
+      .heroInner,
+      .infoGrid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:760px){
+      .plans,
+      .miniStats{
+        grid-template-columns:1fr;
+      }
+      .compare{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
+      .nav,.hero,.card,.plan,.footer{
+        opacity:1 !important;
+        transform:none !important;
+      }
+    }
   </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Product",
+    "name":"ScriptNova Keys",
+    "description":"Compare ScriptNova Free, BASIC, PRO, and EXPRESS plans with session limits, total time, and pricing.",
+    "brand":{
+      "@type":"Brand",
+      "name":"ScriptNova"
+    }
+  }
+  </script>
 </head>
 <body>
   <div class="wrap">
-    <div class="hero">
-      <div class="title"><b>ScriptNova</b> — Buy Keys</div>
-      <div class="sub">
-        Compare FREE vs BASIC vs PRO keys, then purchase through Discord by opening a ticket.
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>ScriptNova</div>
       </div>
-      <div style="margin-top:10px;">
-        <span class="tag">ScriptNova Hardware</span>
-        <span class="tag">Fast Setup</span>
-        <span class="tag">Works on managed laptops</span>
-      </div>
-      <div class="btnrow">
-        <a class="btn" href="/download">Download Launcher</a>
-        <a class="btn btn2" href="/freekey">Get FREE Key</a>
-        <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join Discord</a>
-      </div>
-    </div>
+      <nav class="navlinks">
+        <a class="btn btnGhost" href="/">Home</a>
+        <a class="btn btnGhost" href="/download">Download</a>
+        <a class="btn btnGhost" href="/freekey">FREE Key</a>
+        <a class="btn btnGhost" href="/buykeys">Buy Keys</a>
+      </nav>
+    </header>
 
-    <div class="card">
-      <h3>Plan Comparison</h3>
-      <table>
+    <section class="hero">
+      <div class="heroInner">
+        <div>
+          <div class="eyebrow">
+            <span class="dot" aria-hidden="true"></span>
+            Plans • comparisons • simple choices
+          </div>
+
+          <h1>Choose the <b>right ScriptNova key</b> for your budget, time, and usage</h1>
+
+          <p class="sub">
+            Compare FREE, BASIC, PRO, and EXPRESS in one clean page. Whether you want the cheapest way to start,
+            a stronger plan with more time, or a business-style option for bigger use, this page makes the differences easy to understand.
+          </p>
+
+          <div class="ctaRow">
+            <a class="btn" href="/freekey">Get FREE Key</a>
+            <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy Through Discord</a>
+            <a class="btn btnGhost" href="/download">Download Launcher</a>
+          </div>
+        </div>
+
+        <div class="miniStats">
+          <div class="miniStat">
+            <div class="label">Best budget choice</div>
+            <div class="value">BASIC</div>
+            <div class="text">Great if you want a low-cost option and do not need a huge amount of time.</div>
+          </div>
+          <div class="miniStat">
+            <div class="label">Best full experience</div>
+            <div class="value">PRO</div>
+            <div class="text">Much more session time and enough room for up to 4 people to use one key.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="plans">
+      <article class="plan">
+        <span class="tag">Starter</span>
+        <div class="planName">FREE</div>
+        <div class="price">$0 <small>free</small></div>
+        <div class="planSub">
+          The easiest way to test ScriptNova and get started with the launcher before moving to a paid plan.
+        </div>
+
+        <ul class="specs">
+          <li><b>Sessions allowed:</b> 1 session</li>
+          <li><b>Total time:</b> 15 minutes</li>
+          <li><b>Price:</b> Free</li>
+          <li><b>Best for:</b> Trying it out and seeing how the launcher works</li>
+        </ul>
+
+        <div class="planActions">
+          <a class="btn" href="/freekey">Get FREE Key</a>
+        </div>
+      </article>
+
+      <article class="plan">
+        <span class="tag">Budget pick</span>
+        <div class="planName">BASIC</div>
+        <div class="price">$2 <small>/ month</small></div>
+        <div class="planSub">
+          Good for users who are more on the budget side and want a cheap upgrade over the FREE key.
+        </div>
+
+        <ul class="specs">
+          <li><b>Sessions allowed:</b> 2 sessions</li>
+          <li><b>Total time:</b> 32 minutes</li>
+          <li><b>Price:</b> $2 per month</li>
+          <li><b>Best for:</b> Budget users who want more time than FREE without spending much</li>
+        </ul>
+
+        <div class="planActions">
+          <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy BASIC</a>
+        </div>
+      </article>
+
+      <article class="plan popular">
+        <span class="tag popular">Most popular</span>
+        <div class="planName">PRO</div>
+        <div class="price">$11 <small>/ month</small></div>
+        <div class="planSub">
+          The all-out experience for users who want much more session time, more flexibility, and enough room for shared use.
+        </div>
+
+        <ul class="specs">
+          <li><b>Sessions allowed:</b> 4 sessions</li>
+          <li><b>Total time:</b> 118 hours</li>
+          <li><b>Price:</b> $11 per month</li>
+          <li><b>Best for:</b> People who have the money and want a much bigger plan</li>
+          <li><b>Shared use:</b> Up to 4 people can use the same key for friends</li>
+        </ul>
+
+        <div class="planActions">
+          <a class="btn" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy PRO</a>
+        </div>
+      </article>
+
+      <article class="plan comingsoon">
+        <span class="tag warn">Not out yet</span>
+        <div class="planName">EXPRESS</div>
+        <div class="price">$89.55 <small>one time</small></div>
+        <div class="planSub">
+          A higher-end business-style plan built more for serious use, teams, and larger projects when it becomes available.
+        </div>
+
+        <ul class="specs">
+          <li><b>Sessions allowed:</b> 725 sessions</li>
+          <li><b>Total time:</b> 5,444 hours</li>
+          <li><b>Price:</b> $89.55 one time</li>
+          <li><b>Best for:</b> Businesses and larger-scale use</li>
+          <li><b>Eligibility:</b> Only ScriptNova developers or people who own a gaming website can purchase when released</li>
+        </ul>
+
+        <div class="planActions">
+          <a class="btn btnGhost" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Ask About EXPRESS</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="card compareWrap">
+      <h2 class="sectionTitle">Plan comparison</h2>
+      <table class="compare">
         <thead>
           <tr>
-            <th style="width:22%;">Plan</th>
-            <th style="width:18%;">Price</th>
-            <th style="width:24%;">Best For</th>
-            <th>What you get</th>
+            <th>Plan</th>
+            <th>Price</th>
+            <th>Sessions</th>
+            <th>Total time</th>
+            <th>Best for</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><b>FREE</b></td>
-            <td class="price">$0</td>
-            <td>Quick testing</td>
-            <td>
-              15 minutes per key • 1 session • generate at
-              <a href="/freekey">scriptnovaa.com/freekey</a>
-            </td>
+            <td>$0</td>
+            <td>1</td>
+            <td>15 minutes</td>
+            <td>Trying ScriptNova for the first time</td>
+            <td>Available</td>
           </tr>
           <tr>
             <td><b>BASIC</b></td>
-            <td class="price">$2 <span style="font-size:12px;color:var(--muted);font-weight:600;">/ month</span></td>
-            <td>Everyday use</td>
-            <td>
-              More time than FREE • less interruptions • good value for personal use
-            </td>
+            <td>$2 / month</td>
+            <td>2</td>
+            <td>32 minutes</td>
+            <td>Budget users who want a cheap upgrade</td>
+            <td>Available</td>
           </tr>
           <tr>
             <td><b>PRO</b></td>
-            <td class="price">$11 <span style="font-size:12px;color:var(--muted);font-weight:600;">/ month</span></td>
-            <td>Power users</td>
-            <td>
-              Best experience • longest usage time • higher limits • recommended for frequent use
-            </td>
+            <td>$11 / month</td>
+            <td>4</td>
+            <td>118 hours</td>
+            <td>Users who want the full experience and much more time</td>
+            <td>Available</td>
+          </tr>
+          <tr>
+            <td><b>EXPRESS</b></td>
+            <td>$89.55 one time</td>
+            <td>725</td>
+            <td>5,444 hours</td>
+            <td>Business-style use and larger needs</td>
+            <td>Coming soon</td>
           </tr>
         </tbody>
       </table>
+    </section>
 
-      <div class="note">
-        Not sure? Start FREE → upgrade to BASIC → move to PRO once you use it regularly.
-      </div>
-    </div>
-
-    <div class="grid2">
-      <div class="card proGlow">
-        <h3>Why PRO is worth it</h3>
-        <div class="note">
-          PRO is for people who don’t want to deal with short sessions or constant key resets.
-          If you use ScriptNova a lot, PRO saves time and makes everything smoother.
-        </div>
-
-        <ul class="bullet note">
-          <li><span class="hi">Fewer interruptions:</span> use it longer without needing new keys.</li>
-          <li><span class="hi">Better limits:</span> PRO is designed for frequent use.</li>
-          <li><span class="hi">More consistent daily use:</span> great if you rely on ScriptNova often.</li>
-          <li><span class="hi">Best overall experience:</span> PRO is the “set it and go” plan.</li>
-          <li><span class="hi">Priority help:</span> PRO buyers typically get faster support in Discord tickets.</li>
-        </ul>
-
-        <div class="note" style="margin-top:10px;">
-          If you only use ScriptNova once in a while, BASIC is fine.  
-          If you use it a lot, PRO is the best choice.
-        </div>
-
-        <div class="btnrow">
-          <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy PRO on Discord</a>
-          <a class="btn" href="/download">Download</a>
-        </div>
-      </div>
-
-      <div class="card">
+    <section class="infoGrid">
+      <div class="card infoBox">
         <h3>Which plan should I pick?</h3>
-        <ul class="bullet note">
-          <li><b>FREE</b> — You just want to test it right now.</li>
-          <li><b>BASIC ($2/mo)</b> — You use it sometimes and want longer use than FREE.</li>
-          <li><b>PRO ($11/mo)</b> — You use it often and want the smoothest experience with the best limits.</li>
-        </ul>
-
-        <div class="note" style="margin-top:10px;">
-          If you ever hit limits or find yourself generating FREE keys repeatedly, that’s the sign you should upgrade.
-        </div>
-
-        <div class="btnrow">
-          <a class="btn" href="/freekey">Try FREE First</a>
-          <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join Discord</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>How To Buy (Discord)</h3>
-      <ol class="note" style="margin:0; padding-left:18px;">
-        <li>Join the Discord: <a href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">discord.gg/gscGTMVsWE</a></li>
-        <li>Create a ticket in the support/tickets channel.</li>
-        <li>In your ticket, say which plan you want: <b>BASIC ($2/month)</b> or <b>PRO ($11/month)</b>.</li>
-        <li>Then <b>tag the owner</b> in the ticket so it gets handled faster.</li>
-      </ol>
-
-      <div class="btnrow">
-        <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Open Discord</a>
-        <a class="btn" href="/download">Back to Download</a>
+        <p>
+          If you are more into the budget side, go for <b>BASIC</b>. It gives you more than the FREE option while staying cheap.
+          If you just want to test things first, start with <b>FREE</b>.
+        </p>
       </div>
 
-      <div class="note" style="margin-top:12px;">
-        Support email: <b>gomegaassist@gmail.com</b>
+      <div class="card infoBox">
+        <h3>Why choose PRO?</h3>
+        <p>
+          If you have the money and want the all-out experience, <b>PRO</b> is the stronger pick. It has a lot more session time
+          and can be used by up to 4 people on one key for friends.
+        </p>
       </div>
-    </div>
+
+      <div class="card infoBox">
+        <h3>What is EXPRESS for?</h3>
+        <p>
+          <b>EXPRESS</b> is more like a business option. It is not out yet, and when it launches it will only be available
+          to ScriptNova developers or people who own a gaming website.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="sectionTitle">More about ScriptNova plans</h2>
+      <p style="color:var(--muted); line-height:1.7; margin:0;">
+        ScriptNova gives users multiple ways to get started. FREE is best for testing. BASIC is the low-cost option for people who want
+        a simple paid upgrade. PRO is the best overall choice for users who want much more value, longer usage time, and more flexibility.
+        EXPRESS is designed more like a serious high-capacity option for business-style use when it becomes available. This page is built to
+        help users compare ScriptNova pricing, ScriptNova plan limits, ScriptNova key sessions, and ScriptNova key time in one easy place.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2 class="sectionTitle">Frequently asked questions</h2>
+      <div class="faq">
+        <details>
+          <summary>Can I start without paying?</summary>
+          <p>Yes. You can start with the FREE key, which gives 1 session and 15 minutes.</p>
+        </details>
+        <details>
+          <summary>Which plan is best for a low budget?</summary>
+          <p>BASIC is the budget-friendly option and is the best choice if you want a cheap paid plan.</p>
+        </details>
+        <details>
+          <summary>Which plan gives the most value right now?</summary>
+          <p>PRO gives a much bigger amount of time and up to 4 sessions, making it the strongest currently available plan for most users.</p>
+        </details>
+        <details>
+          <summary>Can anyone buy EXPRESS?</summary>
+          <p>No. EXPRESS is not out yet, and when it does release it is intended only for ScriptNova developers or people who own a gaming website.</p>
+        </details>
+      </div>
+    </section>
 
     <div class="footer">
-      © <span id="yr"></span> ScriptNova • <a href="/">Home</a> • <a href="/download">Download</a> • <a href="/freekey">FREE Keys</a>
+      © <span id="yr"></span> ScriptNova •
+      <a href="/">Home</a> •
+      <a href="/download">Download</a> •
+      <a href="/freekey">FREE Key</a> •
+      <a href="/buykeys">Buy Keys</a>
     </div>
   </div>
 
