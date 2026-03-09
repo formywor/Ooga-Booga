@@ -3,319 +3,1370 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ScriptNova Admin</title>
+  <title>ScriptNova Admin Panel</title>
   <meta name="robots" content="noindex,nofollow" />
   <style>
-    :root{--bg:#08101b;--panel:#0d1728;--panel2:#101d33;--line:#22314a;--text:#eaf2ff;--muted:#9fb2d6;--cyan:#00e5ff;--purple:#7c4dff;--red:#ff5d73;--green:#2ad186;--yellow:#ffd166}
-    *{box-sizing:border-box} html,body{margin:0;height:100%;font-family:Segoe UI,Tahoma,Arial,sans-serif;background:linear-gradient(180deg,#08101b,#0b1421 60%,#0d1727);color:var(--text)}
-    a{color:var(--cyan)} .hidden{display:none!important}
-    .app{padding:14px;max-width:1600px;margin:0 auto}.top{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-bottom:12px}
-    .card{background:rgba(13,23,40,.96);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 0 30px rgba(0,229,255,.07)}
-    .brand{font-size:24px;font-weight:900;letter-spacing:.6px}.brand span{color:var(--cyan)} .muted{color:var(--muted)} .tiny{font-size:12px;color:var(--muted)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}.pill{padding:7px 11px;border:1px solid rgba(0,229,255,.32);background:#0c2131;border-radius:999px;font-size:12px;color:#baf8ff}
-    .role-owner{border-color:rgba(42,209,134,.4);background:#11271f;color:#c7ffe1}.role-ulises{border-color:rgba(255,209,102,.35);background:#2a2310;color:#ffe7a9}.role-other{border-color:rgba(124,77,255,.35);background:#181230;color:#dccfff}
-    .loginGrid,.grid2,.grid3,.grid4{display:grid;gap:12px}.loginGrid{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
-    input,select,textarea,button{width:100%;border-radius:12px;border:1px solid var(--line);background:#07101b;color:var(--text);padding:11px 12px;font:inherit} textarea{min-height:110px;resize:vertical}
-    button{cursor:pointer;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:#0e2a3a;border-color:rgba(0,229,255,.35)} button:hover{background:#13364b}
-    button.alt{background:#1a1840;border-color:rgba(124,77,255,.35)} button.danger{background:#31131a;border-color:rgba(255,93,115,.35)} button.good{background:#0f261b;border-color:rgba(42,209,134,.35)} button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.2)}
-    .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.tab{padding:10px 12px;border:1px solid var(--line);border-radius:999px;background:#0d182a;cursor:pointer;font-weight:700}.tab.active{background:#123148;border-color:rgba(0,229,255,.45);color:#c6fbff}
-    .section{display:none}.section.active{display:block}.metric{padding:12px;border:1px solid var(--line);background:#0c1525;border-radius:14px}.metric b{display:block;font-size:20px;margin-top:6px}
-    .locked{position:relative;overflow:hidden}.locked::after{content:'🔒 Locked';position:absolute;top:10px;right:10px;font-size:12px;padding:6px 8px;border-radius:999px;background:#2a2310;color:#ffe7a9;border:1px solid rgba(255,209,102,.3)}
-    .status{padding:10px 12px;border-radius:12px;background:#0a1423;border:1px solid var(--line);white-space:pre-wrap;min-height:46px}.ok{color:#98ffc7}.bad{color:#ffb2bd}.warn{color:#ffe39b}
-    table{width:100%;border-collapse:collapse;font-size:13px} th,td{border-bottom:1px solid #1c2a40;padding:9px 8px;text-align:left;vertical-align:top} th{color:#9fb2d6;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
-    .scroll{max-height:340px;overflow:auto}.split{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
-    @media (max-width:1100px){.top,.split,.grid2,.grid3,.grid4,.loginGrid{grid-template-columns:1fr}}
+    :root{
+      --bg:#07111d;
+      --bg2:#0b1627;
+      --panel:#0d1b2d;
+      --panel2:#101f35;
+      --line:#20314c;
+      --text:#e9f2ff;
+      --muted:#98aed1;
+      --cyan:#00e5ff;
+      --cyan2:#67f2ff;
+      --purple:#8a7dff;
+      --green:#29e38a;
+      --yellow:#ffcf5a;
+      --red:#ff6464;
+      --shadow:0 18px 40px rgba(0,0,0,.34);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#07111d 0%,#091726 100%);color:var(--text);font-family:Segoe UI,Arial,sans-serif}
+    a{color:var(--cyan2);text-decoration:none}
+    button,input,select,textarea{font:inherit}
+    .hidden{display:none !important}
+
+    .shell{max-width:1500px;margin:0 auto;padding:18px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:16px 18px;margin-bottom:16px;border:1px solid var(--line);
+      border-radius:20px;background:rgba(12,23,39,.86);backdrop-filter:blur(8px);
+      box-shadow:var(--shadow)
+    }
+    .brand b{color:var(--cyan)}
+    .brand .sub{margin-top:6px;color:var(--muted);font-size:12px}
+    .topright{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;border:1px solid rgba(0,229,255,.25);
+      background:#0d2234;color:#dffbff;font-weight:700;font-size:12px
+    }
+    .statusdot{width:8px;height:8px;border-radius:999px;background:var(--green);box-shadow:0 0 12px rgba(41,227,138,.8)}
+    .logoutBtn{
+      border:1px solid rgba(255,255,255,.14);background:#13253d;color:#fff;padding:10px 14px;border-radius:12px;
+      cursor:pointer;font-weight:800
+    }
+    .logoutBtn:hover{background:#183050}
+
+    .loginWrap{
+      min-height:calc(100vh - 36px);
+      display:flex;align-items:center;justify-content:center
+    }
+    .loginCard{
+      width:min(520px,95vw);background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
+      border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)
+    }
+    .loginCard h1{margin:0 0 8px;font-size:28px}
+    .loginCard p{margin:0 0 18px;color:var(--muted);line-height:1.45}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .fieldWrap{margin-bottom:12px}
+    .label{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:8px;text-transform:uppercase}
+    .field,.select,.text{
+      width:100%;background:#09111d;border:1px solid var(--line);color:#fff;border-radius:14px;padding:12px 14px;outline:none
+    }
+    .field:focus,.select:focus,.text:focus{border-color:rgba(0,229,255,.4);box-shadow:0 0 0 3px rgba(0,229,255,.08)}
+    .text{min-height:100px;resize:vertical}
+    .btn{
+      border:1px solid rgba(0,229,255,.34);background:linear-gradient(180deg,#0f3042 0%,#0d2537 100%);
+      color:#fff;padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:900;letter-spacing:.4px
+    }
+    .btn:hover{background:linear-gradient(180deg,#133b51 0%,#113148 100%)}
+    .btn2{
+      border:1px solid rgba(138,125,255,.34);background:linear-gradient(180deg,#241f51 0%,#1e1a44 100%);
+      color:#fff;padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:900
+    }
+    .btn2:hover{background:linear-gradient(180deg,#2b2562 0%,#241f54 100%)}
+    .btnDanger{
+      border:1px solid rgba(255,100,100,.34);background:linear-gradient(180deg,#4a1d24 0%,#36151a 100%);
+      color:#fff;padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:900
+    }
+    .btnDanger:hover{background:linear-gradient(180deg,#5a252e 0%,#451c23 100%)}
+    .btnWarn{
+      border:1px solid rgba(255,207,90,.34);background:linear-gradient(180deg,#473618 0%,#372a14 100%);
+      color:#fff;padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:900
+    }
+    .btnWarn:hover{background:linear-gradient(180deg,#564220 0%,#403118 100%)}
+    .btnSm,.btnSm2,.btnSmDanger,.btnSmWarn{
+      padding:9px 11px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:900
+    }
+    .btnSm{border:1px solid rgba(0,229,255,.34);background:#0f3042;color:#fff}
+    .btnSm2{border:1px solid rgba(138,125,255,.34);background:#241f51;color:#fff}
+    .btnSmDanger{border:1px solid rgba(255,100,100,.34);background:#4a1d24;color:#fff}
+    .btnSmWarn{border:1px solid rgba(255,207,90,.34);background:#473618;color:#fff}
+    .btn:disabled,.btn2:disabled,.btnDanger:disabled,.btnWarn:disabled,.btnSm:disabled,.btnSm2:disabled,.btnSmDanger:disabled,.btnSmWarn:disabled{
+      opacity:.55;cursor:not-allowed;filter:grayscale(25%)
+    }
+
+    .app{
+      display:grid;grid-template-columns:280px 1fr;gap:16px
+    }
+    .sidebar{
+      border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,#0c1728 0%,#0b1524 100%);
+      padding:14px;box-shadow:var(--shadow);height:calc(100vh - 112px);position:sticky;top:18px;overflow:auto
+    }
+    .navTitle{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:4px 6px 10px}
+    .navBtn{
+      width:100%;text-align:left;background:#101d31;color:#dbe7ff;border:1px solid var(--line);
+      padding:12px 14px;border-radius:14px;margin-bottom:10px;cursor:pointer;font-weight:800
+    }
+    .navBtn:hover{background:#15253d}
+    .navBtn.active{border-color:rgba(0,229,255,.3);background:#11283a;color:#fff;box-shadow:0 0 0 1px rgba(0,229,255,.12) inset}
+    .navBtn .small{display:block;color:var(--muted);font-size:11px;font-weight:600;margin-top:4px}
+
+    .content{min-width:0}
+    .section{display:none}
+    .section.active{display:block}
+    .sectionHead{
+      margin-bottom:14px;padding:16px 18px;border:1px solid var(--line);border-radius:20px;
+      background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);box-shadow:var(--shadow)
+    }
+    .sectionHead h2{margin:0 0 8px;font-size:24px}
+    .sectionHead p{margin:0;color:var(--muted)}
+
+    .cards{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px
+    }
+    .card{
+      border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
+      padding:16px;box-shadow:var(--shadow)
+    }
+    .card h3{margin:0 0 10px;font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+    .metric{font-size:26px;font-weight:900}
+    .muted{color:var(--muted)}
+    .ok{color:var(--green)}
+    .bad{color:var(--red)}
+    .warn{color:var(--yellow)}
+
+    .panel{
+      border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
+      padding:16px;box-shadow:var(--shadow);margin-bottom:14px
+    }
+    .panel h3{margin:0 0 10px;font-size:16px}
+    .panel p{margin:0 0 10px;color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row > *{min-width:0}
+    .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+    table{width:100%;border-collapse:collapse;background:#0a1322}
+    th,td{padding:10px 12px;border-bottom:1px solid #1b2a42;text-align:left;font-size:13px;vertical-align:top}
+    th{background:#0f1c30;color:#9db2d7;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+    tr:hover td{background:#101b2d}
+    .code{font-family:Consolas,monospace;word-break:break-all}
+    .notice{
+      padding:12px 14px;border-radius:14px;border:1px solid rgba(255,207,90,.3);background:#2b2412;color:#ffecc0;margin-bottom:14px
+    }
+    .error{
+      padding:12px 14px;border-radius:14px;border:1px solid rgba(255,100,100,.32);background:#33171c;color:#ffd8d8;margin-bottom:14px
+    }
+    .success{
+      padding:12px 14px;border-radius:14px;border:1px solid rgba(41,227,138,.32);background:#12271d;color:#d6ffe9;margin-bottom:14px
+    }
+
+    .locked{
+      position:relative;opacity:.72
+    }
+    .locked::after{
+      content:"🔒 Locked";
+      position:absolute;top:12px;right:12px;
+      font-size:12px;font-weight:900;color:#ffe1a0;
+      background:#33260f;border:1px solid rgba(255,207,90,.24);
+      border-radius:999px;padding:6px 10px
+    }
+
+    .tag{
+      display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+      background:#112236;border:1px solid var(--line);font-size:12px;font-weight:800
+    }
+
+    .kv{display:grid;grid-template-columns:220px 1fr;gap:10px;font-size:13px}
+    .kv div:nth-child(odd){color:var(--muted)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .toolbar .field,.toolbar .select{max-width:260px}
+
+    @media (max-width:1200px){
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .cols4{grid-template-columns:repeat(2,1fr)}
+      .cols3{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:980px){
+      .app{grid-template-columns:1fr}
+      .sidebar{height:auto;position:static}
+      .cols2,.cols3,.cols4,.grid2{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+      .kv{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="top">
-      <div class="card">
-        <div class="brand"><span>ScriptNova</span> Admin Control</div>
-        <div class="muted">Owner gets full power. Ulises gets read-only operational access. Other gets status-only access. Locked tools stay visible with a lock.</div>
-        <div class="row" style="margin-top:12px">
-          <div id="roleBadge" class="pill">Not logged in</div>
-          <div id="sessionBadge" class="pill">No admin token</div>
-          <div id="buildBadge" class="pill">Waiting…</div>
-        </div>
+  <div id="loginView" class="loginWrap">
+    <div class="loginCard">
+      <div class="pill" style="margin-bottom:14px;"><span class="statusdot"></span> Internal Admin Access</div>
+      <h1><span style="color:#00e5ff;">ScriptNova</span> Admin Panel</h1>
+      <p>Owner has full access. Ulises has read-only staff access. Other has limited health-only access. Locked features stay visible but cannot be used without permission.</p>
+
+      <div id="loginMsg" class="hidden"></div>
+
+      <div class="fieldWrap">
+        <label class="label">Profile</label>
+        <select id="loginUsername" class="select">
+          <option value="Owner">Owner</option>
+          <option value="Ulises">Ulises</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
-      <div class="card">
-        <div class="tiny" style="margin-bottom:8px">Admin Login</div>
-        <div class="loginGrid">
-          <select id="loginRole">
-            <option value="owner">Owner</option>
-            <option value="ulises">Ulises</option>
-            <option value="other">Other</option>
-          </select>
-          <input id="loginPassword" type="password" placeholder="Password" />
-        </div>
-        <div class="row" style="margin-top:10px">
-          <button onclick="login()">Login</button>
-          <button class="alt" onclick="loadMe()">Refresh Session</button>
-          <button class="danger" onclick="logout()">Logout</button>
-        </div>
-        <div id="globalStatus" class="status" style="margin-top:10px">Ready.</div>
+
+      <div class="fieldWrap">
+        <label class="label">Password</label>
+        <input id="loginPassword" class="field" type="password" placeholder="Enter admin password" />
+      </div>
+
+      <div class="grid2">
+        <button class="btn" id="btnLogin">LOGIN</button>
+        <button class="btn2" id="btnLoadDashboard">LOAD SESSION</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appView" class="shell hidden">
+    <div class="topbar">
+      <div class="brand">
+        <div><b>ScriptNova</b> // Admin Dashboard</div>
+        <div class="sub">Owner = full control • Ulises = read-only staff • Other = health-only</div>
+      </div>
+      <div class="topright">
+        <span id="whoami" class="pill">Not logged in</span>
+        <span id="globalStatePill" class="pill">System: Loading...</span>
+        <button class="logoutBtn" id="btnLogout">Logout</button>
       </div>
     </div>
 
-    <div class="tabs" id="tabs"></div>
+    <div id="globalMsg" class="hidden"></div>
 
-    <div id="dashboard" class="section active"></div>
-    <div id="sessions" class="section"></div>
-    <div id="keys" class="section"></div>
-    <div id="freekeys" class="section"></div>
-    <div id="launcher" class="section"></div>
-    <div id="hwid" class="section"></div>
-    <div id="admins" class="section"></div>
-    <div id="config" class="section"></div>
-    <div id="analytics" class="section"></div>
-    <div id="alerts" class="section"></div>
-    <div id="audit" class="section"></div>
-    <div id="emergency" class="section"></div>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="navTitle">Sections</div>
+        <button class="navBtn active" data-section="dashboard">Dashboard<span class="small">Health, counters, live state</span></button>
+        <button class="navBtn" data-section="sessions">Sessions<span class="small">View and end active sessions</span></button>
+        <button class="navBtn" data-section="keys">Keys<span class="small">Search, disable, custom keys</span></button>
+        <button class="navBtn" data-section="freekeys">Free Keys<span class="small">Manual add/remove/expire</span></button>
+        <button class="navBtn" data-section="launcher">Launcher Control<span class="small">Pause, version, maintenance</span></button>
+        <button class="navBtn" data-section="hwid">HWID / Devices<span class="small">Ban, inspect, suspicious</span></button>
+        <button class="navBtn" data-section="accounts">Admin Accounts<span class="small">Sessions and role visibility</span></button>
+        <button class="navBtn" data-section="config">System Config<span class="small">Defaults and global config</span></button>
+        <button class="navBtn" data-section="analytics">Analytics<span class="small">Totals and daily counts</span></button>
+        <button class="navBtn" data-section="alerts">Alerts<span class="small">Warnings and abuse signals</span></button>
+        <button class="navBtn" data-section="audit">Audit Log<span class="small">Admin activity trail</span></button>
+        <button class="navBtn" data-section="emergency">Emergency Tools<span class="small">Owner-only kill controls</span></button>
+      </aside>
+
+      <main class="content">
+        <!-- DASHBOARD -->
+        <section id="section-dashboard" class="section active">
+          <div class="sectionHead">
+            <h2>Dashboard</h2>
+            <p>API online/offline, public site state, launcher status, Redis/KV state, counters, and global switches.</p>
+          </div>
+
+          <div class="toolbar">
+            <button class="btnSm" id="refreshDashboard">Refresh Dashboard</button>
+            <button class="btnSm2" id="refreshAll">Refresh Current Section</button>
+          </div>
+
+          <div class="cards">
+            <div class="card"><h3>API</h3><div id="d_api" class="metric">—</div><div class="muted">Backend service state</div></div>
+            <div class="card"><h3>Public Site</h3><div id="d_public" class="metric">—</div><div class="muted">scriptnovaa.com state</div></div>
+            <div class="card"><h3>Redis / KV</h3><div id="d_redis" class="metric">—</div><div class="muted">Storage backend state</div></div>
+            <div class="card"><h3>Launcher</h3><div id="d_launcher" class="metric">—</div><div class="muted">Paused / maintenance / version</div></div>
+          </div>
+
+          <div class="cards">
+            <div class="card"><h3>Active Sessions</h3><div id="d_sessions" class="metric">0</div></div>
+            <div class="card"><h3>Free Keys</h3><div id="d_freekeys" class="metric">0</div></div>
+            <div class="card"><h3>Custom Keys</h3><div id="d_customkeys" class="metric">0</div></div>
+            <div class="card"><h3>Banned HWIDs</h3><div id="d_banned" class="metric">0</div></div>
+          </div>
+
+          <div class="cols2">
+            <div class="panel">
+              <h3>Launcher State</h3>
+              <div id="dashboardLauncherState" class="kv"></div>
+            </div>
+            <div class="panel">
+              <h3>Today</h3>
+              <div id="dashboardToday" class="kv"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SESSIONS -->
+        <section id="section-sessions" class="section">
+          <div class="sectionHead">
+            <h2>Sessions</h2>
+            <p>View current active sessions, filter by key, plan, clientId, sessionId, or HWID hash. Owner can end one or all sessions.</p>
+          </div>
+
+          <div class="panel">
+            <h3>Search Sessions</h3>
+            <div class="cols4">
+              <div><label class="label">License</label><input id="sessLicense" class="field" placeholder="BASIC-xxxx" /></div>
+              <div><label class="label">Plan</label><select id="sessPlan" class="select"><option value="">Any</option><option value="free">FREE</option><option value="basic">BASIC</option><option value="pro">PRO</option></select></div>
+              <div><label class="label">Client ID</label><input id="sessClient" class="field" placeholder="clientId" /></div>
+              <div><label class="label">HWID Hash</label><input id="sessHwid" class="field" placeholder="hwid hash" /></div>
+            </div>
+            <div class="row" style="margin-top:12px;">
+              <input id="sessSearch" class="field" style="flex:1" placeholder="Search all fields" />
+              <button class="btnSm" id="btnLoadSessions">Load Sessions</button>
+              <button class="btnSmDanger ownerOnly" id="btnEndAllSessions">End All Sessions</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Active Sessions</h3>
+            <div class="tableWrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>License</th>
+                    <th>Plan</th>
+                    <th>Session</th>
+                    <th>Client ID</th>
+                    <th>HWID Hash</th>
+                    <th>Last Seen</th>
+                    <th>Expires</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sessionsTbody">
+                  <tr><td colspan="8" class="muted">No data loaded yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- KEYS -->
+        <section id="section-keys" class="section">
+          <div class="sectionHead">
+            <h2>Keys</h2>
+            <p>Search keys, disable or enable them, create custom keys, update plan/expiry/limits, and reset bound HWIDs.</p>
+          </div>
+
+          <div class="cols2">
+            <div class="panel">
+              <h3>Search Key</h3>
+              <div class="row">
+                <input id="keySearchLicense" class="field" style="flex:1" placeholder="BASIC-xxxx or PRO-xxxx or FREE-xxxx" />
+                <button class="btnSm" id="btnKeySearch">Search</button>
+              </div>
+              <div id="keySearchResult" style="margin-top:12px;"></div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btnSmWarn ownerOnly" id="btnDisableKey">Disable Key</button>
+                <button class="btnSm ownerOnly" id="btnEnableKey">Enable Key</button>
+                <button class="btnSmDanger ownerOnly" id="btnResetKeyHwids">Reset HWID Bindings</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Create / Update Custom Key</h3>
+              <div class="cols2">
+                <div><label class="label">License</label><input id="customLicense" class="field" placeholder="PRO-MYKEY123" /></div>
+                <div><label class="label">Plan</label><select id="customPlan" class="select"><option value="basic">BASIC</option><option value="pro">PRO</option><option value="free">FREE</option></select></div>
+                <div><label class="label">TTL Seconds</label><input id="customTtl" class="field" value="1920" /></div>
+                <div><label class="label">Session Limit</label><input id="customSessions" class="field" value="2" /></div>
+                <div><label class="label">Max Devices</label><input id="customDevices" class="field" value="2" /></div>
+                <div><label class="label">Absolute Expiry Unix</label><input id="customExp" class="field" placeholder="0 for none" value="0" /></div>
+              </div>
+              <div class="fieldWrap" style="margin-top:12px;">
+                <label class="label">Note</label>
+                <textarea id="customNote" class="text" placeholder="Internal note"></textarea>
+              </div>
+              <div class="row">
+                <button class="btnSm ownerOnly" id="btnCreateCustomKey">Create Custom Key</button>
+                <button class="btnSm2 ownerOnly" id="btnUpdateCustomKey">Update Custom Key</button>
+                <button class="btnSmDanger ownerOnly" id="btnDeleteCustomKey">Delete Custom Key</button>
+                <button class="btnSm" id="btnLoadCustomKeys">Load Custom Keys</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Custom Keys</h3>
+            <div class="tableWrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>License</th>
+                    <th>Plan</th>
+                    <th>TTL</th>
+                    <th>Sessions</th>
+                    <th>Devices</th>
+                    <th>Expiry</th>
+                    <th>Created By</th>
+                    <th>Note</th>
+                  </tr>
+                </thead>
+                <tbody id="customKeysTbody">
+                  <tr><td colspan="8" class="muted">No custom keys loaded yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- FREE KEYS -->
+        <section id="section-freekeys" class="section">
+          <div class="sectionHead">
+            <h2>Free Keys</h2>
+            <p>View current free keys, add a free key manually, remove one, or expire all free keys.</p>
+          </div>
+
+          <div class="cols2">
+            <div class="panel">
+              <h3>Manual Free Key</h3>
+              <div class="cols2">
+                <div><label class="label">License</label><input id="freeAddLicense" class="field" placeholder="FREE-MANUAL123" /></div>
+                <div><label class="label">TTL Seconds</label><input id="freeAddTtl" class="field" value="900" /></div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btnSm ownerOnly" id="btnAddFreeKey">Add Free Key</button>
+                <button class="btnSmDanger ownerOnly" id="btnExpireAllFreeKeys">Expire All Free Keys</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Remove Free Key</h3>
+              <div class="row">
+                <input id="freeRemoveLicense" class="field" style="flex:1" placeholder="FREE-xxxx" />
+                <button class="btnSmDanger ownerOnly" id="btnRemoveFreeKey">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="row" style="justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;">Current Free Keys</h3>
+              <button class="btnSm" id="btnLoadFreeKeys">Load Free Keys</button>
+            </div>
+            <div class="tableWrap" style="margin-top:12px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>License</th>
+                    <th>TTL Seconds</th>
+                    <th>Expires</th>
+                    <th>Created At</th>
+                    <th>Created By</th>
+                  </tr>
+                </thead>
+                <tbody id="freeKeysTbody">
+                  <tr><td colspan="5" class="muted">No free keys loaded yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- LAUNCHER -->
+        <section id="section-launcher" class="section">
+          <div class="sectionHead">
+            <h2>Launcher Control</h2>
+            <p>Pause HTA launches, unpause them, force minimum version, and set a maintenance message shown by the API.</p>
+          </div>
+
+          <div class="cols2">
+            <div class="panel">
+              <h3>Pause / Unpause</h3>
+              <div class="fieldWrap">
+                <label class="label">Pause Reason</label>
+                <input id="pauseReason" class="field" placeholder="Example: Maintenance in progress" />
+              </div>
+              <div class="row">
+                <button class="btnWarn ownerOnly" id="btnPauseLauncher">Pause HTA Launches</button>
+                <button class="btnSm ownerOnly" id="btnUnpauseLauncher">Unpause HTA Launches</button>
+                <button class="btnSm" id="btnLauncherStatus">Refresh Status</button>
+              </div>
+              <div id="launcherStatusBox" style="margin-top:12px;"></div>
+            </div>
+
+            <div class="panel">
+              <h3>Version + Maintenance</h3>
+              <div class="fieldWrap">
+                <label class="label">Force Minimum Version</label>
+                <input id="minVersion" class="field" placeholder="v13.13.14" />
+              </div>
+              <div class="fieldWrap">
+                <label class="label">Maintenance Message</label>
+                <textarea id="maintenanceMessage" class="text" placeholder="Maintenance message shown when maintenance mode is active"></textarea>
+              </div>
+              <div class="row">
+                <button class="btnSm ownerOnly" id="btnSetMinVersion">Set Min Version</button>
+                <button class="btnSm2 ownerOnly" id="btnSetMaintenanceMsg">Set Maintenance Message</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- HWID -->
+        <section id="section-hwid" class="section">
+          <div class="sectionHead">
+            <h2>HWID / Device Controls</h2>
+            <p>Search by HWID or license, see tied licenses and sessions, ban/unban HWIDs, mark suspicious devices, and disconnect sessions for a device.</p>
+          </div>
+
+          <div class="cols2">
+            <div class="panel">
+              <h3>Search</h3>
+              <div class="cols2">
+                <div><label class="label">License</label><input id="hwidLicense" class="field" placeholder="BASIC-xxxx" /></div>
+                <div><label class="label">HWID Hash</label><input id="hwidHash" class="field" placeholder="hwid hash" /></div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btnSm" id="btnSearchHwid">Search</button>
+                <button class="btnSmDanger ownerOnly" id="btnBanHwid">Ban HWID</button>
+                <button class="btnSm ownerOnly" id="btnUnbanHwid">Unban HWID</button>
+                <button class="btnSmWarn ownerOnly" id="btnMarkSuspicious">Mark Suspicious</button>
+                <button class="btnSmDanger ownerOnly" id="btnDisconnectHwid">Disconnect Sessions For HWID</button>
+              </div>
+              <div class="fieldWrap" style="margin-top:12px;">
+                <label class="label">Reason</label>
+                <input id="hwidReason" class="field" placeholder="Reason for action" />
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Results</h3>
+              <div id="hwidSearchResult" class="kv"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Sessions / Ties</h3>
+            <div id="hwidRelationsBox"></div>
+          </div>
+        </section>
+
+        <!-- ACCOUNTS -->
+        <section id="section-accounts" class="section">
+          <div class="sectionHead">
+            <h2>Admin Accounts</h2>
+            <p>List roles, see active admin sessions, and force logout all admins. Owner only.</p>
+          </div>
+
+          <div class="notice">This section is owner-only. Ulises and Other can see it locked but cannot use it.</div>
+
+          <div class="panel ownerOnlyWrap">
+            <div class="row" style="justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;">Admin Accounts</h3>
+              <div class="row">
+                <button class="btnSm ownerOnly" id="btnLoadAdminAccounts">Load Accounts</button>
+                <button class="btnSmDanger ownerOnly" id="btnForceLogoutAdmins">Force Logout All Admins</button>
+              </div>
+            </div>
+            <div class="cols2" style="margin-top:12px;">
+              <div>
+                <h3>Known Admin Accounts</h3>
+                <div class="tableWrap">
+                  <table>
+                    <thead><tr><th>Username</th><th>Role</th><th>Disabled</th></tr></thead>
+                    <tbody id="adminAccountsTbody"><tr><td colspan="3" class="muted">No data loaded yet.</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <h3>Active Admin Sessions</h3>
+                <div class="tableWrap">
+                  <table>
+                    <thead><tr><th>User</th><th>Role</th><th>IP</th><th>Created</th><th>Exp</th></tr></thead>
+                    <tbody id="adminActiveTbody"><tr><td colspan="5" class="muted">No data loaded yet.</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONFIG -->
+        <section id="section-config" class="section">
+          <div class="sectionHead">
+            <h2>System Config</h2>
+            <p>Current defaults, forced version, maintenance text, and feature toggles. Owner-only read for now.</p>
+          </div>
+
+          <div class="panel">
+            <div class="row" style="justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;">Current Config</h3>
+              <button class="btnSm ownerOnly" id="btnLoadConfig">Load Config</button>
+            </div>
+            <div id="configBox" style="margin-top:12px;"></div>
+          </div>
+        </section>
+
+        <!-- ANALYTICS -->
+        <section id="section-analytics" class="section">
+          <div class="sectionHead">
+            <h2>Analytics / Counters</h2>
+            <p>Total visitors, trusted visitors, downloads, and today’s key checks, verify attempts, launches, failures, and more.</p>
+          </div>
+
+          <div class="panel">
+            <div class="row" style="justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;">Analytics Summary</h3>
+              <button class="btnSm" id="btnLoadAnalytics">Load Analytics</button>
+            </div>
+            <div id="analyticsBox" class="kv" style="margin-top:12px;"></div>
+          </div>
+        </section>
+
+        <!-- ALERTS -->
+        <section id="section-alerts" class="section">
+          <div class="sectionHead">
+            <h2>Alerts / Abuse Monitoring</h2>
+            <p>Repeated failed key attempts, banned device tries, session pressure, and other warning entries.</p>
+          </div>
+
+          <div class="panel">
+            <div class="row" style="justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;">Recent Alerts</h3>
+              <div class="row">
+                <input id="alertsLimit" class="field" style="width:120px" value="50" />
+                <button class="btnSm" id="btnLoadAlerts">Load Alerts</button>
+              </div>
+            </div>
+            <div class="tableWrap" style="margin-top:12px;">
+              <table>
+                <thead><tr><th>Time</th><th>Type</th><th>Level</th><th>Actor / License</th><th>Details</th></tr></thead>
+                <tbody id="alertsTbody"><tr><td colspan="5" class="muted">No data loaded yet.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- AUDIT -->
+        <section id="section-audit" class="section">
+          <div class="sectionHead">
+            <h2>Audit Log</h2>
+            <p>Who did what, when, from what IP or admin account, and what changed.</p>
+          </div>
+
+          <div class="panel">
+            <div class="row" style="justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;">Recent Audit Entries</h3>
+              <div class="row">
+                <input id="auditLimit" class="field" style="width:120px" value="50" />
+                <button class="btnSm" id="btnLoadAudit">Load Audit</button>
+              </div>
+            </div>
+            <div class="tableWrap" style="margin-top:12px;">
+              <table>
+                <thead><tr><th>Time</th><th>Type</th><th>Actor</th><th>Role</th><th>Action</th><th>Target</th><th>Success</th></tr></thead>
+                <tbody id="auditTbody"><tr><td colspan="7" class="muted">No data loaded yet.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- EMERGENCY -->
+        <section id="section-emergency" class="section">
+          <div class="sectionHead">
+            <h2>Emergency Tools</h2>
+            <p>Owner-only controls for disable all keys, pause all launches, clear launch nonces, end all sessions, and set emergency banners.</p>
+          </div>
+
+          <div class="notice">These actions are powerful. Use them only when needed.</div>
+
+          <div class="cols2">
+            <div class="panel">
+              <h3>Global Key / Session Controls</h3>
+              <div class="row">
+                <button class="btnDanger ownerOnly" id="btnDisableAllKeys">Disable All Keys</button>
+                <button class="btnSm ownerOnly" id="btnEnableAllKeys">Re-enable All Keys</button>
+              </div>
+              <div class="row" style="margin-top:10px;">
+                <button class="btnWarn ownerOnly" id="btnEmergencyPause">Pause All Launches</button>
+                <button class="btnSmDanger ownerOnly" id="btnEmergencyEndSessions">End All Sessions Now</button>
+              </div>
+              <div class="row" style="margin-top:10px;">
+                <button class="btnSmDanger ownerOnly" id="btnEmergencyClearNonces">Clear Launch Nonces</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Emergency Banner</h3>
+              <div class="fieldWrap">
+                <label class="label">Message</label>
+                <textarea id="emergencyBanner" class="text" placeholder="Emergency or outage banner message"></textarea>
+              </div>
+              <div class="row">
+                <button class="btnSm2 ownerOnly" id="btnSetEmergencyBanner">Set Emergency Banner</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   </div>
 
   <script>
-    const API = 'https://api.scriptnovaa.com';
-    const state = { token: localStorage.getItem('sn_admin_token') || '', role: localStorage.getItem('sn_admin_role') || '' };
-    const tabs = [
-      ['dashboard','Dashboard'],['sessions','Sessions'],['keys','Keys'],['freekeys','Free Keys'],['launcher','Launcher'],['hwid','HWID'],['admins','Admin Accounts'],['config','System Config'],['analytics','Analytics'],['alerts','Alerts'],['audit','Audit'],['emergency','Emergency']
-    ];
-    const roleRank = { owner: 3, ulises: 2, other: 1, none: 0 };
-    const perms = {
-      dashboard:'other', sessions:'ulises', keys:'ulises', freekeys:'ulises', launcher:'ulises', hwid:'ulises', admins:'owner', config:'ulises', analytics:'ulises', alerts:'other', audit:'ulises', emergency:'owner'
-    };
-    function byId(id){return document.getElementById(id)}
-    function setStatus(msg, cls){ const el=byId('globalStatus'); el.className='status '+(cls||''); el.textContent=msg; }
-    function can(need){ return roleRank[state.role||'none'] >= roleRank[need||'owner']; }
-    function authHeaders(){ return state.token ? { 'Authorization':'Bearer '+state.token, 'Content-Type':'application/json' } : { 'Content-Type':'application/json' }; }
-    function fmtTs(ts){ if(!ts) return '—'; const d=new Date(ts*1000); return d.toLocaleString(); }
-    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-    function roleClass(role){ return role==='owner'?'role-owner':role==='ulises'?'role-ulises':'role-other'; }
-    function lockWrap(sectionId, html){ return can(perms[sectionId]) ? html : '<div class="card locked">'+html+'</div>'; }
+    (function(){
+      var API = "https://api.scriptnovaa.com/api/admin";
+      var state = {
+        token: localStorage.getItem("sn_admin_token") || "",
+        me: null,
+        currentSection: "dashboard",
+        lastKeyLookup: "",
+        lastHwidLookup: ""
+      };
 
-    function renderTabs(){
-      const box = byId('tabs');
-      box.innerHTML = tabs.map(([id,label],i)=>'<button class="tab '+(i===0?'active':'')+'" onclick="openTab(\''+id+'\',this)">'+label+'</button>').join('');
-    }
-    function openTab(id, btn){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); byId(id).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); if(btn) btn.classList.add('active'); }
+      function $(id){ return document.getElementById(id); }
 
-    async function api(path, options){
-      const res = await fetch(API + path, Object.assign({ headers: authHeaders() }, options||{}));
-      const txt = await res.text();
-      let json = {}; try{ json = JSON.parse(txt) }catch{ json = { ok:false, error:'bad_json', raw:txt } }
-      if(json.build) byId('buildBadge').textContent = json.build;
-      if(!res.ok || json.ok === false) throw json;
-      return json;
-    }
-
-    async function login(){
-      const role = byId('loginRole').value;
-      const password = byId('loginPassword').value;
-      try{
-        const j = await api('/api/admin/login', { method:'POST', body: JSON.stringify({ role, password }) });
-        state.token = j.token; state.role = j.role;
-        localStorage.setItem('sn_admin_token', j.token); localStorage.setItem('sn_admin_role', j.role);
-        byId('roleBadge').className = 'pill '+roleClass(j.role); byId('roleBadge').textContent = 'Role: ' + j.role;
-        byId('sessionBadge').textContent = 'Admin session active';
-        setStatus('Logged in as '+j.role, 'ok');
-        await loadAll();
-      }catch(e){ setStatus('Login failed: '+(e.error||'unknown'), 'bad'); }
-    }
-
-    async function loadMe(){
-      if(!state.token) return;
-      try{
-        const j = await api('/api/admin/me');
-        state.role = j.role; localStorage.setItem('sn_admin_role', j.role);
-        byId('roleBadge').className = 'pill '+roleClass(j.role); byId('roleBadge').textContent = 'Role: ' + j.role;
-        byId('sessionBadge').textContent = 'Expires: ' + fmtTs(j.exp);
-        setStatus('Admin session refreshed.', 'ok');
-      }catch(e){
-        setStatus('Session check failed: '+(e.error||'unknown'), 'bad');
+      function esc(s){
+        s = String(s == null ? "" : s);
+        return s
+          .replace(/&/g,"&amp;")
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/"/g,"&quot;")
+          .replace(/'/g,"&#39;");
       }
-    }
 
-    async function logout(){
-      try{ if(state.token) await api('/api/admin/logout', { method:'POST', body:'{}' }); }catch{}
-      state.token=''; state.role=''; localStorage.removeItem('sn_admin_token'); localStorage.removeItem('sn_admin_role');
-      byId('roleBadge').className='pill'; byId('roleBadge').textContent='Not logged in';
-      byId('sessionBadge').textContent='No admin token';
-      setStatus('Logged out.', 'warn');
-    }
+      function ts(v){
+        v = parseInt(v,10)||0;
+        if(!v) return "—";
+        try { return new Date(v*1000).toLocaleString(); } catch(e){ return String(v); }
+      }
 
-    async function loadAll(){ await loadMe(); await Promise.allSettled([loadDashboard(),loadSessions(),loadKeys(),loadFreeKeys(),loadLauncher(),loadHwid(),loadAdmins(),loadConfig(),loadAnalytics(),loadAlerts(),loadAudit()]); }
+      function yesNo(v){ return v ? "Yes" : "No"; }
 
-    async function loadDashboard(){
-      const j = await api('/api/admin/dashboard');
-      const d = j.dashboard;
-      byId('dashboard').innerHTML = lockWrap('dashboard', `
-        <div class="grid4">
-          ${metric('API', d.apiOnline?'ONLINE':'OFFLINE')}
-          ${metric('Public Site', d.publicSiteOnline?'ONLINE':'OFFLINE')}
-          ${metric('Redis / KV', d.redisOnline?'ONLINE':'OFFLINE')}
-          ${metric('Paused State', d.pausedState)}
-          ${metric('Launcher Version', d.launcherVersionStatus)}
-          ${metric('Force Min Version', d.forceMinVersion)}
-          ${metric('Active Sessions', d.activeSessionsCount)}
-          ${metric('Free Keys', d.freeKeysCount)}
-          ${metric('Custom Keys', d.customKeysCount)}
-          ${metric('Disabled Keys', d.disabledKeysCount)}
-          ${metric('Banned HWIDs', d.bannedHwidsCount)}
-          ${metric('Downloads', d.totals.downloads)}
-        </div>
-        <div class="grid2" style="margin-top:12px">
-          <div class="card"><div class="tiny">Maintenance Message</div><div class="status">${esc(d.maintenanceMessage||'None')}</div></div>
-          <div class="card"><div class="tiny">Emergency Banner</div><div class="status">${esc(d.emergencyBanner||'None')}</div></div>
-        </div>
-      `);
-    }
-    function metric(label, value){ return `<div class="metric"><div class="tiny">${esc(label)}</div><b>${esc(value)}</b></div>` }
+      function roleName(){
+        return state.me && state.me.admin ? String(state.me.admin.role || "") : "";
+      }
 
-    async function loadSessions(){
-      const q = byId('sessionSearch') ? byId('sessionSearch').value : '';
-      const j = await api('/api/admin/sessions?action=list&q='+encodeURIComponent(q));
-      byId('sessions').innerHTML = lockWrap('sessions', `
-        <div class="card">
-          <div class="row"><input id="sessionSearch" class="grow" placeholder="Search by key / plan / clientId / hwid / sessionId" value="${esc(q)}" /><button onclick="loadSessions()">Search</button><button class="danger" ${can('owner')?'':'disabled'} onclick="sessionAction('end_all',{})">End All Sessions</button></div>
-          <div class="scroll" style="margin-top:12px"><table><thead><tr><th>License</th><th>Plan</th><th>Session</th><th>Client</th><th>HWID</th><th>Seen</th><th>Exp</th><th>Action</th></tr></thead><tbody>
-            ${j.sessions.map(s=>`<tr><td>${esc(s.license)}</td><td>${esc(s.plan)}</td><td>${esc(s.sessionId)}</td><td>${esc(s.cid)}</td><td>${esc(s.hw)}</td><td>${esc(fmtTs(s.seen))}</td><td>${esc(fmtTs(s.exp))}</td><td><button ${can('owner')?'':'disabled'} onclick="sessionAction('end_one',{license:'${esc(s.license)}',sessionId:'${esc(s.sessionId)}'})">End</button></td></tr>`).join('') || '<tr><td colspan="8">No sessions.</td></tr>'}
-          </tbody></table></div>
-        </div>`);
-    }
-    async function sessionAction(action, payload){ try{ await api('/api/admin/sessions', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('Session action done: '+action, 'ok'); await loadSessions(); await loadDashboard(); }catch(e){ setStatus('Session action failed: '+(e.error||'unknown'), 'bad'); } }
+      function isOwner(){ return roleName() === "owner"; }
+      function isUlises(){ return roleName() === "ulises"; }
+      function isOther(){ return roleName() === "other"; }
 
-    async function loadKeys(){
-      byId('keys').innerHTML = lockWrap('keys', `
-        <div class="split">
-          <div class="card">
-            <div class="tiny">Search Key</div>
-            <div class="row" style="margin-top:8px"><input id="keySearchValue" class="grow" placeholder="BASIC-xxxx / PRO-xxxx / FREE-xxxx" /><button onclick="searchKey()">Search</button></div>
-            <div id="keySearchOut" class="status" style="margin-top:10px">No key loaded.</div>
-          </div>
-          <div class="card ${can('owner')?'':'locked'}">
-            <div class="tiny">Custom Key Editor</div>
-            <div class="grid2" style="margin-top:8px"><input id="customLicense" placeholder="CUSTOM-KEY" /><select id="customPlan"><option value="basic">basic</option><option value="pro">pro</option><option value="free">free</option></select><input id="customTtl" placeholder="TTL seconds" value="3600" /><input id="customSessions" placeholder="Session limit" value="1" /><input id="customDevices" placeholder="Device limit" value="1" /><input id="customExp" placeholder="Expiry unix optional" value="0" /></div>
-            <textarea id="customNotes" placeholder="Notes"></textarea>
-            <div class="row"><button ${can('owner')?'':'disabled'} onclick="saveCustomKey()">Create / Update</button><button class="danger" ${can('owner')?'':'disabled'} onclick="keyAction('delete_custom')">Delete Custom</button><button ${can('owner')?'':'disabled'} onclick="keyAction('reset_bindings')">Reset Bindings</button></div>
-            <div class="row"><button class="danger" ${can('owner')?'':'disabled'} onclick="keyAction('disable')">Disable Key</button><button class="good" ${can('owner')?'':'disabled'} onclick="keyAction('enable')">Enable Key</button></div>
-          </div>
-        </div>`);
-    }
-    async function searchKey(){
-      const license = byId('keySearchValue').value.trim();
-      if(!license) return setStatus('Enter a key first.', 'warn');
-      try{ const j = await api('/api/admin/keys?license='+encodeURIComponent(license)+'&action=search'); byId('customLicense').value = license; byId('keySearchOut').textContent = JSON.stringify(j, null, 2); setStatus('Key loaded.', 'ok'); }catch(e){ setStatus('Key search failed: '+(e.error||'unknown'), 'bad'); }
-    }
-    async function saveCustomKey(){
-      try{ await api('/api/admin/keys', { method:'POST', body: JSON.stringify({ action:'create_custom', license:byId('customLicense').value.trim(), plan:byId('customPlan').value, ttlSeconds:+byId('customTtl').value||0, sessionLimit:+byId('customSessions').value||0, deviceLimit:+byId('customDevices').value||0, exp:+byId('customExp').value||0, notes:byId('customNotes').value }) }); setStatus('Custom key saved.', 'ok'); await searchKey(); await loadDashboard(); }catch(e){ setStatus('Save failed: '+(e.error||'unknown'), 'bad'); }
-    }
-    async function keyAction(action){
-      try{ await api('/api/admin/keys', { method:'POST', body: JSON.stringify({ action, license:byId('customLicense').value.trim(), reason:'Admin panel' }) }); setStatus('Key action done: '+action, 'ok'); await searchKey(); await loadDashboard(); }catch(e){ setStatus('Key action failed: '+(e.error||'unknown'), 'bad'); }
-    }
+      function setMsg(type, text, targetId){
+        var el = $(targetId || "globalMsg");
+        if(!el) return;
+        el.className = type;
+        el.innerHTML = esc(text);
+      }
 
-    async function loadFreeKeys(){
-      const j = await api('/api/admin/freekeys?action=list');
-      byId('freekeys').innerHTML = lockWrap('freekeys', `
-        <div class="split">
-          <div class="card ${can('owner')?'':'locked'}">
-            <div class="tiny">Manual Free Key Controls</div>
-            <div class="grid2" style="margin-top:8px"><input id="freeKeyManual" placeholder="FREE-XXXXXX or leave blank" /><input id="freeKeyTtl" value="900" placeholder="TTL seconds" /></div>
-            <div class="row"><button ${can('owner')?'':'disabled'} onclick="freeKeyAction('add')">Add Free Key</button><button class="danger" ${can('owner')?'':'disabled'} onclick="freeKeyAction('remove')">Remove Free Key</button><button class="danger" ${can('owner')?'':'disabled'} onclick="freeKeyAction('expire_all')">Expire All Free Keys</button></div>
-          </div>
-          <div class="card"><div class="tiny">Current Free Keys</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Key</th><th>Issued</th><th>Expires</th></tr></thead><tbody>${j.items.map(x=>`<tr><td>${esc(x.key)}</td><td>${esc(fmtTs(x.issuedAt))}</td><td>${esc(fmtTs(x.exp))}</td></tr>`).join('')||'<tr><td colspan="3">No free keys.</td></tr>'}</tbody></table></div></div>
-        </div>`);
-    }
-    async function freeKeyAction(action){ try{ await api('/api/admin/freekeys', { method:'POST', body: JSON.stringify({ action, key:byId('freeKeyManual').value.trim(), ttlSeconds:+byId('freeKeyTtl').value||900 }) }); setStatus('Free key action done: '+action, 'ok'); await loadFreeKeys(); await loadDashboard(); }catch(e){ setStatus('Free key action failed: '+(e.error||'unknown'), 'bad'); } }
+      function clearMsg(targetId){
+        var el = $(targetId || "globalMsg");
+        if(!el) return;
+        el.className = "hidden";
+        el.innerHTML = "";
+      }
 
-    async function loadLauncher(){
-      const j = await api('/api/admin/launcher?action=status');
-      byId('launcher').innerHTML = lockWrap('launcher', `
-        <div class="split">
-          <div class="card"><div class="tiny">Launcher State</div><div class="status" style="margin-top:8px">Paused: ${esc(j.paused ? 'yes' : 'no')}\nMin Version: ${esc(j.config.forceMinVersion)}\nMaintenance: ${esc(j.config.maintenanceMessage || 'None')}</div></div>
-          <div class="card ${can('owner')?'':'locked'}">
-            <div class="tiny">Launcher Controls</div>
-            <textarea id="launcherMessage" placeholder="Pause or maintenance message"></textarea>
-            <input id="launcherMinVersion" placeholder="Force minimum version" value="${esc(j.config.forceMinVersion||'')}" />
-            <div class="row"><button ${can('owner')?'':'disabled'} onclick="launcherAction('pause',{ message:byId('launcherMessage').value })">Pause HTA Launches</button><button class="good" ${can('owner')?'':'disabled'} onclick="launcherAction('unpause',{})">Unpause HTA</button></div>
-            <div class="row"><button ${can('owner')?'':'disabled'} onclick="launcherAction('set_min_version',{ value:byId('launcherMinVersion').value.trim() })">Force Minimum Version</button><button ${can('owner')?'':'disabled'} onclick="launcherAction('set_maintenance',{ message:byId('launcherMessage').value })">Show Maintenance Message</button></div>
-          </div>
-        </div>`);
-    }
-    async function launcherAction(action,payload){ try{ await api('/api/admin/launcher', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('Launcher action done: '+action, 'ok'); await loadLauncher(); await loadDashboard(); }catch(e){ setStatus('Launcher action failed: '+(e.error||'unknown'), 'bad'); } }
+      async function api(action, data){
+        data = data || {};
+        data.action = action;
+        if(state.token) data.token = state.token;
 
-    async function loadHwid(){
-      byId('hwid').innerHTML = lockWrap('hwid', `
-        <div class="split">
-          <div class="card">
-            <div class="tiny">HWID / License Search</div>
-            <div class="row" style="margin-top:8px"><input id="hwidSearchValue" class="grow" placeholder="Search by HWID or license" /><button onclick="searchHwid()">Search</button></div>
-            <div id="hwidSearchOut" class="status" style="margin-top:10px">No search yet.</div>
-          </div>
-          <div class="card ${can('owner')?'':'locked'}">
-            <div class="tiny">HWID Actions</div>
-            <input id="hwidTarget" placeholder="HWID hash" />
-            <input id="hwidLicenseTarget" placeholder="License for reset bindings" />
-            <textarea id="hwidReason" placeholder="Ban or suspicious reason"></textarea>
-            <div class="row"><button class="danger" ${can('owner')?'':'disabled'} onclick="hwidAction('ban',{ hw:byId('hwidTarget').value.trim(), reason:byId('hwidReason').value })">Ban HWID</button><button class="good" ${can('owner')?'':'disabled'} onclick="hwidAction('unban',{ hw:byId('hwidTarget').value.trim() })">Unban HWID</button></div>
-            <div class="row"><button ${can('owner')?'':'disabled'} onclick="hwidAction('mark_suspicious',{ hw:byId('hwidTarget').value.trim(), reason:byId('hwidReason').value })">Mark Suspicious</button><button ${can('owner')?'':'disabled'} onclick="sessionAction('disconnect_hwid',{ hw:byId('hwidTarget').value.trim() })">Disconnect Sessions</button></div>
-            <div class="row"><button ${can('owner')?'':'disabled'} onclick="hwidAction('reset_key_bindings',{ license:byId('hwidLicenseTarget').value.trim() })">Reset Device Bindings For Key</button></div>
-          </div>
-        </div>`);
-    }
-    async function searchHwid(){ try{ const q=byId('hwidSearchValue').value.trim(); const j=await api('/api/admin/hwid?q='+encodeURIComponent(q)+'&action=search'); byId('hwidSearchOut').textContent=JSON.stringify(j.items, null, 2); setStatus('HWID search loaded.', 'ok'); }catch(e){ setStatus('HWID search failed: '+(e.error||'unknown'), 'bad'); } }
-    async function hwidAction(action,payload){ try{ await api('/api/admin/hwid', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('HWID action done: '+action, 'ok'); }catch(e){ setStatus('HWID action failed: '+(e.error||'unknown'), 'bad'); } }
+        var r = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify(data)
+        });
 
-    async function loadAdmins(){
-      if(!can('owner')){ byId('admins').innerHTML = lockWrap('admins', '<div class="tiny">Owner only.</div>'); return; }
-      const j = await api('/api/admin/admin_accounts?action=list');
-      byId('admins').innerHTML = `
-        <div class="split">
-          <div class="card"><div class="tiny">Current Admin Sessions</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Role</th><th>TID</th><th>Created</th><th>Last Seen</th><th>IP</th><th>Action</th></tr></thead><tbody>${j.sessions.map(s=>`<tr><td>${esc(s.role)}</td><td>${esc(s.tid)}</td><td>${esc(fmtTs(s.createdAt))}</td><td>${esc(fmtTs(s.lastSeen))}</td><td>${esc(s.ip)}</td><td><button onclick="adminAction('revoke',{ tid:'${esc(s.tid)}' })">Revoke</button></td></tr>`).join('')||'<tr><td colspan="6">No admin sessions.</td></tr>'}</tbody></table></div></div>
-          <div class="card"><div class="tiny">Admin Account Controls</div><div class="status" style="margin:8px 0">Role disabled state:\n${esc(JSON.stringify(j.disabled,null,2))}</div><div class="grid2"><select id="adminRoleToggle"><option value="owner">owner</option><option value="ulises">ulises</option><option value="other">other</option></select><button class="danger" onclick="adminAction('disable_role',{ role:byId('adminRoleToggle').value })">Disable Role</button><button class="good" onclick="adminAction('enable_role',{ role:byId('adminRoleToggle').value })">Enable Role</button><button class="danger" onclick="adminAction('force_logout_all',{})">Force Logout All Admins</button></div></div>
-        </div>`;
-    }
-    async function adminAction(action,payload){ try{ await api('/api/admin/admin_accounts', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('Admin account action done: '+action, 'ok'); await loadAdmins(); }catch(e){ setStatus('Admin action failed: '+(e.error||'unknown'), 'bad'); } }
+        var j = {};
+        try { j = await r.json(); } catch(e){ j = { ok:false, error:"bad_json" }; }
 
-    async function loadConfig(){
-      const j = await api('/api/admin/config?action=get');
-      byId('config').innerHTML = lockWrap('config', `
-        <div class="split">
-          <div class="card"><div class="tiny">Current Config</div><div class="status" style="margin-top:8px">${esc(JSON.stringify(j.config, null, 2))}</div></div>
-          <div class="card ${can('owner')?'':'locked'}"><div class="tiny">Patch Config JSON</div><textarea id="configPatch">{
-  "planDefaults": {
-    "free": { "ttlSeconds": 900, "sessionLimit": 1, "deviceLimit": 1 },
-    "basic": { "ttlSeconds": 1920, "sessionLimit": 2, "deviceLimit": 2 },
-    "pro": { "ttlSeconds": 424800, "sessionLimit": 4, "deviceLimit": 4 }
-  }
-}</textarea><button ${can('owner')?'':'disabled'} onclick="updateConfig()">Update Config</button></div>
-        </div>`);
-    }
-    async function updateConfig(){ try{ const patch=JSON.parse(byId('configPatch').value); await api('/api/admin/config', { method:'POST', body: JSON.stringify({ action:'update', patch }) }); setStatus('Config updated.', 'ok'); await loadConfig(); await loadDashboard(); }catch(e){ setStatus('Config update failed: '+(e.error||e.message||'unknown'), 'bad'); } }
+        if(!r.ok || j.ok === false){
+          var err = (j && (j.error || j.message)) ? (j.error || j.message) : ("http_" + r.status);
+          throw new Error(err);
+        }
+        return j;
+      }
 
-    async function loadAnalytics(){ const j = await api('/api/admin/analytics'); byId('analytics').innerHTML = lockWrap('analytics', `<div class="grid3">${metric('Visitors',j.totals.visitors)}${metric('Trusted Visitors',j.totals.trustedVisitors)}${metric('Downloads',j.totals.downloads)}${metric('Key Checks Today',j.today.keyChecks)}${metric('Verify Attempts Today',j.today.verifyAttempts)}${metric('Launch Attempts Today',j.today.launchAttempts)}${metric('Launch Failures Today',j.today.launchFailures)}${metric('Free Keys Today',j.today.freeKeysGenerated)}${metric('Sessions Ended Today',j.today.sessionsEnded)}</div><div class="card" style="margin-top:12px"><div class="tiny">Top Error Types</div><div class="status" style="margin-top:8px">${esc(JSON.stringify(j.topErrorTypes,null,2))}</div></div>`); }
-    async function loadAlerts(){ const j = await api('/api/admin/alerts'); byId('alerts').innerHTML = lockWrap('alerts', `<div class="card"><div class="tiny">Alerts / Abuse Monitoring</div><div class="status" style="margin-top:8px">${esc(JSON.stringify(j.alerts,null,2))}</div></div>`); }
-    async function loadAudit(){ const j = await api('/api/admin/audit'); byId('audit').innerHTML = lockWrap('audit', `<div class="card"><div class="tiny">Audit Log</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Type</th><th>Role</th><th>When</th><th>IP</th><th>Success</th><th>Details</th></tr></thead><tbody>${j.items.map(x=>`<tr><td>${esc(x.type)}</td><td>${esc(x.role||'')}</td><td>${esc(fmtTs(x.ts))}</td><td>${esc(x.ip||'')}</td><td>${esc(String(x.success))}</td><td>${esc(JSON.stringify(x.target||x.value||x.reason||'',null,0))}</td></tr>`).join('')||'<tr><td colspan="6">No audit items.</td></tr>'}</tbody></table></div></div>`); }
+      function applyPermissions(){
+        var ownerBtns = document.querySelectorAll(".ownerOnly");
+        for(var i=0;i<ownerBtns.length;i++){
+          ownerBtns[i].disabled = !isOwner();
+        }
 
-    byId('emergency').innerHTML = lockWrap('emergency', `
-      <div class="card ${can('owner')?'':'locked'}">
-        <div class="tiny">Emergency Tools — Owner Only</div>
-        <textarea id="emergencyMessage" placeholder="Reason or emergency banner message"></textarea>
-        <div class="grid3" style="margin-top:10px">
-          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('disable_all_keys')">Disable All Keys</button>
-          <button class="good" ${can('owner')?'':'disabled'} onclick="emergencyAction('enable_all_keys')">Re-Enable All Keys</button>
-          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('end_all_sessions_now')">End All Sessions Now</button>
-          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('pause_all_launches')">Pause All Launches</button>
-          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('clear_launch_nonces')">Clear Launch Nonces</button>
-          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('wipe_active_sessions')">Wipe All Active Sessions</button>
-          <button ${can('owner')?'':'disabled'} onclick="emergencyAction('enter_maintenance_mode')">Enter Maintenance Mode</button>
-          <button ${can('owner')?'':'disabled'} onclick="emergencyAction('set_emergency_banner')">Emergency Banner</button>
-        </div>
-      </div>`);
-    async function emergencyAction(action){ try{ await api('/api/admin/emergency', { method:'POST', body: JSON.stringify({ action, reason:byId('emergencyMessage').value, message:byId('emergencyMessage').value }) }); setStatus('Emergency action done: '+action, 'ok'); await loadDashboard(); await loadLauncher(); await loadAudit(); }catch(e){ setStatus('Emergency action failed: '+(e.error||'unknown'), 'bad'); } }
+        var sections = [
+          {id:"accounts", owner:true},
+          {id:"config", owner:true},
+          {id:"emergency", owner:true}
+        ];
 
-    renderTabs();
-    if(state.role){ byId('roleBadge').className='pill '+roleClass(state.role); byId('roleBadge').textContent='Role: '+state.role; }
-    if(state.token){ loadAll().catch(e=>setStatus('Load failed: '+(e.error||e.message||'unknown'),'bad')); }
+        for(var j=0;j<sections.length;j++){
+          var section = $("section-" + sections[j].id);
+          if(!section) continue;
+          if(sections[j].owner && !isOwner()){
+            section.classList.add("locked");
+          } else {
+            section.classList.remove("locked");
+          }
+        }
+
+        if(isOther()){
+          var allowed = {
+            dashboard:1,
+            launcher:1,
+            alerts:1
+          };
+          var nav = document.querySelectorAll(".navBtn");
+          for(var n=0;n<nav.length;n++){
+            var sec = nav[n].getAttribute("data-section");
+            if(!allowed[sec]){
+              nav[n].classList.add("locked");
+            } else {
+              nav[n].classList.remove("locked");
+            }
+          }
+        } else {
+          var nav2 = document.querySelectorAll(".navBtn");
+          for(var m=0;m<nav2.length;m++) nav2[m].classList.remove("locked");
+        }
+
+        var who = $("whoami");
+        if(who && state.me && state.me.admin){
+          who.innerHTML = "Logged in: <b>" + esc(state.me.admin.username) + "</b> • Role: <b>" + esc(state.me.admin.role) + "</b>";
+        }
+      }
+
+      function showView(which){
+        $("loginView").classList.toggle("hidden", which !== "login");
+        $("appView").classList.toggle("hidden", which !== "app");
+      }
+
+      function showSection(section){
+        state.currentSection = section;
+        var all = document.querySelectorAll(".section");
+        for(var i=0;i<all.length;i++) all[i].classList.remove("active");
+        var nav = document.querySelectorAll(".navBtn");
+        for(var j=0;j<nav.length;j++) nav[j].classList.remove("active");
+        $("section-" + section).classList.add("active");
+        var btn = document.querySelector('.navBtn[data-section="' + section + '"]');
+        if(btn) btn.classList.add("active");
+      }
+
+      async function login(){
+        clearMsg("loginMsg");
+        var username = $("loginUsername").value;
+        var password = $("loginPassword").value;
+
+        try{
+          var j = await fetch(API, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ action:"login", username:username, password:password })
+          }).then(function(r){ return r.json(); });
+
+          if(!j || j.ok !== true || !j.token){
+            throw new Error((j && j.error) || "login_failed");
+          }
+
+          state.token = j.token;
+          localStorage.setItem("sn_admin_token", state.token);
+          await loadMe();
+          showView("app");
+          applyPermissions();
+          await loadDashboard();
+        }catch(e){
+          setMsg("error", "Login failed: " + e.message, "loginMsg");
+        }
+      }
+
+      async function loadMe(){
+        var j = await api("me");
+        state.me = j;
+      }
+
+      async function logout(){
+        try{ await api("logout"); }catch(e){}
+        state.token = "";
+        state.me = null;
+        localStorage.removeItem("sn_admin_token");
+        $("loginPassword").value = "";
+        showView("login");
+      }
+
+      function setGlobalStatePill(label, statusClass){
+        var el = $("globalStatePill");
+        if(!el) return;
+        el.innerHTML = esc(label);
+        el.style.borderColor = statusClass === "bad" ? "rgba(255,100,100,.3)" : statusClass === "warn" ? "rgba(255,207,90,.3)" : "rgba(0,229,255,.25)";
+      }
+
+      async function tryLoadSession(){
+        if(!state.token){
+          showView("login");
+          return;
+        }
+        try{
+          await loadMe();
+          showView("app");
+          applyPermissions();
+          await loadDashboard();
+        }catch(e){
+          localStorage.removeItem("sn_admin_token");
+          state.token = "";
+          showView("login");
+        }
+      }
+
+      async function loadDashboard(){
+        clearMsg();
+        var j = await api("dashboard");
+        var d = j.dashboard || {};
+        var s = d.services || {};
+        var c = d.counts || {};
+        var l = d.launcher || {};
+        var a = d.analyticsToday || {};
+
+        $("d_api").innerHTML = s.api && s.api.online ? '<span class="ok">Online</span>' : '<span class="bad">Offline</span>';
+        $("d_public").innerHTML = s.publicSite && s.publicSite.online ? '<span class="ok">Online</span>' : '<span class="warn">Unknown</span>';
+        $("d_redis").innerHTML = s.redis && s.redis.online ? '<span class="ok">Online</span>' : '<span class="bad">Offline</span>';
+        $("d_launcher").innerHTML = l.paused ? '<span class="warn">Paused</span>' : (l.maintenanceMode ? '<span class="warn">Maintenance</span>' : '<span class="ok">Live</span>');
+
+        $("d_sessions").textContent = c.activeSessions || 0;
+        $("d_freekeys").textContent = c.freeKeys || 0;
+        $("d_customkeys").textContent = c.customKeys || 0;
+        $("d_banned").textContent = c.bannedHwids || 0;
+
+        $("dashboardLauncherState").innerHTML =
+          '<div>Paused</div><div>' + esc(yesNo(l.paused)) + '</div>' +
+          '<div>Paused Reason</div><div>' + esc(l.pausedReason || "—") + '</div>' +
+          '<div>Maintenance Mode</div><div>' + esc(yesNo(l.maintenanceMode)) + '</div>' +
+          '<div>Maintenance Message</div><div>' + esc(l.maintenanceMessage || "—") + '</div>' +
+          '<div>Disable All Keys</div><div>' + esc(yesNo(l.disableAllKeys)) + '</div>' +
+          '<div>Required Min Version</div><div>' + esc((s.launcherVersion && s.launcherVersion.requiredMinVersion) || "v13.13.14") + '</div>' +
+          '<div>Cached Version Txt</div><div>' + esc((s.launcherVersion && s.launcherVersion.cachedVersionTxt) || "—") + '</div>';
+
+        $("dashboardToday").innerHTML =
+          '<div>Key Checks</div><div>' + esc(a.keyChecks || 0) + '</div>' +
+          '<div>Verify Attempts</div><div>' + esc(a.verifyAttempts || 0) + '</div>' +
+          '<div>Launch Attempts</div><div>' + esc(a.launchAttempts || 0) + '</div>' +
+          '<div>Launch Failures</div><div>' + esc(a.launchFailures || 0) + '</div>' +
+          '<div>Free Keys Generated</div><div>' + esc(a.freeKeysGenerated || 0) + '</div>' +
+          '<div>Sessions Ended</div><div>' + esc(a.sessionsEnded || 0) + '</div>' +
+          '<div>Admin Login Failures</div><div>' + esc(a.adminLoginFailures || 0) + '</div>';
+
+        var stateLabel = l.paused ? "System: Paused" : (l.maintenanceMode ? "System: Maintenance" : "System: Live");
+        setGlobalStatePill(stateLabel, l.paused || l.maintenanceMode ? "warn" : "ok");
+      }
+
+      async function refreshCurrentSection(){
+        var s = state.currentSection;
+        if(s === "dashboard") return loadDashboard();
+        if(s === "sessions") return loadSessions();
+        if(s === "keys") return loadCustomKeys();
+        if(s === "freekeys") return loadFreeKeys();
+        if(s === "launcher") return loadLauncherStatus();
+        if(s === "hwid") return;
+        if(s === "accounts") return loadAdminAccounts();
+        if(s === "config") return loadConfig();
+        if(s === "analytics") return loadAnalytics();
+        if(s === "alerts") return loadAlerts();
+        if(s === "audit") return loadAudit();
+      }
+
+      async function loadSessions(){
+        var j = await api("sessions_list", {
+          license: $("sessLicense").value.trim(),
+          plan: $("sessPlan").value.trim(),
+          clientId: $("sessClient").value.trim(),
+          hwidHash: $("sessHwid").value.trim(),
+          search: $("sessSearch").value.trim()
+        });
+
+        var rows = j.items || [];
+        var html = "";
+        if(!rows.length){
+          html = '<tr><td colspan="8" class="muted">No active sessions found.</td></tr>';
+        } else {
+          for(var i=0;i<rows.length;i++){
+            var r = rows[i];
+            html += '<tr>' +
+              '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.plan) + '</td>' +
+              '<td class="code">' + esc(r.sessionId) + '</td>' +
+              '<td class="code">' + esc(r.clientId) + '</td>' +
+              '<td class="code">' + esc(r.hwidHash) + '</td>' +
+              '<td>' + esc(ts(r.lastSeen)) + '</td>' +
+              '<td>' + esc(ts(r.exp)) + '</td>' +
+              '<td>' +
+                '<button class="btnSmDanger ownerOnly inlineEndSession" data-license="' + esc(r.license) + '" data-session="' + esc(r.sessionId) + '">End</button>' +
+              '</td>' +
+            '</tr>';
+          }
+        }
+        $("sessionsTbody").innerHTML = html;
+        applyPermissions();
+
+        var btns = document.querySelectorAll(".inlineEndSession");
+        for(var b=0;b<btns.length;b++){
+          btns[b].onclick = async function(){
+            if(!isOwner()) return;
+            var lic = this.getAttribute("data-license");
+            var sid = this.getAttribute("data-session");
+            if(!confirm("End session " + sid + " for " + lic + "?")) return;
+            await api("session_end_one", { license: lic, sessionId: sid });
+            await loadSessions();
+            await loadDashboard();
+          };
+        }
+      }
+
+      async function keySearch(){
+        var lic = $("keySearchLicense").value.trim();
+        if(!lic) throw new Error("missing_license");
+        state.lastKeyLookup = lic;
+        var j = await api("key_search", { license: lic });
+        if(!j.exists){
+          $("keySearchResult").innerHTML = '<div class="error">Key not found.</div>';
+          return;
+        }
+        var k = j.key || {};
+        $("keySearchResult").innerHTML =
+          '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
+            '<div class="kv">' +
+              '<div>License</div><div class="code">' + esc(k.license) + '</div>' +
+              '<div>Source</div><div>' + esc(k.source) + '</div>' +
+              '<div>Plan</div><div>' + esc(k.plan) + '</div>' +
+              '<div>Disabled</div><div>' + esc(yesNo(k.disabled)) + '</div>' +
+              '<div>TTL Seconds</div><div>' + esc(k.ttlSeconds) + '</div>' +
+              '<div>Session Limit</div><div>' + esc(k.sessionLimit) + '</div>' +
+              '<div>Max Devices</div><div>' + esc(k.maxDevices) + '</div>' +
+              '<div>Expiry</div><div>' + esc(k.exp ? ts(k.exp) : "—") + '</div>' +
+              '<div>Active Sessions</div><div>' + esc(k.activeSessions || 0) + '</div>' +
+              '<div>HWIDs</div><div class="code">' + esc((k.hwids || []).join(", ") || "—") + '</div>' +
+              '<div>Note</div><div>' + esc(k.note || "—") + '</div>' +
+            '</div>' +
+          '</div>';
+      }
+
+      async function disableKey(){ await api("key_disable", { license: state.lastKeyLookup || $("keySearchLicense").value.trim() }); await keySearch(); }
+      async function enableKey(){ await api("key_enable", { license: state.lastKeyLookup || $("keySearchLicense").value.trim() }); await keySearch(); }
+      async function resetKeyHwids(){ await api("key_reset_hwid_bindings", { license: state.lastKeyLookup || $("keySearchLicense").value.trim() }); await keySearch(); }
+
+      function customPayload(){
+        return {
+          license: $("customLicense").value.trim(),
+          plan: $("customPlan").value.trim(),
+          ttlSeconds: $("customTtl").value.trim(),
+          sessionLimit: $("customSessions").value.trim(),
+          maxDevices: $("customDevices").value.trim(),
+          exp: $("customExp").value.trim(),
+          note: $("customNote").value.trim()
+        };
+      }
+
+      async function createCustomKey(){ await api("key_create_custom", customPayload()); await loadCustomKeys(); }
+      async function updateCustomKey(){ await api("key_update_custom", customPayload()); await loadCustomKeys(); }
+      async function deleteCustomKey(){ await api("key_delete_custom", { license: $("customLicense").value.trim() }); await loadCustomKeys(); }
+
+      async function loadCustomKeys(){
+        var j = await api("keys_list_custom");
+        var rows = j.items || [];
+        var html = "";
+        if(!rows.length){
+          html = '<tr><td colspan="8" class="muted">No custom keys found.</td></tr>';
+        } else {
+          for(var i=0;i<rows.length;i++){
+            var r = rows[i];
+            html += '<tr>' +
+              '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.plan) + '</td>' +
+              '<td>' + esc(r.ttlSeconds) + '</td>' +
+              '<td>' + esc(r.sessionLimit) + '</td>' +
+              '<td>' + esc(r.maxDevices) + '</td>' +
+              '<td>' + esc(r.exp ? ts(r.exp) : "—") + '</td>' +
+              '<td>' + esc(r.createdBy || "—") + '</td>' +
+              '<td>' + esc(r.note || "—") + '</td>' +
+            '</tr>';
+          }
+        }
+        $("customKeysTbody").innerHTML = html;
+      }
+
+      async function loadFreeKeys(){
+        var j = await api("freekeys_list");
+        var rows = j.items || [];
+        var html = "";
+        if(!rows.length){
+          html = '<tr><td colspan="5" class="muted">No free keys found.</td></tr>';
+        } else {
+          for(var i=0;i<rows.length;i++){
+            var r = rows[i];
+            html += '<tr>' +
+              '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.ttlSeconds) + '</td>' +
+              '<td>' + esc(r.exp ? ts(r.exp) : "—") + '</td>' +
+              '<td>' + esc(r.createdAt ? ts(r.createdAt) : "—") + '</td>' +
+              '<td>' + esc(r.createdBy || "—") + '</td>' +
+            '</tr>';
+          }
+        }
+        $("freeKeysTbody").innerHTML = html;
+      }
+
+      async function addFreeKey(){ await api("freekey_add", { license: $("freeAddLicense").value.trim(), ttlSeconds: $("freeAddTtl").value.trim() }); await loadFreeKeys(); }
+      async function removeFreeKey(){ await api("freekey_remove", { license: $("freeRemoveLicense").value.trim() }); await loadFreeKeys(); }
+      async function expireAllFreeKeys(){ if(!confirm("Expire all free keys?")) return; await api("freekeys_expire_all"); await loadFreeKeys(); }
+
+      async function loadLauncherStatus(){
+        var j = await api("launcher_status");
+        var l = j.launcher || {};
+        $("launcherStatusBox").innerHTML =
+          '<div class="kv">' +
+            '<div>Paused</div><div>' + esc(yesNo(l.paused)) + '</div>' +
+            '<div>Paused Reason</div><div>' + esc(l.pausedReason || "—") + '</div>' +
+            '<div>Disable All</div><div>' + esc(yesNo(l.disableAll)) + '</div>' +
+            '<div>Maintenance</div><div>' + esc(yesNo(l.maintenanceMode)) + '</div>' +
+            '<div>Maintenance Message</div><div>' + esc(l.maintenanceMessage || "—") + '</div>' +
+            '<div>Min Version</div><div>' + esc(l.minVersion || "—") + '</div>' +
+          '</div>';
+      }
+
+      async function pauseLauncher(){ await api("launcher_pause", { reason: $("pauseReason").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
+      async function unpauseLauncher(){ await api("launcher_unpause"); await loadLauncherStatus(); await loadDashboard(); }
+      async function setMinVersion(){ await api("launcher_set_min_version", { version: $("minVersion").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
+      async function setMaintenanceMessage(){ await api("launcher_set_maintenance_message", { message: $("maintenanceMessage").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
+
+      async function searchHwid(){
+        var lic = $("hwidLicense").value.trim();
+        var hw = $("hwidHash").value.trim();
+        state.lastHwidLookup = hw;
+        var j = await api("hwid_search", { license: lic, hwidHash: hw });
+        var r = j.result || {};
+        var byH = r.byHwid || {};
+        var html =
+          '<div>HWID Hash</div><div class="code">' + esc(byH.hwidHash || "—") + '</div>' +
+          '<div>Banned</div><div>' + esc(yesNo(byH.banned)) + '</div>' +
+          '<div>Suspicious</div><div>' + esc(yesNo(byH.suspicious)) + '</div>' +
+          '<div>Ban Info</div><div>' + esc(byH.banInfo ? JSON.stringify(byH.banInfo) : "—") + '</div>' +
+          '<div>Suspicious Info</div><div>' + esc(byH.suspiciousInfo ? JSON.stringify(byH.suspiciousInfo) : "—") + '</div>' +
+          '<div>Licenses Tied</div><div class="code">' + esc((byH.licenses || []).join(", ") || "—") + '</div>' +
+          '<div>Current Active Sessions</div><div>' + esc((byH.sessions || []).length) + '</div>';
+
+        if(r.byLicense && r.byLicense[0]){
+          html += '<div>License HWIDs</div><div class="code">' + esc((r.byLicense[0].hwids || []).join(", ") || "—") + '</div>';
+        }
+
+        $("hwidSearchResult").innerHTML = html;
+
+        var sessions = byH.sessions || [];
+        var rel = "";
+        if(r.byLicense && r.byLicense.length){
+          for(var i=0;i<r.byLicense.length;i++){
+            rel += '<div class="panel" style="margin-bottom:10px;padding:12px;background:#0a1322;">' +
+              '<b>License:</b> <span class="code">' + esc(r.byLicense[i].license) + '</span><br>' +
+              '<b>HWIDs:</b> <span class="code">' + esc((r.byLicense[i].hwids || []).join(", ") || "—") + '</span><br>' +
+              '<b>Sessions:</b> ' + esc((r.byLicense[i].sessions || []).length) +
+            '</div>';
+          }
+        }
+        if(sessions.length){
+          rel += '<div class="tableWrap"><table><thead><tr><th>License</th><th>Session</th><th>Client</th><th>Last Seen</th></tr></thead><tbody>';
+          for(var s=0;s<sessions.length;s++){
+            rel += '<tr><td class="code">' + esc(sessions[s].license) + '</td><td class="code">' + esc(sessions[s].sessionId) + '</td><td class="code">' + esc(sessions[s].clientId) + '</td><td>' + esc(ts(sessions[s].lastSeen)) + '</td></tr>';
+          }
+          rel += '</tbody></table></div>';
+        }
+        if(!rel) rel = '<div class="muted">No relations found.</div>';
+        $("hwidRelationsBox").innerHTML = rel;
+      }
+
+      async function banHwid(){ await api("hwid_ban", { hwidHash: $("hwidHash").value.trim(), reason: $("hwidReason").value.trim() }); await searchHwid(); }
+      async function unbanHwid(){ await api("hwid_unban", { hwidHash: $("hwidHash").value.trim() }); await searchHwid(); }
+      async function markSuspicious(){ await api("hwid_mark_suspicious", { hwidHash: $("hwidHash").value.trim(), reason: $("hwidReason").value.trim() }); await searchHwid(); }
+      async function disconnectHwid(){ await api("sessions_end_by_hwid", { hwidHash: $("hwidHash").value.trim() }); await searchHwid(); await loadDashboard(); }
+
+      async function loadAdminAccounts(){
+        var j = await api("admin_accounts_list");
+        var a = j.accounts || [];
+        var s = j.activeSessions || [];
+
+        $("adminAccountsTbody").innerHTML = a.length ? a.map(function(x){
+          return '<tr><td>' + esc(x.username) + '</td><td>' + esc(x.role) + '</td><td>' + esc(yesNo(x.disabled)) + '</td></tr>';
+        }).join("") : '<tr><td colspan="3" class="muted">No accounts found.</td></tr>';
+
+        $("adminActiveTbody").innerHTML = s.length ? s.map(function(x){
+          return '<tr><td>' + esc(x.username) + '</td><td>' + esc(x.role) + '</td><td>' + esc(x.ip || "—") + '</td><td>' + esc(ts(x.createdAt)) + '</td><td>' + esc(ts(x.exp)) + '</td></tr>';
+        }).join("") : '<tr><td colspan="5" class="muted">No active admin sessions.</td></tr>';
+      }
+
+      async function forceLogoutAdmins(){
+        if(!confirm("Force logout all admin sessions?")) return;
+        await api("admin_force_logout_all");
+        alert("All admin sessions were revoked. You will need to log in again.");
+        await logout();
+      }
+
+      async function loadConfig(){
+        var j = await api("config_get");
+        var c = j.config || {};
+        var p = c.currentPlanDefaults || {};
+        var f = c.featureToggles || {};
+        $("configBox").innerHTML =
+          '<div class="cols2">' +
+            '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
+              '<h3>Plan Defaults</h3>' +
+              '<div class="kv">' +
+                '<div>FREE TTL</div><div>' + esc((p.free && p.free.ttlSeconds) || "—") + '</div>' +
+                '<div>FREE Sessions</div><div>' + esc((p.free && p.free.sessionLimit) || "—") + '</div>' +
+                '<div>FREE Devices</div><div>' + esc((p.free && p.free.maxDevices) || "—") + '</div>' +
+                '<div>BASIC TTL</div><div>' + esc((p.basic && p.basic.ttlSeconds) || "—") + '</div>' +
+                '<div>BASIC Sessions</div><div>' + esc((p.basic && p.basic.sessionLimit) || "—") + '</div>' +
+                '<div>BASIC Devices</div><div>' + esc((p.basic && p.basic.maxDevices) || "—") + '</div>' +
+                '<div>PRO TTL</div><div>' + esc((p.pro && p.pro.ttlSeconds) || "—") + '</div>' +
+                '<div>PRO Sessions</div><div>' + esc((p.pro && p.pro.sessionLimit) || "—") + '</div>' +
+                '<div>PRO Devices</div><div>' + esc((p.pro && p.pro.maxDevices) || "—") + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
+              '<h3>Globals</h3>' +
+              '<div class="kv">' +
+                '<div>Launcher Force Version</div><div>' + esc(c.launcherForceVersionValue || "—") + '</div>' +
+                '<div>Maintenance Message</div><div>' + esc(c.maintenanceMessageText || "—") + '</div>' +
+                '<div>Paused</div><div>' + esc(yesNo(f.paused)) + '</div>' +
+                '<div>Maintenance Mode</div><div>' + esc(yesNo(f.maintenanceMode)) + '</div>' +
+                '<div>Disable All Keys</div><div>' + esc(yesNo(f.disableAllKeys)) + '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      }
+
+      async function loadAnalytics(){
+        var j = await api("analytics_summary");
+        var a = j.analytics || {};
+        $("analyticsBox").innerHTML =
+          '<div>Total Visitors</div><div>' + esc(a.totalVisitors || 0) + '</div>' +
+          '<div>Trusted Visitors</div><div>' + esc(a.trustedVisitors || 0) + '</div>' +
+          '<div>Total Downloads</div><div>' + esc(a.totalDownloads || 0) + '</div>' +
+          '<div>Key Checks Today</div><div>' + esc(a.keyChecksToday || 0) + '</div>' +
+          '<div>Verify Attempts Today</div><div>' + esc(a.verifyAttemptsToday || 0) + '</div>' +
+          '<div>Launch Attempts Today</div><div>' + esc(a.launchAttemptsToday || 0) + '</div>' +
+          '<div>Launch Failures Today</div><div>' + esc(a.launchFailuresToday || 0) + '</div>' +
+          '<div>Free Keys Generated Today</div><div>' + esc(a.freeKeysGeneratedToday || 0) + '</div>' +
+          '<div>Sessions Ended Today</div><div>' + esc(a.sessionsEndedToday || 0) + '</div>' +
+          '<div>Admin Login Failures Today</div><div>' + esc(a.adminLoginFailuresToday || 0) + '</div>';
+      }
+
+      async function loadAlerts(){
+        var j = await api("alerts_list", { limit: $("alertsLimit").value.trim() || "50" });
+        var rows = j.items || [];
+        $("alertsTbody").innerHTML = rows.length ? rows.map(function(x){
+          return '<tr>' +
+            '<td>' + esc(ts(x.ts)) + '</td>' +
+            '<td>' + esc(x.type || "—") + '</td>' +
+            '<td>' + esc(x.level || "—") + '</td>' +
+            '<td>' + esc(x.actor || x.license || "—") + '</td>' +
+            '<td class="code">' + esc(JSON.stringify(x)) + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="5" class="muted">No alerts found.</td></tr>';
+      }
+
+      async function loadAudit(){
+        var j = await api("audit_list", { limit: $("auditLimit").value.trim() || "50" });
+        var rows = j.items || [];
+        $("auditTbody").innerHTML = rows.length ? rows.map(function(x){
+          return '<tr>' +
+            '<td>' + esc(ts(x.ts)) + '</td>' +
+            '<td>' + esc(x.type || "—") + '</td>' +
+            '<td>' + esc(x.actor || "—") + '</td>' +
+            '<td>' + esc(x.role || "—") + '</td>' +
+            '<td>' + esc(x.action || "—") + '</td>' +
+            '<td class="code">' + esc(x.target || "—") + '</td>' +
+            '<td>' + esc(yesNo(x.success !== false)) + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="7" class="muted">No audit entries found.</td></tr>';
+      }
+
+      async function disableAllKeys(){ if(!confirm("Disable all keys?")) return; await api("emergency_disable_all_keys"); await loadDashboard(); }
+      async function enableAllKeys(){ await api("emergency_enable_all_keys"); await loadDashboard(); }
+      async function emergencyPause(){ if(!confirm("Pause all launches?")) return; await api("emergency_pause_all_launches"); await loadDashboard(); }
+      async function emergencyEndSessions(){ if(!confirm("End all sessions now?")) return; await api("emergency_end_all_sessions"); await loadDashboard(); }
+      async function emergencyClearNonces(){ if(!confirm("Clear all launch nonces?")) return; await api("emergency_clear_launch_nonces"); }
+      async function setEmergencyBanner(){ await api("emergency_set_banner", { message: $("emergencyBanner").value.trim() }); await loadDashboard(); }
+
+      function bind(){
+        $("btnLogin").onclick = function(){ login().catch(handleErr); };
+        $("btnLoadDashboard").onclick = function(){ tryLoadSession().catch(handleErr); };
+        $("btnLogout").onclick = function(){ logout().catch(handleErr); };
+
+        var nav = document.querySelectorAll(".navBtn");
+        for(var i=0;i<nav.length;i++){
+          nav[i].onclick = function(){
+            var sec = this.getAttribute("data-section");
+            if(isOther() && ["sessions","keys","freekeys","hwid","accounts","config","analytics","audit","emergency"].indexOf(sec) !== -1){
+              alert("This section is locked for the Other profile.");
+              return;
+            }
+            showSection(sec);
+          };
+        }
+
+        $("refreshDashboard").onclick = function(){ loadDashboard().catch(handleErr); };
+        $("refreshAll").onclick = function(){ refreshCurrentSection().catch(handleErr); };
+
+        $("btnLoadSessions").onclick = function(){ loadSessions().catch(handleErr); };
+        $("btnEndAllSessions").onclick = function(){ if(confirm("End all active sessions?")) api("sessions_end_all").then(loadSessions).then(loadDashboard).catch(handleErr); };
+
+        $("btnKeySearch").onclick = function(){ keySearch().catch(handleErr); };
+        $("btnDisableKey").onclick = function(){ disableKey().catch(handleErr); };
+        $("btnEnableKey").onclick = function(){ enableKey().catch(handleErr); };
+        $("btnResetKeyHwids").onclick = function(){ resetKeyHwids().catch(handleErr); };
+        $("btnCreateCustomKey").onclick = function(){ createCustomKey().catch(handleErr); };
+        $("btnUpdateCustomKey").onclick = function(){ updateCustomKey().catch(handleErr); };
+        $("btnDeleteCustomKey").onclick = function(){ deleteCustomKey().catch(handleErr); };
+        $("btnLoadCustomKeys").onclick = function(){ loadCustomKeys().catch(handleErr); };
+
+        $("btnAddFreeKey").onclick = function(){ addFreeKey().catch(handleErr); };
+        $("btnRemoveFreeKey").onclick = function(){ removeFreeKey().catch(handleErr); };
+        $("btnExpireAllFreeKeys").onclick = function(){ expireAllFreeKeys().catch(handleErr); };
+        $("btnLoadFreeKeys").onclick = function(){ loadFreeKeys().catch(handleErr); };
+
+        $("btnPauseLauncher").onclick = function(){ pauseLauncher().catch(handleErr); };
+        $("btnUnpauseLauncher").onclick = function(){ unpauseLauncher().catch(handleErr); };
+        $("btnSetMinVersion").onclick = function(){ setMinVersion().catch(handleErr); };
+        $("btnSetMaintenanceMsg").onclick = function(){ setMaintenanceMessage().catch(handleErr); };
+        $("btnLauncherStatus").onclick = function(){ loadLauncherStatus().catch(handleErr); };
+
+        $("btnSearchHwid").onclick = function(){ searchHwid().catch(handleErr); };
+        $("btnBanHwid").onclick = function(){ banHwid().catch(handleErr); };
+        $("btnUnbanHwid").onclick = function(){ unbanHwid().catch(handleErr); };
+        $("btnMarkSuspicious").onclick = function(){ markSuspicious().catch(handleErr); };
+        $("btnDisconnectHwid").onclick = function(){ disconnectHwid().catch(handleErr); };
+
+        $("btnLoadAdminAccounts").onclick = function(){ loadAdminAccounts().catch(handleErr); };
+        $("btnForceLogoutAdmins").onclick = function(){ forceLogoutAdmins().catch(handleErr); };
+
+        $("btnLoadConfig").onclick = function(){ loadConfig().catch(handleErr); };
+        $("btnLoadAnalytics").onclick = function(){ loadAnalytics().catch(handleErr); };
+        $("btnLoadAlerts").onclick = function(){ loadAlerts().catch(handleErr); };
+        $("btnLoadAudit").onclick = function(){ loadAudit().catch(handleErr); };
+
+        $("btnDisableAllKeys").onclick = function(){ disableAllKeys().catch(handleErr); };
+        $("btnEnableAllKeys").onclick = function(){ enableAllKeys().catch(handleErr); };
+        $("btnEmergencyPause").onclick = function(){ emergencyPause().catch(handleErr); };
+        $("btnEmergencyEndSessions").onclick = function(){ emergencyEndSessions().catch(handleErr); };
+        $("btnEmergencyClearNonces").onclick = function(){ emergencyClearNonces().catch(handleErr); };
+        $("btnSetEmergencyBanner").onclick = function(){ setEmergencyBanner().catch(handleErr); };
+
+        $("loginPassword").addEventListener("keydown", function(e){
+          if(e.key === "Enter") login().catch(handleErr);
+        });
+      }
+
+      function handleErr(e){
+        setMsg("error", "Error: " + (e && e.message ? e.message : String(e)));
+      }
+
+      bind();
+      tryLoadSession();
+    })();
   </script>
 </body>
 </html>
