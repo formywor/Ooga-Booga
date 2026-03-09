@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Download ScriptNova Browser Launcher | Live Download Count, Setup & Keys</title>
-  <meta name="description" content="Download ScriptNova Browser Launcher with live shared download stats, quick setup instructions, free key links, premium plans, support, and launcher information." />
-  <meta name="keywords" content="ScriptNova download, ScriptNova Browser Launcher, launcher download, HTA launcher, ScriptNova setup, free key, premium key, launcher support, ScriptNova install" />
+  <title>Download ScriptNova Browser Launcher | Fast Setup, Live Stats & Premium Keys</title>
+  <meta name="description" content="Download ScriptNova Browser Launcher, view live stats, get setup help, unlock premium access, and start with a faster and better launcher experience." />
+  <meta name="keywords" content="ScriptNova download, ScriptNova Browser Launcher, launcher download, ScriptNova setup, free key, premium key, BASIC key, PRO key, launcher support, ScriptNova install" />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <meta name="theme-color" content="#0b0f16" />
   <link rel="canonical" href="https://scriptnovaa.com/download" />
 
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Download ScriptNova Browser Launcher" />
-  <meta property="og:description" content="Download ScriptNova, view live shared download counts, and get setup help and key access." />
+  <meta property="og:description" content="Download ScriptNova, view live shared stats, get setup help, and upgrade with BASIC or PRO access." />
   <meta property="og:url" content="https://scriptnovaa.com/download" />
   <meta property="og:site_name" content="ScriptNova" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Download ScriptNova Browser Launcher" />
-  <meta name="twitter:description" content="Launcher download page with live stats, install steps, support links, and key access." />
+  <meta name="twitter:description" content="Launcher download page with live stats, install steps, support links, and premium key access." />
 
   <style>
     :root{
@@ -231,6 +231,7 @@
       font-size:34px;
       font-weight:1000;
       margin-top:8px;
+      word-break:break-word;
     }
 
     .statMeta{
@@ -367,6 +368,23 @@
       margin-bottom:6px;
     }
 
+    .premiumBox{
+      margin-top:14px;
+      border:1px solid rgba(124,77,255,.28);
+      background:rgba(124,77,255,.08);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .premiumTitle{
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:#cab7ff;
+      margin:0 0 8px 0;
+      font-weight:800;
+    }
+
     .footer{
       animation-delay:.15s;
       margin-top:16px;
@@ -394,7 +412,7 @@
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Windows",
     "downloadUrl": "https://scriptnovaa.com/download",
-    "description": "Download page for ScriptNova Browser Launcher with setup steps, key links, and shared download tracking."
+    "description": "Download page for ScriptNova Browser Launcher with setup steps, premium key links, support, and shared download tracking."
   }
   </script>
 </head>
@@ -406,15 +424,15 @@
           <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Download page • live stats • quick setup</div>
           <div class="title"><b>Download</b> ScriptNova Browser Launcher</div>
           <div class="sub">
-            A better download page with stronger layout, clearer install steps, bigger calls to action, more search-ready content, and a shared download counter that can increase on every real download.
+            Download ScriptNova, set it up fast, and unlock more with BASIC or PRO. Premium keys give users a better experience with more access, more power, and a smoother setup flow.
           </div>
 
           <div class="pillrow">
-            <span class="pill">HTA launcher</span>
+            <span class="pill">Fast launcher</span>
             <span class="pill">Shared download count</span>
             <span class="pill">Quick setup guide</span>
+            <span class="pill">Premium upgrades</span>
             <span class="pill">Support links</span>
-            <span class="pill">Search-friendly content</span>
           </div>
 
           <div class="agreeBox">
@@ -440,13 +458,16 @@
           </div>
 
           <div class="btnrow">
-            <a class="btn disabled" id="downloadHtaBtn" href="/downloads/ScriptNova-Launcher.hta" download aria-disabled="true">Download .HTA</a>
-            <a class="btn btn2 disabled" id="downloadZipBtn" href="/downloads/ScriptNova-Launcher.zip" download aria-disabled="true">Download .ZIP</a>
+            <a class="btn disabled" id="downloadLauncherBtn" href="/downloads/ScriptNova-Launcher.hta" download aria-disabled="true">Download Launcher</a>
+            <a class="btn btn2" href="/buykeys">Buy BASIC or PRO</a>
             <a class="btn btnGhost" href="/freekey">Get FREE Key</a>
           </div>
 
-          <div class="note">
-            If your browser blocks HTA downloads, use the ZIP download and extract it first.
+          <div class="premiumBox">
+            <div class="premiumTitle">Best experience</div>
+            <div class="agreeText">
+              Want the best ScriptNova experience? BASIC and PRO are the better choice for users who want more access and a smoother overall setup.
+            </div>
           </div>
 
           <div class="note">
@@ -458,7 +479,7 @@
           <div class="stat">
             <div class="statLabel">Total downloads</div>
             <div class="statNumber"><span id="downloadCount">0</span></div>
-            <div class="statMeta">
+            <div class="statMeta" id="downloadMeta">
               Live totals update as more people download the launcher.
             </div>
           </div>
@@ -466,7 +487,7 @@
           <div class="stat">
             <div class="statLabel">Trusted by</div>
             <div class="statNumber"><span id="trustedCount">0</span> <span id="trustedUnit">people</span></div>
-            <div class="statMeta">
+            <div class="statMeta" id="trustedMeta">
               Community trust shown live across the site.
             </div>
           </div>
@@ -483,7 +504,7 @@
           <li>Choose your access method:
             <ul class="steps">
               <li><b>FREE key:</b> <a href="/freekey">scriptnovaa.com/freekey</a></li>
-              <li><b>BASIC / PRO:</b> review options on <a href="/buykeys">Buy Keys</a> and purchase through Discord</li>
+              <li><b>BASIC or PRO:</b> get more by going to <a href="/buykeys">Buy Keys</a></li>
             </ul>
           </li>
           <li>Open the launcher, paste your key, click <code>Save</code>, then click <code>Launch</code>.</li>
@@ -491,7 +512,7 @@
 
         <div class="featureGrid">
           <div class="feature">
-            <b>Cleaner conversion flow</b>
+            <b>Cleaner download flow</b>
             Users can download, get a key, and get support from the same page without hunting around.
           </div>
           <div class="feature">
@@ -499,38 +520,42 @@
             Download totals update automatically for everyone.
           </div>
           <div class="feature">
-            <b>Better for Google</b>
-            Added keywords, metadata, structured data, and more visible text for search engines.
+            <b>Upgrade anytime</b>
+            BASIC and PRO give users a stronger experience than the free option.
           </div>
           <div class="feature">
             <b>More trust on the page</b>
-            Download and trust stats are displayed above the fold to improve credibility.
+            Download and trust stats are displayed high on the page to improve credibility.
           </div>
         </div>
       </div>
 
       <div class="card">
         <h2 class="sectionTitle">Keys and support</h2>
-        <div class="note">
-          <b>FREE keys</b> are available from the free key page.
+
+        <div class="premiumBox" style="margin-top:0;">
+          <div class="premiumTitle">Recommended</div>
+          <div class="agreeText">
+            BASIC and PRO are the best way to use ScriptNova. They are made for users who want more value, better access, and a more complete launcher experience.
+          </div>
         </div>
 
-        <div class="btnrow" style="margin-top:10px;">
-          <a class="btn" href="/freekey">Get FREE Key</a>
-        </div>
-
-        <div class="note" style="margin-top:14px;">
-          Want BASIC or PRO? Join Discord and open a ticket, or compare plans first.
-        </div>
-
-        <div class="btnrow" style="margin-top:10px;">
-          <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join Discord</a>
-          <a class="btn btnGhost" href="/buykeys">View Plans</a>
+        <div class="btnrow" style="margin-top:12px;">
+          <a class="btn btn2" href="/buykeys">Buy BASIC or PRO</a>
+          <a class="btn btnGhost" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Join Discord</a>
         </div>
 
         <div class="note" style="margin-top:14px;">
           <b>BASIC:</b> $2 / month<br />
           <b>PRO:</b> $11 / month
+        </div>
+
+        <div class="note" style="margin-top:14px;">
+          Free access is available too, but premium is the better option for users who want more from ScriptNova.
+        </div>
+
+        <div class="btnrow" style="margin-top:10px;">
+          <a class="btn" href="/freekey">Get FREE Key</a>
         </div>
 
         <div class="note" style="margin-top:14px;">
@@ -542,7 +567,7 @@
     <div class="card" style="margin-top:14px;">
       <h2 class="sectionTitle">Search-ready page content</h2>
       <p class="note">
-        This download page helps users looking for ScriptNova Browser Launcher download access, ScriptNova setup help, HTA launcher download steps, free key access, premium plans, and ScriptNova support. It is built to be easier to scan, easier to navigate, and easier for search engines to understand.
+        This download page helps users looking for ScriptNova Browser Launcher download access, ScriptNova setup help, free key access, premium plans, BASIC keys, PRO keys, and ScriptNova support. It is built to be easier to scan, easier to navigate, and easier for search engines to understand.
       </p>
     </div>
 
@@ -563,10 +588,7 @@
       download: a + c
     };
 
-    const FALLBACK = {
-      trusted: 2400000,
-      downloads: 482315
-    };
+    const COUNTER_FAIL_MESSAGE = "Hello User your seeing this message because our counter is kind of not working for most users right now hehe sorry about that-scriptnova team";
 
     function animateValue(el, endValue, formatter){
       const duration = 1400;
@@ -599,19 +621,14 @@
     }
 
     function setDownloadState(enabled){
-      var hta = document.getElementById("downloadHtaBtn");
-      var zip = document.getElementById("downloadZipBtn");
+      var launcher = document.getElementById("downloadLauncherBtn");
 
       if(enabled){
-        hta.classList.remove("disabled");
-        zip.classList.remove("disabled");
-        hta.setAttribute("aria-disabled", "false");
-        zip.setAttribute("aria-disabled", "false");
+        launcher.classList.remove("disabled");
+        launcher.setAttribute("aria-disabled", "false");
       }else{
-        hta.classList.add("disabled");
-        zip.classList.add("disabled");
-        hta.setAttribute("aria-disabled", "true");
-        zip.setAttribute("aria-disabled", "true");
+        launcher.classList.add("disabled");
+        launcher.setAttribute("aria-disabled", "true");
       }
     }
 
@@ -627,31 +644,43 @@
       return document.getElementById("termsAgree").checked;
     }
 
+    function showCounterErrorMessage(){
+      document.getElementById("downloadCount").textContent = "Counter unavailable";
+      document.getElementById("trustedCount").textContent = "Counter unavailable";
+      document.getElementById("trustedUnit").textContent = "";
+      document.getElementById("downloadMeta").textContent = COUNTER_FAIL_MESSAGE;
+      document.getElementById("trustedMeta").textContent = COUNTER_FAIL_MESSAGE;
+    }
+
     async function loadStats(){
       try{
         const res = await fetch(API.stats, { headers: { "Accept": "application/json" } });
         if (!res.ok) throw new Error("Stats fetch failed");
 
         const data = await res.json();
-        const downloads = Number(data.downloads ?? FALLBACK.downloads);
-        const trusted = Number(data.trusted ?? data.visitors ?? FALLBACK.trusted);
+        const downloads = Number(data.downloads);
+        const trusted = Number(data.trusted ?? data.visitors);
+
+        if (!Number.isFinite(downloads) || !Number.isFinite(trusted)) {
+          throw new Error("Invalid stats data");
+        }
 
         animateValue(document.getElementById("downloadCount"), downloads, n => n.toLocaleString());
         animateValue(document.getElementById("trustedCount"), trusted, compact);
         document.getElementById("trustedUnit").textContent = trustedUnit(trusted);
+        document.getElementById("downloadMeta").textContent = "Live totals update as more people download the launcher.";
+        document.getElementById("trustedMeta").textContent = "Community trust shown live across the site.";
       }catch(err){
-        animateValue(document.getElementById("downloadCount"), FALLBACK.downloads, n => n.toLocaleString());
-        animateValue(document.getElementById("trustedCount"), FALLBACK.trusted, compact);
-        document.getElementById("trustedUnit").textContent = trustedUnit(FALLBACK.trusted);
+        showCounterErrorMessage();
       }
     }
 
-    async function trackDownload(type){
+    async function trackDownload(){
       try{
         const res = await fetch(API.download, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ page: "download", fileType: type })
+          body: JSON.stringify({ page: "download", fileType: "launcher" })
         });
 
         if (!res.ok) throw new Error("Download tracking failed");
@@ -659,18 +688,18 @@
         const data = await res.json().catch(() => ({}));
 
         if (typeof data.downloads !== "undefined") {
-          animateValue(document.getElementById("downloadCount"), Number(data.downloads), n => n.toLocaleString());
-        } else {
-          const current = Number(document.getElementById("downloadCount").dataset.value || FALLBACK.downloads);
-          animateValue(document.getElementById("downloadCount"), current + 1, n => n.toLocaleString());
+          const downloads = Number(data.downloads);
+          if (Number.isFinite(downloads)) {
+            animateValue(document.getElementById("downloadCount"), downloads, n => n.toLocaleString());
+            document.getElementById("downloadMeta").textContent = "Live totals update as more people download the launcher.";
+          }
         }
       }catch(err){
-        const current = Number(document.getElementById("downloadCount").dataset.value || FALLBACK.downloads);
-        animateValue(document.getElementById("downloadCount"), current + 1, n => n.toLocaleString());
+        console.log("Download tracking failed");
       }
     }
 
-    function handleDownloadClick(type, event){
+    function handleDownloadClick(event){
       if(!hasAgreed()){
         event.preventDefault();
         showBlockedMessage();
@@ -678,7 +707,7 @@
       }
 
       hideBlockedMessage();
-      trackDownload(type);
+      trackDownload();
       return true;
     }
 
@@ -687,12 +716,8 @@
       if(this.checked) hideBlockedMessage();
     });
 
-    document.getElementById("downloadHtaBtn").addEventListener("click", function(event){
-      handleDownloadClick("hta", event);
-    });
-
-    document.getElementById("downloadZipBtn").addEventListener("click", function(event){
-      handleDownloadClick("zip", event);
+    document.getElementById("downloadLauncherBtn").addEventListener("click", function(event){
+      handleDownloadClick(event);
     });
 
     setDownloadState(false);
