@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ScriptNova Admin</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root{--bg:#08101b;--panel:#0d1728;--panel2:#101d33;--line:#22314a;--text:#eaf2ff;--muted:#9fb2d6;--cyan:#00e5ff;--purple:#7c4dff;--red:#ff5d73;--green:#2ad186;--yellow:#ffd166}
+    *{box-sizing:border-box} html,body{margin:0;height:100%;font-family:Segoe UI,Tahoma,Arial,sans-serif;background:linear-gradient(180deg,#08101b,#0b1421 60%,#0d1727);color:var(--text)}
+    a{color:var(--cyan)} .hidden{display:none!important}
+    .app{padding:14px;max-width:1600px;margin:0 auto}.top{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-bottom:12px}
+    .card{background:rgba(13,23,40,.96);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 0 30px rgba(0,229,255,.07)}
+    .brand{font-size:24px;font-weight:900;letter-spacing:.6px}.brand span{color:var(--cyan)} .muted{color:var(--muted)} .tiny{font-size:12px;color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}.pill{padding:7px 11px;border:1px solid rgba(0,229,255,.32);background:#0c2131;border-radius:999px;font-size:12px;color:#baf8ff}
+    .role-owner{border-color:rgba(42,209,134,.4);background:#11271f;color:#c7ffe1}.role-ulises{border-color:rgba(255,209,102,.35);background:#2a2310;color:#ffe7a9}.role-other{border-color:rgba(124,77,255,.35);background:#181230;color:#dccfff}
+    .loginGrid,.grid2,.grid3,.grid4{display:grid;gap:12px}.loginGrid{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    input,select,textarea,button{width:100%;border-radius:12px;border:1px solid var(--line);background:#07101b;color:var(--text);padding:11px 12px;font:inherit} textarea{min-height:110px;resize:vertical}
+    button{cursor:pointer;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:#0e2a3a;border-color:rgba(0,229,255,.35)} button:hover{background:#13364b}
+    button.alt{background:#1a1840;border-color:rgba(124,77,255,.35)} button.danger{background:#31131a;border-color:rgba(255,93,115,.35)} button.good{background:#0f261b;border-color:rgba(42,209,134,.35)} button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.2)}
+    .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.tab{padding:10px 12px;border:1px solid var(--line);border-radius:999px;background:#0d182a;cursor:pointer;font-weight:700}.tab.active{background:#123148;border-color:rgba(0,229,255,.45);color:#c6fbff}
+    .section{display:none}.section.active{display:block}.metric{padding:12px;border:1px solid var(--line);background:#0c1525;border-radius:14px}.metric b{display:block;font-size:20px;margin-top:6px}
+    .locked{position:relative;overflow:hidden}.locked::after{content:'🔒 Locked';position:absolute;top:10px;right:10px;font-size:12px;padding:6px 8px;border-radius:999px;background:#2a2310;color:#ffe7a9;border:1px solid rgba(255,209,102,.3)}
+    .status{padding:10px 12px;border-radius:12px;background:#0a1423;border:1px solid var(--line);white-space:pre-wrap;min-height:46px}.ok{color:#98ffc7}.bad{color:#ffb2bd}.warn{color:#ffe39b}
+    table{width:100%;border-collapse:collapse;font-size:13px} th,td{border-bottom:1px solid #1c2a40;padding:9px 8px;text-align:left;vertical-align:top} th{color:#9fb2d6;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+    .scroll{max-height:340px;overflow:auto}.split{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+    @media (max-width:1100px){.top,.split,.grid2,.grid3,.grid4,.loginGrid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <div class="card">
+        <div class="brand"><span>ScriptNova</span> Admin Control</div>
+        <div class="muted">Owner gets full power. Ulises gets read-only operational access. Other gets status-only access. Locked tools stay visible with a lock.</div>
+        <div class="row" style="margin-top:12px">
+          <div id="roleBadge" class="pill">Not logged in</div>
+          <div id="sessionBadge" class="pill">No admin token</div>
+          <div id="buildBadge" class="pill">Waiting…</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tiny" style="margin-bottom:8px">Admin Login</div>
+        <div class="loginGrid">
+          <select id="loginRole">
+            <option value="owner">Owner</option>
+            <option value="ulises">Ulises</option>
+            <option value="other">Other</option>
+          </select>
+          <input id="loginPassword" type="password" placeholder="Password" />
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button onclick="login()">Login</button>
+          <button class="alt" onclick="loadMe()">Refresh Session</button>
+          <button class="danger" onclick="logout()">Logout</button>
+        </div>
+        <div id="globalStatus" class="status" style="margin-top:10px">Ready.</div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div id="dashboard" class="section active"></div>
+    <div id="sessions" class="section"></div>
+    <div id="keys" class="section"></div>
+    <div id="freekeys" class="section"></div>
+    <div id="launcher" class="section"></div>
+    <div id="hwid" class="section"></div>
+    <div id="admins" class="section"></div>
+    <div id="config" class="section"></div>
+    <div id="analytics" class="section"></div>
+    <div id="alerts" class="section"></div>
+    <div id="audit" class="section"></div>
+    <div id="emergency" class="section"></div>
+  </div>
+
+  <script>
+    const API = 'https://api.scriptnovaa.com';
+    const state = { token: localStorage.getItem('sn_admin_token') || '', role: localStorage.getItem('sn_admin_role') || '' };
+    const tabs = [
+      ['dashboard','Dashboard'],['sessions','Sessions'],['keys','Keys'],['freekeys','Free Keys'],['launcher','Launcher'],['hwid','HWID'],['admins','Admin Accounts'],['config','System Config'],['analytics','Analytics'],['alerts','Alerts'],['audit','Audit'],['emergency','Emergency']
+    ];
+    const roleRank = { owner: 3, ulises: 2, other: 1, none: 0 };
+    const perms = {
+      dashboard:'other', sessions:'ulises', keys:'ulises', freekeys:'ulises', launcher:'ulises', hwid:'ulises', admins:'owner', config:'ulises', analytics:'ulises', alerts:'other', audit:'ulises', emergency:'owner'
+    };
+    function byId(id){return document.getElementById(id)}
+    function setStatus(msg, cls){ const el=byId('globalStatus'); el.className='status '+(cls||''); el.textContent=msg; }
+    function can(need){ return roleRank[state.role||'none'] >= roleRank[need||'owner']; }
+    function authHeaders(){ return state.token ? { 'Authorization':'Bearer '+state.token, 'Content-Type':'application/json' } : { 'Content-Type':'application/json' }; }
+    function fmtTs(ts){ if(!ts) return '—'; const d=new Date(ts*1000); return d.toLocaleString(); }
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    function roleClass(role){ return role==='owner'?'role-owner':role==='ulises'?'role-ulises':'role-other'; }
+    function lockWrap(sectionId, html){ return can(perms[sectionId]) ? html : '<div class="card locked">'+html+'</div>'; }
+
+    function renderTabs(){
+      const box = byId('tabs');
+      box.innerHTML = tabs.map(([id,label],i)=>'<button class="tab '+(i===0?'active':'')+'" onclick="openTab(\''+id+'\',this)">'+label+'</button>').join('');
+    }
+    function openTab(id, btn){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); byId(id).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); if(btn) btn.classList.add('active'); }
+
+    async function api(path, options){
+      const res = await fetch(API + path, Object.assign({ headers: authHeaders() }, options||{}));
+      const txt = await res.text();
+      let json = {}; try{ json = JSON.parse(txt) }catch{ json = { ok:false, error:'bad_json', raw:txt } }
+      if(json.build) byId('buildBadge').textContent = json.build;
+      if(!res.ok || json.ok === false) throw json;
+      return json;
+    }
+
+    async function login(){
+      const role = byId('loginRole').value;
+      const password = byId('loginPassword').value;
+      try{
+        const j = await api('/api/admin/login', { method:'POST', body: JSON.stringify({ role, password }) });
+        state.token = j.token; state.role = j.role;
+        localStorage.setItem('sn_admin_token', j.token); localStorage.setItem('sn_admin_role', j.role);
+        byId('roleBadge').className = 'pill '+roleClass(j.role); byId('roleBadge').textContent = 'Role: ' + j.role;
+        byId('sessionBadge').textContent = 'Admin session active';
+        setStatus('Logged in as '+j.role, 'ok');
+        await loadAll();
+      }catch(e){ setStatus('Login failed: '+(e.error||'unknown'), 'bad'); }
+    }
+
+    async function loadMe(){
+      if(!state.token) return;
+      try{
+        const j = await api('/api/admin/me');
+        state.role = j.role; localStorage.setItem('sn_admin_role', j.role);
+        byId('roleBadge').className = 'pill '+roleClass(j.role); byId('roleBadge').textContent = 'Role: ' + j.role;
+        byId('sessionBadge').textContent = 'Expires: ' + fmtTs(j.exp);
+        setStatus('Admin session refreshed.', 'ok');
+      }catch(e){
+        setStatus('Session check failed: '+(e.error||'unknown'), 'bad');
+      }
+    }
+
+    async function logout(){
+      try{ if(state.token) await api('/api/admin/logout', { method:'POST', body:'{}' }); }catch{}
+      state.token=''; state.role=''; localStorage.removeItem('sn_admin_token'); localStorage.removeItem('sn_admin_role');
+      byId('roleBadge').className='pill'; byId('roleBadge').textContent='Not logged in';
+      byId('sessionBadge').textContent='No admin token';
+      setStatus('Logged out.', 'warn');
+    }
+
+    async function loadAll(){ await loadMe(); await Promise.allSettled([loadDashboard(),loadSessions(),loadKeys(),loadFreeKeys(),loadLauncher(),loadHwid(),loadAdmins(),loadConfig(),loadAnalytics(),loadAlerts(),loadAudit()]); }
+
+    async function loadDashboard(){
+      const j = await api('/api/admin/dashboard');
+      const d = j.dashboard;
+      byId('dashboard').innerHTML = lockWrap('dashboard', `
+        <div class="grid4">
+          ${metric('API', d.apiOnline?'ONLINE':'OFFLINE')}
+          ${metric('Public Site', d.publicSiteOnline?'ONLINE':'OFFLINE')}
+          ${metric('Redis / KV', d.redisOnline?'ONLINE':'OFFLINE')}
+          ${metric('Paused State', d.pausedState)}
+          ${metric('Launcher Version', d.launcherVersionStatus)}
+          ${metric('Force Min Version', d.forceMinVersion)}
+          ${metric('Active Sessions', d.activeSessionsCount)}
+          ${metric('Free Keys', d.freeKeysCount)}
+          ${metric('Custom Keys', d.customKeysCount)}
+          ${metric('Disabled Keys', d.disabledKeysCount)}
+          ${metric('Banned HWIDs', d.bannedHwidsCount)}
+          ${metric('Downloads', d.totals.downloads)}
+        </div>
+        <div class="grid2" style="margin-top:12px">
+          <div class="card"><div class="tiny">Maintenance Message</div><div class="status">${esc(d.maintenanceMessage||'None')}</div></div>
+          <div class="card"><div class="tiny">Emergency Banner</div><div class="status">${esc(d.emergencyBanner||'None')}</div></div>
+        </div>
+      `);
+    }
+    function metric(label, value){ return `<div class="metric"><div class="tiny">${esc(label)}</div><b>${esc(value)}</b></div>` }
+
+    async function loadSessions(){
+      const q = byId('sessionSearch') ? byId('sessionSearch').value : '';
+      const j = await api('/api/admin/sessions?action=list&q='+encodeURIComponent(q));
+      byId('sessions').innerHTML = lockWrap('sessions', `
+        <div class="card">
+          <div class="row"><input id="sessionSearch" class="grow" placeholder="Search by key / plan / clientId / hwid / sessionId" value="${esc(q)}" /><button onclick="loadSessions()">Search</button><button class="danger" ${can('owner')?'':'disabled'} onclick="sessionAction('end_all',{})">End All Sessions</button></div>
+          <div class="scroll" style="margin-top:12px"><table><thead><tr><th>License</th><th>Plan</th><th>Session</th><th>Client</th><th>HWID</th><th>Seen</th><th>Exp</th><th>Action</th></tr></thead><tbody>
+            ${j.sessions.map(s=>`<tr><td>${esc(s.license)}</td><td>${esc(s.plan)}</td><td>${esc(s.sessionId)}</td><td>${esc(s.cid)}</td><td>${esc(s.hw)}</td><td>${esc(fmtTs(s.seen))}</td><td>${esc(fmtTs(s.exp))}</td><td><button ${can('owner')?'':'disabled'} onclick="sessionAction('end_one',{license:'${esc(s.license)}',sessionId:'${esc(s.sessionId)}'})">End</button></td></tr>`).join('') || '<tr><td colspan="8">No sessions.</td></tr>'}
+          </tbody></table></div>
+        </div>`);
+    }
+    async function sessionAction(action, payload){ try{ await api('/api/admin/sessions', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('Session action done: '+action, 'ok'); await loadSessions(); await loadDashboard(); }catch(e){ setStatus('Session action failed: '+(e.error||'unknown'), 'bad'); } }
+
+    async function loadKeys(){
+      byId('keys').innerHTML = lockWrap('keys', `
+        <div class="split">
+          <div class="card">
+            <div class="tiny">Search Key</div>
+            <div class="row" style="margin-top:8px"><input id="keySearchValue" class="grow" placeholder="BASIC-xxxx / PRO-xxxx / FREE-xxxx" /><button onclick="searchKey()">Search</button></div>
+            <div id="keySearchOut" class="status" style="margin-top:10px">No key loaded.</div>
+          </div>
+          <div class="card ${can('owner')?'':'locked'}">
+            <div class="tiny">Custom Key Editor</div>
+            <div class="grid2" style="margin-top:8px"><input id="customLicense" placeholder="CUSTOM-KEY" /><select id="customPlan"><option value="basic">basic</option><option value="pro">pro</option><option value="free">free</option></select><input id="customTtl" placeholder="TTL seconds" value="3600" /><input id="customSessions" placeholder="Session limit" value="1" /><input id="customDevices" placeholder="Device limit" value="1" /><input id="customExp" placeholder="Expiry unix optional" value="0" /></div>
+            <textarea id="customNotes" placeholder="Notes"></textarea>
+            <div class="row"><button ${can('owner')?'':'disabled'} onclick="saveCustomKey()">Create / Update</button><button class="danger" ${can('owner')?'':'disabled'} onclick="keyAction('delete_custom')">Delete Custom</button><button ${can('owner')?'':'disabled'} onclick="keyAction('reset_bindings')">Reset Bindings</button></div>
+            <div class="row"><button class="danger" ${can('owner')?'':'disabled'} onclick="keyAction('disable')">Disable Key</button><button class="good" ${can('owner')?'':'disabled'} onclick="keyAction('enable')">Enable Key</button></div>
+          </div>
+        </div>`);
+    }
+    async function searchKey(){
+      const license = byId('keySearchValue').value.trim();
+      if(!license) return setStatus('Enter a key first.', 'warn');
+      try{ const j = await api('/api/admin/keys?license='+encodeURIComponent(license)+'&action=search'); byId('customLicense').value = license; byId('keySearchOut').textContent = JSON.stringify(j, null, 2); setStatus('Key loaded.', 'ok'); }catch(e){ setStatus('Key search failed: '+(e.error||'unknown'), 'bad'); }
+    }
+    async function saveCustomKey(){
+      try{ await api('/api/admin/keys', { method:'POST', body: JSON.stringify({ action:'create_custom', license:byId('customLicense').value.trim(), plan:byId('customPlan').value, ttlSeconds:+byId('customTtl').value||0, sessionLimit:+byId('customSessions').value||0, deviceLimit:+byId('customDevices').value||0, exp:+byId('customExp').value||0, notes:byId('customNotes').value }) }); setStatus('Custom key saved.', 'ok'); await searchKey(); await loadDashboard(); }catch(e){ setStatus('Save failed: '+(e.error||'unknown'), 'bad'); }
+    }
+    async function keyAction(action){
+      try{ await api('/api/admin/keys', { method:'POST', body: JSON.stringify({ action, license:byId('customLicense').value.trim(), reason:'Admin panel' }) }); setStatus('Key action done: '+action, 'ok'); await searchKey(); await loadDashboard(); }catch(e){ setStatus('Key action failed: '+(e.error||'unknown'), 'bad'); }
+    }
+
+    async function loadFreeKeys(){
+      const j = await api('/api/admin/freekeys?action=list');
+      byId('freekeys').innerHTML = lockWrap('freekeys', `
+        <div class="split">
+          <div class="card ${can('owner')?'':'locked'}">
+            <div class="tiny">Manual Free Key Controls</div>
+            <div class="grid2" style="margin-top:8px"><input id="freeKeyManual" placeholder="FREE-XXXXXX or leave blank" /><input id="freeKeyTtl" value="900" placeholder="TTL seconds" /></div>
+            <div class="row"><button ${can('owner')?'':'disabled'} onclick="freeKeyAction('add')">Add Free Key</button><button class="danger" ${can('owner')?'':'disabled'} onclick="freeKeyAction('remove')">Remove Free Key</button><button class="danger" ${can('owner')?'':'disabled'} onclick="freeKeyAction('expire_all')">Expire All Free Keys</button></div>
+          </div>
+          <div class="card"><div class="tiny">Current Free Keys</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Key</th><th>Issued</th><th>Expires</th></tr></thead><tbody>${j.items.map(x=>`<tr><td>${esc(x.key)}</td><td>${esc(fmtTs(x.issuedAt))}</td><td>${esc(fmtTs(x.exp))}</td></tr>`).join('')||'<tr><td colspan="3">No free keys.</td></tr>'}</tbody></table></div></div>
+        </div>`);
+    }
+    async function freeKeyAction(action){ try{ await api('/api/admin/freekeys', { method:'POST', body: JSON.stringify({ action, key:byId('freeKeyManual').value.trim(), ttlSeconds:+byId('freeKeyTtl').value||900 }) }); setStatus('Free key action done: '+action, 'ok'); await loadFreeKeys(); await loadDashboard(); }catch(e){ setStatus('Free key action failed: '+(e.error||'unknown'), 'bad'); } }
+
+    async function loadLauncher(){
+      const j = await api('/api/admin/launcher?action=status');
+      byId('launcher').innerHTML = lockWrap('launcher', `
+        <div class="split">
+          <div class="card"><div class="tiny">Launcher State</div><div class="status" style="margin-top:8px">Paused: ${esc(j.paused ? 'yes' : 'no')}\nMin Version: ${esc(j.config.forceMinVersion)}\nMaintenance: ${esc(j.config.maintenanceMessage || 'None')}</div></div>
+          <div class="card ${can('owner')?'':'locked'}">
+            <div class="tiny">Launcher Controls</div>
+            <textarea id="launcherMessage" placeholder="Pause or maintenance message"></textarea>
+            <input id="launcherMinVersion" placeholder="Force minimum version" value="${esc(j.config.forceMinVersion||'')}" />
+            <div class="row"><button ${can('owner')?'':'disabled'} onclick="launcherAction('pause',{ message:byId('launcherMessage').value })">Pause HTA Launches</button><button class="good" ${can('owner')?'':'disabled'} onclick="launcherAction('unpause',{})">Unpause HTA</button></div>
+            <div class="row"><button ${can('owner')?'':'disabled'} onclick="launcherAction('set_min_version',{ value:byId('launcherMinVersion').value.trim() })">Force Minimum Version</button><button ${can('owner')?'':'disabled'} onclick="launcherAction('set_maintenance',{ message:byId('launcherMessage').value })">Show Maintenance Message</button></div>
+          </div>
+        </div>`);
+    }
+    async function launcherAction(action,payload){ try{ await api('/api/admin/launcher', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('Launcher action done: '+action, 'ok'); await loadLauncher(); await loadDashboard(); }catch(e){ setStatus('Launcher action failed: '+(e.error||'unknown'), 'bad'); } }
+
+    async function loadHwid(){
+      byId('hwid').innerHTML = lockWrap('hwid', `
+        <div class="split">
+          <div class="card">
+            <div class="tiny">HWID / License Search</div>
+            <div class="row" style="margin-top:8px"><input id="hwidSearchValue" class="grow" placeholder="Search by HWID or license" /><button onclick="searchHwid()">Search</button></div>
+            <div id="hwidSearchOut" class="status" style="margin-top:10px">No search yet.</div>
+          </div>
+          <div class="card ${can('owner')?'':'locked'}">
+            <div class="tiny">HWID Actions</div>
+            <input id="hwidTarget" placeholder="HWID hash" />
+            <input id="hwidLicenseTarget" placeholder="License for reset bindings" />
+            <textarea id="hwidReason" placeholder="Ban or suspicious reason"></textarea>
+            <div class="row"><button class="danger" ${can('owner')?'':'disabled'} onclick="hwidAction('ban',{ hw:byId('hwidTarget').value.trim(), reason:byId('hwidReason').value })">Ban HWID</button><button class="good" ${can('owner')?'':'disabled'} onclick="hwidAction('unban',{ hw:byId('hwidTarget').value.trim() })">Unban HWID</button></div>
+            <div class="row"><button ${can('owner')?'':'disabled'} onclick="hwidAction('mark_suspicious',{ hw:byId('hwidTarget').value.trim(), reason:byId('hwidReason').value })">Mark Suspicious</button><button ${can('owner')?'':'disabled'} onclick="sessionAction('disconnect_hwid',{ hw:byId('hwidTarget').value.trim() })">Disconnect Sessions</button></div>
+            <div class="row"><button ${can('owner')?'':'disabled'} onclick="hwidAction('reset_key_bindings',{ license:byId('hwidLicenseTarget').value.trim() })">Reset Device Bindings For Key</button></div>
+          </div>
+        </div>`);
+    }
+    async function searchHwid(){ try{ const q=byId('hwidSearchValue').value.trim(); const j=await api('/api/admin/hwid?q='+encodeURIComponent(q)+'&action=search'); byId('hwidSearchOut').textContent=JSON.stringify(j.items, null, 2); setStatus('HWID search loaded.', 'ok'); }catch(e){ setStatus('HWID search failed: '+(e.error||'unknown'), 'bad'); } }
+    async function hwidAction(action,payload){ try{ await api('/api/admin/hwid', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('HWID action done: '+action, 'ok'); }catch(e){ setStatus('HWID action failed: '+(e.error||'unknown'), 'bad'); } }
+
+    async function loadAdmins(){
+      if(!can('owner')){ byId('admins').innerHTML = lockWrap('admins', '<div class="tiny">Owner only.</div>'); return; }
+      const j = await api('/api/admin/admin_accounts?action=list');
+      byId('admins').innerHTML = `
+        <div class="split">
+          <div class="card"><div class="tiny">Current Admin Sessions</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Role</th><th>TID</th><th>Created</th><th>Last Seen</th><th>IP</th><th>Action</th></tr></thead><tbody>${j.sessions.map(s=>`<tr><td>${esc(s.role)}</td><td>${esc(s.tid)}</td><td>${esc(fmtTs(s.createdAt))}</td><td>${esc(fmtTs(s.lastSeen))}</td><td>${esc(s.ip)}</td><td><button onclick="adminAction('revoke',{ tid:'${esc(s.tid)}' })">Revoke</button></td></tr>`).join('')||'<tr><td colspan="6">No admin sessions.</td></tr>'}</tbody></table></div></div>
+          <div class="card"><div class="tiny">Admin Account Controls</div><div class="status" style="margin:8px 0">Role disabled state:\n${esc(JSON.stringify(j.disabled,null,2))}</div><div class="grid2"><select id="adminRoleToggle"><option value="owner">owner</option><option value="ulises">ulises</option><option value="other">other</option></select><button class="danger" onclick="adminAction('disable_role',{ role:byId('adminRoleToggle').value })">Disable Role</button><button class="good" onclick="adminAction('enable_role',{ role:byId('adminRoleToggle').value })">Enable Role</button><button class="danger" onclick="adminAction('force_logout_all',{})">Force Logout All Admins</button></div></div>
+        </div>`;
+    }
+    async function adminAction(action,payload){ try{ await api('/api/admin/admin_accounts', { method:'POST', body: JSON.stringify(Object.assign({ action }, payload||{})) }); setStatus('Admin account action done: '+action, 'ok'); await loadAdmins(); }catch(e){ setStatus('Admin action failed: '+(e.error||'unknown'), 'bad'); } }
+
+    async function loadConfig(){
+      const j = await api('/api/admin/config?action=get');
+      byId('config').innerHTML = lockWrap('config', `
+        <div class="split">
+          <div class="card"><div class="tiny">Current Config</div><div class="status" style="margin-top:8px">${esc(JSON.stringify(j.config, null, 2))}</div></div>
+          <div class="card ${can('owner')?'':'locked'}"><div class="tiny">Patch Config JSON</div><textarea id="configPatch">{
+  "planDefaults": {
+    "free": { "ttlSeconds": 900, "sessionLimit": 1, "deviceLimit": 1 },
+    "basic": { "ttlSeconds": 1920, "sessionLimit": 2, "deviceLimit": 2 },
+    "pro": { "ttlSeconds": 424800, "sessionLimit": 4, "deviceLimit": 4 }
+  }
+}</textarea><button ${can('owner')?'':'disabled'} onclick="updateConfig()">Update Config</button></div>
+        </div>`);
+    }
+    async function updateConfig(){ try{ const patch=JSON.parse(byId('configPatch').value); await api('/api/admin/config', { method:'POST', body: JSON.stringify({ action:'update', patch }) }); setStatus('Config updated.', 'ok'); await loadConfig(); await loadDashboard(); }catch(e){ setStatus('Config update failed: '+(e.error||e.message||'unknown'), 'bad'); } }
+
+    async function loadAnalytics(){ const j = await api('/api/admin/analytics'); byId('analytics').innerHTML = lockWrap('analytics', `<div class="grid3">${metric('Visitors',j.totals.visitors)}${metric('Trusted Visitors',j.totals.trustedVisitors)}${metric('Downloads',j.totals.downloads)}${metric('Key Checks Today',j.today.keyChecks)}${metric('Verify Attempts Today',j.today.verifyAttempts)}${metric('Launch Attempts Today',j.today.launchAttempts)}${metric('Launch Failures Today',j.today.launchFailures)}${metric('Free Keys Today',j.today.freeKeysGenerated)}${metric('Sessions Ended Today',j.today.sessionsEnded)}</div><div class="card" style="margin-top:12px"><div class="tiny">Top Error Types</div><div class="status" style="margin-top:8px">${esc(JSON.stringify(j.topErrorTypes,null,2))}</div></div>`); }
+    async function loadAlerts(){ const j = await api('/api/admin/alerts'); byId('alerts').innerHTML = lockWrap('alerts', `<div class="card"><div class="tiny">Alerts / Abuse Monitoring</div><div class="status" style="margin-top:8px">${esc(JSON.stringify(j.alerts,null,2))}</div></div>`); }
+    async function loadAudit(){ const j = await api('/api/admin/audit'); byId('audit').innerHTML = lockWrap('audit', `<div class="card"><div class="tiny">Audit Log</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Type</th><th>Role</th><th>When</th><th>IP</th><th>Success</th><th>Details</th></tr></thead><tbody>${j.items.map(x=>`<tr><td>${esc(x.type)}</td><td>${esc(x.role||'')}</td><td>${esc(fmtTs(x.ts))}</td><td>${esc(x.ip||'')}</td><td>${esc(String(x.success))}</td><td>${esc(JSON.stringify(x.target||x.value||x.reason||'',null,0))}</td></tr>`).join('')||'<tr><td colspan="6">No audit items.</td></tr>'}</tbody></table></div></div>`); }
+
+    byId('emergency').innerHTML = lockWrap('emergency', `
+      <div class="card ${can('owner')?'':'locked'}">
+        <div class="tiny">Emergency Tools — Owner Only</div>
+        <textarea id="emergencyMessage" placeholder="Reason or emergency banner message"></textarea>
+        <div class="grid3" style="margin-top:10px">
+          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('disable_all_keys')">Disable All Keys</button>
+          <button class="good" ${can('owner')?'':'disabled'} onclick="emergencyAction('enable_all_keys')">Re-Enable All Keys</button>
+          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('end_all_sessions_now')">End All Sessions Now</button>
+          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('pause_all_launches')">Pause All Launches</button>
+          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('clear_launch_nonces')">Clear Launch Nonces</button>
+          <button class="danger" ${can('owner')?'':'disabled'} onclick="emergencyAction('wipe_active_sessions')">Wipe All Active Sessions</button>
+          <button ${can('owner')?'':'disabled'} onclick="emergencyAction('enter_maintenance_mode')">Enter Maintenance Mode</button>
+          <button ${can('owner')?'':'disabled'} onclick="emergencyAction('set_emergency_banner')">Emergency Banner</button>
+        </div>
+      </div>`);
+    async function emergencyAction(action){ try{ await api('/api/admin/emergency', { method:'POST', body: JSON.stringify({ action, reason:byId('emergencyMessage').value, message:byId('emergencyMessage').value }) }); setStatus('Emergency action done: '+action, 'ok'); await loadDashboard(); await loadLauncher(); await loadAudit(); }catch(e){ setStatus('Emergency action failed: '+(e.error||'unknown'), 'bad'); } }
+
+    renderTabs();
+    if(state.role){ byId('roleBadge').className='pill '+roleClass(state.role); byId('roleBadge').textContent='Role: '+state.role; }
+    if(state.token){ loadAll().catch(e=>setStatus('Load failed: '+(e.error||e.message||'unknown'),'bad')); }
+  </script>
+</body>
+</html>
