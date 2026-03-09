@@ -75,430 +75,490 @@
   </style>
 
   <script language="JScript">
-/*
-SCRIPTNOVA PROPERTY NOTICE — IMPORTANT
-This launcher and its logic are proprietary to ScriptNova.
-Do NOT tamper with, rebrand, copy, or attempt to take over this code or its infrastructure.
-
-For official documentation and downloads: https://scriptnovaa.com
-*/
-
 (function(){
-  function A0(){alert("API offline");}
-  function A1(){alert("Invalid Key");}
-  function A2(m){alert("API error: "+String(m||"unknown"));}
-  function A3(){alert("Too many people using the same key");}
-  function A4(){alert("Launcher error");}
-  function AU(){alert("Please update to the new file at https://scriptnovaa.com/download");}
+  function tr(s){ return String(s||"").replace(/^\s+|\s+$/g,""); }
+  function joinParts(a){ return String(a||[]).split(",").join(""); }
+  function b64(s){ try{ return window.atob(String(s||"")); }catch(e){ return ""; } }
+  function dec(parts){ return b64(joinParts(parts)); }
 
-  window.onerror=function(){try{A4();}catch(e){} return true;};
+  function alertOffline(){ alert("API offline"); }
+  function alertInvalid(){ alert("Invalid Key"); }
+  function alertApi(m){ alert("API error: " + String(m||"unknown")); }
+  function alertLimit(){ alert("Too many people using the same key"); }
+  function alertLaunch(){ alert("Launcher error"); }
+  function alertUpdate(){ alert("Please update to the new file at https://scriptnovaa.com/download"); }
 
-  var sh=new ActiveXObject("WScript.Shell");
-  var fs=new ActiveXObject("Scripting.FileSystemObject");
+  window.onerror = function(){ try{ alertLaunch(); }catch(e){} return true; };
 
-  function tr(s){ s=String(s); return s.replace(/^\s+|\s+$/g,""); }
+  var sh = new ActiveXObject("WScript.Shell");
+  var fs = new ActiveXObject("Scripting.FileSystemObject");
 
-  // --- base64 helpers (ASCII-safe) ---
-  function J(a){ return String(a||[]).split(",").join(""); }
-  function B(s){
-    try { return window.atob(String(s||"")); }
-    catch(e){ return ""; }
-  }
-  function D(parts){ return B(J(parts)); }
+  var API_BASE = dec(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t"]);
+  var VERSION_URL = dec(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t","LzEy","MzQv","dmVy","c2lv","bi50","eHQ="]);
+  var SUPPORT_EMAIL = dec(["Z29t","ZWdh","YXNz","aXN0","QGdt","YWls","LmNv","bQ=="]);
+  var DISCORD_URL = dec(["aHR0","cHM6","Ly9k","aXNj","b3Jk","Lmdn","L2dz","Y0dU","TVZz","V0U="]);
 
-  // --- strings (split base64) ---
-  // https://api.scriptnovaa.com
-  var S_API = D(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t"]);
-  // https://api.scriptnovaa.com/1234/version.txt
-  var S_VU  = D(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t","LzEy","MzQv","dmVy","c2lv","bi50","eHQ="]);
+  var Q_CPU  = dec(["U0VM","RUNU","IFBy","b2Nl","c3Nv","cklk","IEZS","T00g","V2lu","MzJf","UHJv","Y2Vz","c29y"]);
+  var Q_BIOS = dec(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0JJ","T1M="]);
+  var Q_BRD  = dec(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0Jh","c2VC","b2Fy","ZA=="]);
+  var REG_GUID = dec(["SEtF","WV9M","T0NB","TF9N","QUNI","SU5F","XFNP","RlRX","QVJF","XE1p","Y3Jv","c29m","dFxD","cnlw","dG9n","cmFw","aHlc","TWFj","aGlu","ZUd1","aWQ="]);
 
-  // gomegaassist@gmail.com
-  var S_EM  = D(["Z29t","ZWdh","YXNz","aXN0","QGdt","YWls","LmNv","bQ=="]);
-  // https://discord.gg/gscGTMVsWE
-  var S_DS  = D(["aHR0","cHM6","Ly9k","aXNj","b3Jk","Lmdn","L2dz","Y0dU","TVZz","V0U="]);
+  var END_CHECK  = "/api/check";
+  var END_VERIFY = "/api/verify";
+  var END_UI     = "/api/ui";
+  var END_LAUNCH = "/api/launch";
+  var END_PING   = "/api/ping";
+  var END_END    = "/api/end";
 
-  // WMI queries
-  // SELECT ProcessorId FROM Win32_Processor
-  var Q1 = D(["U0VM","RUNU","IFBy","b2Nl","c3Nv","cklk","IEZS","T00g","V2lu","MzJf","UHJv","Y2Vz","c29y"]);
-  // SELECT SerialNumber FROM Win32_BIOS
-  var Q2 = D(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0JJ","T1M="]);
-  // SELECT SerialNumber FROM Win32_BaseBoard
-  var Q3 = D(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0Jh","c2VC","b2Fy","ZA=="]);
+  var REQUIRED_VERSION = "v13.13.15";
 
-  // HKLM\SOFTWARE\Microsoft\Cryptography\MachineGuid
-  var RG = D(["SEtF","WV9M","T0NB","TF9N","QUNI","SU5F","XFNP","RlRX","QVJF","XE1p","Y3Jv","c29m","dFxD","cnlw","dG9n","cmFw","aHlc","TWFj","aGlu","ZUd1","aWQ="]);
+  var state = {
+    versionOk:false,
+    plan:"none",
+    token:"",
+    exp:0,
+    sid:"",
+    pingTimer:null,
+    expireTimer:null,
+    clientId:"",
+    hwid:""
+  };
 
-  // endpoints
-  var E1="/api/check",E2="/api/verify",E3="/api/ui",E4="/api/launch",E5="/api/ping",E6="/api/end";
-
-  // version gate
-  var V="v13.13.14", gV=false;
-
-  // state
-  var p="none",t="",ex=0,sid="",kt=null,pt=null,cid="",hw="";
-
-  function ST(x){ try{ document.getElementById("licenseStatus").innerText=x; }catch(e){} }
-  function CB(x){
+  function setStatus(x){ try{ document.getElementById("licenseStatus").innerText = x; }catch(e){} }
+  function setClientBadge(x){
     try{
-      var el=document.getElementById("clientBadge"); if(!el) return;
-      x=String(x||"");
-      if(x.length>=10) el.innerText="Client: "+x.substring(0,6)+"…"+x.substring(x.length-4);
-      else if(x) el.innerText="Client: "+x;
-      else el.innerText="Client: none";
+      var el = document.getElementById("clientBadge");
+      if(!el) return;
+      x = String(x||"");
+      if(x.length>=10) el.innerText = "Client: " + x.substring(0,6) + "…" + x.substring(x.length-4);
+      else if(x) el.innerText = "Client: " + x;
+      else el.innerText = "Client: none";
     }catch(e){}
   }
-  function UI(en){
-    try{document.getElementById("btnSave").disabled=!en;}catch(e){}
-    try{document.getElementById("btnVerify").disabled=!en;}catch(e){}
-    try{document.getElementById("btnLaunch").disabled=!en;}catch(e){}
-    try{document.getElementById("btnDiscord").disabled=!en;}catch(e){}
-    try{document.getElementById("licenseKey").disabled=!en;}catch(e){}
-    try{document.getElementById("startUrl").disabled=!en;}catch(e){}
+  function lockUi(enabled){
+    try{document.getElementById("btnSave").disabled=!enabled;}catch(e){}
+    try{document.getElementById("btnVerify").disabled=!enabled;}catch(e){}
+    try{document.getElementById("btnLaunch").disabled=!enabled;}catch(e){}
+    try{document.getElementById("btnDiscord").disabled=!enabled;}catch(e){}
+    try{document.getElementById("licenseKey").disabled=!enabled;}catch(e){}
+    try{document.getElementById("startUrl").disabled=!enabled;}catch(e){}
   }
 
-  function DD(){
-    var d=sh.ExpandEnvironmentStrings("%APPDATA%")+"\\ScriptNova";
-    if(!fs.FolderExists(d)) fs.CreateFolder(d);
+  function appDir(){
+    var d = sh.ExpandEnvironmentStrings("%APPDATA%") + "\\ScriptNova";
+    try{ if(!fs.FolderExists(d)) fs.CreateFolder(d); }catch(e){}
     return d;
   }
-  function LP(){ return DD()+"\\license.txt"; }
-  function CP(){ return DD()+"\\clientid.txt"; }
-  function W(pth,txt){ try{ var tf=fs.CreateTextFile(pth,true); tf.Write(String(txt||"")); tf.Close(); }catch(e){} }
-  function R(pth){
+  function licensePath(){ return appDir() + "\\license.txt"; }
+  function clientPath(){ return appDir() + "\\clientid.txt"; }
+
+  function writeFile(p,txt){
     try{
-      if(!fs.FileExists(pth)) return "";
-      var tf=fs.OpenTextFile(pth,1,false);
-      var s=tf.ReadAll(); tf.Close();
+      var f = fs.CreateTextFile(p,true);
+      f.Write(String(txt||""));
+      f.Close();
+    }catch(e){}
+  }
+  function readFile(p){
+    try{
+      if(!fs.FileExists(p)) return "";
+      var f = fs.OpenTextFile(p,1,false);
+      var s = f.ReadAll();
+      f.Close();
       return tr(s);
     }catch(e){ return ""; }
   }
 
-  function okCID(s){
-    s=String(s||"").replace(/^\s+|\s+$/g,"");
+  function validClientId(s){
+    s = tr(s);
     if(!s) return false;
-    if(s.length<16||s.length>80) return false;
-    return (/^[A-Za-z0-9\-_.]+$/).test(s);
+    if(s.length<16 || s.length>80) return false;
+    return /^[A-Za-z0-9\-_.]+$/.test(s);
   }
-  function h32(){
-    var hx="0123456789abcdef",o="",i=0;
-    for(i=0;i<32;i++) o+=hx.charAt(Math.floor(Math.random()*16));
+  function randHex32(){
+    var h="0123456789abcdef", o="", i=0;
+    for(i=0;i<32;i++) o+=h.charAt(Math.floor(Math.random()*16));
     return o;
   }
-  function EC(){
-    var c=tr(R(CP()));
-    if(okCID(c)){ cid=c; CB(cid); return; }
-    var g="";
+  function ensureClientId(){
+    var c = tr(readFile(clientPath()));
+    if(validClientId(c)){
+      state.clientId = c;
+      setClientBadge(c);
+      return;
+    }
+    var g = "";
     try{
-      g=String((new ActiveXObject("Scriptlet.TypeLib").Guid)||"");
-      g=g.replace("{","").replace("}","").toLowerCase();
+      g = String((new ActiveXObject("Scriptlet.TypeLib").Guid)||"");
+      g = g.replace("{","").replace("}","").toLowerCase();
     }catch(e){ g=""; }
-    if(!okCID(g)) g="sn-"+h32();
-    cid=g;
-    W(CP(),cid);
-    CB(cid);
+    if(!validClientId(g)) g = "sn-" + randHex32();
+    state.clientId = g;
+    writeFile(clientPath(), g);
+    setClientBadge(g);
   }
 
-  function WM(q,prop){
+  function wmiOne(query, prop){
     try{
-      var svc=GetObject("winmgmts:\\\\.\\root\\cimv2");
-      var items=svc.ExecQuery(q);
-      var en=new Enumerator(items);
-      for(;!en.atEnd();en.moveNext()){
-        var it=en.item(),v="";
-        try{ v=it[prop]; }catch(x){ v=""; }
-        v=tr(v);
+      var svc = GetObject("winmgmts:\\\\.\\root\\cimv2");
+      var items = svc.ExecQuery(query);
+      var en = new Enumerator(items);
+      for(; !en.atEnd(); en.moveNext()){
+        var it = en.item(), v="";
+        try{ v = it[prop]; }catch(x){ v=""; }
+        v = tr(v);
         if(v) return v;
       }
     }catch(e){}
     return "";
   }
-  function RR(path){ try{ return tr(sh.RegRead(path)); }catch(e){ return ""; } }
-  function HW(){
-    var cpu=WM(Q1,"ProcessorId");
-    var bios=WM(Q2,"SerialNumber");
-    var brd=WM(Q3,"SerialNumber");
-    var mg=RR(RG);
-    var cn="",ud="";
-    try{cn=sh.ExpandEnvironmentStrings("%COMPUTERNAME%");}catch(e){cn="";}
-    try{ud=sh.ExpandEnvironmentStrings("%USERDOMAIN%");}catch(e){ud="";}
-    var r=tr(cpu)+"|"+tr(bios)+"|"+tr(brd)+"|"+tr(mg)+"|"+tr(cn)+"|"+tr(ud);
-    r=r.replace(/\s+/g," ").replace(/\|+/g,"|").replace(/^\|+|\|+$/g,"");
-    if(r.length<8 && okCID(cid)) r=r+"|CID:"+cid;
-    if(r.length>220) r=r.substr(0,220);
+  function regRead(path){ try{ return tr(sh.RegRead(path)); }catch(e){ return ""; } }
+
+  function buildHwid(){
+    var cpu = wmiOne(Q_CPU, "ProcessorId");
+    var bios = wmiOne(Q_BIOS, "SerialNumber");
+    var brd = wmiOne(Q_BRD, "SerialNumber");
+    var mg = regRead(REG_GUID);
+    var cn="", ud="";
+    try{ cn = sh.ExpandEnvironmentStrings("%COMPUTERNAME%"); }catch(e){ cn=""; }
+    try{ ud = sh.ExpandEnvironmentStrings("%USERDOMAIN%"); }catch(e){ ud=""; }
+
+    var r = tr(cpu)+"|"+tr(bios)+"|"+tr(brd)+"|"+tr(mg)+"|"+tr(cn)+"|"+tr(ud);
+    r = r.replace(/\s+/g," ").replace(/\|+/g,"|").replace(/^\|+|\|+$/g,"");
+    if(r.length<8 && validClientId(state.clientId)) r = r + "|CID:" + state.clientId;
+    if(r.length>220) r = r.substr(0,220);
     return r;
   }
 
-  function HG(u){
-    var http=new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
-    http.setTimeouts(3000,7000,7000,12000);
-    http.open("GET",u,false);
-    http.send();
-    return {s:http.status,t:http.responseText};
+  function httpGet(u){
+    var h = new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
+    h.setTimeouts(3000,7000,7000,12000);
+    h.open("GET",u,false);
+    h.send();
+    return { s:h.status, t:h.responseText };
   }
-  function HP(u,o){
-    var http=new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
-    http.setTimeouts(3000,7000,7000,12000);
-    http.open("POST",u,false);
-    http.setRequestHeader("Content-Type","application/json");
-    http.send(JSON.stringify(o));
-    return {s:http.status,t:http.responseText};
+  function httpPost(u,o){
+    var h = new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
+    h.setTimeouts(3000,7000,7000,12000);
+    h.open("POST",u,false);
+    h.setRequestHeader("Content-Type","application/json");
+    h.send(JSON.stringify(o));
+    return { s:h.status, t:h.responseText };
   }
 
-  function VG(){
-    gV=false; UI(false);
-    var r=HG(S_VU);
-    if(r.s!==200){ A0(); AU(); return false; }
-    var rv=tr(r.t||"");
-    if(rv!==V){ AU(); return false; }
-    gV=true; UI(true);
+  function checkVersion(){
+    state.versionOk = false;
+    lockUi(false);
+    var r = httpGet(VERSION_URL);
+    if(r.s !== 200){ alertOffline(); alertUpdate(); return false; }
+    var rv = tr(r.t||"");
+    if(rv !== REQUIRED_VERSION){ alertUpdate(); return false; }
+    state.versionOk = true;
+    lockUi(true);
     return true;
   }
 
-  function SU(u){
-    u=tr(u||"");
+  function safeUrl(u){
+    u = tr(u||"");
     if(!u) return false;
-    if(u.indexOf("\"")!==-1 || u.indexOf("'")!==-1) return false;
+    if(u.indexOf('"')!==-1 || u.indexOf("'")!==-1) return false;
     if(u.indexOf("\r")!==-1 || u.indexOf("\n")!==-1) return false;
-    var l=u.toLowerCase();
-    return (l.indexOf("http://")===0 || l.indexOf("https://")===0);
+    var l = u.toLowerCase();
+    return l.indexOf("http://")===0 || l.indexOf("https://")===0;
   }
 
-  function SaveK(){
-    if(!gV){ AU(); return; }
-    var k=tr(document.getElementById("licenseKey").value);
-    if(!k){ A1(); return; }
-    W(LP(),k);
-    ST("Key saved (not started)");
-  }
-  function LoadK(){ return tr(R(LP())); }
-
-  function CHK(){
-    if(!gV){ AU(); return; }
-    var k=tr(document.getElementById("licenseKey").value);
-    if(!k){ A1(); return; }
-    var r=HG(S_API+E1+"?license="+encodeURIComponent(k));
-    if(r.s!==200){ A0(); return; }
-    var d=null; try{ d=JSON.parse(r.t); }catch(e){ d=null; }
-    if(!d || d.ok!==true){ ST("Invalid key"); A1(); return; }
-    ST("Key OK ("+d.plan+") — not started");
+  function saveLocalKey(){
+    if(!state.versionOk){ alertUpdate(); return; }
+    var k = tr(document.getElementById("licenseKey").value);
+    if(!k){ alertInvalid(); return; }
+    writeFile(licensePath(), k);
+    setStatus("Key saved (not started)");
   }
 
-  function SP(){
-    if(!gV) return {ok:false,m:"update_required"};
-    if(!okCID(cid)) EC();
-    hw=HW();
-    var k=tr(document.getElementById("licenseKey").value);
+  function loadLocalKey(){ return tr(readFile(licensePath())); }
+
+  function checkKeyNoSession(){
+    if(!state.versionOk){ alertUpdate(); return; }
+    var k = tr(document.getElementById("licenseKey").value);
+    if(!k){ alertInvalid(); return; }
+    var r = httpGet(API_BASE + END_CHECK + "?license=" + encodeURIComponent(k));
+    if(r.s !== 200){ alertOffline(); return; }
+    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    if(!d || d.ok !== true){ setStatus("Invalid key"); alertInvalid(); return; }
+    setStatus("Key OK (" + d.plan + ") — not started");
+  }
+
+  function startSession(){
+    if(!state.versionOk) return {ok:false,m:"update_required"};
+    if(!validClientId(state.clientId)) ensureClientId();
+    state.hwid = buildHwid();
+
+    var k = tr(document.getElementById("licenseKey").value);
     if(!k) return {ok:false,m:"invalid_key"};
-    if(!hw || hw.length<8) return {ok:false,m:"bad_hwid"};
+    if(!state.hwid || state.hwid.length<8) return {ok:false,m:"bad_hwid"};
 
-    var r=HP(S_API+E2,{license:k,clientId:String(cid),hwid:String(hw)});
-    if(r.s!==200){
-      var j=null; try{ j=JSON.parse(r.t); }catch(e){ j=null; }
+    var r = httpPost(API_BASE + END_VERIFY, {
+      license:k,
+      clientId:String(state.clientId),
+      hwid:String(state.hwid)
+    });
+
+    if(r.s !== 200){
+      var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
       return {ok:false,m:(j && j.error ? j.error : "offline")};
     }
-    var d=null; try{ d=JSON.parse(r.t); }catch(e){ d=null; }
-    if(!d || d.ok!==true){
+
+    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    if(!d || d.ok !== true){
       if(d && d.error) return {ok:false,m:d.error,a:d.active,l:d.limit};
       return {ok:false,m:"invalid"};
     }
-    p=d.plan||"basic";
-    t=String(d.token||"");
-    ex=parseInt(d.exp,10)||0;
-    sid=String(d.sessionId||"");
-    if(!t || !ex || !sid) return {ok:false,m:"bad_session"};
-    ST("Session ACTIVE ("+p+")");
-    EK();
-    HB();
+
+    state.plan = d.plan || "basic";
+    state.token = String(d.token || "");
+    state.exp = parseInt(d.exp,10) || 0;
+    state.sid = String(d.sessionId || "");
+
+    if(!state.token || !state.exp || !state.sid) return {ok:false,m:"bad_session"};
+
+    setStatus("Session ACTIVE (" + state.plan + ")");
+    armExpiry();
+    startHeartbeat();
     return {ok:true};
   }
 
-  function UIc(){
-    var r=HG(S_API+E3+"?token="+encodeURIComponent(t)+"&cid="+encodeURIComponent(cid));
-    if(r.s!==200){
-      var j=null; try{ j=JSON.parse(r.t); }catch(e){ j=null; }
+  function getUiChallenge(){
+    var r = httpGet(API_BASE + END_UI + "?token=" + encodeURIComponent(state.token) + "&cid=" + encodeURIComponent(state.clientId));
+    if(r.s !== 200){
+      var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
       return {ok:false,e:(j && j.error ? j.error : "ui_failed")};
     }
-    var d=null; try{ d=JSON.parse(r.t); }catch(e){ d=null; }
-    if(!d || d.ok!==true || !d.launchNonce || !d.launchExp || !d.launchSig || !d.launchProfileId){
+    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    if(!d || d.ok !== true || !d.launchNonce || !d.launchExp || !d.launchSig || !d.launchProfileId){
       return {ok:false,e:"bad_ui_json"};
     }
     return {ok:true,d:d};
   }
 
-  function LB(u,ui){
-    var r=HP(S_API+E4,{
-      token:t,
-      clientId:cid,
-      startUrl:u,
-      launchNonce:ui.launchNonce,
-      launchExp:ui.launchExp,
-      launchSig:ui.launchSig,
-      launchProfileId:ui.launchProfileId
+  function getLaunchBundle(u, ui){
+    var r = httpPost(API_BASE + END_LAUNCH, {
+      token: state.token,
+      clientId: state.clientId,
+      startUrl: u,
+      launchNonce: ui.launchNonce,
+      launchExp: ui.launchExp,
+      launchSig: ui.launchSig,
+      launchProfileId: ui.launchProfileId
     });
-    if(r.s!==200){
-      var j=null; try{ j=JSON.parse(r.t); }catch(e){ j=null; }
+
+    if(r.s !== 200){
+      var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
       return {ok:false,e:(j && j.error ? j.error : "launch_failed")};
     }
-    var d=null; try{ d=JSON.parse(r.t); }catch(e){ d=null; }
-    if(!d || d.ok!==true || !d.bundle || !d.bundle.flags || !d.bundle.url){
+
+    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    if(!d || d.ok !== true || !d.bundle || !d.bundle.flags || !d.bundle.url){
       return {ok:false,e:"bad_launch_json"};
     }
     return {ok:true,b:d.bundle};
   }
 
-  function P1(){ if(!t) return; try{ HP(S_API+E5,{token:t,clientId:cid}); }catch(e){} }
-  function HB(){ HStop(); P1(); pt=window.setInterval(P1,60000); }
-  function HStop(){ if(pt){ try{window.clearInterval(pt);}catch(e){} pt=null; } }
-  function END(){ if(!t) return; HStop(); try{ HP(S_API+E6,{token:t,clientId:cid}); }catch(e){} }
-
-  function EK(){
-    if(kt){ try{window.clearTimeout(kt);}catch(e){} kt=null; }
-    if(!ex) return;
-    var d=(ex*1000)-(new Date().getTime()); if(d<0) d=0;
-    kt=window.setTimeout(function(){
-      END(); KILL();
-      p="none"; t=""; ex=0; sid="";
-      ST("Session EXPIRED");
-    },d);
+  function pingOnce(){ if(!state.token) return; try{ httpPost(API_BASE + END_PING, {token:state.token, clientId:state.clientId}); }catch(e){} }
+  function stopHeartbeat(){ if(state.pingTimer){ try{ window.clearInterval(state.pingTimer); }catch(e){} state.pingTimer = null; } }
+  function startHeartbeat(){ stopHeartbeat(); pingOnce(); state.pingTimer = window.setInterval(pingOnce, 60000); }
+  function endSession(){
+    if(!state.token) return;
+    stopHeartbeat();
+    try{ httpPost(API_BASE + END_END, {token:state.token, clientId:state.clientId}); }catch(e){}
   }
 
-  function FC(){
-    var p1="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-    var p2="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-    var p3=sh.ExpandEnvironmentStrings("%LOCALAPPDATA%")+"\\Google\\Chrome\\Application\\chrome.exe";
+  function armExpiry(){
+    if(state.expireTimer){ try{ window.clearTimeout(state.expireTimer); }catch(e){} state.expireTimer = null; }
+    if(!state.exp) return;
+    var d = (state.exp * 1000) - (new Date().getTime());
+    if(d < 0) d = 0;
+    state.expireTimer = window.setTimeout(function(){
+      endSession();
+      killChrome();
+      state.plan="none"; state.token=""; state.exp=0; state.sid="";
+      setStatus("Session EXPIRED");
+    }, d);
+  }
+
+  function findChrome(){
+    var p1 = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+    var p2 = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
+    var p3 = sh.ExpandEnvironmentStrings("%LOCALAPPDATA%") + "\\Google\\Chrome\\Application\\chrome.exe";
     if(fs.FileExists(p1)) return p1;
     if(fs.FileExists(p2)) return p2;
     if(fs.FileExists(p3)) return p3;
     return "";
   }
-  function KILL(){ try{ sh.Run("taskkill /IM chrome.exe /F",0,true); }catch(e){} }
 
-  function NF(f){
-    f=tr(f||"");
+  function killChrome(){
+    try{ sh.Run("taskkill /IM chrome.exe /F", 0, true); }catch(e){}
+  }
+
+  function normFlag(f){
+    f = tr(f||"");
     if(!f) return "";
     if(/[\r\n\t\0]/.test(f)) return "";
     if(f.indexOf("--")!==0) return "";
-    if(/[&|<>^%`]/.test(f)) return "";
+    if(/[&|<>^`]/.test(f)) return "";
+    if(f.indexOf("--user-data-dir=")===0) return "";
     return f;
   }
-  function UA(f){
-    f=String(f||"");
+
+  function fixUserAgent(f){
+    f = String(f||"");
     if(f.indexOf("--user-agent=")!==0) return f;
-    var v=tr(f.substring(13)).replace(/"/g,"");
-    if(/\s/.test(v)) return '--user-agent="'+v+'"';
-    return "--user-agent="+v;
+    var v = tr(f.substring(13)).replace(/"/g,"");
+    if(/\s/.test(v)) return '--user-agent="' + v + '"';
+    return "--user-agent=" + v;
   }
-  function QI(s){
-    s=String(s||"");
+
+  function q(s){
+    s = String(s||"");
     if(!s) return "";
     if(s.indexOf('"')!==-1) return s;
-    if(/\s/.test(s)) return '"'+s+'"';
+    if(/\s/.test(s)) return '"' + s + '"';
     return s;
   }
-  function BA(flags,url){
-    var i=0,parts=[];
+
+  function buildArgs(flags, url){
+    var parts = [];
+    var i=0;
+
     for(i=0;i<flags.length;i++){
-      var x=NF(flags[i]);
+      var x = normFlag(flags[i]);
       if(!x) continue;
-      x=UA(x);
+      x = fixUserAgent(x);
       parts.push(x);
     }
-    parts.push(QI(url));
+
+    parts.push("--new-window");
+    parts.push(q(url));
     return parts.join(" ");
   }
 
-  function WMIrun(exe,args){
+  function launchShellExecute(exe, args){
     try{
-      var svc=GetObject("winmgmts:\\\\.\\root\\cimv2");
-      var pr=svc.Get("Win32_Process");
-      var inp=pr.Methods_("Create").InParameters.SpawnInstance_();
-      inp.CommandLine='"'+exe+'" '+args;
-      var outp=pr.ExecMethod_("Create",inp);
-      var rv=9999;
-      try{ rv=outp.ReturnValue; }catch(e){ rv=9999; }
-      return (rv===0);
-    }catch(e){ return false; }
-  }
-  function RUN(exe,args){
-    var cmd='"'+exe+'" '+args;
-    try{ sh.Run(cmd,0,false); return true; }catch(e){ return false; }
+      var sa = new ActiveXObject("Shell.Application");
+      sa.ShellExecute(exe, args, "", "open", 1);
+      return true;
+    }catch(e){
+      return false;
+    }
   }
 
-  function LCH(){
-    if(!gV){ AU(); return; }
-    var u=tr(document.getElementById("startUrl").value);
-    if(!u) u="https://example.com";
-    if(!SU(u)){ A2("unsafe_url"); return; }
+  function launchWmi(exe,args){
+    try{
+      var svc = GetObject("winmgmts:\\\\.\\root\\cimv2");
+      var pr = svc.Get("Win32_Process");
+      var inp = pr.Methods_("Create").InParameters.SpawnInstance_();
+      inp.CommandLine = '"' + exe + '" ' + args;
+      var outp = pr.ExecMethod_("Create", inp);
+      var rv = 9999;
+      try{ rv = outp.ReturnValue; }catch(e){ rv = 9999; }
+      return (rv === 0);
+    }catch(e){
+      return false;
+    }
+  }
 
-    var c=FC();
-    if(!c){ A4(); return; }
+  function launchRun(exe,args){
+    var cmd = '"' + exe + '" ' + args;
+    try{
+      sh.Run(cmd, 1, false);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
 
-    KILL();
+  function resetSessionUi(){
+    stopHeartbeat();
+    state.plan="none"; state.token=""; state.exp=0; state.sid="";
+    setStatus("Key saved (not started)");
+  }
 
-    var s=SP();
+  function doLaunch(){
+    if(!state.versionOk){ alertUpdate(); return; }
+
+    var u = tr(document.getElementById("startUrl").value);
+    if(!u) u = "https://example.com";
+    if(!safeUrl(u)){ alertApi("unsafe_url"); return; }
+
+    var chrome = findChrome();
+    if(!chrome){ alertLaunch(); return; }
+
+    killChrome();
+
+    var s = startSession();
     if(!s.ok){
-      if(s.m==="update_required"){ AU(); }
-      else if(s.m==="offline"){ A0(); }
-      else if(s.m==="too_many_sessions"){ A3(); }
-      else if(s.m==="invalid_key"||s.m==="invalid"){ A1(); }
-      else { A2(s.m); }
-      HStop(); p="none"; t=""; ex=0; sid="";
-      ST("Key saved (not started)");
+      if(s.m==="update_required") alertUpdate();
+      else if(s.m==="offline") alertOffline();
+      else if(s.m==="too_many_sessions") alertLimit();
+      else if(s.m==="invalid_key" || s.m==="invalid") alertInvalid();
+      else alertApi(s.m);
+      resetSessionUi();
       return;
     }
 
-    var ui=UIc();
+    var ui = getUiChallenge();
     if(!ui.ok){
-      if(ui.e==="offline") A0(); else A2(ui.e);
-      END(); p="none"; t=""; ex=0; sid="";
-      ST("Key saved (not started)");
+      if(ui.e==="offline") alertOffline(); else alertApi(ui.e);
+      endSession();
+      resetSessionUi();
       return;
     }
 
-    var lb=LB(u,ui.d);
+    var lb = getLaunchBundle(u, ui.d);
     if(!lb.ok){
-      if(lb.e==="offline") A0(); else A2(lb.e);
-      END(); p="none"; t=""; ex=0; sid="";
-      ST("Key saved (not started)");
+      if(lb.e==="offline") alertOffline(); else alertApi(lb.e);
+      endSession();
+      resetSessionUi();
       return;
     }
 
-    var as=BA(lb.b.flags,String(lb.b.url||u));
-    if(WMIrun(c,as)) return;
-    if(RUN(c,as)) return;
+    var args = buildArgs(lb.b.flags, String(lb.b.url || u));
 
-    END(); p="none"; t=""; ex=0; sid="";
-    ST("Key saved (not started)");
-    A4();
+    if(launchWmi(chrome, args)) return;
+    if(launchRun(chrome, args)) return;
+    if(launchShellExecute(chrome, args)) return;
+
+    endSession();
+    resetSessionUi();
+    alertLaunch();
   }
 
-  function DIS(){
-    if(!gV){ AU(); return; }
-    try{ document.getElementById("startUrl").value=S_DS; }catch(e){}
+  function setDiscordUrl(){
+    if(!state.versionOk){ alertUpdate(); return; }
+    try{ document.getElementById("startUrl").value = DISCORD_URL; }catch(e){}
   }
 
-  function INIT(){
-    EC(); hw=HW();
+  function init(){
+    ensureClientId();
+    state.hwid = buildHwid();
 
-    try{ document.getElementById("supportEmail").innerText=S_EM; }catch(e){}
-    try{ document.getElementById("supportDiscord").innerText=S_DS; }catch(e){}
+    try{ document.getElementById("supportEmail").innerText = SUPPORT_EMAIL; }catch(e){}
+    try{ document.getElementById("supportDiscord").innerText = DISCORD_URL; }catch(e){}
 
-    var saved=LoadK();
-    if(saved) document.getElementById("licenseKey").value=saved;
+    var saved = loadLocalKey();
+    if(saved) document.getElementById("licenseKey").value = saved;
 
-    VG();
+    checkVersion();
 
-    if(gV) ST(saved ? "Key saved (not started)" : "No key");
-    else ST("Update required");
+    if(state.versionOk) setStatus(saved ? "Key saved (not started)" : "No key");
+    else setStatus("Update required");
   }
 
-  // expose only the UI hooks
-  window.SaveLicenseLocal=SaveK;
-  window.CheckLicenseNoSession=CHK;
-  window.Launch=LCH;
-  window.CleanupOnExit=function(){ try{ END(); }catch(e){} try{ KILL(); }catch(e2){} };
-  window.SetDiscordAsStartupUrl=DIS;
-  window.InitApp=INIT;
+  window.SaveLicenseLocal = saveLocalKey;
+  window.CheckLicenseNoSession = checkKeyNoSession;
+  window.Launch = doLaunch;
+  window.CleanupOnExit = function(){ try{ endSession(); }catch(e){} try{ killChrome(); }catch(e2){} };
+  window.SetDiscordAsStartupUrl = setDiscordUrl;
+  window.InitApp = init;
 })();
   </script>
 </head>
@@ -555,3 +615,4 @@ For official documentation and downloads: https://scriptnovaa.com
   </div>
 </body>
 </html>
+
