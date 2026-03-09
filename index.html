@@ -517,7 +517,7 @@
             <div class="statNumber">
               <span id="trustedCount">0</span> <small id="trustedUnit">people</small>
             </div>
-            <div class="statMeta">
+            <div class="statMeta" id="trustedMeta">
               Growing community trust with live updates across the site.
             </div>
           </div>
@@ -527,7 +527,7 @@
             <div class="statNumber">
               <span id="downloadCount">0</span>
             </div>
-            <div class="statMeta">
+            <div class="statMeta" id="downloadMeta">
               Live site totals update as more people install the launcher.
             </div>
           </div>
@@ -635,10 +635,7 @@
       visit: a + c
     };
 
-    const FALLBACK = {
-      trusted: 2400000,
-      downloads: 482315
-    };
+    const COUNTER_FAIL_MESSAGE = "Hello User your seeing this message because our counter is kind of not working for most users right now hehe sorry about that-scriptnova team";
 
     function animateValue(el, endValue, formatter){
       const duration = 1400;
@@ -670,6 +667,14 @@
       return n.toLocaleString();
     }
 
+    function showCounterErrorMessage(){
+      document.getElementById("trustedCount").textContent = "Counter unavailable";
+      document.getElementById("trustedUnit").textContent = "";
+      document.getElementById("downloadCount").textContent = "Counter unavailable";
+      document.getElementById("trustedMeta").textContent = COUNTER_FAIL_MESSAGE;
+      document.getElementById("downloadMeta").textContent = COUNTER_FAIL_MESSAGE;
+    }
+
     async function loadStats(){
       try{
         const res = await fetch(API.stats, {
@@ -679,16 +684,21 @@
         if (!res.ok) throw new Error("Stats fetch failed");
 
         const data = await res.json();
-        const trusted = Number(data.trusted ?? data.visitors ?? FALLBACK.trusted);
-        const downloads = Number(data.downloads ?? FALLBACK.downloads);
+        const trusted = Number(data.trusted ?? data.visitors);
+        const downloads = Number(data.downloads);
+
+        if (!Number.isFinite(trusted) || !Number.isFinite(downloads)) {
+          throw new Error("Invalid stats data");
+        }
 
         animateValue(document.getElementById("trustedCount"), trusted, compact);
         document.getElementById("trustedUnit").textContent = trustedUnit(trusted);
         animateValue(document.getElementById("downloadCount"), downloads, n => n.toLocaleString());
+
+        document.getElementById("trustedMeta").textContent = "Growing community trust with live updates across the site.";
+        document.getElementById("downloadMeta").textContent = "Live site totals update as more people install the launcher.";
       }catch(err){
-        animateValue(document.getElementById("trustedCount"), FALLBACK.trusted, compact);
-        document.getElementById("trustedUnit").textContent = trustedUnit(FALLBACK.trusted);
-        animateValue(document.getElementById("downloadCount"), FALLBACK.downloads, n => n.toLocaleString());
+        showCounterErrorMessage();
       }
     }
 
@@ -706,12 +716,19 @@
 
         if (typeof data.trusted !== "undefined" || typeof data.visitors !== "undefined"){
           const trusted = Number(data.trusted ?? data.visitors);
-          animateValue(document.getElementById("trustedCount"), trusted, compact);
-          document.getElementById("trustedUnit").textContent = trustedUnit(trusted);
+          if (Number.isFinite(trusted)) {
+            animateValue(document.getElementById("trustedCount"), trusted, compact);
+            document.getElementById("trustedUnit").textContent = trustedUnit(trusted);
+            document.getElementById("trustedMeta").textContent = "Growing community trust with live updates across the site.";
+          }
         }
 
         if (typeof data.downloads !== "undefined"){
-          animateValue(document.getElementById("downloadCount"), Number(data.downloads), n => n.toLocaleString());
+          const downloads = Number(data.downloads);
+          if (Number.isFinite(downloads)) {
+            animateValue(document.getElementById("downloadCount"), downloads, n => n.toLocaleString());
+            document.getElementById("downloadMeta").textContent = "Live site totals update as more people install the launcher.";
+          }
         }
       }catch(err){
         console.log("Visit tracking failed");
