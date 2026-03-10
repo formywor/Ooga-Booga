@@ -363,12 +363,69 @@
     return {ok:true,b:d.bundle};
   }
 
-  function pingOnce(){ if(!state.token) return; try{ httpPost(API_BASE + END_PING, {token:state.token, clientId:state.clientId}); }catch(e){} }
+  function clearSessionTimers(){
+    stopHeartbeat();
+    if(state.expireTimer){ try{ window.clearTimeout(state.expireTimer); }catch(e){} state.expireTimer = null; }
+  }
+
+  function clearSessionState(){
+    state.plan="none"; state.token=""; state.exp=0; state.sid="";
+  }
+
+  function handleSessionEnded(reason, doNotify){
+    clearSessionTimers();
+    try{ killChrome(); }catch(e){}
+    clearSessionState();
+
+    reason = tr(reason||"");
+    if(reason==="session_expired" || reason==="expired"){
+      setStatus("Session EXPIRED");
+      if(doNotify) alert("Session expired");
+      return;
+    }
+    if(reason==="session_not_found"){
+      setStatus("Session ENDED");
+      if(doNotify) alert("Session ended");
+      return;
+    }
+    if(reason==="client_mismatch"){
+      setStatus("Session ended (client mismatch)");
+      if(doNotify) alert("Session ended: client mismatch");
+      return;
+    }
+    if(reason==="hwid_mismatch"){
+      setStatus("Session ended (device mismatch)");
+      if(doNotify) alert("Session ended: device mismatch");
+      return;
+    }
+    if(reason){
+      setStatus("Session ended (" + reason + ")");
+      if(doNotify) alert("Session ended: " + reason);
+      return;
+    }
+    setStatus("Session ended");
+    if(doNotify) alert("Session ended");
+  }
+
+  function pingOnce(){
+    if(!state.token) return;
+    try{
+      var r = httpPost(API_BASE + END_PING, {token:state.token, clientId:state.clientId});
+      var d = null;
+      try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+
+      if(r.s === 200 && d && d.ok === true) return;
+
+      handleSessionEnded((d && d.error ? d.error : "ping_failed"), true);
+    }catch(e){
+      if(state.token) setStatus("Session heartbeat issue");
+    }
+  }
   function stopHeartbeat(){ if(state.pingTimer){ try{ window.clearInterval(state.pingTimer); }catch(e){} state.pingTimer = null; } }
-  function startHeartbeat(){ stopHeartbeat(); pingOnce(); state.pingTimer = window.setInterval(pingOnce, 60000); }
+  function startHeartbeat(){ stopHeartbeat(); pingOnce(); if(state.token) state.pingTimer = window.setInterval(pingOnce, 60000); }
   function endSession(){
     if(!state.token) return;
-    stopHeartbeat();
+    clearSessionTimers();
     try{ httpPost(API_BASE + END_END, {token:state.token, clientId:state.clientId}); }catch(e){}
   }
 
@@ -379,9 +436,7 @@
     if(d < 0) d = 0;
     state.expireTimer = window.setTimeout(function(){
       endSession();
-      killChrome();
-      state.plan="none"; state.token=""; state.exp=0; state.sid="";
-      setStatus("Session EXPIRED");
+      handleSessionEnded("session_expired", true);
     }, d);
   }
 
@@ -477,8 +532,8 @@
   }
 
   function resetSessionUi(){
-    stopHeartbeat();
-    state.plan="none"; state.token=""; state.exp=0; state.sid="";
+    clearSessionTimers();
+    clearSessionState();
     setStatus("Key saved (not started)");
   }
 
@@ -615,4 +670,3 @@
   </div>
 </body>
 </html>
-
