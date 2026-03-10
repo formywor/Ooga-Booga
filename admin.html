@@ -266,7 +266,6 @@
       </aside>
 
       <main class="content">
-        <!-- DASHBOARD -->
         <section id="section-dashboard" class="section active">
           <div class="sectionHead">
             <h2>Dashboard</h2>
@@ -304,7 +303,6 @@
           </div>
         </section>
 
-        <!-- SESSIONS -->
         <section id="section-sessions" class="section">
           <div class="sectionHead">
             <h2>Sessions</h2>
@@ -350,7 +348,6 @@
           </div>
         </section>
 
-        <!-- KEYS -->
         <section id="section-keys" class="section">
           <div class="sectionHead">
             <h2>Keys</h2>
@@ -419,7 +416,6 @@
           </div>
         </section>
 
-        <!-- FREE KEYS -->
         <section id="section-freekeys" class="section">
           <div class="sectionHead">
             <h2>Free Keys</h2>
@@ -429,9 +425,10 @@
           <div class="cols2">
             <div class="panel">
               <h3>Manual Free Key</h3>
-              <div class="cols2">
+              <div class="cols3">
                 <div><label class="label">License</label><input id="freeAddLicense" class="field" placeholder="FREE-MANUAL123" /></div>
                 <div><label class="label">TTL Seconds</label><input id="freeAddTtl" class="field" value="900" /></div>
+                <div><label class="label">Tier</label><select id="freeAddTier" class="select"><option value="">None</option><option value="15m">15m</option><option value="35m">35m</option><option value="2h">2h</option></select></div>
               </div>
               <div class="row" style="margin-top:12px;">
                 <button class="btnSm ownerOnly" id="btnAddFreeKey">Add Free Key</button>
@@ -458,6 +455,7 @@
                 <thead>
                   <tr>
                     <th>License</th>
+                    <th>Tier</th>
                     <th>TTL Seconds</th>
                     <th>Expires</th>
                     <th>Created At</th>
@@ -465,18 +463,17 @@
                   </tr>
                 </thead>
                 <tbody id="freeKeysTbody">
-                  <tr><td colspan="5" class="muted">No free keys loaded yet.</td></tr>
+                  <tr><td colspan="6" class="muted">No free keys loaded yet.</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <!-- LAUNCHER -->
         <section id="section-launcher" class="section">
           <div class="sectionHead">
             <h2>Launcher Control</h2>
-            <p>Pause HTA launches, unpause them, force minimum version, and set a maintenance message shown by the API.</p>
+            <p>Pause HTA launches, unpause them, force minimum version, set a maintenance message, and control the old ScriptNova cleanup prompt.</p>
           </div>
 
           <div class="cols2">
@@ -510,9 +507,34 @@
               </div>
             </div>
           </div>
+
+          <div class="panel">
+            <h3>Old ScriptNova Cleanup Prompt</h3>
+            <p>This only controls the future HTA prompt. It does not delete anything by itself.</p>
+
+            <div class="fieldWrap">
+              <label class="label">Enabled</label>
+              <select id="cleanupPromptEnabled" class="select">
+                <option value="0">Disabled</option>
+                <option value="1">Enabled</option>
+              </select>
+            </div>
+
+            <div class="fieldWrap">
+              <label class="label">Prompt Message</label>
+              <textarea id="cleanupPromptMessage" class="text" placeholder="Owner recommends removing outdated ScriptNova launcher copies from Desktop and Downloads."></textarea>
+            </div>
+
+            <div class="row">
+              <button class="btnSm ownerOnly" id="btnSaveCleanupPrompt">Save Cleanup Prompt</button>
+              <button class="btnSmWarn ownerOnly" id="btnBumpCleanupPrompt">Force Prompt Again</button>
+              <button class="btnSm" id="btnLoadCleanupPrompt">Load Cleanup Prompt</button>
+            </div>
+
+            <div id="cleanupPromptStatusBox" style="margin-top:12px;"></div>
+          </div>
         </section>
 
-        <!-- HWID -->
         <section id="section-hwid" class="section">
           <div class="sectionHead">
             <h2>HWID / Device Controls</h2>
@@ -551,7 +573,6 @@
           </div>
         </section>
 
-        <!-- ACCOUNTS -->
         <section id="section-accounts" class="section">
           <div class="sectionHead">
             <h2>Admin Accounts</h2>
@@ -591,11 +612,10 @@
           </div>
         </section>
 
-        <!-- CONFIG -->
         <section id="section-config" class="section">
           <div class="sectionHead">
             <h2>System Config</h2>
-            <p>Current defaults, forced version, maintenance text, and feature toggles. Owner-only read for now.</p>
+            <p>Current defaults, forced version, maintenance text, cleanup prompt state, and feature toggles. Owner-only read for now.</p>
           </div>
 
           <div class="panel">
@@ -607,7 +627,6 @@
           </div>
         </section>
 
-        <!-- ANALYTICS -->
         <section id="section-analytics" class="section">
           <div class="sectionHead">
             <h2>Analytics / Counters</h2>
@@ -623,7 +642,6 @@
           </div>
         </section>
 
-        <!-- ALERTS -->
         <section id="section-alerts" class="section">
           <div class="sectionHead">
             <h2>Alerts / Abuse Monitoring</h2>
@@ -647,7 +665,6 @@
           </div>
         </section>
 
-        <!-- AUDIT -->
         <section id="section-audit" class="section">
           <div class="sectionHead">
             <h2>Audit Log</h2>
@@ -671,7 +688,6 @@
           </div>
         </section>
 
-        <!-- EMERGENCY -->
         <section id="section-emergency" class="section">
           <div class="sectionHead">
             <h2>Emergency Tools</h2>
@@ -941,7 +957,10 @@
           '<div>Maintenance Message</div><div>' + esc(l.maintenanceMessage || "—") + '</div>' +
           '<div>Disable All Keys</div><div>' + esc(yesNo(l.disableAllKeys)) + '</div>' +
           '<div>Required Min Version</div><div>' + esc((s.launcherVersion && s.launcherVersion.requiredMinVersion) || "v13.13.15") + '</div>' +
-          '<div>Cached Version Txt</div><div>' + esc((s.launcherVersion && s.launcherVersion.cachedVersionTxt) || "—") + '</div>';
+          '<div>Cached Version Txt</div><div>' + esc((s.launcherVersion && s.launcherVersion.cachedVersionTxt) || "—") + '</div>' +
+          '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(l.cleanupOldPromptEnabled)) + '</div>' +
+          '<div>Cleanup Prompt Message</div><div>' + esc(l.cleanupOldPromptMessage || "—") + '</div>' +
+          '<div>Cleanup Prompt Force Once</div><div>' + esc(l.cleanupOldPromptForceOnce ? ts(l.cleanupOldPromptForceOnce) : "—") + '</div>';
 
         $("dashboardToday").innerHTML =
           '<div>Key Checks</div><div>' + esc(a.keyChecks || 0) + '</div>' +
@@ -1095,12 +1114,13 @@
         var rows = j.items || [];
         var html = "";
         if(!rows.length){
-          html = '<tr><td colspan="5" class="muted">No free keys found.</td></tr>';
+          html = '<tr><td colspan="6" class="muted">No free keys found.</td></tr>';
         } else {
           for(var i=0;i<rows.length;i++){
             var r = rows[i];
             html += '<tr>' +
               '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.tier || "—") + '</td>' +
               '<td>' + esc(r.ttlSeconds) + '</td>' +
               '<td>' + esc(r.exp ? ts(r.exp) : "—") + '</td>' +
               '<td>' + esc(r.createdAt ? ts(r.createdAt) : "—") + '</td>' +
@@ -1111,7 +1131,15 @@
         $("freeKeysTbody").innerHTML = html;
       }
 
-      async function addFreeKey(){ await api("freekey_add", { license: $("freeAddLicense").value.trim(), ttlSeconds: $("freeAddTtl").value.trim() }); await loadFreeKeys(); }
+      async function addFreeKey(){
+        await api("freekey_add", {
+          license: $("freeAddLicense").value.trim(),
+          ttlSeconds: $("freeAddTtl").value.trim(),
+          tier: $("freeAddTier").value.trim()
+        });
+        await loadFreeKeys();
+      }
+
       async function removeFreeKey(){ await api("freekey_remove", { license: $("freeRemoveLicense").value.trim() }); await loadFreeKeys(); }
       async function expireAllFreeKeys(){ if(!confirm("Expire all free keys?")) return; await api("freekeys_expire_all"); await loadFreeKeys(); }
 
@@ -1126,7 +1154,40 @@
             '<div>Maintenance</div><div>' + esc(yesNo(l.maintenanceMode)) + '</div>' +
             '<div>Maintenance Message</div><div>' + esc(l.maintenanceMessage || "—") + '</div>' +
             '<div>Min Version</div><div>' + esc(l.minVersion || "—") + '</div>' +
+            '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(l.cleanupOldPromptEnabled)) + '</div>' +
+            '<div>Cleanup Prompt Message</div><div>' + esc(l.cleanupOldPromptMessage || "—") + '</div>' +
+            '<div>Cleanup Prompt Force Once</div><div>' + esc(l.cleanupOldPromptForceOnce ? ts(l.cleanupOldPromptForceOnce) : "—") + '</div>' +
           '</div>';
+      }
+
+      async function loadCleanupPrompt(){
+        var j = await api("launcher_cleanup_prompt_get");
+        var c = j.cleanupPrompt || {};
+        $("cleanupPromptEnabled").value = c.enabled ? "1" : "0";
+        $("cleanupPromptMessage").value = c.message || "";
+        $("cleanupPromptStatusBox").innerHTML =
+          '<div class="kv">' +
+            '<div>Enabled</div><div>' + esc(yesNo(c.enabled)) + '</div>' +
+            '<div>Message</div><div>' + esc(c.message || "—") + '</div>' +
+            '<div>Force Once</div><div>' + esc(c.forceOnce ? ts(c.forceOnce) : "—") + '</div>' +
+          '</div>';
+      }
+
+      async function saveCleanupPrompt(){
+        await api("launcher_cleanup_prompt_set", {
+          enabled: $("cleanupPromptEnabled").value === "1",
+          message: $("cleanupPromptMessage").value.trim()
+        });
+        await loadCleanupPrompt();
+        await loadLauncherStatus();
+        await loadDashboard();
+      }
+
+      async function bumpCleanupPrompt(){
+        await api("launcher_cleanup_prompt_bump");
+        await loadCleanupPrompt();
+        await loadLauncherStatus();
+        await loadDashboard();
       }
 
       async function pauseLauncher(){ await api("launcher_pause", { reason: $("pauseReason").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
@@ -1209,6 +1270,7 @@
         var c = j.config || {};
         var p = c.currentPlanDefaults || {};
         var f = c.featureToggles || {};
+        var cleanup = c.cleanupOldPrompt || {};
         $("configBox").innerHTML =
           '<div class="cols2">' +
             '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
@@ -1230,6 +1292,9 @@
               '<div class="kv">' +
                 '<div>Launcher Force Version</div><div>' + esc(c.launcherForceVersionValue || "—") + '</div>' +
                 '<div>Maintenance Message</div><div>' + esc(c.maintenanceMessageText || "—") + '</div>' +
+                '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(cleanup.enabled)) + '</div>' +
+                '<div>Cleanup Prompt Message</div><div>' + esc(cleanup.message || "—") + '</div>' +
+                '<div>Cleanup Prompt Force Once</div><div>' + esc(cleanup.forceOnce ? ts(cleanup.forceOnce) : "—") + '</div>' +
                 '<div>Paused</div><div>' + esc(yesNo(f.paused)) + '</div>' +
                 '<div>Maintenance Mode</div><div>' + esc(yesNo(f.maintenanceMode)) + '</div>' +
                 '<div>Disable All Keys</div><div>' + esc(yesNo(f.disableAllKeys)) + '</div>' +
@@ -1333,6 +1398,10 @@
         $("btnSetMinVersion").onclick = function(){ setMinVersion().catch(handleErr); };
         $("btnSetMaintenanceMsg").onclick = function(){ setMaintenanceMessage().catch(handleErr); };
         $("btnLauncherStatus").onclick = function(){ loadLauncherStatus().catch(handleErr); };
+
+        $("btnLoadCleanupPrompt").onclick = function(){ loadCleanupPrompt().catch(handleErr); };
+        $("btnSaveCleanupPrompt").onclick = function(){ saveCleanupPrompt().catch(handleErr); };
+        $("btnBumpCleanupPrompt").onclick = function(){ bumpCleanupPrompt().catch(handleErr); };
 
         $("btnSearchHwid").onclick = function(){ searchHwid().catch(handleErr); };
         $("btnBanHwid").onclick = function(){ banHwid().catch(handleErr); };
