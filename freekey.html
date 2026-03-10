@@ -239,10 +239,7 @@
       "2h":  { label: "2 Hours",     ttl: 7200, needed: 100 }
     };
 
-    let expEpoch = 0;
-    let timer = null;
-    let cooldownUntil = 0;
-    let redirectCooldownUntil = 0;
+    let autoPaused = { "35m": false, "2h": false };
 
     function showErr(msg){
       const el = document.getElementById("err");
@@ -417,7 +414,17 @@
       btn2hAuto.disabled = !canDoRedirect();
       btn35Generate.disabled = !canGenerateTier("35m");
       btn2hGenerate.disabled = !canGenerateTier("2h");
+      if(autoPaused["35m"]){
+        btn35Auto.textContent = "Continue Auto";
+      } else {
+        btn35Auto.textContent = "Auto Redirect (Fast)";
+      }
 
+      if(autoPaused["2h"]){
+        btn2hAuto.textContent = "Continue Auto";
+      } else {
+        btn2hAuto.textContent = "Auto Redirect (Fast)";
+      }
       if(active){
         btn15.textContent = "Key already generated";
         btn35Generate.textContent = "Key already generated";
@@ -459,6 +466,23 @@
       const p = readProgress();
       const cur = Math.max(0, parseInt(p[tier], 10) || 0);
 
+      let success = false;
+      try{
+        const win = window.open(REDIRECT_URL, "_blank", "noopener,noreferrer");
+        if(win) success = true;
+      }catch(e){}
+
+      if(!success){
+        if(auto){
+          showErr("Popup blocked or failed. Enable popups for this site and try again.");
+          refreshButtons();
+          return;
+        } else {
+          location.href = REDIRECT_URL;
+          return;
+        }
+      }
+
       if(cur < cfg.needed){
         p[tier] = cur + 1;
         saveProgress(p);
@@ -466,13 +490,6 @@
 
       redirectCooldownUntil = Date.now() + (auto ? 200 : REDIRECT_STEP_COOLDOWN_MS);
       renderProgress();
-
-      try{
-        window.open(REDIRECT_URL, "_blank", "noopener,noreferrer");
-      }catch(e){
-        location.href = REDIRECT_URL;
-        return;
-      }
 
       const next = Math.min((p[tier] || 0), cfg.needed);
       if(next >= cfg.needed){
@@ -489,11 +506,23 @@
         return;
       }
 
+      if(autoPaused[tier]){
+        autoPaused[tier] = false; // resume
+      }
+
       doRedirectStep(tier, true);
 
       const p = readProgress();
       const cur = p[tier] || 0;
       const needed = TIER_CONFIG[tier].needed;
+      const halfway = Math.ceil(needed / 2);
+
+      if(cur >= halfway && autoPaused[tier] === false){
+        autoPaused[tier] = true;
+        showOk("Auto redirect paused at halfway (" + halfway + " redirects). Click 'Auto Redirect (Fast)' again to continue.");
+        refreshButtons();
+        return;
+      }
 
       if(cur < needed){
         setTimeout(() => autoRedirect(tier), 250);
