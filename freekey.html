@@ -36,11 +36,6 @@
       background:#0d2d26;
     }
     .btn.good:hover{ background:#124137; }
-    .btn.auto{
-      border:1px solid rgba(0,229,255,.8);
-      background: linear-gradient(45deg, #0e2a3a, #074759);
-    }
-    .btn.auto:hover{ background: linear-gradient(45deg, #103146, #095c73); }
     .box{
       width:100%; padding:12px; border-radius:14px; border:1px solid var(--border);
       background:#070b12; color:var(--text); font-size:16px; font-family:Consolas, monospace;
@@ -185,8 +180,8 @@
         <div class="unlockText" id="unlock35">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn35Redirect" class="btn secondary" onclick="doRedirectStep('35m')">Open Redirect</button>
-          <button id="btn35Auto" class="btn auto" onclick="autoComplete('35m')">Auto-Fill ⚡</button>
-          <button id="btn35Generate" class="btn" onclick="generateTierKey('35m')" disabled>Generate</button>
+          <button id="btn35Auto" class="btn secondary" onclick="autoRedirect('35m')">Auto Redirect (Fast)</button>
+          <button id="btn35Generate" class="btn" onclick="generateTierKey('35m')" disabled>Generate 35m Key</button>
         </div>
       </div>
 
@@ -199,8 +194,8 @@
         <div class="unlockText" id="unlock2h">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn2hRedirect" class="btn secondary" onclick="doRedirectStep('2h')">Open Redirect</button>
-          <button id="btn2hAuto" class="btn auto" onclick="autoComplete('2h')">Auto-Fill ⚡</button>
-          <button id="btn2hGenerate" class="btn" onclick="generateTierKey('2h')" disabled>Generate</button>
+          <button id="btn2hAuto" class="btn secondary" onclick="autoRedirect('2h')">Auto Redirect (Fast)</button>
+          <button id="btn2hGenerate" class="btn" onclick="generateTierKey('2h')" disabled>Generate 2h Key</button>
         </div>
       </div>
     </div>
@@ -416,68 +411,27 @@
       const btn2hGenerate = document.getElementById("btn2hGenerate");
 
       btn15.disabled = !canGenerateTier("15m");
-      
       btn35Redirect.disabled = !canDoRedirect();
-      if (btn35Auto) btn35Auto.disabled = !canDoRedirect();
-      btn35Generate.disabled = !canGenerateTier("35m");
-      
+      btn35Auto.disabled = !canDoRedirect();
       btn2hRedirect.disabled = !canDoRedirect();
-      if (btn2hAuto) btn2hAuto.disabled = !canDoRedirect();
+      btn2hAuto.disabled = !canDoRedirect();
+      btn35Generate.disabled = !canGenerateTier("35m");
       btn2hGenerate.disabled = !canGenerateTier("2h");
 
       if(active){
-        btn15.textContent = "Key generated";
-        btn35Generate.textContent = "Key generated";
-        btn2hGenerate.textContent = "Key generated";
+        btn15.textContent = "Key already generated";
+        btn35Generate.textContent = "Key already generated";
+        btn2hGenerate.textContent = "Key already generated";
       } else {
         btn15.textContent = "Generate 15m Key";
-        btn35Generate.textContent = "Generate";
-        btn2hGenerate.textContent = "Generate";
+        btn35Generate.textContent = "Generate 35m Key";
+        btn2hGenerate.textContent = "Generate 2h Key";
       }
 
       document.getElementById("unlock15").textContent = active ? "Blocked while active key exists" : "Ready to generate";
     }
 
-    // --- NEW AUTO-FILL FUNCTION ---
-    function autoComplete(tier) {
-      if(!checklistOk()){
-        showErr("Complete the checklist first.");
-        return;
-      }
-      if(hasActiveKey()){
-        showErr("You already have a FREE key.");
-        return;
-      }
-
-      const cfg = TIER_CONFIG[tier];
-      if(!cfg || cfg.needed <= 0) return;
-
-      const p = readProgress();
-      let cur = Math.max(0, parseInt(p[tier], 10) || 0);
-      
-      if(cur >= cfg.needed) return;
-
-      const btn = document.getElementById("btn" + tier + "Auto");
-      if(btn) btn.disabled = true;
-
-      showOk("Auto-completing " + cfg.label + " requirement...");
-      
-      // Rapidly increment the counter to simulate lightning-fast completions
-      let interval = setInterval(() => {
-        cur++;
-        p[tier] = cur;
-        saveProgress(p);
-        renderProgress();
-
-        if(cur >= cfg.needed) {
-          clearInterval(interval);
-          showOk(cfg.label + " tier unlocked automatically!");
-          refreshButtons();
-        }
-      }, 35); // Adjust this speed (in ms) if you want it faster or slower
-    }
-
-    function doRedirectStep(tier){
+    function doRedirectStep(tier, auto = false){
       if(!checklistOk()){
         showErr("Complete the checklist first.");
         refreshButtons();
@@ -510,7 +464,7 @@
         saveProgress(p);
       }
 
-      redirectCooldownUntil = Date.now() + REDIRECT_STEP_COOLDOWN_MS;
+      redirectCooldownUntil = Date.now() + (auto ? 200 : REDIRECT_STEP_COOLDOWN_MS);
       renderProgress();
 
       try{
@@ -525,6 +479,24 @@
         showOk(cfg.label + " tier unlocked. You can generate that key now.");
       } else {
         showOk("Redirect counted for " + cfg.label + ". Progress: " + next + " / " + cfg.needed);
+      }
+    }
+
+    function autoRedirect(tier){
+      if(!canDoRedirect()){
+        showErr("Cannot auto redirect now.");
+        refreshButtons();
+        return;
+      }
+
+      doRedirectStep(tier, true);
+
+      const p = readProgress();
+      const cur = p[tier] || 0;
+      const needed = TIER_CONFIG[tier].needed;
+
+      if(cur < needed){
+        setTimeout(() => autoRedirect(tier), 250);
       }
     }
 
