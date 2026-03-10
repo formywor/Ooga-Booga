@@ -7,11 +7,11 @@
   <style>
     :root{
       --bg:#0b0f16; --panel:#101828; --panel2:#0f1726; --border:#22314a;
-      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --danger:#ff5a5a;
+      --text:#eaf2ff; --muted:#9fb2d6; --accent:#00e5ff; --danger:#ff5a5a; --good:#00ffaa;
     }
     *{ box-sizing:border-box; }
     body{ margin:0; font-family:Segoe UI,Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text); }
-    .wrap{ max-width:780px; margin:0 auto; padding:22px; }
+    .wrap{ max-width:900px; margin:0 auto; padding:22px; }
     .hero{ border:1px solid var(--border); background:var(--panel); border-radius:18px; padding:18px; box-shadow:0 0 18px rgba(0,229,255,.08); }
     .title{ font-size:20px; font-weight:900; }
     .title b{ color:var(--accent); }
@@ -26,6 +26,16 @@
     }
     .btn:hover{ background:#103146; }
     .btn:disabled{ opacity:.55; cursor:not-allowed; }
+    .btn.secondary{
+      border:1px solid rgba(255,255,255,.14);
+      background:#101927;
+    }
+    .btn.secondary:hover{ background:#162234; }
+    .btn.good{
+      border:1px solid rgba(0,255,170,.35);
+      background:#0d2d26;
+    }
+    .btn.good:hover{ background:#124137; }
     .box{
       width:100%; padding:12px; border-radius:14px; border:1px solid var(--border);
       background:#070b12; color:var(--text); font-size:16px; font-family:Consolas, monospace;
@@ -38,11 +48,67 @@
     .chk input{ margin-top:3px; }
     .small{ font-size:12px; color:var(--muted); }
     .danger{ color:var(--danger); }
-    .turnstileWrap{ display:none; margin-top:10px; }
     .pill{
       display:inline-block; padding:6px 10px; border-radius:999px;
       border:1px solid rgba(255,255,255,.12); background:#0c1422; color:var(--muted); font-size:12px;
       margin-right:8px; margin-top:8px;
+    }
+    .plans{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    .plan{
+      border:1px solid var(--border);
+      background:#0b1220;
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 0 14px rgba(0,229,255,.04);
+    }
+    .plan h4{
+      margin:0;
+      font-size:16px;
+      color:var(--text);
+    }
+    .plan .time{
+      margin-top:6px;
+      font-size:22px;
+      font-weight:900;
+      color:var(--accent);
+    }
+    .plan .desc{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      min-height:44px;
+    }
+    .meter{
+      margin-top:10px;
+      width:100%;
+      height:12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#071019;
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#00e5ff,#00ffaa);
+      transition:width .18s ease;
+    }
+    .stat{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .unlockText{
+      margin-top:8px;
+      font-size:12px;
+      color:#c9ffe2;
+      min-height:18px;
     }
   </style>
 </head>
@@ -51,13 +117,14 @@
     <div class="hero">
       <div class="title"><b>ScriptNova</b> — FREE Key Generator</div>
       <div class="sub">
-        FREE keys last <b>15 minutes</b> and allow <b>1 session</b>.
-        If you already generated a key, it will be shown here even after refresh.
+        Choose your FREE key tier below. Only <b>one active FREE key</b> can exist on this browser at a time.
+        If you already made one, it will stay here after refresh until it expires.
       </div>
       <div>
+        <span class="pill">15m FREE</span>
+        <span class="pill">35m FREE</span>
+        <span class="pill">2h FREE</span>
         <span class="pill">Saved key recovery</span>
-        <span class="pill">15 min expiry</span>
-        <span class="pill">1 session</span>
       </div>
     </div>
 
@@ -75,7 +142,7 @@
       <div class="chk">
         <input id="c2" type="checkbox"/>
         <div>
-          <div>I understand FREE keys expire after 15 minutes.</div>
+          <div>I understand FREE keys expire after their selected time.</div>
           <div class="small">After expiry, new sessions require a new key.</div>
         </div>
       </div>
@@ -88,18 +155,52 @@
         </div>
       </div>
 
-      <div class="row" style="margin-top:10px;">
-        <button id="btnGen" class="btn" onclick="generateKey()" disabled>Generate FREE Key</button>
-        <a class="btn" href="/" style="text-decoration:none; display:inline-block;">Back Home</a>
-      </div>
-
       <div id="err" class="err" style="margin-top:10px;"></div>
       <div id="ok" class="ok" style="margin-top:10px;"></div>
     </div>
 
+    <div class="plans">
+      <div class="plan">
+        <h4>FREE Key</h4>
+        <div class="time">15 Minutes</div>
+        <div class="desc">Instant free key. No redirects required.</div>
+        <div class="stat">Requirement: instant</div>
+        <div class="unlockText" id="unlock15">Ready to generate</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn15" class="btn good" onclick="generateTierKey('15m')">Generate 15m Key</button>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h4>FREE Key</h4>
+        <div class="time">35 Minutes</div>
+        <div class="desc">Unlock after clicking the redirect button <b>45 times</b>.</div>
+        <div class="meter"><div id="fill35" class="fill"></div></div>
+        <div class="stat"><span id="stat35">0 / 45 redirects completed</span></div>
+        <div class="unlockText" id="unlock35">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn35Redirect" class="btn secondary" onclick="doRedirectStep('35m')">Open Redirect</button>
+          <button id="btn35Generate" class="btn" onclick="generateTierKey('35m')" disabled>Generate 35m Key</button>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h4>FREE Key</h4>
+        <div class="time">2 Hours</div>
+        <div class="desc">Unlock after clicking the redirect button <b>100 times</b>.</div>
+        <div class="meter"><div id="fill2h" class="fill"></div></div>
+        <div class="stat"><span id="stat2h">0 / 100 redirects completed</span></div>
+        <div class="unlockText" id="unlock2h">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn2hRedirect" class="btn secondary" onclick="doRedirectStep('2h')">Open Redirect</button>
+          <button id="btn2hGenerate" class="btn" onclick="generateTierKey('2h')" disabled>Generate 2h Key</button>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Your FREE Key</h3>
-      <input id="keyBox" class="box" type="text" value="" placeholder="Click Generate..." readonly />
+      <input id="keyBox" class="box" type="text" value="" placeholder="Choose a tier..." readonly />
       <div class="row" style="margin-top:10px;">
         <button class="btn" onclick="copyKey()">Copy</button>
         <div class="note">Expires in: <b id="ttl">—</b></div>
@@ -107,6 +208,11 @@
       <div class="note" id="statusNote">
         Open the launcher, paste the key, click <b>Save</b>, then <b>Launch</b>.
       </div>
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <a class="btn" href="/" style="text-decoration:none; display:inline-block;">Back Home</a>
+      <button class="btn secondary" onclick="resetRedirectProgress()">Reset Redirect Progress</button>
     </div>
 
     <div class="note" style="text-align:center; margin-top:14px;">
@@ -117,12 +223,24 @@
 
   <script>
     const API = "https://api.scriptnovaa.com/api/freekey";
-    const LS_KEY = "sn_freekey_v1"; // stores {key, exp}
+    const REDIRECT_URL = "https://omg10.com/4/10708386";
+
+    const LS_KEY = "sn_freekey_v2";
+    const LS_PROGRESS = "sn_freekey_progress_v2";
+
     const CLICK_COOLDOWN_MS = 4000;
+    const REDIRECT_STEP_COOLDOWN_MS = 1200;
+
+    const TIER_CONFIG = {
+      "15m": { label: "15 Minutes", ttl: 900, needed: 0 },
+      "35m": { label: "35 Minutes", ttl: 2100, needed: 45 },
+      "2h":  { label: "2 Hours",     ttl: 7200, needed: 100 }
+    };
 
     let expEpoch = 0;
     let timer = null;
     let cooldownUntil = 0;
+    let redirectCooldownUntil = 0;
 
     function showErr(msg){
       const el = document.getElementById("err");
@@ -131,6 +249,7 @@
       el.style.display = "block";
       el.textContent = String(msg || "Unknown error");
     }
+
     function showOk(msg){
       const el = document.getElementById("ok");
       const err = document.getElementById("err");
@@ -147,15 +266,25 @@
         if(!raw) return null;
         const j = JSON.parse(raw);
         if(!j || !j.key || !j.exp) return null;
-        return { key: String(j.key), exp: Number(j.exp) };
+        return {
+          key: String(j.key),
+          exp: Number(j.exp),
+          tier: String(j.tier || "15m"),
+          ttlSeconds: Number(j.ttlSeconds || 900)
+        };
       }catch(e){
         return null;
       }
     }
 
-    function saveKey(key, exp){
+    function saveKey(key, exp, tier, ttlSeconds){
       try{
-        localStorage.setItem(LS_KEY, JSON.stringify({ key, exp }));
+        localStorage.setItem(LS_KEY, JSON.stringify({
+          key,
+          exp,
+          tier,
+          ttlSeconds
+        }));
       }catch(e){}
     }
 
@@ -169,33 +298,61 @@
       return s.exp > nowSec();
     }
 
-    function canGenerate(){
-      const c1 = document.getElementById("c1").checked;
-      const c2 = document.getElementById("c2").checked;
-      const c3 = document.getElementById("c3").checked;
-
-      // Don’t allow generating another key if one is still active (on this browser)
-      if(hasActiveKey()) return false;
-
-      // local cooldown to stop spam clicking
-      if(Date.now() < cooldownUntil) return false;
-
-      return c1 && c2 && c3;
-    }
-
-    function refreshBtn(){
-      const btn = document.getElementById("btnGen");
-      btn.disabled = !canGenerate();
-      if(hasActiveKey()){
-        btn.textContent = "Key already generated";
-      } else {
-        btn.textContent = "Generate FREE Key";
+    function readProgress(){
+      try{
+        const raw = localStorage.getItem(LS_PROGRESS);
+        if(!raw) return { "35m": 0, "2h": 0 };
+        const j = JSON.parse(raw);
+        return {
+          "35m": Math.max(0, parseInt(j["35m"], 10) || 0),
+          "2h": Math.max(0, parseInt(j["2h"], 10) || 0)
+        };
+      }catch(e){
+        return { "35m": 0, "2h": 0 };
       }
     }
 
-    document.getElementById("c1").addEventListener("change", refreshBtn);
-    document.getElementById("c2").addEventListener("change", refreshBtn);
-    document.getElementById("c3").addEventListener("change", refreshBtn);
+    function saveProgress(p){
+      try{
+        localStorage.setItem(LS_PROGRESS, JSON.stringify({
+          "35m": Math.max(0, parseInt(p["35m"], 10) || 0),
+          "2h": Math.max(0, parseInt(p["2h"], 10) || 0)
+        }));
+      }catch(e){}
+    }
+
+    function resetRedirectProgress(){
+      saveProgress({ "35m": 0, "2h": 0 });
+      renderProgress();
+      if(!hasActiveKey()) showOk("Redirect progress reset.");
+    }
+
+    function checklistOk(){
+      return document.getElementById("c1").checked &&
+             document.getElementById("c2").checked &&
+             document.getElementById("c3").checked;
+    }
+
+    function tierUnlocked(tier){
+      if(tier === "15m") return true;
+      const p = readProgress();
+      return (p[tier] || 0) >= TIER_CONFIG[tier].needed;
+    }
+
+    function canGenerateTier(tier){
+      if(!checklistOk()) return false;
+      if(hasActiveKey()) return false;
+      if(Date.now() < cooldownUntil) return false;
+      if(!tierUnlocked(tier)) return false;
+      return true;
+    }
+
+    function canDoRedirect(){
+      if(!checklistOk()) return false;
+      if(hasActiveKey()) return false;
+      if(Date.now() < redirectCooldownUntil) return false;
+      return true;
+    }
 
     function setKeyUi(key, exp){
       document.getElementById("keyBox").value = key || "";
@@ -206,55 +363,176 @@
     function loadExistingKeyIntoUi(){
       const s = readSaved();
       if(!s) return;
-      setKeyUi(s.key, s.exp);
 
       if(s.exp > nowSec()){
+        setKeyUi(s.key, s.exp);
         showOk("You already generated a FREE key. Use it until it expires.");
         document.getElementById("statusNote").textContent =
           "You already have a FREE key saved on this device. Use it until it expires, then you can generate a new one.";
       } else {
-        // expired saved key
         clearSaved();
       }
     }
 
-    async function generateKey(){
-      // Extra guard
+    function updatePlanUi(tier, current, needed){
+      const pct = Math.max(0, Math.min(100, needed <= 0 ? 100 : (current / needed) * 100));
+
+      if(tier === "35m"){
+        document.getElementById("fill35").style.width = pct + "%";
+        document.getElementById("stat35").textContent = current + " / " + needed + " redirects completed";
+        document.getElementById("unlock35").textContent = current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects");
+      }
+
+      if(tier === "2h"){
+        document.getElementById("fill2h").style.width = pct + "%";
+        document.getElementById("stat2h").textContent = current + " / " + needed + " redirects completed";
+        document.getElementById("unlock2h").textContent = current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects");
+      }
+    }
+
+    function renderProgress(){
+      const p = readProgress();
+      updatePlanUi("35m", Math.min(p["35m"], TIER_CONFIG["35m"].needed), TIER_CONFIG["35m"].needed);
+      updatePlanUi("2h", Math.min(p["2h"], TIER_CONFIG["2h"].needed), TIER_CONFIG["2h"].needed);
+      refreshButtons();
+    }
+
+    function refreshButtons(){
+      const active = hasActiveKey();
+
+      const btn15 = document.getElementById("btn15");
+      const btn35Redirect = document.getElementById("btn35Redirect");
+      const btn35Generate = document.getElementById("btn35Generate");
+      const btn2hRedirect = document.getElementById("btn2hRedirect");
+      const btn2hGenerate = document.getElementById("btn2hGenerate");
+
+      btn15.disabled = !canGenerateTier("15m");
+      btn35Redirect.disabled = !canDoRedirect();
+      btn2hRedirect.disabled = !canDoRedirect();
+      btn35Generate.disabled = !canGenerateTier("35m");
+      btn2hGenerate.disabled = !canGenerateTier("2h");
+
+      if(active){
+        btn15.textContent = "Key already generated";
+        btn35Generate.textContent = "Key already generated";
+        btn2hGenerate.textContent = "Key already generated";
+      } else {
+        btn15.textContent = "Generate 15m Key";
+        btn35Generate.textContent = "Generate 35m Key";
+        btn2hGenerate.textContent = "Generate 2h Key";
+      }
+
+      document.getElementById("unlock15").textContent = active ? "Blocked while active key exists" : "Ready to generate";
+    }
+
+    function doRedirectStep(tier){
+      if(!checklistOk()){
+        showErr("Complete the checklist first.");
+        refreshButtons();
+        return;
+      }
+
       if(hasActiveKey()){
         showErr("You already have a FREE key. Use it until it expires.");
-        refreshBtn();
+        refreshButtons();
+        return;
+      }
+
+      if(Date.now() < redirectCooldownUntil){
+        showErr("Please wait a second before opening another redirect.");
+        refreshButtons();
+        return;
+      }
+
+      const cfg = TIER_CONFIG[tier];
+      if(!cfg || cfg.needed <= 0){
+        showErr("Invalid tier.");
+        return;
+      }
+
+      const p = readProgress();
+      const cur = Math.max(0, parseInt(p[tier], 10) || 0);
+
+      if(cur < cfg.needed){
+        p[tier] = cur + 1;
+        saveProgress(p);
+      }
+
+      redirectCooldownUntil = Date.now() + REDIRECT_STEP_COOLDOWN_MS;
+      renderProgress();
+
+      try{
+        window.open(REDIRECT_URL, "_blank", "noopener,noreferrer");
+      }catch(e){
+        location.href = REDIRECT_URL;
+        return;
+      }
+
+      const next = Math.min((p[tier] || 0), cfg.needed);
+      if(next >= cfg.needed){
+        showOk(cfg.label + " tier unlocked. You can generate that key now.");
+      } else {
+        showOk("Redirect counted for " + cfg.label + ". Progress: " + next + " / " + cfg.needed);
+      }
+    }
+
+    async function generateTierKey(tier){
+      if(!TIER_CONFIG[tier]){
+        showErr("Invalid tier.");
+        return;
+      }
+
+      if(hasActiveKey()){
+        showErr("You already have a FREE key. Use it until it expires.");
+        refreshButtons();
+        return;
+      }
+
+      if(!checklistOk()){
+        showErr("Complete the checklist first.");
+        refreshButtons();
+        return;
+      }
+
+      if(!tierUnlocked(tier)){
+        showErr("This tier is still locked.");
+        refreshButtons();
         return;
       }
 
       cooldownUntil = Date.now() + CLICK_COOLDOWN_MS;
-      refreshBtn();
+      refreshButtons();
 
       try{
         showOk("Generating key...");
         const r = await fetch(API, {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ proof: "" })
+          body: JSON.stringify({
+            proof: "",
+            tier: tier
+          })
         });
 
         const j = await r.json().catch(() => null);
         if(!j || j.ok !== true){
           const err = (j && j.error) ? j.error : ("http_" + r.status);
           showErr("Failed: " + err);
-          refreshBtn();
+          refreshButtons();
           return;
         }
 
-        saveKey(j.key, Number(j.exp || 0));
+        saveKey(j.key, Number(j.exp || 0), String(j.tier || tier), Number(j.ttlSeconds || TIER_CONFIG[tier].ttl));
         setKeyUi(j.key, Number(j.exp || 0));
 
-        showOk("Done. Key created and saved to this browser.");
+        showOk("Done. " + TIER_CONFIG[tier].label + " key created and saved to this browser.");
         document.getElementById("statusNote").textContent =
           "This key is saved on this device. If you refresh or go offline, it will still be here until it expires.";
-        refreshBtn();
+
+        refreshButtons();
       }catch(e){
         showErr("Failed: api_offline");
-        refreshBtn();
+        refreshButtons();
       }
     }
 
@@ -275,12 +553,17 @@
       let left = expEpoch - now;
       if(left < 0) left = 0;
 
-      const m = Math.floor(left/60);
+      const h = Math.floor(left / 3600);
+      const m = Math.floor((left % 3600) / 60);
       const s = left % 60;
-      ttlEl.textContent = m + ":" + (s<10 ? "0"+s : s);
+
+      if(h > 0){
+        ttlEl.textContent = h + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+      } else {
+        ttlEl.textContent = m + ":" + String(s).padStart(2,"0");
+      }
 
       if(left === 0){
-        // key expired
         const saved = readSaved();
         if(saved && saved.exp <= now){
           clearSaved();
@@ -288,7 +571,7 @@
         showErr("Expired. You can generate a new FREE key now.");
         document.getElementById("statusNote").textContent =
           "Your FREE key expired. You can generate a new one.";
-        refreshBtn();
+        refreshButtons();
         clearInterval(timer);
         timer = null;
       }
@@ -297,23 +580,34 @@
     async function copyKey(){
       const v = document.getElementById("keyBox").value;
       if(!v){ showErr("No key to copy."); return; }
+
       try{
         await navigator.clipboard.writeText(v);
         showOk("Copied.");
       }catch(e){
         const box = document.getElementById("keyBox");
-        box.focus(); box.select();
-        try{ document.execCommand("copy"); showOk("Copied."); }
-        catch(e2){ showErr("Copy failed."); }
+        box.focus();
+        box.select();
+        try{
+          document.execCommand("copy");
+          showOk("Copied.");
+        }catch(e2){
+          showErr("Copy failed.");
+        }
       }
     }
 
-    // init
-    loadExistingKeyIntoUi();
-    refreshBtn();
+    document.getElementById("c1").addEventListener("change", refreshButtons);
+    document.getElementById("c2").addEventListener("change", refreshButtons);
+    document.getElementById("c3").addEventListener("change", refreshButtons);
 
-    // Update button state during cooldown
-    setInterval(refreshBtn, 500);
+    loadExistingKeyIntoUi();
+    renderProgress();
+    refreshButtons();
+
+    setInterval(function(){
+      refreshButtons();
+    }, 500);
   </script>
 </body>
 </html>
