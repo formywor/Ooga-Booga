@@ -240,6 +240,10 @@
     };
 
     let autoPaused = { "35m": false, "2h": false };
+    let cooldownUntil = 0;
+    let redirectCooldownUntil = 0;
+    let expEpoch = 0;
+    let timer = null;
 
     function showErr(msg){
       const el = document.getElementById("err");
@@ -413,6 +417,7 @@
       btn2hAuto.disabled = !canDoRedirect();
       btn35Generate.disabled = !canGenerateTier("35m");
       btn2hGenerate.disabled = !canGenerateTier("2h");
+
       if(autoPaused["35m"]){
         btn35Auto.textContent = "Continue Auto";
       } else {
@@ -424,6 +429,7 @@
       } else {
         btn2hAuto.textContent = "Auto Redirect (Fast)";
       }
+
       if(active){
         btn15.textContent = "Key already generated";
         btn35Generate.textContent = "Key already generated";
@@ -506,7 +512,7 @@
       }
 
       if(autoPaused[tier]){
-        autoPaused[tier] = false; // resume
+        autoPaused[tier] = false;
       }
 
       doRedirectStep(tier, true);
