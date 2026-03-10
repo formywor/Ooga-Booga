@@ -348,7 +348,6 @@
 
     function canDoRedirect(){
       if(!checklistOk()) return false;
-      if(hasActiveKey()) return false;
       if(Date.now() < redirectCooldownUntil) return false;
       return true;
     }
@@ -553,9 +552,6 @@
         return;
       }
 
-      cooldownUntil = Date.now() + CLICK_COOLDOWN_MS;
-      refreshButtons();
-
       try{
         showOk("Generating key...");
         const r = await fetch(API, {
@@ -577,6 +573,8 @@
 
         saveKey(j.key, Number(j.exp || 0), String(j.tier || tier), Number(j.ttlSeconds || TIER_CONFIG[tier].ttl));
         setKeyUi(j.key, Number(j.exp || 0));
+
+        cooldownUntil = Date.now() + CLICK_COOLDOWN_MS;
 
         showOk("Done. " + TIER_CONFIG[tier].label + " key created and saved to this browser.");
         document.getElementById("statusNote").textContent =
