@@ -19,32 +19,144 @@
 
   <style>
     html, body { height:100%; }
-    body{ margin:0; font-family:"Segoe UI", Tahoma, Arial; background:#0b0f16; color:#eaf2ff; overflow:hidden; }
-    .wrap{ height:100%; padding:14px; box-sizing:border-box; }
-    .topbar{ border:1px solid #22314a; border-radius:14px; padding:12px 14px; background:#101828; box-shadow:0 0 18px rgba(0,229,255,0.08); }
+    body{
+      margin:0;
+      font-family:"Segoe UI", Tahoma, Arial;
+      background:#0a0f17;
+      color:#eaf2ff;
+      overflow:hidden;
+    }
+    .wrap{
+      height:100%;
+      padding:14px;
+      box-sizing:border-box;
+      background:
+        radial-gradient(circle at top left, rgba(0,229,255,.07), transparent 28%),
+        radial-gradient(circle at top right, rgba(124,77,255,.06), transparent 24%),
+        linear-gradient(180deg,#09101a 0%,#0b111b 100%);
+    }
+
+    .topbar{
+      border:1px solid #22314a;
+      border-radius:16px;
+      padding:12px 14px;
+      background:linear-gradient(180deg,#0f1724 0%, #0d1522 100%);
+      box-shadow:0 0 20px rgba(0,229,255,0.07);
+    }
     .brandRow{ display:table; width:100%; }
     .brandLeft,.brandRight{ display:table-cell; vertical-align:middle; }
     .brandLeft{ width:70%; }
     .brandRight{ width:30%; text-align:right; color:#9fb2d6; font-size:12px; }
-    .pill{ display:inline-block; padding:6px 10px; border-radius:999px; background:#0e2a3a; border:1px solid rgba(0,229,255,0.35); color:#9fefff; font-size:12px; margin-top:6px; }
-    .subpill{ display:inline-block; padding:4px 8px; border-radius:999px; background:#0c1422; border:1px solid rgba(255,255,255,0.12); color:#9fb2d6; font-size:11px; margin-top:6px; margin-right:8px; }
+    .logo{
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.4px;
+      color:#00e5ff;
+      text-shadow:0 0 12px rgba(0,229,255,.16);
+    }
+    .subtitle{
+      margin-top:4px;
+      color:#9fb2d6;
+      font-size:11px;
+      letter-spacing:.2px;
+    }
 
-    .layout{ margin-top:12px; height:calc(100% - 86px); border:1px solid #22314a; border-radius:14px; background:#0f1726; overflow:hidden; }
-    .sidebar{ float:left; width:260px; height:100%; border-right:1px solid #22314a; background:#0c1422; overflow-y:auto; }
-    .sideTitle{ padding:12px; border-bottom:1px solid #22314a; color:#9fb2d6; font-size:12px; letter-spacing:.8px; text-transform:uppercase; }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#0e2a3a;
+      border:1px solid rgba(0,229,255,0.35);
+      color:#9fefff;
+      font-size:12px;
+      margin-top:6px;
+    }
+    .subpill{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#0c1422;
+      border:1px solid rgba(255,255,255,0.12);
+      color:#9fb2d6;
+      font-size:11px;
+      margin-top:6px;
+      margin-right:8px;
+    }
 
-    .tab{ margin:10px; padding:10px; border:1px solid #22314a; border-radius:12px; background:#101a2b; color:#9fb2d6; font-weight:bold; }
-    .sideCard{ margin:10px; padding:10px; border:1px solid #22314a; border-radius:12px; background:#0b1220; }
-    .sideCard h4{ margin:0 0 8px 0; font-size:12px; letter-spacing:.8px; text-transform:uppercase; color:#9fb2d6; }
-    .sideLine{ font-size:12px; color:#cfe1ff; line-height:1.35; word-break:break-word; }
-    .sideLabel{ color:#9fb2d6; font-size:11px; margin-top:8px; }
+    .layout{
+      margin-top:12px;
+      height:calc(100% - 88px);
+      border:1px solid #22314a;
+      border-radius:16px;
+      background:linear-gradient(180deg,#0e1624 0%, #0b1220 100%);
+      overflow:hidden;
+      box-shadow:0 16px 34px rgba(0,0,0,.28);
+    }
+
+    .sidebar{
+      float:left;
+      width:270px;
+      height:100%;
+      border-right:1px solid #22314a;
+      background:linear-gradient(180deg,#0b1320 0%, #0a111c 100%);
+      overflow-y:auto;
+    }
+    .sideTitle{
+      padding:12px;
+      border-bottom:1px solid #22314a;
+      color:#9fb2d6;
+      font-size:12px;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+    }
+
+    .tab{
+      margin:10px;
+      padding:10px;
+      border:1px solid #22314a;
+      border-radius:12px;
+      background:#101a2b;
+      color:#d8e6ff;
+      font-weight:900;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+
+    .sideCard{
+      margin:10px;
+      padding:12px;
+      border:1px solid #22314a;
+      border-radius:14px;
+      background:linear-gradient(180deg,#0b1220 0%, #0a111c 100%);
+      box-shadow:0 0 16px rgba(0,0,0,.15);
+    }
+    .sideCard h4{
+      margin:0 0 8px 0;
+      font-size:12px;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      color:#9fb2d6;
+    }
+    .sideLine{
+      font-size:12px;
+      color:#d4e4ff;
+      line-height:1.35;
+      word-break:break-word;
+    }
+    .sideLabel{
+      color:#8ea6ca;
+      font-size:11px;
+      margin-top:8px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
     .sideBtn{
       width:100%;
       padding:10px;
       margin-top:8px;
       border-radius:10px;
       border:1px solid rgba(0,229,255,0.45);
-      background:#0e2a3a;
+      background:linear-gradient(180deg,#103147 0%, #0e283b 100%);
       color:#eaf2ff;
       cursor:pointer;
       font-weight:900;
@@ -52,53 +164,150 @@
       text-transform:uppercase;
       font-size:12px;
     }
-    .sideBtn:hover{ background:#103146; }
+    .sideBtn:hover{ background:linear-gradient(180deg,#143a54 0%, #113247 100%); }
 
-    .main{ margin-left:260px; height:100%; padding:12px; box-sizing:border-box; overflow-y:auto; }
+    .main{
+      margin-left:270px;
+      height:100%;
+      padding:12px;
+      box-sizing:border-box;
+      overflow-y:auto;
+    }
 
-    .card{ border:1px solid #22314a; border-radius:14px; padding:12px; background:#0b1220; margin-bottom:10px; }
-    .card h3{ margin:0 0 8px 0; font-size:12px; letter-spacing:.8px; text-transform:uppercase; color:#9fb2d6; }
+    .card{
+      border:1px solid #22314a;
+      border-radius:16px;
+      padding:14px;
+      background:linear-gradient(180deg,#0c1421 0%, #0a111c 100%);
+      margin-bottom:12px;
+      box-shadow:0 0 18px rgba(0,0,0,.14);
+    }
+    .card h3{
+      margin:0 0 8px 0;
+      font-size:12px;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      color:#9fb2d6;
+    }
 
-    .btn{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(0,229,255,0.45); background:#0e2a3a; color:#eaf2ff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
-    .btn:hover{ background:#103146; }
+    .btn{
+      width:100%;
+      padding:12px;
+      margin:8px 0;
+      border-radius:12px;
+      border:1px solid rgba(0,229,255,0.45);
+      background:linear-gradient(180deg,#103147 0%, #0e283b 100%);
+      color:#eaf2ff;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+    .btn:hover{ background:linear-gradient(180deg,#143a54 0%, #113247 100%); }
 
-    .btn2{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(124,77,255,0.45); background:#1a1840; color:#eaf2ff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
-    .btn2:hover{ background:#211f55; }
+    .btn2{
+      width:100%;
+      padding:12px;
+      margin:8px 0;
+      border-radius:12px;
+      border:1px solid rgba(124,77,255,0.45);
+      background:linear-gradient(180deg,#24204f 0%, #1d1a42 100%);
+      color:#eaf2ff;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+    .btn2:hover{ background:linear-gradient(180deg,#2a255d 0%, #221f4e 100%); }
 
-    .btnWarn{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(255,207,90,.45); background:#3a2a0e; color:#fff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
-    .btnWarn:hover{ background:#4a3714; }
+    .btnWarn{
+      width:100%;
+      padding:12px;
+      margin:8px 0;
+      border-radius:12px;
+      border:1px solid rgba(255,207,90,.45);
+      background:linear-gradient(180deg,#4a3812 0%, #37290d 100%);
+      color:#fff;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+    .btnWarn:hover{ background:linear-gradient(180deg,#58441a 0%, #443213 100%); }
 
-    .btnDanger{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(255,90,90,.45); background:#3a1717; color:#fff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
-    .btnDanger:hover{ background:#502020; }
+    .btnDanger{
+      width:100%;
+      padding:12px;
+      margin:8px 0;
+      border-radius:12px;
+      border:1px solid rgba(255,90,90,.45);
+      background:linear-gradient(180deg,#4a1c20 0%, #371417 100%);
+      color:#fff;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+    .btnDanger:hover{ background:linear-gradient(180deg,#5a2228 0%, #45191d 100%); }
 
     .btn:disabled, .btn2:disabled, .btnWarn:disabled, .btnDanger:disabled, .sideBtn:disabled{
-      opacity:.55; cursor:not-allowed;
+      opacity:.55;
+      cursor:not-allowed;
       filter:grayscale(35%);
     }
 
-    .field{ width:100%; padding:12px; border-radius:12px; border:1px solid #22314a; background:#070b12; color:#eaf2ff; outline:none; box-sizing:border-box; font-size:16px; }
-    .note{ color:#9fb2d6; font-size:11px; line-height:1.35; }
+    .field{
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid #22314a;
+      background:#070b12;
+      color:#eaf2ff;
+      outline:none;
+      box-sizing:border-box;
+      font-size:16px;
+    }
+    .field:focus{
+      border-color:rgba(0,229,255,.42);
+      box-shadow:0 0 0 3px rgba(0,229,255,.08);
+    }
+
+    .note{
+      color:#9fb2d6;
+      font-size:11px;
+      line-height:1.4;
+    }
 
     .banner{
       display:none;
-      margin-bottom:10px;
-      border-radius:14px;
-      padding:12px;
+      margin-bottom:12px;
+      border-radius:16px;
+      padding:13px 14px;
       border:1px solid rgba(0,229,255,0.35);
-      background:#0d2234;
+      background:linear-gradient(180deg,#0d2234 0%, #0d1d2f 100%);
       color:#eaf7ff;
+      box-shadow:0 0 18px rgba(0,229,255,.05);
     }
     .banner.warn{
       border-color:rgba(255,207,90,.35);
-      background:#2c2512;
+      background:linear-gradient(180deg,#2c2512 0%, #251f10 100%);
       color:#fff0c5;
     }
     .banner.danger{
       border-color:rgba(255,90,90,.35);
-      background:#2f171b;
+      background:linear-gradient(180deg,#2f171b 0%, #261316 100%);
       color:#ffd9df;
     }
-    .banner .title{ font-weight:900; margin-bottom:6px; }
+    .banner.success{
+      border-color:rgba(40,220,130,.35);
+      background:linear-gradient(180deg,#142b1e 0%, #112319 100%);
+      color:#dbffea;
+    }
+    .banner .title{
+      font-weight:900;
+      margin-bottom:6px;
+      letter-spacing:.2px;
+    }
     .banner .actions{ margin-top:10px; }
 
     .miniBtn{
@@ -121,9 +330,9 @@
       width:100%;
       text-align:left;
       margin-top:8px;
-      padding:10px;
+      padding:11px;
       border:1px solid #22314a;
-      border-radius:10px;
+      border-radius:12px;
       background:#101a2b;
       color:#eaf2ff;
       cursor:pointer;
@@ -137,34 +346,58 @@
       border-radius:12px;
       background:#09111d;
       padding:10px;
-      max-height:180px;
+      max-height:220px;
       overflow:auto;
       font-family:Consolas, monospace;
       font-size:12px;
       color:#d7e8ff;
     }
 
+    .statusGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .tiny{
+      padding:10px;
+      border:1px solid #22314a;
+      border-radius:12px;
+      background:#09111d;
+    }
+    .tiny .k{
+      color:#8ea6ca;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+    }
+    .tiny .v{
+      color:#fff;
+      font-size:13px;
+      margin-top:6px;
+      word-break:break-word;
+    }
+
     .overlay{
       display:none;
       position:fixed;
       left:0; top:0; right:0; bottom:0;
-      background:rgba(0,0,0,.68);
+      background:rgba(0,0,0,.72);
       z-index:9999;
     }
     .modal{
-      width:640px;
+      width:650px;
       max-width:calc(100% - 40px);
-      margin:70px auto 0 auto;
+      margin:68px auto 0 auto;
       border:1px solid #22314a;
-      border-radius:18px;
-      background:#0f1726;
-      box-shadow:0 0 30px rgba(0,0,0,.45);
-      padding:16px;
+      border-radius:20px;
+      background:linear-gradient(180deg,#101927 0%, #0c1421 100%);
+      box-shadow:0 0 34px rgba(0,0,0,.48);
+      padding:18px;
     }
     .modal h2{
       margin:0 0 8px 0;
       color:#00e5ff;
-      font-size:20px;
+      font-size:21px;
     }
     .modal .body{
       color:#dbe8ff;
@@ -182,45 +415,92 @@
       display:inline-block;
       margin-left:8px;
     }
+
+    .liveDot{
+      display:inline-block;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#29e38a;
+      box-shadow:0 0 12px rgba(41,227,138,.75);
+      margin-right:6px;
+      vertical-align:middle;
+    }
+
+    .compactNote{
+      margin-top:6px;
+      font-size:10px;
+      color:#88a1c9;
+      letter-spacing:.25px;
+    }
   </style>
 
   <script language="JScript">
 (function(){
-  function tr(s){ return String(s||"").replace(/^\s+|\s+$/g,""); }
-  function joinParts(a){ return String(a||[]).split(",").join(""); }
-  function b64(s){ try{ return window.atob(String(s||"")); }catch(e){ return ""; } }
-  function dec(parts){ return b64(joinParts(parts)); }
-  function escHtml(s){
+  function T(s){ return String(s||"").replace(/^\s+|\s+$/g,""); }
+  function A(v){ return String(v||"").split(",").join(""); }
+  function B(s){ try{ return window.atob(String(s||"")); }catch(e){ return ""; } }
+  function D(parts){ return B(A(parts)); }
+  function EH(s){
     s = String(s == null ? "" : s);
     return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
-  function nowSec(){ return Math.floor((new Date().getTime())/1000); }
-  function escJs(s){
+  function EJ(s){
     s = String(s||"");
-    return s.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    return s.replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"").replace(/\n/g,"");
+  }
+  function NS(){ return Math.floor((new Date().getTime())/1000); }
+
+  function J(x){
+    try{ return JSON.stringify(x); }catch(e){ return ""; }
   }
 
-  function alertOffline(){ alert("API offline"); }
-  function alertInvalid(){ alert("Invalid Key"); }
-  function alertApi(m){ alert("API error: " + String(m||"unknown")); }
-  function alertLimit(){ alert("Too many people using the same key"); }
-  function alertLaunch(){ alert("Launcher error"); }
-  function alertUpdate(){ alert("Please update to the new file at https://scriptnovaa.com/download"); }
+  function Hx(s){
+    s = String(s||"");
+    var h = 0, i = 0;
+    for(i=0;i<s.length;i++){
+      h = ((h << 5) - h) + s.charCodeAt(i);
+      h = h & h;
+    }
+    return String(h);
+  }
 
-  window.onerror = function(){ try{ alertLaunch(); }catch(e){} return true; };
+  function sameData(a,b){
+    return Hx(J(a)) === Hx(J(b));
+  }
+
+  function alOff(){ alert("API offline"); }
+  function alBad(){ alert("Invalid Key"); }
+  function alApi(m){ alert("API error: " + String(m||"unknown")); }
+  function alLim(){ alert("Too many people using the same key"); }
+  function alLn(){ alert("Launcher error"); }
+  function alUp(u){ alert("Please update to the latest file at " + String(u||"https://scriptnovaa.com/download")); }
+
+  window.onerror = function(){ try{ alLn(); }catch(e){} return true; };
 
   var sh = new ActiveXObject("WScript.Shell");
   var fs = new ActiveXObject("Scripting.FileSystemObject");
 
-  var API_BASE = dec(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t"]);
-  var END_BOOTSTRAP = "/api/bootstrap";
+  var R = {
+    base: D(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t"]),
+    boot: "/" + D(["YXBp"]) + "/" + D(["Ym9v","dHN0","cmFw"]),
+    epCheck: "/" + D(["YXBp"]) + "/" + D(["Y2hl","Y2s="]),
+    epVerify: "/" + D(["YXBp"]) + "/" + D(["dmVy","aWZ5"]),
+    epUi: "/" + D(["YXBp"]) + "/" + D(["dWk="]),
+    epLaunch: "/" + D(["YXBp"]) + "/" + D(["bGF1","bmNo"]),
+    epPing: "/" + D(["YXBp"]) + "/" + D(["cGlu","Zw=="]),
+    epEnd: "/" + D(["YXBp"]) + "/" + D(["ZW5k"])
+  };
 
-  var Q_CPU  = dec(["U0VM","RUNU","IFBy","b2Nl","c3Nv","cklk","IEZS","T00g","V2lu","MzJf","UHJv","Y2Vz","c29y"]);
-  var Q_BIOS = dec(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0JJ","T1M="]);
-  var Q_BRD  = dec(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0Jh","c2VC","b2Fy","ZA=="]);
-  var REG_GUID = dec(["SEtF","WV9M","T0NB","TF9N","QUNI","SU5F","XFNP","RlRX","QVJF","XE1p","Y3Jv","c29m","dFxD","cnlw","dG9n","cmFw","aHlc","TWFj","aGlu","ZUd1","aWQ="]);
+  var Q = {
+    cpu: D(["U0VM","RUNU","IFBy","b2Nl","c3Nv","cklk","IEZS","T00g","V2lu","MzJf","UHJv","Y2Vz","c29y"]),
+    bios: D(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0JJ","T1M="]),
+    brd: D(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0Jh","c2VC","b2Fy","ZA=="]),
+    guid: D(["SEtF","WV9M","T0NB","TF9N","QUNI","SU5F","XFNP","RlRX","QVJF","XE1p","Y3Jv","c29m","dFxD","cnlw","dG9n","cmFw","aHlc","TWFj","aGlu","ZUd1","aWQ="])
+  };
 
-  var DEFAULT_REQUIRED_VERSION = "v13.13.15";
+  var APP_VERSION = "v13.13.16";
+  var AUTO_REFRESH_MS = 20000;
 
   var state = {
     versionOk:false,
@@ -230,48 +510,57 @@
     sid:"",
     pingTimer:null,
     expireTimer:null,
+    remoteTimer:null,
     clientId:"",
     hwid:"",
     localState:null,
     bootstrap:null,
+    lastRemoteSig:"",
+    lastUiSig:"",
     endpoints:{
-      check:"/api/check",
-      verify:"/api/verify",
-      ui:"/api/ui",
-      launch:"/api/launch",
-      ping:"/api/ping",
-      end:"/api/end"
+      check:R.epCheck,
+      verify:R.epVerify,
+      ui:R.epUi,
+      launch:R.epLaunch,
+      ping:R.epPing,
+      end:R.epEnd
     },
     support:{
       email:"gomegaassist@gmail.com",
       discordUrl:"https://discord.gg/gscGTMVsWE"
     },
     version:{
-      required:DEFAULT_REQUIRED_VERSION,
+      current:APP_VERSION,
+      required:APP_VERSION,
       downloadUrl:"https://scriptnovaa.com/download"
     },
-    ui:{
+    remote:{
       banner:null,
       modal:null,
       poll:null,
       cleanupPrompt:null,
       quickLinks:[],
-      submitUrl:""
+      submitUrl:"",
+      launcher:null
     },
-    runtimeMessageShown:{},
+    modalShownRuntime:{},
     currentModalId:"",
-    pollVoted:false
+    cleanupScanCache:[],
+    lastCleanupSig:"",
+    refreshing:false
   };
 
   function $(id){ return document.getElementById(id); }
 
-  function setStatus(x){ try{ $("licenseStatus").innerText = x; }catch(e){} }
+  function setStatus(x){
+    try{ $("licenseStatus").innerText = x; }catch(e){}
+  }
   function setClientBadge(x){
     try{
       var el = $("clientBadge");
       if(!el) return;
       x = String(x||"");
-      if(x.length>=10) el.innerText = "Client: " + x.substring(0,6) + "…" + x.substring(x.length-4);
+      if(x.length >= 10) el.innerText = "Client: " + x.substring(0,6) + "…" + x.substring(x.length-4);
       else if(x) el.innerText = "Client: " + x;
       else el.innerText = "Client: none";
     }catch(e){}
@@ -297,29 +586,29 @@
     try{ if(!fs.FolderExists(d)) fs.CreateFolder(d); }catch(e){}
     return d;
   }
-  function licensePath(){ return appDir() + "\\license.txt"; }
-  function clientPath(){ return appDir() + "\\clientid.txt"; }
-  function statePath(){ return appDir() + "\\launcher_state.json"; }
+  function P_lic(){ return appDir() + "\\license.txt"; }
+  function P_cid(){ return appDir() + "\\clientid.txt"; }
+  function P_state(){ return appDir() + "\\launcher_state.json"; }
 
-  function writeFile(p,txt){
+  function wf(p,txt){
     try{
       var f = fs.CreateTextFile(p,true);
       f.Write(String(txt||""));
       f.Close();
     }catch(e){}
   }
-  function readFile(p){
+  function rf(p){
     try{
       if(!fs.FileExists(p)) return "";
       var f = fs.OpenTextFile(p,1,false);
       var s = f.ReadAll();
       f.Close();
-      return tr(s);
+      return T(s);
     }catch(e){ return ""; }
   }
 
   function loadLocalState(){
-    var s = readFile(statePath());
+    var s = rf(P_state());
     if(!s){
       state.localState = { dismissed:{}, polls:{}, cleanupHandled:{} };
       return;
@@ -335,22 +624,22 @@
     }
   }
   function saveLocalState(){
-    try{ writeFile(statePath(), JSON.stringify(state.localState||{})); }catch(e){}
+    try{ wf(P_state(), JSON.stringify(state.localState||{})); }catch(e){}
   }
 
   function validClientId(s){
-    s = tr(s);
+    s = T(s);
     if(!s) return false;
-    if(s.length<16 || s.length>80) return false;
+    if(s.length < 16 || s.length > 80) return false;
     return /^[A-Za-z0-9\-_.]+$/.test(s);
   }
   function randHex32(){
     var h="0123456789abcdef", o="", i=0;
-    for(i=0;i<32;i++) o+=h.charAt(Math.floor(Math.random()*16));
+    for(i=0;i<32;i++) o += h.charAt(Math.floor(Math.random()*16));
     return o;
   }
   function ensureClientId(){
-    var c = tr(readFile(clientPath()));
+    var c = T(rf(P_cid()));
     if(validClientId(c)){
       state.clientId = c;
       setClientBadge(c);
@@ -363,7 +652,7 @@
     }catch(e){ g=""; }
     if(!validClientId(g)) g = "sn-" + randHex32();
     state.clientId = g;
-    writeFile(clientPath(), g);
+    wf(P_cid(), g);
     setClientBadge(g);
   }
 
@@ -375,38 +664,38 @@
       for(; !en.atEnd(); en.moveNext()){
         var it = en.item(), v="";
         try{ v = it[prop]; }catch(x){ v=""; }
-        v = tr(v);
+        v = T(v);
         if(v) return v;
       }
     }catch(e){}
     return "";
   }
-  function regRead(path){ try{ return tr(sh.RegRead(path)); }catch(e){ return ""; } }
+  function regRead(path){ try{ return T(sh.RegRead(path)); }catch(e){ return ""; } }
 
   function buildHwid(){
-    var cpu = wmiOne(Q_CPU, "ProcessorId");
-    var bios = wmiOne(Q_BIOS, "SerialNumber");
-    var brd = wmiOne(Q_BRD, "SerialNumber");
-    var mg = regRead(REG_GUID);
-    var cn="", ud="";
+    var cpu = wmiOne(Q.cpu, "ProcessorId");
+    var bios = wmiOne(Q.bios, "SerialNumber");
+    var brd = wmiOne(Q.brd, "SerialNumber");
+    var mg = regRead(Q.guid);
+    var cn = "", ud = "";
     try{ cn = sh.ExpandEnvironmentStrings("%COMPUTERNAME%"); }catch(e){ cn=""; }
     try{ ud = sh.ExpandEnvironmentStrings("%USERDOMAIN%"); }catch(e){ ud=""; }
 
-    var r = tr(cpu)+"|"+tr(bios)+"|"+tr(brd)+"|"+tr(mg)+"|"+tr(cn)+"|"+tr(ud);
+    var r = T(cpu)+"|"+T(bios)+"|"+T(brd)+"|"+T(mg)+"|"+T(cn)+"|"+T(ud);
     r = r.replace(/\s+/g," ").replace(/\|+/g,"|").replace(/^\|+|\|+$/g,"");
-    if(r.length<8 && validClientId(state.clientId)) r = r + "|CID:" + state.clientId;
-    if(r.length>220) r = r.substr(0,220);
+    if(r.length < 8 && validClientId(state.clientId)) r = r + "|CID:" + state.clientId;
+    if(r.length > 220) r = r.substr(0,220);
     return r;
   }
 
-  function httpGet(u){
+  function hg(u){
     var h = new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
     h.setTimeouts(3000,7000,7000,12000);
     h.open("GET",u,false);
     h.send();
     return { s:h.status, t:h.responseText };
   }
-  function httpPost(u,o){
+  function hp(u,o){
     var h = new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
     h.setTimeouts(3000,7000,7000,12000);
     h.open("POST",u,false);
@@ -415,12 +704,40 @@
     return { s:h.status, t:h.responseText };
   }
 
-  function mergeBootstrap(d){
+  function parseJson(s){
+    try{ return JSON.parse(s); }catch(e){ return null; }
+  }
+
+  function normalizeVersion(v){
+    v = T(v||"");
+    if(!v) return "0.0.0";
+    v = v.toLowerCase();
+    if(v.charAt(0) === "v") v = v.substring(1);
+    v = v.replace(/[^0-9.]/g,"");
+    if(!v) return "0.0.0";
+    return v;
+  }
+
+  function compareVersions(a,b){
+    a = normalizeVersion(a).split(".");
+    b = normalizeVersion(b).split(".");
+    var i = 0, n = Math.max(a.length,b.length);
+    for(i=0;i<n;i++){
+      var ai = parseInt(a[i] || "0",10);
+      var bi = parseInt(b[i] || "0",10);
+      if(ai > bi) return 1;
+      if(ai < bi) return -1;
+    }
+    return 0;
+  }
+
+  function mergeRemote(d){
     if(!d) return;
+
     state.bootstrap = d;
 
     if(d.version){
-      state.version.required = String(d.version.required || DEFAULT_REQUIRED_VERSION);
+      state.version.required = String(d.version.required || APP_VERSION);
       state.version.downloadUrl = String(d.version.downloadUrl || "https://scriptnovaa.com/download");
     }
 
@@ -438,33 +755,36 @@
       if(d.endpoints.end) state.endpoints.end = String(d.endpoints.end);
     }
 
-    if(d.launcher && d.launcher.defaultStartUrl){
-      try{
-        if(!$("startUrl").value || $("startUrl").value === "https://www.guns.lol/iii_dev"){
-          $("startUrl").value = String(d.launcher.defaultStartUrl);
-        }
-      }catch(e){}
+    if(d.launcher){
+      state.remote.launcher = d.launcher;
+      if(d.launcher.defaultStartUrl){
+        try{
+          var cur = String($("startUrl").value || "");
+          if(!cur || cur === "https://www.guns.lol/iii_dev"){
+            $("startUrl").value = String(d.launcher.defaultStartUrl);
+          }
+        }catch(e){}
+      }
     }
 
     if(d.ui){
-      state.ui.banner = d.ui.banner || null;
-      state.ui.modal = d.ui.modal || null;
-      state.ui.poll = d.ui.poll || null;
-      state.ui.cleanupPrompt = d.ui.cleanupPrompt || null;
-      state.ui.quickLinks = d.ui.quickLinks || [];
-      state.ui.submitUrl = String(d.ui.submitUrl || "");
+      state.remote.banner = d.ui.banner || null;
+      state.remote.modal = d.ui.modal || null;
+      state.remote.poll = d.ui.poll || null;
+      state.remote.cleanupPrompt = d.ui.cleanupPrompt || null;
+      state.remote.quickLinks = d.ui.quickLinks || [];
+      state.remote.submitUrl = String(d.ui.submitUrl || "");
     }
 
     try{ $("supportEmail").innerText = state.support.email; }catch(e){}
     try{ $("supportDiscord").innerText = state.support.discordUrl; }catch(e){}
   }
 
-  function fetchBootstrap(){
-    var u = API_BASE + END_BOOTSTRAP + "?cid=" + encodeURIComponent(state.clientId || "");
-    var r = httpGet(u);
+  function fetchRemote(){
+    var u = R.base + R.boot + "?cid=" + encodeURIComponent(state.clientId || "");
+    var r = hg(u);
     if(r.s !== 200) return null;
-    var d = null;
-    try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    var d = parseJson(r.t);
     if(!d || d.ok !== true) return null;
     return d;
   }
@@ -473,9 +793,10 @@
     state.versionOk = false;
     lockUi(false);
 
-    var required = String(state.version.required || DEFAULT_REQUIRED_VERSION);
-    if(required !== DEFAULT_REQUIRED_VERSION){
-      alertUpdate();
+    var cmp = compareVersions(state.version.current, state.version.required);
+    if(cmp < 0){
+      alUp(state.version.downloadUrl);
+      setStatus("Update required");
       return false;
     }
 
@@ -485,33 +806,33 @@
   }
 
   function safeUrl(u){
-    u = tr(u||"");
+    u = T(u||"");
     if(!u) return false;
-    if(u.indexOf('"')!==-1 || u.indexOf("'")!==-1) return false;
-    if(u.indexOf("\r")!==-1 || u.indexOf("\n")!==-1) return false;
+    if(u.indexOf('"') !== -1 || u.indexOf("'") !== -1) return false;
+    if(u.indexOf("\r") !== -1 || u.indexOf("\n") !== -1) return false;
     var l = u.toLowerCase();
-    return l.indexOf("http://")===0 || l.indexOf("https://")===0;
+    return l.indexOf("http://") === 0 || l.indexOf("https://") === 0;
   }
 
   function saveLocalKey(){
-    if(!state.versionOk){ alertUpdate(); return; }
-    var k = tr($("licenseKey").value);
-    if(!k){ alertInvalid(); return; }
-    writeFile(licensePath(), k);
-    setStatus("Key saved (not started)");
+    if(!state.versionOk){ alUp(state.version.downloadUrl); return; }
+    var k = T($("licenseKey").value);
+    if(!k){ alBad(); return; }
+    wf(P_lic(), k);
+    setStatus("Key saved");
   }
 
-  function loadLocalKey(){ return tr(readFile(licensePath())); }
+  function loadLocalKey(){ return T(rf(P_lic())); }
 
   function checkKeyNoSession(){
-    if(!state.versionOk){ alertUpdate(); return; }
-    var k = tr($("licenseKey").value);
-    if(!k){ alertInvalid(); return; }
-    var r = httpGet(API_BASE + state.endpoints.check + "?license=" + encodeURIComponent(k));
-    if(r.s !== 200){ alertOffline(); return; }
-    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
-    if(!d || d.ok !== true){ setStatus("Invalid key"); alertInvalid(); return; }
-    setStatus("Key OK (" + d.plan + ") — not started");
+    if(!state.versionOk){ alUp(state.version.downloadUrl); return; }
+    var k = T($("licenseKey").value);
+    if(!k){ alBad(); return; }
+    var r = hg(R.base + state.endpoints.check + "?license=" + encodeURIComponent(k));
+    if(r.s !== 200){ alOff(); return; }
+    var d = parseJson(r.t);
+    if(!d || d.ok !== true){ setStatus("Invalid key"); alBad(); return; }
+    setStatus("Ready (" + d.plan + ")");
   }
 
   function startSession(){
@@ -519,22 +840,22 @@
     if(!validClientId(state.clientId)) ensureClientId();
     state.hwid = buildHwid();
 
-    var k = tr($("licenseKey").value);
+    var k = T($("licenseKey").value);
     if(!k) return {ok:false,m:"invalid_key"};
-    if(!state.hwid || state.hwid.length<8) return {ok:false,m:"bad_hwid"};
+    if(!state.hwid || state.hwid.length < 8) return {ok:false,m:"bad_hwid"};
 
-    var r = httpPost(API_BASE + state.endpoints.verify, {
+    var r = hp(R.base + state.endpoints.verify, {
       license:k,
       clientId:String(state.clientId),
       hwid:String(state.hwid)
     });
 
     if(r.s !== 200){
-      var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
+      var j = parseJson(r.t);
       return {ok:false,m:(j && j.error ? j.error : "offline")};
     }
 
-    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    var d = parseJson(r.t);
     if(!d || d.ok !== true){
       if(d && d.error) return {ok:false,m:d.error,a:d.active,l:d.limit};
       return {ok:false,m:"invalid"};
@@ -547,19 +868,20 @@
 
     if(!state.token || !state.exp || !state.sid) return {ok:false,m:"bad_session"};
 
-    setStatus("Session ACTIVE (" + state.plan + ")");
+    setStatus("Session active (" + state.plan + ")");
     armExpiry();
     startHeartbeat();
+    refreshLiveStateCard();
     return {ok:true};
   }
 
   function getUiChallenge(){
-    var r = httpGet(API_BASE + state.endpoints.ui + "?token=" + encodeURIComponent(state.token) + "&cid=" + encodeURIComponent(state.clientId));
+    var r = hg(R.base + state.endpoints.ui + "?token=" + encodeURIComponent(state.token) + "&cid=" + encodeURIComponent(state.clientId));
     if(r.s !== 200){
-      var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
+      var j = parseJson(r.t);
       return {ok:false,e:(j && j.error ? j.error : "ui_failed")};
     }
-    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    var d = parseJson(r.t);
     if(!d || d.ok !== true || !d.launchNonce || !d.launchExp || !d.launchSig || !d.launchProfileId){
       return {ok:false,e:"bad_ui_json"};
     }
@@ -567,7 +889,7 @@
   }
 
   function getLaunchBundle(u, ui){
-    var r = httpPost(API_BASE + state.endpoints.launch, {
+    var r = hp(R.base + state.endpoints.launch, {
       token: state.token,
       clientId: state.clientId,
       startUrl: u,
@@ -578,11 +900,11 @@
     });
 
     if(r.s !== 200){
-      var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
+      var j = parseJson(r.t);
       return {ok:false,e:(j && j.error ? j.error : "launch_failed")};
     }
 
-    var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    var d = parseJson(r.t);
     if(!d || d.ok !== true || !d.bundle || !d.bundle.flags || !d.bundle.url){
       return {ok:false,e:"bad_launch_json"};
     }
@@ -591,11 +913,18 @@
 
   function clearSessionTimers(){
     stopHeartbeat();
-    if(state.expireTimer){ try{ window.clearTimeout(state.expireTimer); }catch(e){} state.expireTimer = null; }
+    if(state.expireTimer){
+      try{ window.clearTimeout(state.expireTimer); }catch(e){}
+      state.expireTimer = null;
+    }
   }
 
   function clearSessionState(){
-    state.plan="none"; state.token=""; state.exp=0; state.sid="";
+    state.plan = "none";
+    state.token = "";
+    state.exp = 0;
+    state.sid = "";
+    refreshLiveStateCard();
   }
 
   function handleSessionEnded(reason, doNotify){
@@ -603,14 +932,14 @@
     try{ killChrome(); }catch(e){}
     clearSessionState();
 
-    reason = tr(reason||"");
+    reason = T(reason||"");
     if(reason==="session_expired" || reason==="expired"){
-      setStatus("Session EXPIRED");
+      setStatus("Session expired");
       if(doNotify) alert("Session expired");
       return;
     }
     if(reason==="session_not_found"){
-      setStatus("Session ENDED");
+      setStatus("Session ended");
       if(doNotify) alert("Session ended");
       return;
     }
@@ -636,26 +965,36 @@
   function pingOnce(){
     if(!state.token) return;
     try{
-      var r = httpPost(API_BASE + state.endpoints.ping, {token:state.token, clientId:state.clientId});
-      var d = null;
-      try{ d = JSON.parse(r.t); }catch(e){ d = null; }
-
+      var r = hp(R.base + state.endpoints.ping, {token:state.token, clientId:state.clientId});
+      var d = parseJson(r.t);
       if(r.s === 200 && d && d.ok === true) return;
       handleSessionEnded((d && d.error ? d.error : "ping_failed"), true);
     }catch(e){
       if(state.token) setStatus("Session heartbeat issue");
     }
   }
-  function stopHeartbeat(){ if(state.pingTimer){ try{ window.clearInterval(state.pingTimer); }catch(e){} state.pingTimer = null; } }
-  function startHeartbeat(){ stopHeartbeat(); pingOnce(); if(state.token) state.pingTimer = window.setInterval(pingOnce, 60000); }
+  function stopHeartbeat(){
+    if(state.pingTimer){
+      try{ window.clearInterval(state.pingTimer); }catch(e){}
+      state.pingTimer = null;
+    }
+  }
+  function startHeartbeat(){
+    stopHeartbeat();
+    pingOnce();
+    if(state.token) state.pingTimer = window.setInterval(pingOnce, 60000);
+  }
   function endSession(){
     if(!state.token) return;
     clearSessionTimers();
-    try{ httpPost(API_BASE + state.endpoints.end, {token:state.token, clientId:state.clientId}); }catch(e){}
+    try{ hp(R.base + state.endpoints.end, {token:state.token, clientId:state.clientId}); }catch(e){}
   }
 
   function armExpiry(){
-    if(state.expireTimer){ try{ window.clearTimeout(state.expireTimer); }catch(e){} state.expireTimer = null; }
+    if(state.expireTimer){
+      try{ window.clearTimeout(state.expireTimer); }catch(e){}
+      state.expireTimer = null;
+    }
     if(!state.exp) return;
     var d = (state.exp * 1000) - (new Date().getTime());
     if(d < 0) d = 0;
@@ -680,19 +1019,19 @@
   }
 
   function normFlag(f){
-    f = tr(f||"");
+    f = T(f||"");
     if(!f) return "";
     if(/[\r\n\t\0]/.test(f)) return "";
-    if(f.indexOf("--")!==0) return "";
+    if(f.indexOf("--") !== 0) return "";
     if(/[&|<>^`]/.test(f)) return "";
-    if(f.indexOf("--user-data-dir=")===0) return "";
+    if(f.indexOf("--user-data-dir=") === 0) return "";
     return f;
   }
 
   function fixUserAgent(f){
     f = String(f||"");
-    if(f.indexOf("--user-agent=")!==0) return f;
-    var v = tr(f.substring(13)).replace(/"/g,"");
+    if(f.indexOf("--user-agent=") !== 0) return f;
+    var v = T(f.substring(13)).replace(/"/g,"");
     if(/\s/.test(v)) return '--user-agent="' + v + '"';
     return "--user-agent=" + v;
   }
@@ -700,14 +1039,13 @@
   function q(s){
     s = String(s||"");
     if(!s) return "";
-    if(s.indexOf('"')!==-1) return s;
+    if(s.indexOf('"') !== -1) return s;
     if(/\s/.test(s)) return '"' + s + '"';
     return s;
   }
 
   function buildArgs(flags, url){
-    var parts = [];
-    var i=0;
+    var parts = [], i = 0;
     for(i=0;i<flags.length;i++){
       var x = normFlag(flags[i]);
       if(!x) continue;
@@ -757,35 +1095,35 @@
   function resetSessionUi(){
     clearSessionTimers();
     clearSessionState();
-    setStatus("Key saved (not started)");
+    setStatus("Ready");
   }
 
   function doLaunch(){
-    if(!state.versionOk){ alertUpdate(); return; }
+    if(!state.versionOk){ alUp(state.version.downloadUrl); return; }
 
-    var u = tr($("startUrl").value);
+    var u = T($("startUrl").value);
     if(!u) u = "https://example.com";
-    if(!safeUrl(u)){ alertApi("unsafe_url"); return; }
+    if(!safeUrl(u)){ alApi("unsafe_url"); return; }
 
     var chrome = findChrome();
-    if(!chrome){ alertLaunch(); return; }
+    if(!chrome){ alLn(); return; }
 
     killChrome();
 
     var s = startSession();
     if(!s.ok){
-      if(s.m==="update_required") alertUpdate();
-      else if(s.m==="offline") alertOffline();
-      else if(s.m==="too_many_sessions") alertLimit();
-      else if(s.m==="invalid_key" || s.m==="invalid") alertInvalid();
-      else alertApi(s.m);
+      if(s.m === "update_required") alUp(state.version.downloadUrl);
+      else if(s.m === "offline") alOff();
+      else if(s.m === "too_many_sessions") alLim();
+      else if(s.m === "invalid_key" || s.m === "invalid") alBad();
+      else alApi(s.m);
       resetSessionUi();
       return;
     }
 
     var ui = getUiChallenge();
     if(!ui.ok){
-      if(ui.e==="offline") alertOffline(); else alertApi(ui.e);
+      if(ui.e === "offline") alOff(); else alApi(ui.e);
       endSession();
       resetSessionUi();
       return;
@@ -793,7 +1131,7 @@
 
     var lb = getLaunchBundle(u, ui.d);
     if(!lb.ok){
-      if(lb.e==="offline") alertOffline(); else alertApi(lb.e);
+      if(lb.e === "offline") alOff(); else alApi(lb.e);
       endSession();
       resetSessionUi();
       return;
@@ -807,11 +1145,11 @@
 
     endSession();
     resetSessionUi();
-    alertLaunch();
+    alLn();
   }
 
   function setDiscordUrl(){
-    if(!state.versionOk){ alertUpdate(); return; }
+    if(!state.versionOk){ alUp(state.version.downloadUrl); return; }
     try{ $("startUrl").value = state.support.discordUrl; }catch(e){}
   }
 
@@ -819,9 +1157,9 @@
     try{
       var p = String(document.location.pathname || "");
       p = p.replace(/\//g,"\\");
-      if(p.indexOf("\\")===0 && /^[\\][A-Za-z][:]/.test(p)) p = p.substring(1);
+      if(p.indexOf("\\") === 0 && /^[\\][A-Za-z][:]/.test(p)) p = p.substring(1);
       p = decodeURIComponent(p);
-      return tr(p);
+      return T(p);
     }catch(e){
       return "";
     }
@@ -838,21 +1176,82 @@
     }
   }
 
-  function isScriptNovaOldHta(content){
-    content = String(content||"");
-    var matches = 0;
-    if(content.indexOf("ScriptNova") !== -1) matches++;
-    if(content.indexOf("Hardware Suite") !== -1) matches++;
-    if(content.indexOf("Browser Launcher") !== -1) matches++;
-    if(content.indexOf("api.scriptnovaa.com") !== -1) matches++;
-    if(content.indexOf("scriptnovaa.com") !== -1) matches++;
-    if(content.indexOf("gomegaassist@gmail.com") !== -1) matches++;
-    if(content.indexOf("discord.gg/gscGTMVsWE") !== -1) matches++;
-    if(content.indexOf("--dns-over-https-templates=") !== -1) matches++;
-    if(content.indexOf("--user-agent=") !== -1) matches++;
-    if(content.indexOf("--disable-extensions") !== -1) matches++;
-    if(content.indexOf("applicationname=\"ScriptNova\"") !== -1) matches++;
-    return matches >= 2;
+  function getRemoteCleanupNameHints(){
+    var cp = state.remote.cleanupPrompt || {};
+    var hints = [];
+    var arr = cp.nameHints || [];
+    var i = 0;
+    for(i=0;i<arr.length;i++){
+      var x = T(arr[i]);
+      if(x) hints.push(x.toLowerCase());
+    }
+    if(!hints.length){
+      hints = [
+        "scriptnova",
+        "scriptnova launcher",
+        "browser launcher",
+        "scriptnova browser launcher"
+      ];
+    }
+    return hints;
+  }
+
+  function getRemoteCleanupScanPaths(){
+    var cp = state.remote.cleanupPrompt || {};
+    var arr = cp.scanPaths || [];
+    var out = [], i = 0, v = "";
+    for(i=0;i<arr.length;i++){
+      v = String(arr[i] || "");
+      if(!v) continue;
+      try{ v = v.replace(/%USERNAME%/gi, sh.ExpandEnvironmentStrings("%USERNAME%")); }catch(e){}
+      try{ v = sh.ExpandEnvironmentStrings(v); }catch(e2){}
+      v = T(v);
+      if(v) out.push(v);
+    }
+    return out;
+  }
+
+  function looksLikeTargetName(path){
+    path = String(path || "").toLowerCase();
+    var hints = getRemoteCleanupNameHints();
+    var i = 0;
+    for(i=0;i<hints.length;i++){
+      if(hints[i] && path.indexOf(hints[i]) !== -1) return true;
+    }
+    return false;
+  }
+
+  function contentSignalsScore(content){
+    content = String(content || "");
+    var n = 0;
+    if(content.indexOf("ScriptNova") !== -1) n++;
+    if(content.indexOf("Browser Launcher") !== -1) n++;
+    if(content.indexOf("applicationname=\"ScriptNova\"") !== -1) n++;
+    if(content.indexOf("chrome.exe") !== -1) n++;
+    if(content.indexOf("/api/check") !== -1) n++;
+    if(content.indexOf("/api/verify") !== -1) n++;
+    if(content.indexOf("/api/ui") !== -1) n++;
+    if(content.indexOf("/api/launch") !== -1) n++;
+    if(content.indexOf("/api/ping") !== -1) n++;
+    if(content.indexOf("/api/end") !== -1) n++;
+    if(content.indexOf("gomegaassist@gmail.com") !== -1) n++;
+    if(content.indexOf("discord.gg") !== -1) n++;
+    if(content.indexOf("--disable-extensions") !== -1) n++;
+    if(content.indexOf("--user-agent=") !== -1) n++;
+    if(content.indexOf("clientid.txt") !== -1) n++;
+    if(content.indexOf("launcher_state.json") !== -1) n++;
+    return n;
+  }
+
+  function isLikelyOldLocalCopy(path, content){
+    var p = String(path || "");
+    var c = String(content || "");
+    var score = contentSignalsScore(c);
+    var samePath = (p.toLowerCase() === String(currentExePathGuess() || "").toLowerCase());
+    if(samePath) return false;
+    if(looksLikeTargetName(p) && score >= 2) return true;
+    if(score >= 4) return true;
+    return false;
   }
 
   function getKnownFoldersForCleanup(){
@@ -860,7 +1259,14 @@
     try{ arr.push(sh.SpecialFolders("Desktop")); }catch(e){}
     try{ arr.push(sh.SpecialFolders("DesktopDirectory")); }catch(e){}
     try{ arr.push(sh.ExpandEnvironmentStrings("%USERPROFILE%") + "\\Downloads"); }catch(e){}
-    return arr;
+    try{ arr.push(sh.ExpandEnvironmentStrings("%USERPROFILE%") + "\\Documents"); }catch(e){}
+    try{ arr.push(sh.ExpandEnvironmentStrings("%USERPROFILE%")); }catch(e){}
+    try{
+      var extra = getRemoteCleanupScanPaths();
+      var i = 0;
+      for(i=0;i<extra.length;i++) arr.push(extra[i]);
+    }catch(e2){}
+    return uniqueArr(arr);
   }
 
   function uniqueArr(a){
@@ -875,32 +1281,30 @@
     return out;
   }
 
-  function scanOldScriptNovaHtas(){
-    var folders = uniqueArr(getKnownFoldersForCleanup());
-    var current = currentExePathGuess().toLowerCase();
+  function scanFolderForCandidates(folder, out){
+    try{
+      if(!fs.FolderExists(folder)) return;
+      var files = fs.GetFolder(folder).Files;
+      var en = new Enumerator(files);
+      for(; !en.atEnd(); en.moveNext()){
+        var f = en.item();
+        var path = String(f.Path || "");
+        if(!path) continue;
+        if(path.toLowerCase().indexOf(".hta") !== path.toLowerCase().length - 4) continue;
+
+        var content = readTextFileSafe(path);
+        if(!content) continue;
+
+        if(isLikelyOldLocalCopy(path, content)) out.push(path);
+      }
+    }catch(e){}
+  }
+
+  function scanOldCopies(){
+    var folders = getKnownFoldersForCleanup();
     var found = [];
-    var i, fld, files, en, f, path, content;
-    for(i=0;i<folders.length;i++){
-      fld = String(folders[i]||"");
-      if(!fld) continue;
-      try{
-        if(!fs.FolderExists(fld)) continue;
-        files = fs.GetFolder(fld).Files;
-        en = new Enumerator(files);
-        for(; !en.atEnd(); en.moveNext()){
-          f = en.item();
-          path = String(f.Path || "");
-          if(!path) continue;
-          if(path.toLowerCase().indexOf(".hta") !== path.toLowerCase().length - 4) continue;
-          if(current && path.toLowerCase() === current) continue;
-          content = readTextFileSafe(path);
-          if(!content) continue;
-          if(isScriptNovaOldHta(content)){
-            found.push(path);
-          }
-        }
-      }catch(e){}
-    }
+    var i = 0;
+    for(i=0;i<folders.length;i++) scanFolderForCandidates(String(folders[i]||""), found);
     return uniqueArr(found);
   }
 
@@ -908,10 +1312,10 @@
     var html = "";
     var i;
     if(!files || !files.length){
-      html = '<div class="note">No old ScriptNova HTA files found in Desktop or Downloads.</div>';
+      html = '<div class="note">No extra local copies found.</div>';
     } else {
-      html = '<div class="note">Found old ScriptNova launcher copies:</div><div class="listBox">';
-      for(i=0;i<files.length;i++) html += escHtml(files[i]) + '<br>';
+      html = '<div class="note">Local copies found:</div><div class="listBox">';
+      for(i=0;i<files.length;i++) html += EH(files[i]) + '<br>';
       html += '</div>';
     }
     try{ $("cleanupResults").innerHTML = html; }catch(e){}
@@ -936,10 +1340,9 @@
 
   function markDismissed(id){
     if(!id) return;
-    state.localState.dismissed[String(id)] = nowSec();
+    state.localState.dismissed[String(id)] = NS();
     saveLocalState();
   }
-
   function isDismissed(id){
     if(!id) return false;
     return !!state.localState.dismissed[String(id)];
@@ -948,10 +1351,9 @@
   function markCleanupHandled(forceOnce){
     forceOnce = String(forceOnce || "");
     if(!forceOnce) return;
-    state.localState.cleanupHandled[forceOnce] = nowSec();
+    state.localState.cleanupHandled[forceOnce] = NS();
     saveLocalState();
   }
-
   function cleanupHandled(forceOnce){
     forceOnce = String(forceOnce || "");
     if(!forceOnce) return false;
@@ -960,15 +1362,15 @@
 
   function submitRemoteEvent(kind, payload){
     try{
-      if(!state.ui.submitUrl) return false;
+      if(!state.remote.submitUrl) return false;
       var body = {
         kind:String(kind||""),
         clientId:String(state.clientId||""),
         hwid:String(state.hwid||""),
-        version:String(state.version.required || DEFAULT_REQUIRED_VERSION),
+        version:String(state.version.current || APP_VERSION),
         data: payload || {}
       };
-      var r = httpPost(API_BASE + String(state.ui.submitUrl), body);
+      var r = hp(R.base + String(state.remote.submitUrl), body);
       return r.s === 200;
     }catch(e){
       return false;
@@ -979,13 +1381,17 @@
     try{
       var el = $("topBanner");
       if(!el) return;
-      el.className = "banner";
-      if(mode==="warn") el.className += " warn";
-      else if(mode==="danger") el.className += " danger";
-      var h = '<div class="title">' + escHtml(title || "Message") + '</div>' +
-              '<div>' + escHtml(text || "") + '</div>';
+      var cls = "banner";
+      mode = String(mode || "").toLowerCase();
+      if(mode === "warn" || mode === "warning") cls += " warn";
+      else if(mode === "danger" || mode === "error") cls += " danger";
+      else if(mode === "success") cls += " success";
+      el.className = cls;
+
+      var h = '<div class="title">' + EH(title || "Message") + '</div>' +
+              '<div>' + EH(text || "") + '</div>';
       if(dismissable && id){
-        h += '<div class="actions"><button class="miniBtn" onclick="DismissRemoteBanner(\'' + escJs(id) + '\')">Dismiss</button></div>';
+        h += '<div class="actions"><button class="miniBtn" onclick="DismissRemoteBanner(\'' + EJ(id) + '\')">Dismiss</button></div>';
       }
       el.innerHTML = h;
       el.style.display = "block";
@@ -1002,18 +1408,19 @@
   function showModal(id, title, body, buttons){
     try{
       state.currentModalId = String(id||"");
-      $("modalTitle").innerHTML = escHtml(title||"Message");
-      $("modalBody").innerHTML = escHtml(body||"").replace(/\n/g,"<br>");
+      $("modalTitle").innerHTML = EH(title || "Message");
+      $("modalBody").innerHTML = EH(body || "").replace(/\n/g,"<br>");
 
       var html = "";
       if(buttons && buttons.length){
-        var i=0;
+        var i = 0;
         for(i=0;i<buttons.length;i++){
           var b = buttons[i] || {};
           var label = String(b.label || ("Button " + (i+1)));
           var action = String(b.action || "dismiss");
-          var extra = String(b.value || "");
-          html += '<button class="' + (b.danger ? 'btnDanger' : (b.warn ? 'btnWarn' : 'btn2')) + '" onclick="HandleModalButton(\'' + escJs(action) + '\',\'' + escJs(extra) + '\')">' + escHtml(label) + '</button>';
+          var extra = String(b.value || b.url || "");
+          var klass = (b.danger ? 'btnDanger' : (b.warn ? 'btnWarn' : 'btn2'));
+          html += '<button class="' + klass + '" onclick="HandleModalButton(\'' + EJ(action) + '\',\'' + EJ(extra) + '\')">' + EH(label) + '</button>';
         }
       } else {
         html = '<button class="btn2" onclick="HandleModalButton(\'dismiss\',\'\')">Dismiss</button>';
@@ -1033,14 +1440,14 @@
   function renderQuickLinks(){
     var box = $("quickLinksBox");
     if(!box) return;
-    if(!state.ui.quickLinks || !state.ui.quickLinks.length){
-      box.innerHTML = '<div class="note">No remote quick links.</div>';
+    if(!state.remote.quickLinks || !state.remote.quickLinks.length){
+      box.innerHTML = '<div class="note">No quick links.</div>';
       return;
     }
     var html = "", i, q;
-    for(i=0;i<state.ui.quickLinks.length;i++){
-      q = state.ui.quickLinks[i] || {};
-      html += '<button class="sideBtn" onclick="ApplyQuickLink(\'' + escJs(String(q.url||"")) + '\')">' + escHtml(String(q.label||("Link " + (i+1)))) + '</button>';
+    for(i=0;i<state.remote.quickLinks.length;i++){
+      q = state.remote.quickLinks[i] || {};
+      html += '<button class="sideBtn" onclick="ApplyQuickLink(\'' + EJ(String(q.url||"")) + '\')">' + EH(String(q.label || ("Link " + (i+1)))) + '</button>';
     }
     box.innerHTML = html;
   }
@@ -1052,12 +1459,12 @@
     var meta = $("pollMeta");
     if(!card || !title || !body || !meta) return;
 
-    if(!state.ui.poll || !state.ui.poll.enabled){
+    if(!state.remote.poll || !state.remote.poll.enabled){
       card.style.display = "none";
       return;
     }
 
-    var poll = state.ui.poll || {};
+    var poll = state.remote.poll || {};
     var pollId = String(poll.id || "default_poll");
     title.innerText = String(poll.question || "Poll");
     var html = "";
@@ -1066,72 +1473,102 @@
     for(i=0;i<opts.length;i++){
       var opt = String(opts[i] || "");
       if(!opt) continue;
-      html += '<button class="pollOption" ' + (voted ? 'disabled="disabled"' : '') + ' onclick="VotePoll(\'' + escJs(pollId) + '\',\'' + escJs(opt) + '\')">' + escHtml(opt) + '</button>';
+      html += '<button class="pollOption" ' + (voted ? 'disabled="disabled"' : '') + ' onclick="VotePoll(\'' + EJ(pollId) + '\',\'' + EJ(opt) + '\')">' + EH(opt) + '</button>';
     }
     body.innerHTML = html || '<div class="note">No options.</div>';
-    meta.innerHTML = voted ? ('You voted: <b>' + escHtml(voted) + '</b>') : ('Choose one answer.');
+    meta.innerHTML = voted ? ('You voted: <b>' + EH(voted) + '</b>') : 'Choose one answer.';
     card.style.display = "block";
   }
 
-  function renderRemoteUi(){
-    setFeedBadge(state.bootstrap ? "Feed: bootstrap" : "Feed: none");
-
-    renderQuickLinks();
-    renderPoll();
-
-    if(state.ui.banner && state.ui.banner.enabled && !isDismissed(state.ui.banner.id)){
-      showBanner(
-        state.ui.banner.title || "Message",
-        state.ui.banner.text || "",
-        state.ui.banner.mode || "",
-        state.ui.banner.id || "",
-        !!state.ui.banner.dismissable
-      );
-    } else {
-      hideBanner();
-    }
-
-    if(state.ui.modal && state.ui.modal.enabled && !isDismissed(state.ui.modal.id) && !state.runtimeMessageShown[String(state.ui.modal.id||"")]){
-      state.runtimeMessageShown[String(state.ui.modal.id||"")] = true;
-      showModal(
-        state.ui.modal.id || "",
-        state.ui.modal.title || "Message",
-        state.ui.modal.text || "",
-        state.ui.modal.buttons || []
-      );
-    }
-
-    maybeHandleCleanupPrompt();
-  }
-
   function maybeHandleCleanupPrompt(){
-    if(!state.ui.cleanupPrompt || !state.ui.cleanupPrompt.enabled) return;
-    var cp = state.ui.cleanupPrompt || {};
+    if(!state.remote.cleanupPrompt || !state.remote.cleanupPrompt.enabled) return;
+
+    var cp = state.remote.cleanupPrompt || {};
     var forceOnce = String(cp.forceOnce || "");
     if(forceOnce && cleanupHandled(forceOnce)) return;
 
-    var msg = String(cp.message || "Owner recommends removing outdated ScriptNova launcher copies from Desktop and Downloads.");
-    var files = scanOldScriptNovaHtas();
-    renderCleanupResults(files);
+    var files = scanOldCopies();
+    var sig = Hx(J(files));
+
+    state.cleanupScanCache = files;
+    if(sig !== state.lastCleanupSig){
+      state.lastCleanupSig = sig;
+      renderCleanupResults(files);
+    }
 
     if(!files.length){
       if(forceOnce) markCleanupHandled(forceOnce);
       return;
     }
 
-    showModal(
-      "cleanup_prompt_" + forceOnce,
-      "Old ScriptNova Launchers Found",
-      msg + "\n\nFound " + files.length + " old ScriptNova HTA file(s). Open System Center to review them. You can remove them now or later.",
-      [
-        { label:"Open System Center", action:"open_cleanup", value:"" },
-        { label:"Not Now", action:"dismiss_cleanup", value:forceOnce, warn:true }
-      ]
-    );
+    var title = "Extra Local Copies Found";
+    var msg = String(cp.message || "Recommended action available.") + "\n\nFound " + files.length + " local file(s). You can review them or remove them now.";
+
+    if(!state.modalShownRuntime["cleanup_" + forceOnce + "_" + sig]){
+      state.modalShownRuntime["cleanup_" + forceOnce + "_" + sig] = true;
+      showModal(
+        "cleanup_prompt_" + forceOnce,
+        title,
+        msg,
+        [
+          { label:"Review", action:"open_cleanup", value:"" },
+          { label:"Delete Now", action:"delete_cleanup_now", value:forceOnce, warn:true },
+          { label:"Not Now", action:"dismiss_cleanup", value:forceOnce }
+        ]
+      );
+    }
+  }
+
+  function renderRemoteUi(force){
+    var payload = {
+      banner: state.remote.banner,
+      modal: state.remote.modal,
+      poll: state.remote.poll,
+      cleanupPrompt: state.remote.cleanupPrompt,
+      quickLinks: state.remote.quickLinks,
+      support: state.support,
+      launcher: state.remote.launcher
+    };
+    var sig = Hx(J(payload));
+    if(!force && sig === state.lastUiSig){
+      maybeHandleCleanupPrompt();
+      refreshLiveStateCard();
+      return;
+    }
+    state.lastUiSig = sig;
+
+    setFeedBadge("Remote: live");
+    renderQuickLinks();
+    renderPoll();
+
+    if(state.remote.banner && state.remote.banner.enabled && !isDismissed(state.remote.banner.id)){
+      showBanner(
+        state.remote.banner.title || "Message",
+        state.remote.banner.text || "",
+        state.remote.banner.mode || "",
+        state.remote.banner.id || "",
+        !!state.remote.banner.dismissable
+      );
+    } else {
+      hideBanner();
+    }
+
+    if(state.remote.modal && state.remote.modal.enabled && !isDismissed(state.remote.modal.id) && !state.modalShownRuntime[String(state.remote.modal.id||"")]){
+      state.modalShownRuntime[String(state.remote.modal.id||"")] = true;
+      showModal(
+        state.remote.modal.id || "",
+        state.remote.modal.title || "Message",
+        state.remote.modal.text || "",
+        state.remote.modal.buttons || []
+      );
+    }
+
+    maybeHandleCleanupPrompt();
+    refreshLiveStateCard();
   }
 
   function applyQuickLink(url){
-    if(!safeUrl(url)){ alertApi("unsafe_quick_link"); return; }
+    if(!safeUrl(url)){ alApi("unsafe_quick_link"); return; }
     try{ $("startUrl").value = url; }catch(e){}
   }
 
@@ -1153,6 +1590,29 @@
     alert("Vote submitted: " + value);
   }
 
+  function deleteCleanupNow(forceOnce){
+    var files = scanOldCopies();
+    state.cleanupScanCache = files;
+    renderCleanupResults(files);
+
+    if(!files.length){
+      if(forceOnce) markCleanupHandled(forceOnce);
+      alert("No extra local copies found.");
+      return;
+    }
+
+    if(!confirm("Delete " + files.length + " local file(s)?")) return;
+
+    var r = deleteListedFiles(files);
+    var left = scanOldCopies();
+    state.cleanupScanCache = left;
+    renderCleanupResults(left);
+
+    submitRemoteEvent("cleanup_run", { deleted:r.deleted, failed:r.failed });
+    if(forceOnce) markCleanupHandled(forceOnce);
+    alert("Cleanup finished. Deleted: " + r.deleted + " Failed: " + r.failed);
+  }
+
   function handleModalButton(action, value){
     action = String(action||"");
     value = String(value||"");
@@ -1166,6 +1626,12 @@
     if(action === "open_cleanup"){
       hideModal();
       try{ $("systemCenterCard").scrollIntoView(); }catch(e){}
+      return;
+    }
+
+    if(action === "delete_cleanup_now"){
+      hideModal();
+      deleteCleanupNow(value);
       return;
     }
 
@@ -1183,7 +1649,7 @@
       return;
     }
 
-    if(action === "open_url"){
+    if(action === "open" || action === "open_url"){
       if(safeUrl(value)){
         try{ sh.Run('cmd /c start "" "' + value + '"', 0, false); }catch(e){}
       }
@@ -1201,36 +1667,84 @@
   }
 
   function runCleanupNow(){
-    var files = scanOldScriptNovaHtas();
+    var files = scanOldCopies();
+    state.cleanupScanCache = files;
     renderCleanupResults(files);
     if(!files.length){
-      alert("No old ScriptNova HTA files found.");
+      alert("No extra local copies found.");
       return;
     }
-    if(!confirm("Delete " + files.length + " old ScriptNova HTA file(s) from Desktop/Downloads?")) return;
+    if(!confirm("Delete " + files.length + " local file(s)?")) return;
     var r = deleteListedFiles(files);
-    renderCleanupResults(scanOldScriptNovaHtas());
+    var left = scanOldCopies();
+    state.cleanupScanCache = left;
+    renderCleanupResults(left);
     alert("Cleanup finished. Deleted: " + r.deleted + " Failed: " + r.failed);
     submitRemoteEvent("cleanup_run", { deleted:r.deleted, failed:r.failed });
   }
 
-  function loadRuntimeStatus(){
+  function refreshLiveStateCard(){
     try{
-      $("runtimeInfo").innerHTML =
-        '<div class="note">' +
-        'Version: <b>' + escHtml(String(state.version.required || DEFAULT_REQUIRED_VERSION)) + '</b><br>' +
-        'Client: <b>' + escHtml(state.clientId || "none") + '</b><br>' +
-        'Session Plan: <b>' + escHtml(state.plan || "none") + '</b><br>' +
-        'Session Active: <b>' + escHtml(state.token ? "yes" : "no") + '</b>' +
-        '</div>';
+      var remoteState = "Live";
+      var verState = state.version.current + " / req " + state.version.required;
+      var sessState = state.token ? ("Yes — " + state.plan) : "No";
+      var expState = state.exp ? (new Date(state.exp * 1000).toLocaleString()) : "—";
+      var startState = "";
+      try{ startState = String($("startUrl").value || ""); }catch(e){ startState = ""; }
+
+      $("runtimeGrid").innerHTML =
+        '<div class="tiny"><div class="k">Version</div><div class="v">' + EH(verState) + '</div></div>' +
+        '<div class="tiny"><div class="k">Remote</div><div class="v"><span class="liveDot"></span>' + EH(remoteState) + '</div></div>' +
+        '<div class="tiny"><div class="k">Client</div><div class="v">' + EH(state.clientId || "none") + '</div></div>' +
+        '<div class="tiny"><div class="k">Session</div><div class="v">' + EH(sessState) + '</div></div>' +
+        '<div class="tiny"><div class="k">Expires</div><div class="v">' + EH(expState) + '</div></div>' +
+        '<div class="tiny"><div class="k">Start URL</div><div class="v">' + EH(startState || "—") + '</div></div>';
+
+      $("runtimeFoot").innerHTML =
+        '<div class="compactNote">Auto refresh every 20s • Smart render active</div>';
     }catch(e){}
   }
 
-  function refreshBootstrap(){
-    var boot = fetchBootstrap();
-    if(boot) mergeBootstrap(boot);
-    renderRemoteUi();
-    loadRuntimeStatus();
+  function manualRefresh(){
+    refreshRemote(true);
+  }
+
+  function refreshRemote(force){
+    if(state.refreshing) return;
+    state.refreshing = true;
+    try{
+      var remote = fetchRemote();
+      if(remote){
+        var sig = Hx(J(remote));
+        var changed = (sig !== state.lastRemoteSig);
+
+        if(changed || force){
+          state.lastRemoteSig = sig;
+          mergeRemote(remote);
+          checkVersion();
+          renderRemoteUi(true);
+        } else {
+          renderRemoteUi(false);
+        }
+      }
+      refreshLiveStateCard();
+    }catch(e){
+    }
+    state.refreshing = false;
+  }
+
+  function startRemoteRefresh(){
+    stopRemoteRefresh();
+    state.remoteTimer = window.setInterval(function(){
+      refreshRemote(false);
+    }, AUTO_REFRESH_MS);
+  }
+
+  function stopRemoteRefresh(){
+    if(state.remoteTimer){
+      try{ window.clearInterval(state.remoteTimer); }catch(e){}
+      state.remoteTimer = null;
+    }
   }
 
   function init(){
@@ -1244,22 +1758,30 @@
     var saved = loadLocalKey();
     if(saved) $("licenseKey").value = saved;
 
-    var boot = fetchBootstrap();
-    if(boot) mergeBootstrap(boot);
+    var remote = fetchRemote();
+    if(remote){
+      state.lastRemoteSig = Hx(J(remote));
+      mergeRemote(remote);
+    }
 
     checkVersion();
 
-    if(state.versionOk) setStatus(saved ? "Key saved (not started)" : "No key");
+    if(state.versionOk) setStatus(saved ? "Ready" : "No key");
     else setStatus("Update required");
 
-    renderRemoteUi();
-    loadRuntimeStatus();
+    renderRemoteUi(true);
+    refreshLiveStateCard();
+    startRemoteRefresh();
   }
 
   window.SaveLicenseLocal = saveLocalKey;
   window.CheckLicenseNoSession = checkKeyNoSession;
   window.Launch = doLaunch;
-  window.CleanupOnExit = function(){ try{ endSession(); }catch(e){} try{ killChrome(); }catch(e2){} };
+  window.CleanupOnExit = function(){
+    try{ stopRemoteRefresh(); }catch(e){}
+    try{ endSession(); }catch(e2){}
+    try{ killChrome(); }catch(e3){}
+  };
   window.SetDiscordAsStartupUrl = setDiscordUrl;
   window.InitApp = init;
   window.RunCleanupNow = runCleanupNow;
@@ -1267,7 +1789,7 @@
   window.VotePoll = votePoll;
   window.HandleModalButton = handleModalButton;
   window.ApplyQuickLink = applyQuickLink;
-  window.RefreshBootstrap = refreshBootstrap;
+  window.RefreshRemote = manualRefresh;
 })();
   </script>
 </head>
@@ -1285,12 +1807,12 @@
     <div class="topbar">
       <div class="brandRow">
         <div class="brandLeft">
-          <b style="color:#00e5ff;">ScriptNova</b> // Browser Launcher
-          <div class="note">Verify/Refresh = no session • Launch = starts session</div>
+          <div class="logo">ScriptNova</div>
+          <div class="subtitle">Browser Launcher</div>
         </div>
         <div class="brandRight">
           <span id="clientBadge" class="subpill">Client: …</span>
-          <span id="feedBadge" class="subpill">Feed: …</span>
+          <span id="feedBadge" class="subpill">Remote: …</span>
           <span id="licenseStatus" class="pill">No key</span>
         </div>
       </div>
@@ -1309,19 +1831,20 @@
           <div class="sideLabel" style="margin-top:10px;">Discord</div>
           <div id="supportDiscord" class="sideLine">—</div>
 
-          <button id="btnDiscord" class="sideBtn" onclick="SetDiscordAsStartupUrl()">ADD AS STARTUP URL</button>
+          <button id="btnDiscord" class="sideBtn" onclick="SetDiscordAsStartupUrl()">Use Discord URL</button>
         </div>
 
         <div class="sideCard">
-          <h4>System Center</h4>
-          <div id="runtimeInfo" class="sideLine">—</div>
-          <button class="sideBtn" onclick="RefreshBootstrap()">REFRESH REMOTE UI</button>
-          <button class="sideBtn" onclick="RunCleanupNow()">CLEAN OLD SCRIPTNOVA HTAS</button>
+          <h4>Control Center</h4>
+          <div id="runtimeGrid" class="statusGrid"></div>
+          <div id="runtimeFoot"></div>
+          <button class="sideBtn" onclick="RefreshRemote()">Refresh Now</button>
+          <button class="sideBtn" onclick="RunCleanupNow()">Clean Extra Local Copies</button>
         </div>
 
         <div class="sideCard">
           <h4>Quick Links</h4>
-          <div id="quickLinksBox" class="sideLine">No remote quick links.</div>
+          <div id="quickLinksBox" class="sideLine">No quick links.</div>
         </div>
       </div>
 
@@ -1331,9 +1854,9 @@
         <div class="card">
           <h3>License Key</h3>
           <input id="licenseKey" class="field" type="text" placeholder="BASIC-xxxx or PRO-xxxx or FREE-xxxx"/>
-          <button id="btnSave" class="btn2" onclick="SaveLicenseLocal()">SAVE LICENSE (LOCAL)</button>
-          <button id="btnVerify" class="btn2" onclick="CheckLicenseNoSession()">VERIFY / REFRESH (NO SESSION)</button>
-          <p class="note">Thank you for using ScriptNova we dont collect any data besides your key info so we know who is using our unblocker and we do collect error details so we fix them later also we collect your device ID and Device info so we can check if your on our ban list.</p>
+          <button id="btnSave" class="btn2" onclick="SaveLicenseLocal()">Save License</button>
+          <button id="btnVerify" class="btn2" onclick="CheckLicenseNoSession()">Verify / Refresh</button>
+          <p class="note">Session begins only when launch is used.</p>
         </div>
 
         <div class="card">
@@ -1341,11 +1864,11 @@
           <input id="startUrl" class="field" type="text" value="https://www.guns.lol/iii_dev"/>
         </div>
 
-        <button id="btnLaunch" class="btn" onclick="Launch()">LAUNCH BROWSER ENGINE</button>
+        <button id="btnLaunch" class="btn" onclick="Launch()">Launch Browser Engine</button>
 
         <div id="systemCenterCard" class="card">
-          <h3>System Center</h3>
-          <div class="note">This section is now driven by bootstrap data and is ready for future admin messages, polls, links, and cleanup prompts.</div>
+          <h3>Control Center</h3>
+          <div class="note">Live items will appear here when available.</div>
 
           <div id="pollCard" class="card" style="display:none; margin-top:10px;">
             <h3 id="pollTitle">Poll</h3>
@@ -1354,9 +1877,9 @@
           </div>
 
           <div class="card" style="margin-top:10px;">
-            <h3>Cleanup Results</h3>
-            <div id="cleanupResults" class="note">No cleanup scan run yet.</div>
-            <button class="btnWarn" onclick="RunCleanupNow()">SCAN + DELETE OLD SCRIPTNOVA HTAS</button>
+            <h3>Local Scan</h3>
+            <div id="cleanupResults" class="note">No scan run yet.</div>
+            <button class="btnWarn" onclick="RunCleanupNow()">Scan + Delete Extra Local Copies</button>
           </div>
         </div>
       </div>
