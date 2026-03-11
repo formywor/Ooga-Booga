@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <title>ScriptNova — Browser Launcher (HTA)</title>
+  <title>ScriptNova — Browser Launcher</title>
 
   <hta:application
     applicationname="ScriptNova"
@@ -30,7 +30,7 @@
     .subpill{ display:inline-block; padding:4px 8px; border-radius:999px; background:#0c1422; border:1px solid rgba(255,255,255,0.12); color:#9fb2d6; font-size:11px; margin-top:6px; margin-right:8px; }
 
     .layout{ margin-top:12px; height:calc(100% - 86px); border:1px solid #22314a; border-radius:14px; background:#0f1726; overflow:hidden; }
-    .sidebar{ float:left; width:240px; height:100%; border-right:1px solid #22314a; background:#0c1422; }
+    .sidebar{ float:left; width:260px; height:100%; border-right:1px solid #22314a; background:#0c1422; overflow-y:auto; }
     .sideTitle{ padding:12px; border-bottom:1px solid #22314a; color:#9fb2d6; font-size:12px; letter-spacing:.8px; text-transform:uppercase; }
 
     .tab{ margin:10px; padding:10px; border:1px solid #22314a; border-radius:12px; background:#101a2b; color:#9fb2d6; font-weight:bold; }
@@ -54,7 +54,7 @@
     }
     .sideBtn:hover{ background:#103146; }
 
-    .main{ margin-left:240px; height:100%; padding:12px; box-sizing:border-box; overflow-y:auto; }
+    .main{ margin-left:260px; height:100%; padding:12px; box-sizing:border-box; overflow-y:auto; }
 
     .card{ border:1px solid #22314a; border-radius:14px; padding:12px; background:#0b1220; margin-bottom:10px; }
     .card h3{ margin:0 0 8px 0; font-size:12px; letter-spacing:.8px; text-transform:uppercase; color:#9fb2d6; }
@@ -65,13 +65,123 @@
     .btn2{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(124,77,255,0.45); background:#1a1840; color:#eaf2ff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
     .btn2:hover{ background:#211f55; }
 
-    .btn:disabled, .btn2:disabled, .sideBtn:disabled{
+    .btnWarn{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(255,207,90,.45); background:#3a2a0e; color:#fff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
+    .btnWarn:hover{ background:#4a3714; }
+
+    .btnDanger{ width:100%; padding:12px; margin:8px 0; border-radius:12px; border:1px solid rgba(255,90,90,.45); background:#3a1717; color:#fff; cursor:pointer; font-weight:900; letter-spacing:.7px; text-transform:uppercase; }
+    .btnDanger:hover{ background:#502020; }
+
+    .btn:disabled, .btn2:disabled, .btnWarn:disabled, .btnDanger:disabled, .sideBtn:disabled{
       opacity:.55; cursor:not-allowed;
       filter:grayscale(35%);
     }
 
     .field{ width:100%; padding:12px; border-radius:12px; border:1px solid #22314a; background:#070b12; color:#eaf2ff; outline:none; box-sizing:border-box; font-size:16px; }
     .note{ color:#9fb2d6; font-size:11px; line-height:1.35; }
+
+    .banner{
+      display:none;
+      margin-bottom:10px;
+      border-radius:14px;
+      padding:12px;
+      border:1px solid rgba(0,229,255,0.35);
+      background:#0d2234;
+      color:#eaf7ff;
+    }
+    .banner.warn{
+      border-color:rgba(255,207,90,.35);
+      background:#2c2512;
+      color:#fff0c5;
+    }
+    .banner.danger{
+      border-color:rgba(255,90,90,.35);
+      background:#2f171b;
+      color:#ffd9df;
+    }
+    .banner .title{ font-weight:900; margin-bottom:6px; }
+    .banner .actions{ margin-top:10px; }
+
+    .miniBtn{
+      display:inline-block;
+      padding:8px 10px;
+      margin-right:8px;
+      margin-top:6px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:#13253d;
+      color:#fff;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+    }
+    .miniBtn:hover{ background:#183050; }
+
+    .pollOption{
+      display:block;
+      width:100%;
+      text-align:left;
+      margin-top:8px;
+      padding:10px;
+      border:1px solid #22314a;
+      border-radius:10px;
+      background:#101a2b;
+      color:#eaf2ff;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .pollOption:hover{ background:#16253d; }
+    .pollMeta{ font-size:12px; color:#9fb2d6; margin-top:8px; }
+
+    .listBox{
+      border:1px solid #22314a;
+      border-radius:12px;
+      background:#09111d;
+      padding:10px;
+      max-height:180px;
+      overflow:auto;
+      font-family:Consolas, monospace;
+      font-size:12px;
+      color:#d7e8ff;
+    }
+
+    .overlay{
+      display:none;
+      position:fixed;
+      left:0; top:0; right:0; bottom:0;
+      background:rgba(0,0,0,.68);
+      z-index:9999;
+    }
+    .modal{
+      width:640px;
+      max-width:calc(100% - 40px);
+      margin:70px auto 0 auto;
+      border:1px solid #22314a;
+      border-radius:18px;
+      background:#0f1726;
+      box-shadow:0 0 30px rgba(0,0,0,.45);
+      padding:16px;
+    }
+    .modal h2{
+      margin:0 0 8px 0;
+      color:#00e5ff;
+      font-size:20px;
+    }
+    .modal .body{
+      color:#dbe8ff;
+      line-height:1.45;
+      white-space:pre-wrap;
+      font-size:14px;
+    }
+    .modal .btnRow{
+      margin-top:14px;
+      text-align:right;
+    }
+    .modal .btnRow button{
+      width:auto;
+      min-width:140px;
+      display:inline-block;
+      margin-left:8px;
+    }
   </style>
 
   <script language="JScript">
@@ -80,6 +190,15 @@
   function joinParts(a){ return String(a||[]).split(",").join(""); }
   function b64(s){ try{ return window.atob(String(s||"")); }catch(e){ return ""; } }
   function dec(parts){ return b64(joinParts(parts)); }
+  function escHtml(s){
+    s = String(s == null ? "" : s);
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function nowSec(){ return Math.floor((new Date().getTime())/1000); }
+  function escJs(s){
+    s = String(s||"");
+    return s.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  }
 
   function alertOffline(){ alert("API offline"); }
   function alertInvalid(){ alert("Invalid Key"); }
@@ -94,23 +213,14 @@
   var fs = new ActiveXObject("Scripting.FileSystemObject");
 
   var API_BASE = dec(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t"]);
-  var VERSION_URL = dec(["aHR0","cHM6","Ly9h","cGku","c2Ny","aXB0","bm92","YWEu","Y29t","LzEy","MzQv","dmVy","c2lv","bi50","eHQ="]);
-  var SUPPORT_EMAIL = dec(["Z29t","ZWdh","YXNz","aXN0","QGdt","YWls","LmNv","bQ=="]);
-  var DISCORD_URL = dec(["aHR0","cHM6","Ly9k","aXNj","b3Jk","Lmdn","L2dz","Y0dU","TVZz","V0U="]);
+  var END_BOOTSTRAP = "/api/bootstrap";
 
   var Q_CPU  = dec(["U0VM","RUNU","IFBy","b2Nl","c3Nv","cklk","IEZS","T00g","V2lu","MzJf","UHJv","Y2Vz","c29y"]);
   var Q_BIOS = dec(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0JJ","T1M="]);
   var Q_BRD  = dec(["U0VM","RUNU","IFNl","cmlh","bE51","bWJl","ciBG","Uk9N","IFdp","bjMy","X0Jh","c2VC","b2Fy","ZA=="]);
   var REG_GUID = dec(["SEtF","WV9M","T0NB","TF9N","QUNI","SU5F","XFNP","RlRX","QVJF","XE1p","Y3Jv","c29m","dFxD","cnlw","dG9n","cmFw","aHlc","TWFj","aGlu","ZUd1","aWQ="]);
 
-  var END_CHECK  = "/api/check";
-  var END_VERIFY = "/api/verify";
-  var END_UI     = "/api/ui";
-  var END_LAUNCH = "/api/launch";
-  var END_PING   = "/api/ping";
-  var END_END    = "/api/end";
-
-  var REQUIRED_VERSION = "v13.13.15";
+  var DEFAULT_REQUIRED_VERSION = "v13.13.15";
 
   var state = {
     versionOk:false,
@@ -121,13 +231,44 @@
     pingTimer:null,
     expireTimer:null,
     clientId:"",
-    hwid:""
+    hwid:"",
+    localState:null,
+    bootstrap:null,
+    endpoints:{
+      check:"/api/check",
+      verify:"/api/verify",
+      ui:"/api/ui",
+      launch:"/api/launch",
+      ping:"/api/ping",
+      end:"/api/end"
+    },
+    support:{
+      email:"gomegaassist@gmail.com",
+      discordUrl:"https://discord.gg/gscGTMVsWE"
+    },
+    version:{
+      required:DEFAULT_REQUIRED_VERSION,
+      downloadUrl:"https://scriptnovaa.com/download"
+    },
+    ui:{
+      banner:null,
+      modal:null,
+      poll:null,
+      cleanupPrompt:null,
+      quickLinks:[],
+      submitUrl:""
+    },
+    runtimeMessageShown:{},
+    currentModalId:"",
+    pollVoted:false
   };
 
-  function setStatus(x){ try{ document.getElementById("licenseStatus").innerText = x; }catch(e){} }
+  function $(id){ return document.getElementById(id); }
+
+  function setStatus(x){ try{ $("licenseStatus").innerText = x; }catch(e){} }
   function setClientBadge(x){
     try{
-      var el = document.getElementById("clientBadge");
+      var el = $("clientBadge");
       if(!el) return;
       x = String(x||"");
       if(x.length>=10) el.innerText = "Client: " + x.substring(0,6) + "…" + x.substring(x.length-4);
@@ -135,13 +276,20 @@
       else el.innerText = "Client: none";
     }catch(e){}
   }
+  function setFeedBadge(x){
+    try{
+      var el = $("feedBadge");
+      if(!el) return;
+      el.innerText = x;
+    }catch(e){}
+  }
   function lockUi(enabled){
-    try{document.getElementById("btnSave").disabled=!enabled;}catch(e){}
-    try{document.getElementById("btnVerify").disabled=!enabled;}catch(e){}
-    try{document.getElementById("btnLaunch").disabled=!enabled;}catch(e){}
-    try{document.getElementById("btnDiscord").disabled=!enabled;}catch(e){}
-    try{document.getElementById("licenseKey").disabled=!enabled;}catch(e){}
-    try{document.getElementById("startUrl").disabled=!enabled;}catch(e){}
+    try{$("btnSave").disabled=!enabled;}catch(e){}
+    try{$("btnVerify").disabled=!enabled;}catch(e){}
+    try{$("btnLaunch").disabled=!enabled;}catch(e){}
+    try{$("btnDiscord").disabled=!enabled;}catch(e){}
+    try{$("licenseKey").disabled=!enabled;}catch(e){}
+    try{$("startUrl").disabled=!enabled;}catch(e){}
   }
 
   function appDir(){
@@ -151,6 +299,7 @@
   }
   function licensePath(){ return appDir() + "\\license.txt"; }
   function clientPath(){ return appDir() + "\\clientid.txt"; }
+  function statePath(){ return appDir() + "\\launcher_state.json"; }
 
   function writeFile(p,txt){
     try{
@@ -167,6 +316,26 @@
       f.Close();
       return tr(s);
     }catch(e){ return ""; }
+  }
+
+  function loadLocalState(){
+    var s = readFile(statePath());
+    if(!s){
+      state.localState = { dismissed:{}, polls:{}, cleanupHandled:{} };
+      return;
+    }
+    try{
+      state.localState = JSON.parse(s);
+      if(!state.localState || typeof state.localState !== "object") throw new Error("bad");
+      if(!state.localState.dismissed) state.localState.dismissed = {};
+      if(!state.localState.polls) state.localState.polls = {};
+      if(!state.localState.cleanupHandled) state.localState.cleanupHandled = {};
+    }catch(e){
+      state.localState = { dismissed:{}, polls:{}, cleanupHandled:{} };
+    }
+  }
+  function saveLocalState(){
+    try{ writeFile(statePath(), JSON.stringify(state.localState||{})); }catch(e){}
   }
 
   function validClientId(s){
@@ -246,13 +415,70 @@
     return { s:h.status, t:h.responseText };
   }
 
+  function mergeBootstrap(d){
+    if(!d) return;
+    state.bootstrap = d;
+
+    if(d.version){
+      state.version.required = String(d.version.required || DEFAULT_REQUIRED_VERSION);
+      state.version.downloadUrl = String(d.version.downloadUrl || "https://scriptnovaa.com/download");
+    }
+
+    if(d.support){
+      state.support.email = String(d.support.email || state.support.email);
+      state.support.discordUrl = String(d.support.discordUrl || state.support.discordUrl);
+    }
+
+    if(d.endpoints){
+      if(d.endpoints.check) state.endpoints.check = String(d.endpoints.check);
+      if(d.endpoints.verify) state.endpoints.verify = String(d.endpoints.verify);
+      if(d.endpoints.ui) state.endpoints.ui = String(d.endpoints.ui);
+      if(d.endpoints.launch) state.endpoints.launch = String(d.endpoints.launch);
+      if(d.endpoints.ping) state.endpoints.ping = String(d.endpoints.ping);
+      if(d.endpoints.end) state.endpoints.end = String(d.endpoints.end);
+    }
+
+    if(d.launcher && d.launcher.defaultStartUrl){
+      try{
+        if(!$("startUrl").value || $("startUrl").value === "https://www.guns.lol/iii_dev"){
+          $("startUrl").value = String(d.launcher.defaultStartUrl);
+        }
+      }catch(e){}
+    }
+
+    if(d.ui){
+      state.ui.banner = d.ui.banner || null;
+      state.ui.modal = d.ui.modal || null;
+      state.ui.poll = d.ui.poll || null;
+      state.ui.cleanupPrompt = d.ui.cleanupPrompt || null;
+      state.ui.quickLinks = d.ui.quickLinks || [];
+      state.ui.submitUrl = String(d.ui.submitUrl || "");
+    }
+
+    try{ $("supportEmail").innerText = state.support.email; }catch(e){}
+    try{ $("supportDiscord").innerText = state.support.discordUrl; }catch(e){}
+  }
+
+  function fetchBootstrap(){
+    var u = API_BASE + END_BOOTSTRAP + "?cid=" + encodeURIComponent(state.clientId || "");
+    var r = httpGet(u);
+    if(r.s !== 200) return null;
+    var d = null;
+    try{ d = JSON.parse(r.t); }catch(e){ d = null; }
+    if(!d || d.ok !== true) return null;
+    return d;
+  }
+
   function checkVersion(){
     state.versionOk = false;
     lockUi(false);
-    var r = httpGet(VERSION_URL);
-    if(r.s !== 200){ alertOffline(); alertUpdate(); return false; }
-    var rv = tr(r.t||"");
-    if(rv !== REQUIRED_VERSION){ alertUpdate(); return false; }
+
+    var required = String(state.version.required || DEFAULT_REQUIRED_VERSION);
+    if(required !== DEFAULT_REQUIRED_VERSION){
+      alertUpdate();
+      return false;
+    }
+
     state.versionOk = true;
     lockUi(true);
     return true;
@@ -269,7 +495,7 @@
 
   function saveLocalKey(){
     if(!state.versionOk){ alertUpdate(); return; }
-    var k = tr(document.getElementById("licenseKey").value);
+    var k = tr($("licenseKey").value);
     if(!k){ alertInvalid(); return; }
     writeFile(licensePath(), k);
     setStatus("Key saved (not started)");
@@ -279,9 +505,9 @@
 
   function checkKeyNoSession(){
     if(!state.versionOk){ alertUpdate(); return; }
-    var k = tr(document.getElementById("licenseKey").value);
+    var k = tr($("licenseKey").value);
     if(!k){ alertInvalid(); return; }
-    var r = httpGet(API_BASE + END_CHECK + "?license=" + encodeURIComponent(k));
+    var r = httpGet(API_BASE + state.endpoints.check + "?license=" + encodeURIComponent(k));
     if(r.s !== 200){ alertOffline(); return; }
     var d = null; try{ d = JSON.parse(r.t); }catch(e){ d = null; }
     if(!d || d.ok !== true){ setStatus("Invalid key"); alertInvalid(); return; }
@@ -293,11 +519,11 @@
     if(!validClientId(state.clientId)) ensureClientId();
     state.hwid = buildHwid();
 
-    var k = tr(document.getElementById("licenseKey").value);
+    var k = tr($("licenseKey").value);
     if(!k) return {ok:false,m:"invalid_key"};
     if(!state.hwid || state.hwid.length<8) return {ok:false,m:"bad_hwid"};
 
-    var r = httpPost(API_BASE + END_VERIFY, {
+    var r = httpPost(API_BASE + state.endpoints.verify, {
       license:k,
       clientId:String(state.clientId),
       hwid:String(state.hwid)
@@ -328,7 +554,7 @@
   }
 
   function getUiChallenge(){
-    var r = httpGet(API_BASE + END_UI + "?token=" + encodeURIComponent(state.token) + "&cid=" + encodeURIComponent(state.clientId));
+    var r = httpGet(API_BASE + state.endpoints.ui + "?token=" + encodeURIComponent(state.token) + "&cid=" + encodeURIComponent(state.clientId));
     if(r.s !== 200){
       var j = null; try{ j = JSON.parse(r.t); }catch(e){ j = null; }
       return {ok:false,e:(j && j.error ? j.error : "ui_failed")};
@@ -341,7 +567,7 @@
   }
 
   function getLaunchBundle(u, ui){
-    var r = httpPost(API_BASE + END_LAUNCH, {
+    var r = httpPost(API_BASE + state.endpoints.launch, {
       token: state.token,
       clientId: state.clientId,
       startUrl: u,
@@ -410,12 +636,11 @@
   function pingOnce(){
     if(!state.token) return;
     try{
-      var r = httpPost(API_BASE + END_PING, {token:state.token, clientId:state.clientId});
+      var r = httpPost(API_BASE + state.endpoints.ping, {token:state.token, clientId:state.clientId});
       var d = null;
       try{ d = JSON.parse(r.t); }catch(e){ d = null; }
 
       if(r.s === 200 && d && d.ok === true) return;
-
       handleSessionEnded((d && d.error ? d.error : "ping_failed"), true);
     }catch(e){
       if(state.token) setStatus("Session heartbeat issue");
@@ -426,7 +651,7 @@
   function endSession(){
     if(!state.token) return;
     clearSessionTimers();
-    try{ httpPost(API_BASE + END_END, {token:state.token, clientId:state.clientId}); }catch(e){}
+    try{ httpPost(API_BASE + state.endpoints.end, {token:state.token, clientId:state.clientId}); }catch(e){}
   }
 
   function armExpiry(){
@@ -483,14 +708,12 @@
   function buildArgs(flags, url){
     var parts = [];
     var i=0;
-
     for(i=0;i<flags.length;i++){
       var x = normFlag(flags[i]);
       if(!x) continue;
       x = fixUserAgent(x);
       parts.push(x);
     }
-
     parts.push("--new-window");
     parts.push(q(url));
     return parts.join(" ");
@@ -540,7 +763,7 @@
   function doLaunch(){
     if(!state.versionOk){ alertUpdate(); return; }
 
-    var u = tr(document.getElementById("startUrl").value);
+    var u = tr($("startUrl").value);
     if(!u) u = "https://example.com";
     if(!safeUrl(u)){ alertApi("unsafe_url"); return; }
 
@@ -589,23 +812,448 @@
 
   function setDiscordUrl(){
     if(!state.versionOk){ alertUpdate(); return; }
-    try{ document.getElementById("startUrl").value = DISCORD_URL; }catch(e){}
+    try{ $("startUrl").value = state.support.discordUrl; }catch(e){}
+  }
+
+  function currentExePathGuess(){
+    try{
+      var p = String(document.location.pathname || "");
+      p = p.replace(/\//g,"\\");
+      if(p.indexOf("\\")===0 && /^[\\][A-Za-z][:]/.test(p)) p = p.substring(1);
+      p = decodeURIComponent(p);
+      return tr(p);
+    }catch(e){
+      return "";
+    }
+  }
+
+  function readTextFileSafe(p){
+    try{
+      var f = fs.OpenTextFile(p,1,false);
+      var s = f.ReadAll();
+      f.Close();
+      return String(s||"");
+    }catch(e){
+      return "";
+    }
+  }
+
+  function isScriptNovaOldHta(content){
+    content = String(content||"");
+    var matches = 0;
+    if(content.indexOf("ScriptNova") !== -1) matches++;
+    if(content.indexOf("Hardware Suite") !== -1) matches++;
+    if(content.indexOf("Browser Launcher") !== -1) matches++;
+    if(content.indexOf("api.scriptnovaa.com") !== -1) matches++;
+    if(content.indexOf("scriptnovaa.com") !== -1) matches++;
+    if(content.indexOf("gomegaassist@gmail.com") !== -1) matches++;
+    if(content.indexOf("discord.gg/gscGTMVsWE") !== -1) matches++;
+    if(content.indexOf("--dns-over-https-templates=") !== -1) matches++;
+    if(content.indexOf("--user-agent=") !== -1) matches++;
+    if(content.indexOf("--disable-extensions") !== -1) matches++;
+    if(content.indexOf("applicationname=\"ScriptNova\"") !== -1) matches++;
+    return matches >= 2;
+  }
+
+  function getKnownFoldersForCleanup(){
+    var arr = [];
+    try{ arr.push(sh.SpecialFolders("Desktop")); }catch(e){}
+    try{ arr.push(sh.SpecialFolders("DesktopDirectory")); }catch(e){}
+    try{ arr.push(sh.ExpandEnvironmentStrings("%USERPROFILE%") + "\\Downloads"); }catch(e){}
+    return arr;
+  }
+
+  function uniqueArr(a){
+    var out = [], seen = {}, i, v;
+    for(i=0;i<a.length;i++){
+      v = String(a[i]||"");
+      if(!v) continue;
+      if(seen[v]) continue;
+      seen[v] = true;
+      out.push(v);
+    }
+    return out;
+  }
+
+  function scanOldScriptNovaHtas(){
+    var folders = uniqueArr(getKnownFoldersForCleanup());
+    var current = currentExePathGuess().toLowerCase();
+    var found = [];
+    var i, fld, files, en, f, path, content;
+    for(i=0;i<folders.length;i++){
+      fld = String(folders[i]||"");
+      if(!fld) continue;
+      try{
+        if(!fs.FolderExists(fld)) continue;
+        files = fs.GetFolder(fld).Files;
+        en = new Enumerator(files);
+        for(; !en.atEnd(); en.moveNext()){
+          f = en.item();
+          path = String(f.Path || "");
+          if(!path) continue;
+          if(path.toLowerCase().indexOf(".hta") !== path.toLowerCase().length - 4) continue;
+          if(current && path.toLowerCase() === current) continue;
+          content = readTextFileSafe(path);
+          if(!content) continue;
+          if(isScriptNovaOldHta(content)){
+            found.push(path);
+          }
+        }
+      }catch(e){}
+    }
+    return uniqueArr(found);
+  }
+
+  function renderCleanupResults(files){
+    var html = "";
+    var i;
+    if(!files || !files.length){
+      html = '<div class="note">No old ScriptNova HTA files found in Desktop or Downloads.</div>';
+    } else {
+      html = '<div class="note">Found old ScriptNova launcher copies:</div><div class="listBox">';
+      for(i=0;i<files.length;i++) html += escHtml(files[i]) + '<br>';
+      html += '</div>';
+    }
+    try{ $("cleanupResults").innerHTML = html; }catch(e){}
+  }
+
+  function deleteListedFiles(files){
+    var deleted = 0, failed = 0, i, p;
+    for(i=0;i<files.length;i++){
+      p = String(files[i]||"");
+      if(!p) continue;
+      try{
+        if(fs.FileExists(p)){
+          fs.DeleteFile(p, true);
+          deleted++;
+        }
+      }catch(e){
+        failed++;
+      }
+    }
+    return {deleted:deleted, failed:failed};
+  }
+
+  function markDismissed(id){
+    if(!id) return;
+    state.localState.dismissed[String(id)] = nowSec();
+    saveLocalState();
+  }
+
+  function isDismissed(id){
+    if(!id) return false;
+    return !!state.localState.dismissed[String(id)];
+  }
+
+  function markCleanupHandled(forceOnce){
+    forceOnce = String(forceOnce || "");
+    if(!forceOnce) return;
+    state.localState.cleanupHandled[forceOnce] = nowSec();
+    saveLocalState();
+  }
+
+  function cleanupHandled(forceOnce){
+    forceOnce = String(forceOnce || "");
+    if(!forceOnce) return false;
+    return !!state.localState.cleanupHandled[forceOnce];
+  }
+
+  function submitRemoteEvent(kind, payload){
+    try{
+      if(!state.ui.submitUrl) return false;
+      var body = {
+        kind:String(kind||""),
+        clientId:String(state.clientId||""),
+        hwid:String(state.hwid||""),
+        version:String(state.version.required || DEFAULT_REQUIRED_VERSION),
+        data: payload || {}
+      };
+      var r = httpPost(API_BASE + String(state.ui.submitUrl), body);
+      return r.s === 200;
+    }catch(e){
+      return false;
+    }
+  }
+
+  function showBanner(title, text, mode, id, dismissable){
+    try{
+      var el = $("topBanner");
+      if(!el) return;
+      el.className = "banner";
+      if(mode==="warn") el.className += " warn";
+      else if(mode==="danger") el.className += " danger";
+      var h = '<div class="title">' + escHtml(title || "Message") + '</div>' +
+              '<div>' + escHtml(text || "") + '</div>';
+      if(dismissable && id){
+        h += '<div class="actions"><button class="miniBtn" onclick="DismissRemoteBanner(\'' + escJs(id) + '\')">Dismiss</button></div>';
+      }
+      el.innerHTML = h;
+      el.style.display = "block";
+    }catch(e){}
+  }
+
+  function hideBanner(){
+    try{
+      var el = $("topBanner");
+      if(el){ el.style.display = "none"; el.innerHTML = ""; }
+    }catch(e){}
+  }
+
+  function showModal(id, title, body, buttons){
+    try{
+      state.currentModalId = String(id||"");
+      $("modalTitle").innerHTML = escHtml(title||"Message");
+      $("modalBody").innerHTML = escHtml(body||"").replace(/\n/g,"<br>");
+
+      var html = "";
+      if(buttons && buttons.length){
+        var i=0;
+        for(i=0;i<buttons.length;i++){
+          var b = buttons[i] || {};
+          var label = String(b.label || ("Button " + (i+1)));
+          var action = String(b.action || "dismiss");
+          var extra = String(b.value || "");
+          html += '<button class="' + (b.danger ? 'btnDanger' : (b.warn ? 'btnWarn' : 'btn2')) + '" onclick="HandleModalButton(\'' + escJs(action) + '\',\'' + escJs(extra) + '\')">' + escHtml(label) + '</button>';
+        }
+      } else {
+        html = '<button class="btn2" onclick="HandleModalButton(\'dismiss\',\'\')">Dismiss</button>';
+      }
+      $("modalButtons").innerHTML = html;
+      $("overlay").style.display = "block";
+    }catch(e){}
+  }
+
+  function hideModal(){
+    try{
+      $("overlay").style.display = "none";
+      state.currentModalId = "";
+    }catch(e){}
+  }
+
+  function renderQuickLinks(){
+    var box = $("quickLinksBox");
+    if(!box) return;
+    if(!state.ui.quickLinks || !state.ui.quickLinks.length){
+      box.innerHTML = '<div class="note">No remote quick links.</div>';
+      return;
+    }
+    var html = "", i, q;
+    for(i=0;i<state.ui.quickLinks.length;i++){
+      q = state.ui.quickLinks[i] || {};
+      html += '<button class="sideBtn" onclick="ApplyQuickLink(\'' + escJs(String(q.url||"")) + '\')">' + escHtml(String(q.label||("Link " + (i+1)))) + '</button>';
+    }
+    box.innerHTML = html;
+  }
+
+  function renderPoll(){
+    var card = $("pollCard");
+    var title = $("pollTitle");
+    var body = $("pollBody");
+    var meta = $("pollMeta");
+    if(!card || !title || !body || !meta) return;
+
+    if(!state.ui.poll || !state.ui.poll.enabled){
+      card.style.display = "none";
+      return;
+    }
+
+    var poll = state.ui.poll || {};
+    var pollId = String(poll.id || "default_poll");
+    title.innerText = String(poll.question || "Poll");
+    var html = "";
+    var voted = state.localState.polls[pollId];
+    var i, opts = poll.options || [];
+    for(i=0;i<opts.length;i++){
+      var opt = String(opts[i] || "");
+      if(!opt) continue;
+      html += '<button class="pollOption" ' + (voted ? 'disabled="disabled"' : '') + ' onclick="VotePoll(\'' + escJs(pollId) + '\',\'' + escJs(opt) + '\')">' + escHtml(opt) + '</button>';
+    }
+    body.innerHTML = html || '<div class="note">No options.</div>';
+    meta.innerHTML = voted ? ('You voted: <b>' + escHtml(voted) + '</b>') : ('Choose one answer.');
+    card.style.display = "block";
+  }
+
+  function renderRemoteUi(){
+    setFeedBadge(state.bootstrap ? "Feed: bootstrap" : "Feed: none");
+
+    renderQuickLinks();
+    renderPoll();
+
+    if(state.ui.banner && state.ui.banner.enabled && !isDismissed(state.ui.banner.id)){
+      showBanner(
+        state.ui.banner.title || "Message",
+        state.ui.banner.text || "",
+        state.ui.banner.mode || "",
+        state.ui.banner.id || "",
+        !!state.ui.banner.dismissable
+      );
+    } else {
+      hideBanner();
+    }
+
+    if(state.ui.modal && state.ui.modal.enabled && !isDismissed(state.ui.modal.id) && !state.runtimeMessageShown[String(state.ui.modal.id||"")]){
+      state.runtimeMessageShown[String(state.ui.modal.id||"")] = true;
+      showModal(
+        state.ui.modal.id || "",
+        state.ui.modal.title || "Message",
+        state.ui.modal.text || "",
+        state.ui.modal.buttons || []
+      );
+    }
+
+    maybeHandleCleanupPrompt();
+  }
+
+  function maybeHandleCleanupPrompt(){
+    if(!state.ui.cleanupPrompt || !state.ui.cleanupPrompt.enabled) return;
+    var cp = state.ui.cleanupPrompt || {};
+    var forceOnce = String(cp.forceOnce || "");
+    if(forceOnce && cleanupHandled(forceOnce)) return;
+
+    var msg = String(cp.message || "Owner recommends removing outdated ScriptNova launcher copies from Desktop and Downloads.");
+    var files = scanOldScriptNovaHtas();
+    renderCleanupResults(files);
+
+    if(!files.length){
+      if(forceOnce) markCleanupHandled(forceOnce);
+      return;
+    }
+
+    showModal(
+      "cleanup_prompt_" + forceOnce,
+      "Old ScriptNova Launchers Found",
+      msg + "\n\nFound " + files.length + " old ScriptNova HTA file(s). Open System Center to review them. You can remove them now or later.",
+      [
+        { label:"Open System Center", action:"open_cleanup", value:"" },
+        { label:"Not Now", action:"dismiss_cleanup", value:forceOnce, warn:true }
+      ]
+    );
+  }
+
+  function applyQuickLink(url){
+    if(!safeUrl(url)){ alertApi("unsafe_quick_link"); return; }
+    try{ $("startUrl").value = url; }catch(e){}
+  }
+
+  function dismissRemoteBanner(id){
+    markDismissed(id);
+    hideBanner();
+    submitRemoteEvent("dismiss_banner", { id:String(id||"") });
+  }
+
+  function votePoll(pollId, value){
+    pollId = String(pollId||"");
+    value = String(value||"");
+    if(!pollId || !value) return;
+    if(state.localState.polls[pollId]) return;
+    state.localState.polls[pollId] = value;
+    saveLocalState();
+    submitRemoteEvent("poll_vote", { pollId:pollId, value:value });
+    renderPoll();
+    alert("Vote submitted: " + value);
+  }
+
+  function handleModalButton(action, value){
+    action = String(action||"");
+    value = String(value||"");
+
+    if(action === "dismiss" || action === "dismiss_permanent"){
+      if(state.currentModalId) markDismissed(state.currentModalId);
+      hideModal();
+      return;
+    }
+
+    if(action === "open_cleanup"){
+      hideModal();
+      try{ $("systemCenterCard").scrollIntoView(); }catch(e){}
+      return;
+    }
+
+    if(action === "dismiss_cleanup"){
+      if(value) markCleanupHandled(value);
+      hideModal();
+      return;
+    }
+
+    if(action === "set_url"){
+      if(safeUrl(value)){
+        try{ $("startUrl").value = value; }catch(e){}
+      }
+      hideModal();
+      return;
+    }
+
+    if(action === "open_url"){
+      if(safeUrl(value)){
+        try{ sh.Run('cmd /c start "" "' + value + '"', 0, false); }catch(e){}
+      }
+      hideModal();
+      return;
+    }
+
+    if(action === "end_session"){
+      try{ endSession(); }catch(e){}
+      hideModal();
+      return;
+    }
+
+    hideModal();
+  }
+
+  function runCleanupNow(){
+    var files = scanOldScriptNovaHtas();
+    renderCleanupResults(files);
+    if(!files.length){
+      alert("No old ScriptNova HTA files found.");
+      return;
+    }
+    if(!confirm("Delete " + files.length + " old ScriptNova HTA file(s) from Desktop/Downloads?")) return;
+    var r = deleteListedFiles(files);
+    renderCleanupResults(scanOldScriptNovaHtas());
+    alert("Cleanup finished. Deleted: " + r.deleted + " Failed: " + r.failed);
+    submitRemoteEvent("cleanup_run", { deleted:r.deleted, failed:r.failed });
+  }
+
+  function loadRuntimeStatus(){
+    try{
+      $("runtimeInfo").innerHTML =
+        '<div class="note">' +
+        'Version: <b>' + escHtml(String(state.version.required || DEFAULT_REQUIRED_VERSION)) + '</b><br>' +
+        'Client: <b>' + escHtml(state.clientId || "none") + '</b><br>' +
+        'Session Plan: <b>' + escHtml(state.plan || "none") + '</b><br>' +
+        'Session Active: <b>' + escHtml(state.token ? "yes" : "no") + '</b>' +
+        '</div>';
+    }catch(e){}
+  }
+
+  function refreshBootstrap(){
+    var boot = fetchBootstrap();
+    if(boot) mergeBootstrap(boot);
+    renderRemoteUi();
+    loadRuntimeStatus();
   }
 
   function init(){
+    loadLocalState();
     ensureClientId();
     state.hwid = buildHwid();
 
-    try{ document.getElementById("supportEmail").innerText = SUPPORT_EMAIL; }catch(e){}
-    try{ document.getElementById("supportDiscord").innerText = DISCORD_URL; }catch(e){}
+    try{ $("supportEmail").innerText = state.support.email; }catch(e){}
+    try{ $("supportDiscord").innerText = state.support.discordUrl; }catch(e){}
 
     var saved = loadLocalKey();
-    if(saved) document.getElementById("licenseKey").value = saved;
+    if(saved) $("licenseKey").value = saved;
+
+    var boot = fetchBootstrap();
+    if(boot) mergeBootstrap(boot);
 
     checkVersion();
 
     if(state.versionOk) setStatus(saved ? "Key saved (not started)" : "No key");
     else setStatus("Update required");
+
+    renderRemoteUi();
+    loadRuntimeStatus();
   }
 
   window.SaveLicenseLocal = saveLocalKey;
@@ -614,11 +1262,25 @@
   window.CleanupOnExit = function(){ try{ endSession(); }catch(e){} try{ killChrome(); }catch(e2){} };
   window.SetDiscordAsStartupUrl = setDiscordUrl;
   window.InitApp = init;
+  window.RunCleanupNow = runCleanupNow;
+  window.DismissRemoteBanner = dismissRemoteBanner;
+  window.VotePoll = votePoll;
+  window.HandleModalButton = handleModalButton;
+  window.ApplyQuickLink = applyQuickLink;
+  window.RefreshBootstrap = refreshBootstrap;
 })();
   </script>
 </head>
 
 <body onload="InitApp()" onbeforeunload="CleanupOnExit()">
+  <div id="overlay" class="overlay">
+    <div class="modal">
+      <h2 id="modalTitle">Message</h2>
+      <div id="modalBody" class="body">—</div>
+      <div id="modalButtons" class="btnRow"></div>
+    </div>
+  </div>
+
   <div class="wrap">
     <div class="topbar">
       <div class="brandRow">
@@ -628,6 +1290,7 @@
         </div>
         <div class="brandRight">
           <span id="clientBadge" class="subpill">Client: …</span>
+          <span id="feedBadge" class="subpill">Feed: …</span>
           <span id="licenseStatus" class="pill">No key</span>
         </div>
       </div>
@@ -648,9 +1311,23 @@
 
           <button id="btnDiscord" class="sideBtn" onclick="SetDiscordAsStartupUrl()">ADD AS STARTUP URL</button>
         </div>
+
+        <div class="sideCard">
+          <h4>System Center</h4>
+          <div id="runtimeInfo" class="sideLine">—</div>
+          <button class="sideBtn" onclick="RefreshBootstrap()">REFRESH REMOTE UI</button>
+          <button class="sideBtn" onclick="RunCleanupNow()">CLEAN OLD SCRIPTNOVA HTAS</button>
+        </div>
+
+        <div class="sideCard">
+          <h4>Quick Links</h4>
+          <div id="quickLinksBox" class="sideLine">No remote quick links.</div>
+        </div>
       </div>
 
       <div class="main">
+        <div id="topBanner" class="banner"></div>
+
         <div class="card">
           <h3>License Key</h3>
           <input id="licenseKey" class="field" type="text" placeholder="BASIC-xxxx or PRO-xxxx or FREE-xxxx"/>
@@ -665,6 +1342,23 @@
         </div>
 
         <button id="btnLaunch" class="btn" onclick="Launch()">LAUNCH BROWSER ENGINE</button>
+
+        <div id="systemCenterCard" class="card">
+          <h3>System Center</h3>
+          <div class="note">This section is now driven by bootstrap data and is ready for future admin messages, polls, links, and cleanup prompts.</div>
+
+          <div id="pollCard" class="card" style="display:none; margin-top:10px;">
+            <h3 id="pollTitle">Poll</h3>
+            <div id="pollBody"></div>
+            <div id="pollMeta" class="pollMeta"></div>
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <h3>Cleanup Results</h3>
+            <div id="cleanupResults" class="note">No cleanup scan run yet.</div>
+            <button class="btnWarn" onclick="RunCleanupNow()">SCAN + DELETE OLD SCRIPTNOVA HTAS</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
