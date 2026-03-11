@@ -25,12 +25,18 @@
     }
 
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:linear-gradient(180deg,#07111d 0%,#091726 100%);color:var(--text);font-family:Segoe UI,Arial,sans-serif}
+    html,body{
+      margin:0;
+      padding:0;
+      background:linear-gradient(180deg,#07111d 0%,#091726 100%);
+      color:var(--text);
+      font-family:Segoe UI,Arial,sans-serif
+    }
     a{color:var(--cyan2);text-decoration:none}
     button,input,select,textarea{font:inherit}
     .hidden{display:none !important}
 
-    .shell{max-width:1500px;margin:0 auto;padding:18px}
+    .shell{max-width:1600px;margin:0 auto;padding:18px}
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:16px;
       padding:16px 18px;margin-bottom:16px;border:1px solid var(--line);
@@ -57,19 +63,23 @@
       display:flex;align-items:center;justify-content:center
     }
     .loginCard{
-      width:min(520px,95vw);background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
+      width:min(560px,95vw);background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
       border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)
     }
     .loginCard h1{margin:0 0 8px;font-size:28px}
     .loginCard p{margin:0 0 18px;color:var(--muted);line-height:1.45}
+
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
     .fieldWrap{margin-bottom:12px}
     .label{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:8px;text-transform:uppercase}
     .field,.select,.text{
       width:100%;background:#09111d;border:1px solid var(--line);color:#fff;border-radius:14px;padding:12px 14px;outline:none
     }
     .field:focus,.select:focus,.text:focus{border-color:rgba(0,229,255,.4);box-shadow:0 0 0 3px rgba(0,229,255,.08)}
-    .text{min-height:100px;resize:vertical}
+    .text{min-height:110px;resize:vertical}
+    .text.small{min-height:72px}
     .btn{
       border:1px solid rgba(0,229,255,.34);background:linear-gradient(180deg,#0f3042 0%,#0d2537 100%);
       color:#fff;padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:900;letter-spacing:.4px
@@ -101,9 +111,7 @@
       opacity:.55;cursor:not-allowed;filter:grayscale(25%)
     }
 
-    .app{
-      display:grid;grid-template-columns:280px 1fr;gap:16px
-    }
+    .app{display:grid;grid-template-columns:300px 1fr;gap:16px}
     .sidebar{
       border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,#0c1728 0%,#0b1524 100%);
       padding:14px;box-shadow:var(--shadow);height:calc(100vh - 112px);position:sticky;top:18px;overflow:auto
@@ -127,9 +135,7 @@
     .sectionHead h2{margin:0 0 8px;font-size:24px}
     .sectionHead p{margin:0;color:var(--muted)}
 
-    .cards{
-      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px
-    }
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
     .card{
       border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
       padding:16px;box-shadow:var(--shadow)
@@ -167,10 +173,7 @@
     .success{
       padding:12px 14px;border-radius:14px;border:1px solid rgba(41,227,138,.32);background:#12271d;color:#d6ffe9;margin-bottom:14px
     }
-
-    .locked{
-      position:relative;opacity:.72
-    }
+    .locked{position:relative;opacity:.72}
     .locked::after{
       content:"🔒 Locked";
       position:absolute;top:12px;right:12px;
@@ -178,16 +181,28 @@
       background:#33260f;border:1px solid rgba(255,207,90,.24);
       border-radius:999px;padding:6px 10px
     }
-
     .tag{
       display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
       background:#112236;border:1px solid var(--line);font-size:12px;font-weight:800
     }
-
     .kv{display:grid;grid-template-columns:220px 1fr;gap:10px;font-size:13px}
     .kv div:nth-child(odd){color:var(--muted)}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
     .toolbar .field,.toolbar .select{max-width:260px}
+    .miniGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .help{font-size:12px;color:var(--muted);line-height:1.45}
+    .right{margin-left:auto}
+    .spacer{height:8px}
+    .badge{
+      display:inline-block;
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#0c1d31;
+      color:#dff6ff;
+      font-size:11px;
+      font-weight:800
+    }
 
     @media (max-width:1200px){
       .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -197,7 +212,7 @@
     @media (max-width:980px){
       .app{grid-template-columns:1fr}
       .sidebar{height:auto;position:static}
-      .cols2,.cols3,.cols4,.grid2{grid-template-columns:1fr}
+      .cols2,.cols3,.cols4,.grid2,.grid3,.grid4,.miniGrid{grid-template-columns:1fr}
       .cards{grid-template-columns:1fr}
       .kv{grid-template-columns:1fr}
     }
@@ -213,537 +228,834 @@
       <div id="loginMsg" class="hidden"></div>
 
       <div class="fieldWrap">
-        <label class="label">Profile</label>
-        <select id="loginUsername" class="select">
-          <option value="Owner">Owner</option>
-          <option value="Ulises">Ulises</option>
-          <option value="Other">Other</option>
-        </select>
+        <label class="label" for="loginUsername">Username</label>
+        <input id="loginUsername" class="field" placeholder="Owner / Ulises / Other" />
       </div>
-
       <div class="fieldWrap">
-        <label class="label">Password</label>
-        <input id="loginPassword" class="field" type="password" placeholder="Enter admin password" />
+        <label class="label" for="loginPassword">Password</label>
+        <input id="loginPassword" class="field" type="password" placeholder="Password" />
       </div>
-
       <div class="grid2">
-        <button class="btn" id="btnLogin">LOGIN</button>
-        <button class="btn2" id="btnLoadDashboard">LOAD SESSION</button>
+        <button id="btnLogin" class="btn">Login</button>
+        <button id="btnLoadDashboard" class="btn2">Use Saved Session</button>
       </div>
     </div>
   </div>
 
-  <div id="appView" class="shell hidden">
-    <div class="topbar">
-      <div class="brand">
-        <div><b>ScriptNova</b> // Admin Dashboard</div>
-        <div class="sub">Owner = full control • Ulises = read-only staff • Other = health-only</div>
+  <div id="appView" class="hidden">
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div style="font-size:24px;font-weight:900"><b>ScriptNova</b> Admin Panel</div>
+          <div class="sub">Bootstrap-ready controls, sessions, keys, public launcher UI, votes, cleanup, analytics</div>
+        </div>
+        <div class="topright">
+          <div class="pill"><span class="statusdot"></span> <span id="topRole">Unknown</span></div>
+          <div class="pill">User: <span id="topUser">—</span></div>
+          <div class="pill">Build: <span id="topBuild">—</span></div>
+          <button id="refreshAll" class="logoutBtn">Refresh</button>
+          <button id="btnLogout" class="logoutBtn">Logout</button>
+        </div>
       </div>
-      <div class="topright">
-        <span id="whoami" class="pill">Not logged in</span>
-        <span id="globalStatePill" class="pill">System: Loading...</span>
-        <button class="logoutBtn" id="btnLogout">Logout</button>
-      </div>
-    </div>
 
-    <div id="globalMsg" class="hidden"></div>
+      <div id="msgBox" class="hidden"></div>
 
-    <div class="app">
-      <aside class="sidebar">
-        <div class="navTitle">Sections</div>
-        <button class="navBtn active" data-section="dashboard">Dashboard<span class="small">Health, counters, live state</span></button>
-        <button class="navBtn" data-section="sessions">Sessions<span class="small">View and end active sessions</span></button>
-        <button class="navBtn" data-section="keys">Keys<span class="small">Search, disable, custom keys</span></button>
-        <button class="navBtn" data-section="freekeys">Free Keys<span class="small">Manual add/remove/expire</span></button>
-        <button class="navBtn" data-section="launcher">Launcher Control<span class="small">Pause, version, maintenance</span></button>
-        <button class="navBtn" data-section="hwid">HWID / Devices<span class="small">Ban, inspect, suspicious</span></button>
-        <button class="navBtn" data-section="accounts">Admin Accounts<span class="small">Sessions and role visibility</span></button>
-        <button class="navBtn" data-section="config">System Config<span class="small">Defaults and global config</span></button>
-        <button class="navBtn" data-section="analytics">Analytics<span class="small">Totals and daily counts</span></button>
-        <button class="navBtn" data-section="alerts">Alerts<span class="small">Warnings and abuse signals</span></button>
-        <button class="navBtn" data-section="audit">Audit Log<span class="small">Admin activity trail</span></button>
-        <button class="navBtn" data-section="emergency">Emergency Tools<span class="small">Owner-only kill controls</span></button>
-      </aside>
+      <div class="app">
+        <div class="sidebar">
+          <div class="navTitle">Navigation</div>
 
-      <main class="content">
-        <section id="section-dashboard" class="section active">
-          <div class="sectionHead">
-            <h2>Dashboard</h2>
-            <p>API online/offline, public site state, launcher status, Redis/KV state, counters, and global switches.</p>
-          </div>
+          <button class="navBtn active" data-section="dashboard">Dashboard <span class="small">Health, counts, launcher status</span></button>
+          <button class="navBtn" data-section="sessions">Sessions <span class="small">List / end / filter active sessions</span></button>
+          <button class="navBtn" data-section="keys">Keys <span class="small">Search, custom keys, enable/disable</span></button>
+          <button class="navBtn" data-section="freekeys">Free Keys <span class="small">List, add, remove, expire all</span></button>
+          <button class="navBtn" data-section="launcher">Launcher Controls <span class="small">Pause, version, maintenance, runtime</span></button>
+          <button class="navBtn" data-section="publicui">Public Launcher UI <span class="small">Banner, modal, poll, quick links</span></button>
+          <button class="navBtn" data-section="cleanup">Cleanup Prompt <span class="small">Old HTA cleanup controls</span></button>
+          <button class="navBtn" data-section="events">Public Events / Votes <span class="small">View feed, poll results, reset</span></button>
+          <button class="navBtn" data-section="hwid">HWID Controls <span class="small">Search, ban, suspicious, disconnect</span></button>
+          <button class="navBtn" data-section="accounts">Admin Accounts <span class="small">List sessions, force logout</span></button>
+          <button class="navBtn" data-section="config">Config View <span class="small">Current runtime / bootstrap state</span></button>
+          <button class="navBtn" data-section="analytics">Analytics <span class="small">Traffic + launcher event counts</span></button>
+          <button class="navBtn" data-section="alerts">Alerts <span class="small">Recent admin / warning alerts</span></button>
+          <button class="navBtn" data-section="audit">Audit Log <span class="small">Recent admin actions</span></button>
+          <button class="navBtn" data-section="emergency">Emergency Tools <span class="small">Disable all / pause / end all</span></button>
+        </div>
 
-          <div class="toolbar">
-            <button class="btnSm" id="refreshDashboard">Refresh Dashboard</button>
-            <button class="btnSm2" id="refreshAll">Refresh Current Section</button>
-          </div>
-
-          <div class="cards">
-            <div class="card"><h3>API</h3><div id="d_api" class="metric">—</div><div class="muted">Backend service state</div></div>
-            <div class="card"><h3>Public Site</h3><div id="d_public" class="metric">—</div><div class="muted">scriptnovaa.com state</div></div>
-            <div class="card"><h3>Redis / KV</h3><div id="d_redis" class="metric">—</div><div class="muted">Storage backend state</div></div>
-            <div class="card"><h3>Launcher</h3><div id="d_launcher" class="metric">—</div><div class="muted">Paused / maintenance / version</div></div>
-          </div>
-
-          <div class="cards">
-            <div class="card"><h3>Active Sessions</h3><div id="d_sessions" class="metric">0</div></div>
-            <div class="card"><h3>Free Keys</h3><div id="d_freekeys" class="metric">0</div></div>
-            <div class="card"><h3>Custom Keys</h3><div id="d_customkeys" class="metric">0</div></div>
-            <div class="card"><h3>Banned HWIDs</h3><div id="d_banned" class="metric">0</div></div>
-          </div>
-
-          <div class="cols2">
-            <div class="panel">
-              <h3>Launcher State</h3>
-              <div id="dashboardLauncherState" class="kv"></div>
-            </div>
-            <div class="panel">
-              <h3>Today</h3>
-              <div id="dashboardToday" class="kv"></div>
-            </div>
-          </div>
-        </section>
-
-        <section id="section-sessions" class="section">
-          <div class="sectionHead">
-            <h2>Sessions</h2>
-            <p>View current active sessions, filter by key, plan, clientId, sessionId, or HWID hash. Owner can end one or all sessions.</p>
-          </div>
-
-          <div class="panel">
-            <h3>Search Sessions</h3>
-            <div class="cols4">
-              <div><label class="label">License</label><input id="sessLicense" class="field" placeholder="BASIC-xxxx" /></div>
-              <div><label class="label">Plan</label><select id="sessPlan" class="select"><option value="">Any</option><option value="free">FREE</option><option value="basic">BASIC</option><option value="pro">PRO</option></select></div>
-              <div><label class="label">Client ID</label><input id="sessClient" class="field" placeholder="clientId" /></div>
-              <div><label class="label">HWID Hash</label><input id="sessHwid" class="field" placeholder="hwid hash" /></div>
-            </div>
-            <div class="row" style="margin-top:12px;">
-              <input id="sessSearch" class="field" style="flex:1" placeholder="Search all fields" />
-              <button class="btnSm" id="btnLoadSessions">Load Sessions</button>
-              <button class="btnSmDanger ownerOnly" id="btnEndAllSessions">End All Sessions</button>
-            </div>
-          </div>
-
-          <div class="panel">
-            <h3>Active Sessions</h3>
-            <div class="tableWrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>License</th>
-                    <th>Plan</th>
-                    <th>Session</th>
-                    <th>Client ID</th>
-                    <th>HWID Hash</th>
-                    <th>Last Seen</th>
-                    <th>Expires</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="sessionsTbody">
-                  <tr><td colspan="8" class="muted">No data loaded yet.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="section-keys" class="section">
-          <div class="sectionHead">
-            <h2>Keys</h2>
-            <p>Search keys, disable or enable them, create custom keys, update plan/expiry/limits, and reset bound HWIDs.</p>
-          </div>
-
-          <div class="cols2">
-            <div class="panel">
-              <h3>Search Key</h3>
-              <div class="row">
-                <input id="keySearchLicense" class="field" style="flex:1" placeholder="BASIC-xxxx or PRO-xxxx or FREE-xxxx" />
-                <button class="btnSm" id="btnKeySearch">Search</button>
-              </div>
-              <div id="keySearchResult" style="margin-top:12px;"></div>
-              <div class="row" style="margin-top:12px;">
-                <button class="btnSmWarn ownerOnly" id="btnDisableKey">Disable Key</button>
-                <button class="btnSm ownerOnly" id="btnEnableKey">Enable Key</button>
-                <button class="btnSmDanger ownerOnly" id="btnResetKeyHwids">Reset HWID Bindings</button>
-              </div>
+        <div class="content">
+          <section id="section-dashboard" class="section active">
+            <div class="sectionHead">
+              <h2>Dashboard</h2>
+              <p>Current system health, launcher flags, plan counts, and today’s activity.</p>
             </div>
 
-            <div class="panel">
-              <h3>Create / Update Custom Key</h3>
-              <div class="cols2">
-                <div><label class="label">License</label><input id="customLicense" class="field" placeholder="PRO-MYKEY123" /></div>
-                <div><label class="label">Plan</label><select id="customPlan" class="select"><option value="basic">BASIC</option><option value="pro">PRO</option><option value="free">FREE</option></select></div>
-                <div><label class="label">TTL Seconds</label><input id="customTtl" class="field" value="1920" /></div>
-                <div><label class="label">Session Limit</label><input id="customSessions" class="field" value="2" /></div>
-                <div><label class="label">Max Devices</label><input id="customDevices" class="field" value="2" /></div>
-                <div><label class="label">Absolute Expiry Unix</label><input id="customExp" class="field" placeholder="0 for none" value="0" /></div>
-              </div>
-              <div class="fieldWrap" style="margin-top:12px;">
-                <label class="label">Note</label>
-                <textarea id="customNote" class="text" placeholder="Internal note"></textarea>
-              </div>
-              <div class="row">
-                <button class="btnSm ownerOnly" id="btnCreateCustomKey">Create Custom Key</button>
-                <button class="btnSm2 ownerOnly" id="btnUpdateCustomKey">Update Custom Key</button>
-                <button class="btnSmDanger ownerOnly" id="btnDeleteCustomKey">Delete Custom Key</button>
-                <button class="btnSm" id="btnLoadCustomKeys">Load Custom Keys</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <h3>Custom Keys</h3>
-            <div class="tableWrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>License</th>
-                    <th>Plan</th>
-                    <th>TTL</th>
-                    <th>Sessions</th>
-                    <th>Devices</th>
-                    <th>Expiry</th>
-                    <th>Created By</th>
-                    <th>Note</th>
-                  </tr>
-                </thead>
-                <tbody id="customKeysTbody">
-                  <tr><td colspan="8" class="muted">No custom keys loaded yet.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="section-freekeys" class="section">
-          <div class="sectionHead">
-            <h2>Free Keys</h2>
-            <p>View current free keys, add a free key manually, remove one, or expire all free keys.</p>
-          </div>
-
-          <div class="cols2">
-            <div class="panel">
-              <h3>Manual Free Key</h3>
-              <div class="cols3">
-                <div><label class="label">License</label><input id="freeAddLicense" class="field" placeholder="FREE-MANUAL123" /></div>
-                <div><label class="label">TTL Seconds</label><input id="freeAddTtl" class="field" value="900" /></div>
-                <div><label class="label">Tier</label><select id="freeAddTier" class="select"><option value="">None</option><option value="15m">15m</option><option value="35m">35m</option><option value="2h">2h</option></select></div>
-              </div>
-              <div class="row" style="margin-top:12px;">
-                <button class="btnSm ownerOnly" id="btnAddFreeKey">Add Free Key</button>
-                <button class="btnSmDanger ownerOnly" id="btnExpireAllFreeKeys">Expire All Free Keys</button>
-              </div>
+            <div class="cards">
+              <div class="card"><h3>Active Sessions</h3><div id="dashActiveSessions" class="metric">0</div></div>
+              <div class="card"><h3>Free Keys</h3><div id="dashFreeKeys" class="metric">0</div></div>
+              <div class="card"><h3>Custom Keys</h3><div id="dashCustomKeys" class="metric">0</div></div>
+              <div class="card"><h3>Downloads</h3><div id="dashDownloads" class="metric">0</div></div>
             </div>
 
-            <div class="panel">
-              <h3>Remove Free Key</h3>
-              <div class="row">
-                <input id="freeRemoveLicense" class="field" style="flex:1" placeholder="FREE-xxxx" />
-                <button class="btnSmDanger ownerOnly" id="btnRemoveFreeKey">Remove</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="row" style="justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;">Current Free Keys</h3>
-              <button class="btnSm" id="btnLoadFreeKeys">Load Free Keys</button>
-            </div>
-            <div class="tableWrap" style="margin-top:12px;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>License</th>
-                    <th>Tier</th>
-                    <th>TTL Seconds</th>
-                    <th>Expires</th>
-                    <th>Created At</th>
-                    <th>Created By</th>
-                  </tr>
-                </thead>
-                <tbody id="freeKeysTbody">
-                  <tr><td colspan="6" class="muted">No free keys loaded yet.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="section-launcher" class="section">
-          <div class="sectionHead">
-            <h2>Launcher Control</h2>
-            <p>Pause HTA launches, unpause them, force minimum version, set a maintenance message, and control the old ScriptNova cleanup prompt.</p>
-          </div>
-
-          <div class="cols2">
-            <div class="panel">
-              <h3>Pause / Unpause</h3>
-              <div class="fieldWrap">
-                <label class="label">Pause Reason</label>
-                <input id="pauseReason" class="field" placeholder="Example: Maintenance in progress" />
-              </div>
-              <div class="row">
-                <button class="btnWarn ownerOnly" id="btnPauseLauncher">Pause HTA Launches</button>
-                <button class="btnSm ownerOnly" id="btnUnpauseLauncher">Unpause HTA Launches</button>
-                <button class="btnSm" id="btnLauncherStatus">Refresh Status</button>
-              </div>
-              <div id="launcherStatusBox" style="margin-top:12px;"></div>
+            <div class="cards">
+              <div class="card"><h3>Visitors</h3><div id="dashVisitors" class="metric">0</div></div>
+              <div class="card"><h3>Trusted Visitors</h3><div id="dashTrusted" class="metric">0</div></div>
+              <div class="card"><h3>Banned HWIDs</h3><div id="dashBannedHwids" class="metric">0</div></div>
+              <div class="card"><h3>Suspicious HWIDs</h3><div id="dashSuspiciousHwids" class="metric">0</div></div>
             </div>
 
-            <div class="panel">
-              <h3>Version + Maintenance</h3>
-              <div class="fieldWrap">
-                <label class="label">Force Minimum Version</label>
-                <input id="minVersion" class="field" placeholder="v13.13.15" />
-              </div>
-              <div class="fieldWrap">
-                <label class="label">Maintenance Message</label>
-                <textarea id="maintenanceMessage" class="text" placeholder="Maintenance message shown when maintenance mode is active"></textarea>
-              </div>
-              <div class="row">
-                <button class="btnSm ownerOnly" id="btnSetMinVersion">Set Min Version</button>
-                <button class="btnSm2 ownerOnly" id="btnSetMaintenanceMsg">Set Maintenance Message</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <h3>Old ScriptNova Cleanup Prompt</h3>
-            <p>This only controls the future HTA prompt. It does not delete anything by itself.</p>
-
-            <div class="fieldWrap">
-              <label class="label">Enabled</label>
-              <select id="cleanupPromptEnabled" class="select">
-                <option value="0">Disabled</option>
-                <option value="1">Enabled</option>
-              </select>
-            </div>
-
-            <div class="fieldWrap">
-              <label class="label">Prompt Message</label>
-              <textarea id="cleanupPromptMessage" class="text" placeholder="Owner recommends removing outdated ScriptNova launcher copies from Desktop and Downloads."></textarea>
-            </div>
-
-            <div class="row">
-              <button class="btnSm ownerOnly" id="btnSaveCleanupPrompt">Save Cleanup Prompt</button>
-              <button class="btnSmWarn ownerOnly" id="btnBumpCleanupPrompt">Force Prompt Again</button>
-              <button class="btnSm" id="btnLoadCleanupPrompt">Load Cleanup Prompt</button>
-            </div>
-
-            <div id="cleanupPromptStatusBox" style="margin-top:12px;"></div>
-          </div>
-        </section>
-
-        <section id="section-hwid" class="section">
-          <div class="sectionHead">
-            <h2>HWID / Device Controls</h2>
-            <p>Search by HWID or license, see tied licenses and sessions, ban/unban HWIDs, mark suspicious devices, and disconnect sessions for a device.</p>
-          </div>
-
-          <div class="cols2">
-            <div class="panel">
-              <h3>Search</h3>
-              <div class="cols2">
-                <div><label class="label">License</label><input id="hwidLicense" class="field" placeholder="BASIC-xxxx" /></div>
-                <div><label class="label">HWID Hash</label><input id="hwidHash" class="field" placeholder="hwid hash" /></div>
-              </div>
-              <div class="row" style="margin-top:12px;">
-                <button class="btnSm" id="btnSearchHwid">Search</button>
-                <button class="btnSmDanger ownerOnly" id="btnBanHwid">Ban HWID</button>
-                <button class="btnSm ownerOnly" id="btnUnbanHwid">Unban HWID</button>
-                <button class="btnSmWarn ownerOnly" id="btnMarkSuspicious">Mark Suspicious</button>
-                <button class="btnSmDanger ownerOnly" id="btnDisconnectHwid">Disconnect Sessions For HWID</button>
-              </div>
-              <div class="fieldWrap" style="margin-top:12px;">
-                <label class="label">Reason</label>
-                <input id="hwidReason" class="field" placeholder="Reason for action" />
-              </div>
-            </div>
-
-            <div class="panel">
-              <h3>Results</h3>
-              <div id="hwidSearchResult" class="kv"></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <h3>Sessions / Ties</h3>
-            <div id="hwidRelationsBox"></div>
-          </div>
-        </section>
-
-        <section id="section-accounts" class="section">
-          <div class="sectionHead">
-            <h2>Admin Accounts</h2>
-            <p>List roles, see active admin sessions, and force logout all admins. Owner only.</p>
-          </div>
-
-          <div class="notice">This section is owner-only. Ulises and Other can see it locked but cannot use it.</div>
-
-          <div class="panel ownerOnlyWrap">
-            <div class="row" style="justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;">Admin Accounts</h3>
-              <div class="row">
-                <button class="btnSm ownerOnly" id="btnLoadAdminAccounts">Load Accounts</button>
-                <button class="btnSmDanger ownerOnly" id="btnForceLogoutAdmins">Force Logout All Admins</button>
-              </div>
-            </div>
-            <div class="cols2" style="margin-top:12px;">
-              <div>
-                <h3>Known Admin Accounts</h3>
-                <div class="tableWrap">
-                  <table>
-                    <thead><tr><th>Username</th><th>Role</th><th>Disabled</th></tr></thead>
-                    <tbody id="adminAccountsTbody"><tr><td colspan="3" class="muted">No data loaded yet.</td></tr></tbody>
-                  </table>
+            <div class="cols2">
+              <div class="panel">
+                <div class="row" style="align-items:center;margin-bottom:10px;">
+                  <h3 style="margin:0;">Service / Launcher Status</h3>
+                  <button id="refreshDashboard" class="btnSm right">Refresh Dashboard</button>
                 </div>
+                <div id="dashboardStatusBox" class="kv"></div>
               </div>
-              <div>
-                <h3>Active Admin Sessions</h3>
-                <div class="tableWrap">
-                  <table>
-                    <thead><tr><th>User</th><th>Role</th><th>IP</th><th>Created</th><th>Exp</th></tr></thead>
-                    <tbody id="adminActiveTbody"><tr><td colspan="5" class="muted">No data loaded yet.</td></tr></tbody>
-                  </table>
+              <div class="panel">
+                <h3>Today</h3>
+                <div id="dashboardTodayBox" class="kv"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Plan Distribution</h3>
+              <div id="dashboardPlanBox" class="kv"></div>
+            </div>
+          </section>
+
+          <section id="section-sessions" class="section">
+            <div class="sectionHead">
+              <h2>Sessions</h2>
+              <p>List active sessions, filter them, or end them.</p>
+            </div>
+
+            <div class="panel">
+              <div class="toolbar">
+                <input id="sessionsSearch" class="field" placeholder="Search license / clientId / hwid / session / ip" />
+                <input id="sessionsLicense" class="field" placeholder="License filter" />
+                <select id="sessionsPlan" class="select">
+                  <option value="">All plans</option>
+                  <option value="free">FREE</option>
+                  <option value="basic">BASIC</option>
+                  <option value="pro">PRO</option>
+                </select>
+                <input id="sessionsClientId" class="field" placeholder="ClientId" />
+                <input id="sessionsHwid" class="field" placeholder="HWID hash" />
+                <button id="btnLoadSessions" class="btn">Load Sessions</button>
+                <button id="btnEndAllSessions" class="btnDanger">End All Sessions</button>
+              </div>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>License</th>
+                      <th>Plan</th>
+                      <th>Session</th>
+                      <th>ClientId</th>
+                      <th>HWID</th>
+                      <th>Last Seen</th>
+                      <th>Expires</th>
+                      <th>IP</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sessionsTbody">
+                    <tr><td colspan="9" class="muted">No data loaded yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-keys" class="section">
+            <div class="sectionHead">
+              <h2>Keys</h2>
+              <p>Search keys, enable/disable them, reset HWID bindings, and manage custom keys.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Key Search / Quick Actions</h3>
+                <div class="fieldWrap">
+                  <label class="label" for="keyLicense">License</label>
+                  <input id="keyLicense" class="field" placeholder="BASIC-..., PRO-..., FREE-..." />
+                </div>
+                <div class="row">
+                  <button id="btnKeySearch" class="btn">Search Key</button>
+                  <button id="btnDisableKey" class="btnWarn">Disable</button>
+                  <button id="btnEnableKey" class="btn2">Enable</button>
+                  <button id="btnResetKeyHwids" class="btnDanger">Reset HWID Bindings</button>
+                </div>
+                <div class="spacer"></div>
+                <div id="keySearchBox" class="kv"></div>
+              </div>
+
+              <div class="panel">
+                <h3>Create / Update Custom Key</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="customLicense">License</label>
+                    <input id="customLicense" class="field" placeholder="PRO-MYKEY123" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="customPlan">Plan</label>
+                    <select id="customPlan" class="select">
+                      <option value="basic">BASIC</option>
+                      <option value="pro">PRO</option>
+                      <option value="free">FREE</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid3">
+                  <div class="fieldWrap">
+                    <label class="label" for="customTtl">TTL Seconds</label>
+                    <input id="customTtl" class="field" placeholder="900 / 1920 / 424800" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="customSessions">Session Limit</label>
+                    <input id="customSessions" class="field" placeholder="1 / 2 / 4" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="customDevices">Max Devices</label>
+                    <input id="customDevices" class="field" placeholder="1 / 2" />
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="customExp">Absolute Expiry Unix (optional)</label>
+                    <input id="customExp" class="field" placeholder="0 for none" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="customNote">Note</label>
+                    <input id="customNote" class="field" placeholder="Internal note" />
+                  </div>
+                </div>
+                <div class="row">
+                  <button id="btnCreateCustomKey" class="btn">Create Custom Key</button>
+                  <button id="btnUpdateCustomKey" class="btn2">Update Custom Key</button>
+                  <button id="btnDeleteCustomKey" class="btnDanger">Delete Custom Key</button>
+                  <button id="btnLoadCustomKeys" class="btnSm">Load All Custom Keys</button>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        <section id="section-config" class="section">
-          <div class="sectionHead">
-            <h2>System Config</h2>
-            <p>Current defaults, forced version, maintenance text, cleanup prompt state, and feature toggles. Owner-only read for now.</p>
-          </div>
-
-          <div class="panel">
-            <div class="row" style="justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;">Current Config</h3>
-              <button class="btnSm ownerOnly" id="btnLoadConfig">Load Config</button>
-            </div>
-            <div id="configBox" style="margin-top:12px;"></div>
-          </div>
-        </section>
-
-        <section id="section-analytics" class="section">
-          <div class="sectionHead">
-            <h2>Analytics / Counters</h2>
-            <p>Total visitors, trusted visitors, downloads, and today’s key checks, verify attempts, launches, failures, and more.</p>
-          </div>
-
-          <div class="panel">
-            <div class="row" style="justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;">Analytics Summary</h3>
-              <button class="btnSm" id="btnLoadAnalytics">Load Analytics</button>
-            </div>
-            <div id="analyticsBox" class="kv" style="margin-top:12px;"></div>
-          </div>
-        </section>
-
-        <section id="section-alerts" class="section">
-          <div class="sectionHead">
-            <h2>Alerts / Abuse Monitoring</h2>
-            <p>Repeated failed key attempts, banned device tries, session pressure, and other warning entries.</p>
-          </div>
-
-          <div class="panel">
-            <div class="row" style="justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;">Recent Alerts</h3>
-              <div class="row">
-                <input id="alertsLimit" class="field" style="width:120px" value="50" />
-                <button class="btnSm" id="btnLoadAlerts">Load Alerts</button>
-              </div>
-            </div>
-            <div class="tableWrap" style="margin-top:12px;">
-              <table>
-                <thead><tr><th>Time</th><th>Type</th><th>Level</th><th>Actor / License</th><th>Details</th></tr></thead>
-                <tbody id="alertsTbody"><tr><td colspan="5" class="muted">No data loaded yet.</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="section-audit" class="section">
-          <div class="sectionHead">
-            <h2>Audit Log</h2>
-            <p>Who did what, when, from what IP or admin account, and what changed.</p>
-          </div>
-
-          <div class="panel">
-            <div class="row" style="justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;">Recent Audit Entries</h3>
-              <div class="row">
-                <input id="auditLimit" class="field" style="width:120px" value="50" />
-                <button class="btnSm" id="btnLoadAudit">Load Audit</button>
-              </div>
-            </div>
-            <div class="tableWrap" style="margin-top:12px;">
-              <table>
-                <thead><tr><th>Time</th><th>Type</th><th>Actor</th><th>Role</th><th>Action</th><th>Target</th><th>Success</th></tr></thead>
-                <tbody id="auditTbody"><tr><td colspan="7" class="muted">No data loaded yet.</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="section-emergency" class="section">
-          <div class="sectionHead">
-            <h2>Emergency Tools</h2>
-            <p>Owner-only controls for disable all keys, pause all launches, clear launch nonces, end all sessions, and set emergency banners.</p>
-          </div>
-
-          <div class="notice">These actions are powerful. Use them only when needed.</div>
-
-          <div class="cols2">
             <div class="panel">
-              <h3>Global Key / Session Controls</h3>
-              <div class="row">
-                <button class="btnDanger ownerOnly" id="btnDisableAllKeys">Disable All Keys</button>
-                <button class="btnSm ownerOnly" id="btnEnableAllKeys">Re-enable All Keys</button>
+              <h3>Custom Keys</h3>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>License</th>
+                      <th>Plan</th>
+                      <th>TTL</th>
+                      <th>Sessions</th>
+                      <th>Devices</th>
+                      <th>Exp</th>
+                      <th>Created</th>
+                      <th>By</th>
+                      <th>Note</th>
+                    </tr>
+                  </thead>
+                  <tbody id="customKeysTbody">
+                    <tr><td colspan="9" class="muted">No custom keys loaded.</td></tr>
+                  </tbody>
+                </table>
               </div>
-              <div class="row" style="margin-top:10px;">
-                <button class="btnWarn ownerOnly" id="btnEmergencyPause">Pause All Launches</button>
-                <button class="btnSmDanger ownerOnly" id="btnEmergencyEndSessions">End All Sessions Now</button>
+            </div>
+          </section>
+
+          <section id="section-freekeys" class="section">
+            <div class="sectionHead">
+              <h2>Free Keys</h2>
+              <p>Manage FREE keys stored in Redis.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Add / Remove Free Key</h3>
+                <div class="grid3">
+                  <div class="fieldWrap">
+                    <label class="label" for="freeKeyLicense">License</label>
+                    <input id="freeKeyLicense" class="field" placeholder="Leave blank to auto-generate" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="freeKeyTtl">TTL Seconds</label>
+                    <input id="freeKeyTtl" class="field" placeholder="900 / 2100 / 7200" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="freeKeyTier">Tier</label>
+                    <input id="freeKeyTier" class="field" placeholder="15m / 35m / 2h" />
+                  </div>
+                </div>
+                <div class="row">
+                  <button id="btnAddFreeKey" class="btn">Add Free Key</button>
+                  <button id="btnRemoveFreeKey" class="btnWarn">Remove Free Key</button>
+                  <button id="btnExpireAllFreeKeys" class="btnDanger">Expire All Free Keys</button>
+                  <button id="btnLoadFreeKeys" class="btnSm">Load Free Keys</button>
+                </div>
               </div>
-              <div class="row" style="margin-top:10px;">
-                <button class="btnSmDanger ownerOnly" id="btnEmergencyClearNonces">Clear Launch Nonces</button>
+
+              <div class="panel">
+                <h3>Quick Tier Hints</h3>
+                <div class="kv">
+                  <div>15m</div><div>900 seconds</div>
+                  <div>35m</div><div>2100 seconds</div>
+                  <div>2h</div><div>7200 seconds</div>
+                </div>
               </div>
             </div>
 
             <div class="panel">
-              <h3>Emergency Banner</h3>
+              <h3>Active Free Keys</h3>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>License</th>
+                      <th>Tier</th>
+                      <th>TTL Left</th>
+                      <th>Expires</th>
+                      <th>Created</th>
+                      <th>By</th>
+                    </tr>
+                  </thead>
+                  <tbody id="freeKeysTbody">
+                    <tr><td colspan="6" class="muted">No free keys loaded.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-launcher" class="section">
+            <div class="sectionHead">
+              <h2>Launcher Controls</h2>
+              <p>Pause/unpause, min version, maintenance message, and runtime config.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Core Launcher Controls</h3>
+                <div class="fieldWrap">
+                  <label class="label" for="pauseReason">Pause Reason</label>
+                  <input id="pauseReason" class="field" placeholder="Reason shown during pause" />
+                </div>
+                <div class="row">
+                  <button id="btnPauseLauncher" class="btnWarn">Pause Launcher</button>
+                  <button id="btnUnpauseLauncher" class="btn2">Unpause Launcher</button>
+                  <button id="btnLauncherStatus" class="btnSm">Load Status</button>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="fieldWrap">
+                  <label class="label" for="minVersion">Minimum Version</label>
+                  <input id="minVersion" class="field" placeholder="v13.13.15" />
+                </div>
+                <button id="btnSetMinVersion" class="btn">Set Minimum Version</button>
+
+                <div class="spacer"></div>
+
+                <div class="fieldWrap">
+                  <label class="label" for="maintenanceMsg">Maintenance Message</label>
+                  <textarea id="maintenanceMsg" class="text" placeholder="Message shown when maintenance mode is active"></textarea>
+                </div>
+                <button id="btnSetMaintenanceMsg" class="btnWarn">Set Maintenance Message</button>
+              </div>
+
+              <div class="panel">
+                <h3>Runtime Config</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="runtimeSupportEmail">Support Email</label>
+                    <input id="runtimeSupportEmail" class="field" placeholder="gomegaassist@gmail.com" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="runtimeDiscordUrl">Discord URL</label>
+                    <input id="runtimeDiscordUrl" class="field" placeholder="https://discord.gg/..." />
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="runtimeStartUrl">Default Start URL</label>
+                    <input id="runtimeStartUrl" class="field" placeholder="https://..." />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="runtimeSubmitUrl">Submit URL</label>
+                    <input id="runtimeSubmitUrl" class="field" placeholder="/api/ui" />
+                  </div>
+                </div>
+                <button id="btnSaveRuntimeConfig" class="btn">Save Runtime Config</button>
+
+                <div class="spacer"></div>
+
+                <h3>Launcher Status</h3>
+                <div id="launcherStatusBox" class="kv"></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-publicui" class="section">
+            <div class="sectionHead">
+              <h2>Public Launcher UI</h2>
+              <p>Control public banner, modal message, poll/votes, and quick links through bootstrap-compatible settings.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Public Banner</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="bannerEnabled">Enabled</label>
+                    <select id="bannerEnabled" class="select">
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="bannerDismissable">Dismissable</label>
+                    <select id="bannerDismissable" class="select">
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="bannerId">Banner ID</label>
+                    <input id="bannerId" class="field" placeholder="banner_update_1" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="bannerMode">Mode</label>
+                    <select id="bannerMode" class="select">
+                      <option value="info">info</option>
+                      <option value="success">success</option>
+                      <option value="warning">warning</option>
+                      <option value="danger">danger</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="bannerTitle">Title</label>
+                  <input id="bannerTitle" class="field" placeholder="Important notice" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="bannerText">Text</label>
+                  <textarea id="bannerText" class="text" placeholder="Banner text shown in launcher"></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSaveBanner" class="btn">Save Banner</button>
+                  <button id="btnClearBanner" class="btnDanger">Clear Banner</button>
+                </div>
+              </div>
+
+              <div class="panel">
+                <h3>Public Modal</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="modalEnabled">Enabled</label>
+                    <select id="modalEnabled" class="select">
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="modalId">Modal ID</label>
+                    <input id="modalId" class="field" placeholder="modal_news_1" />
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="modalTitle">Title</label>
+                  <input id="modalTitle" class="field" placeholder="Launcher message" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="modalText">Text</label>
+                  <textarea id="modalText" class="text" placeholder="Big message shown inside launcher modal"></textarea>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="modalButtons">Buttons JSON</label>
+                  <textarea id="modalButtons" class="text small" placeholder='[{"label":"Open Discord","action":"open","url":"https://discord.gg/...","style":"normal"},{"label":"Close","action":"close","style":"normal"}]'></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSaveModal" class="btn">Save Modal</button>
+                  <button id="btnClearModal" class="btnDanger">Clear Modal</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Public Poll / Votes</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="pollEnabled">Enabled</label>
+                    <select id="pollEnabled" class="select">
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="pollId">Poll ID</label>
+                    <input id="pollId" class="field" placeholder="poll_feature_1" />
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="pollQuestion">Question</label>
+                  <input id="pollQuestion" class="field" placeholder="Which feature should be next?" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="pollOptions">Options</label>
+                  <textarea id="pollOptions" class="text small" placeholder='One option per line&#10;Example: Better cleanup scan&#10;More browser themes&#10;More quick links'></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSavePoll" class="btn">Save Poll</button>
+                  <button id="btnClearPoll" class="btnDanger">Clear Poll</button>
+                </div>
+              </div>
+
+              <div class="panel">
+                <h3>Quick Links</h3>
+                <p>JSON array of launcher quick links.</p>
+                <div class="fieldWrap">
+                  <label class="label" for="quickLinks">Quick Links JSON</label>
+                  <textarea id="quickLinks" class="text" placeholder='[{"label":"Discord","url":"https://discord.gg/...","icon":"discord","mode":"external"},{"label":"Download Page","url":"https://scriptnovaa.com/download","icon":"download","mode":"external"}]'></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSaveQuickLinks" class="btn">Save Quick Links</button>
+                  <button id="btnClearQuickLinks" class="btnDanger">Clear Quick Links</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-cleanup" class="section">
+            <div class="sectionHead">
+              <h2>Cleanup Prompt</h2>
+              <p>Control the old HTA cleanup prompt and make it more reliable with extra scan paths and name hints.</p>
+            </div>
+
+            <div class="panel">
+              <div class="grid2">
+                <div class="fieldWrap">
+                  <label class="label" for="cleanupEnabled">Enabled</label>
+                  <select id="cleanupEnabled" class="select">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="cleanupForceOnce">Force Once Status</label>
+                  <input id="cleanupForceOnce" class="field" placeholder="Read-only" disabled />
+                </div>
+              </div>
+
               <div class="fieldWrap">
-                <label class="label">Message</label>
-                <textarea id="emergencyBanner" class="text" placeholder="Emergency or outage banner message"></textarea>
+                <label class="label" for="cleanupMessage">Cleanup Message</label>
+                <textarea id="cleanupMessage" class="text" placeholder="Owner recommends deleting old ScriptNova launcher copies from Desktop and Downloads."></textarea>
               </div>
+
+              <div class="cols2">
+                <div class="fieldWrap">
+                  <label class="label" for="cleanupScanPaths">Extra Scan Paths</label>
+                  <textarea id="cleanupScanPaths" class="text small" placeholder='One per line&#10;C:\Users\%USERNAME%\Desktop&#10;C:\Users\%USERNAME%\Downloads'></textarea>
+                  <div class="help">These are extra folders the HTA can scan for old launcher copies.</div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="cleanupNameHints">Name Hints</label>
+                  <textarea id="cleanupNameHints" class="text small" placeholder='One per line&#10;ScriptNova&#10;ScriptNova Launcher&#10;ScriptNova Browser Launcher'></textarea>
+                  <div class="help">Use name fragments the cleanup scan should treat as likely old HTA copies.</div>
+                </div>
+              </div>
+
               <div class="row">
-                <button class="btnSm2 ownerOnly" id="btnSetEmergencyBanner">Set Emergency Banner</button>
+                <button id="btnLoadCleanupPrompt" class="btnSm">Load Cleanup Config</button>
+                <button id="btnSaveCleanupPrompt" class="btn">Save Cleanup Config</button>
+                <button id="btnBumpCleanupPrompt" class="btnWarn">Force Show Once</button>
               </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+
+          <section id="section-events" class="section">
+            <div class="sectionHead">
+              <h2>Public Events / Votes</h2>
+              <p>See launcher public events, banner dismissals, cleanup runs, and poll results.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <div class="row" style="align-items:center;">
+                  <h3 style="margin:0;">Poll Results</h3>
+                  <button id="btnLoadPollResults" class="btnSm right">Load Results</button>
+                  <button id="btnResetPollResults" class="btnSmDanger">Reset Votes</button>
+                </div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="pollResultsId">Poll ID</label>
+                    <input id="pollResultsId" class="field" placeholder="Leave blank to use current poll" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="eventsLimit">Events Limit</label>
+                    <input id="eventsLimit" class="field" value="50" />
+                  </div>
+                </div>
+                <div id="pollResultsBox" class="kv"></div>
+              </div>
+
+              <div class="panel">
+                <div class="row" style="align-items:center;">
+                  <h3 style="margin:0;">Public Events Feed</h3>
+                  <button id="btnLoadEvents" class="btnSm right">Load Events</button>
+                  <button id="btnClearEvents" class="btnSmDanger">Clear Feed</button>
+                </div>
+                <div class="tableWrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Time</th>
+                        <th>Kind</th>
+                        <th>Client</th>
+                        <th>HWID</th>
+                        <th>Version</th>
+                        <th>Data</th>
+                      </tr>
+                    </thead>
+                    <tbody id="eventsTbody">
+                      <tr><td colspan="6" class="muted">No events loaded.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-hwid" class="section">
+            <div class="sectionHead">
+              <h2>HWID Controls</h2>
+              <p>Search by license or HWID hash, then ban, unban, mark suspicious, or disconnect.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Search</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="hwidLicense">License</label>
+                    <input id="hwidLicense" class="field" placeholder="Search bound HWIDs by license" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="hwidValue">HWID Hash</label>
+                    <input id="hwidValue" class="field" placeholder="Search exact HWID hash" />
+                  </div>
+                </div>
+                <button id="btnSearchHwid" class="btn">Search HWID</button>
+                <div class="spacer"></div>
+                <div id="hwidSearchBox" class="kv"></div>
+              </div>
+
+              <div class="panel">
+                <h3>Actions</h3>
+                <div class="fieldWrap">
+                  <label class="label" for="hwidReason">Reason</label>
+                  <input id="hwidReason" class="field" placeholder="Reason for ban or suspicious mark" />
+                </div>
+                <div class="row">
+                  <button id="btnBanHwid" class="btnDanger">Ban HWID</button>
+                  <button id="btnUnbanHwid" class="btn2">Unban HWID</button>
+                  <button id="btnMarkSuspicious" class="btnWarn">Mark Suspicious</button>
+                  <button id="btnDisconnectHwid" class="btnSmDanger">Disconnect Sessions by HWID</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-accounts" class="section">
+            <div class="sectionHead">
+              <h2>Admin Accounts</h2>
+              <p>View admin accounts and force logout admin sessions.</p>
+            </div>
+
+            <div class="panel">
+              <div class="row" style="align-items:center;">
+                <button id="btnLoadAdminAccounts" class="btn">Load Admin Accounts</button>
+                <button id="btnForceLogoutAdmins" class="btnDanger">Force Logout All Admin Sessions</button>
+              </div>
+              <div class="spacer"></div>
+
+              <h3>Accounts</h3>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Disabled</th>
+                    </tr>
+                  </thead>
+                  <tbody id="accountsTbody">
+                    <tr><td colspan="3" class="muted">No account data loaded.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="spacer"></div>
+
+              <h3>Active Admin Sessions</h3>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Role</th>
+                      <th>Token Tail</th>
+                      <th>Created</th>
+                      <th>Expires</th>
+                      <th>IP</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminSessionsTbody">
+                    <tr><td colspan="6" class="muted">No admin session data loaded.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-config" class="section">
+            <div class="sectionHead">
+              <h2>Config View</h2>
+              <p>Inspect the current full config state returned by the admin route.</p>
+            </div>
+
+            <div class="panel">
+              <div class="row">
+                <button id="btnLoadConfig" class="btn">Load Config</button>
+              </div>
+              <div class="spacer"></div>
+              <div id="configBox" class="kv"></div>
+            </div>
+          </section>
+
+          <section id="section-analytics" class="section">
+            <div class="sectionHead">
+              <h2>Analytics</h2>
+              <p>Traffic, launcher activity, and public event counts.</p>
+            </div>
+
+            <div class="panel">
+              <div class="row">
+                <button id="btnLoadAnalytics" class="btn">Load Analytics</button>
+              </div>
+              <div class="spacer"></div>
+              <div id="analyticsBox" class="kv"></div>
+            </div>
+          </section>
+
+          <section id="section-alerts" class="section">
+            <div class="sectionHead">
+              <h2>Alerts</h2>
+              <p>Recent alerts generated by admin/login activity or warning flows.</p>
+            </div>
+
+            <div class="panel">
+              <div class="toolbar">
+                <input id="alertsLimit" class="field" value="50" />
+                <button id="btnLoadAlerts" class="btn">Load Alerts</button>
+              </div>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Type</th>
+                      <th>Level</th>
+                      <th>Actor</th>
+                      <th>Raw</th>
+                    </tr>
+                  </thead>
+                  <tbody id="alertsTbody">
+                    <tr><td colspan="5" class="muted">No alerts loaded.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-audit" class="section">
+            <div class="sectionHead">
+              <h2>Audit Log</h2>
+              <p>Recent admin actions recorded by the backend.</p>
+            </div>
+
+            <div class="panel">
+              <div class="toolbar">
+                <input id="auditLimit" class="field" value="50" />
+                <button id="btnLoadAudit" class="btn">Load Audit Log</button>
+              </div>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Type</th>
+                      <th>Actor</th>
+                      <th>Role</th>
+                      <th>Action</th>
+                      <th>Target</th>
+                      <th>Success</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditTbody">
+                    <tr><td colspan="7" class="muted">No audit rows loaded.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-emergency" class="section">
+            <div class="sectionHead">
+              <h2>Emergency Tools</h2>
+              <p>High-impact actions. Owner-only in the backend.</p>
+            </div>
+
+            <div class="panel">
+              <div class="row">
+                <button id="btnDisableAllKeys" class="btnDanger">Disable All Keys</button>
+                <button id="btnEnableAllKeys" class="btn2">Enable All Keys</button>
+                <button id="btnEmergencyPause" class="btnWarn">Pause All Launches</button>
+                <button id="btnEmergencyEndSessions" class="btnDanger">End All Sessions</button>
+                <button id="btnEmergencyClearNonces" class="btnWarn">Clear Launch Nonces</button>
+              </div>
+              <div class="spacer"></div>
+              <div class="fieldWrap">
+                <label class="label" for="emergencyBanner">Emergency Banner / Maintenance Message</label>
+                <textarea id="emergencyBanner" class="text" placeholder="Emergency message shown to users"></textarea>
+              </div>
+              <button id="btnSetEmergencyBanner" class="btnWarn">Set Emergency Banner</button>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     (function(){
+      "use strict";
+
       var API = "https://api.scriptnovaa.com/api/admin";
+      var TOKEN_KEY = "sn_admin_token";
+      var CURRENT_BUILD = "admin-html-2026-03-10b";
       var state = {
-        token: localStorage.getItem("sn_admin_token") || "",
+        token: "",
         me: null,
-        currentSection: "dashboard",
-        lastKeyLookup: "",
-        lastHwidLookup: ""
+        build: CURRENT_BUILD,
+        currentSection: "dashboard"
       };
 
       function $(id){ return document.getElementById(id); }
 
-      function esc(s){
-        s = String(s == null ? "" : s);
-        return s
+      function esc(v){
+        return String(v == null ? "" : v)
           .replace(/&/g,"&amp;")
           .replace(/</g,"&lt;")
           .replace(/>/g,"&gt;")
@@ -752,555 +1064,837 @@
       }
 
       function ts(v){
-        v = parseInt(v,10)||0;
-        if(!v) return "—";
-        try { return new Date(v*1000).toLocaleString(); } catch(e){ return String(v); }
+        var n = parseInt(v,10);
+        if(!n) return "—";
+        try{
+          return new Date(n*1000).toLocaleString();
+        }catch(_){
+          return String(v);
+        }
       }
 
       function yesNo(v){ return v ? "Yes" : "No"; }
 
-      function roleName(){
-        return state.me && state.me.admin ? String(state.me.admin.role || "") : "";
+      function boolFromInput(v){
+        return String(v) === "1" || String(v).toLowerCase() === "true" || String(v).toLowerCase() === "yes";
       }
 
-      function isOwner(){ return roleName() === "owner"; }
-      function isUlises(){ return roleName() === "ulises"; }
-      function isOther(){ return roleName() === "other"; }
-
-      function setMsg(type, text, targetId){
-        var el = $(targetId || "globalMsg");
-        if(!el) return;
-        el.className = type;
-        el.innerHTML = esc(text);
+      function toLines(arr){
+        return Array.isArray(arr) ? arr.join("\n") : "";
       }
 
-      function clearMsg(targetId){
-        var el = $(targetId || "globalMsg");
-        if(!el) return;
-        el.className = "hidden";
-        el.innerHTML = "";
+      function fromLines(txt){
+        return String(txt || "")
+          .split(/\r?\n/g)
+          .map(function(x){ return x.trim(); })
+          .filter(Boolean);
       }
 
-      async function api(action, data){
-        data = data || {};
-        data.action = action;
-        if(state.token) data.token = state.token;
-
-        var r = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type":"application/json" },
-          body: JSON.stringify(data)
-        });
-
-        var j = {};
-        try { j = await r.json(); } catch(e){ j = { ok:false, error:"bad_json" }; }
-
-        if(!r.ok || j.ok === false){
-          var err = (j && (j.error || j.message)) ? (j.error || j.message) : ("http_" + r.status);
-          throw new Error(err);
+      function parseJsonMaybe(txt, fallback){
+        try{
+          if(typeof txt === "object") return txt;
+          if(!String(txt || "").trim()) return fallback;
+          return JSON.parse(txt);
+        }catch(_){
+          return fallback;
         }
-        return j;
       }
 
-      function applyPermissions(){
-        var ownerBtns = document.querySelectorAll(".ownerOnly");
-        for(var i=0;i<ownerBtns.length;i++){
-          ownerBtns[i].disabled = !isOwner();
-        }
+      function setMsg(kind, text){
+        var box = $("msgBox");
+        box.className = "";
+        if(kind === "error") box.classList.add("error");
+        else if(kind === "success") box.classList.add("success");
+        else box.classList.add("notice");
+        box.textContent = text;
+      }
 
-        var sections = [
-          {id:"accounts", owner:true},
-          {id:"config", owner:true},
-          {id:"emergency", owner:true}
-        ];
+      function clearMsg(){
+        $("msgBox").className = "hidden";
+        $("msgBox").textContent = "";
+      }
 
-        for(var j=0;j<sections.length;j++){
-          var section = $("section-" + sections[j].id);
-          if(!section) continue;
-          if(sections[j].owner && !isOwner()){
-            section.classList.add("locked");
-          } else {
-            section.classList.remove("locked");
-          }
-        }
+      function loginMsg(kind, text){
+        var box = $("loginMsg");
+        box.className = "";
+        if(kind === "error") box.classList.add("error");
+        else if(kind === "success") box.classList.add("success");
+        else box.classList.add("notice");
+        box.textContent = text;
+      }
 
-        if(isOther()){
-          var allowed = {
-            dashboard:1,
-            launcher:1,
-            alerts:1
-          };
-          var nav = document.querySelectorAll(".navBtn");
-          for(var n=0;n<nav.length;n++){
-            var sec = nav[n].getAttribute("data-section");
-            if(!allowed[sec]){
-              nav[n].classList.add("locked");
-            } else {
-              nav[n].classList.remove("locked");
+      function setToken(token){
+        state.token = token || "";
+        if(state.token) localStorage.setItem(TOKEN_KEY, state.token);
+        else localStorage.removeItem(TOKEN_KEY);
+      }
+
+      function role(){ return state.me && state.me.role ? String(state.me.role) : ""; }
+      function isOwner(){ return role() === "owner"; }
+      function isUlises(){ return role() === "ulises"; }
+      function isOther(){ return role() === "other"; }
+
+      function lockUiForRole(){
+        var sections = ["sessions","keys","freekeys","launcher","publicui","cleanup","events","hwid","accounts","config","analytics","alerts","audit","emergency"];
+        for(var i=0;i<sections.length;i++){
+          var sec = sections[i];
+          var btn = document.querySelector('.navBtn[data-section="' + sec + '"]');
+          if(!btn) continue;
+
+          btn.classList.remove("locked");
+          if(isOther()){
+            if(["dashboard","alerts"].indexOf(sec) === -1){
+              btn.classList.add("locked");
+            }
+          }else if(isUlises()){
+            if(["accounts","emergency"].indexOf(sec) !== -1){
+              btn.classList.add("locked");
             }
           }
-        } else {
-          var nav2 = document.querySelectorAll(".navBtn");
-          for(var m=0;m<nav2.length;m++) nav2[m].classList.remove("locked");
-        }
-
-        var who = $("whoami");
-        if(who && state.me && state.me.admin){
-          who.innerHTML = "Logged in: <b>" + esc(state.me.admin.username) + "</b> • Role: <b>" + esc(state.me.admin.role) + "</b>";
         }
       }
 
-      function showView(which){
-        $("loginView").classList.toggle("hidden", which !== "login");
-        $("appView").classList.toggle("hidden", which !== "app");
+      async function api(action, params){
+        params = params || {};
+        var isPost = action === "login" || action.indexOf("_set") !== -1 || action.indexOf("_clear") !== -1 || action.indexOf("_add") !== -1 || action.indexOf("_remove") !== -1 || action.indexOf("_create") !== -1 || action.indexOf("_update") !== -1 || action.indexOf("_delete") !== -1 || action.indexOf("_disable") !== -1 || action.indexOf("_enable") !== -1 || action.indexOf("_pause") !== -1 || action.indexOf("_unpause") !== -1 || action.indexOf("_bump") !== -1 || action.indexOf("_reset") !== -1 || action.indexOf("_ban") !== -1 || action.indexOf("_unban") !== -1 || action.indexOf("_mark") !== -1 || action.indexOf("_logout") !== -1 || action.indexOf("_expire") !== -1 || action.indexOf("_force") !== -1 || action.indexOf("_end") !== -1;
+        var headers = { "Content-Type": "application/json" };
+        if(state.token) headers["Authorization"] = "Bearer " + state.token;
+
+        var resp;
+        if(isPost){
+          resp = await fetch(API, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(Object.assign({}, params, { action: action }))
+          });
+        }else{
+          var qs = new URLSearchParams(Object.assign({}, params, { action: action }));
+          resp = await fetch(API + "?" + qs.toString(), {
+            method: "GET",
+            headers: headers
+          });
+        }
+
+        var json = {};
+        try{ json = await resp.json(); }catch(_){}
+
+        if(!resp.ok || !json.ok){
+          throw new Error((json && (json.error || json.message)) || ("HTTP " + resp.status));
+        }
+
+        if(json.build) {
+          state.build = json.build;
+          $("topBuild").textContent = json.build;
+        }
+
+        return json;
       }
 
-      function showSection(section){
-        state.currentSection = section;
-        var all = document.querySelectorAll(".section");
-        for(var i=0;i<all.length;i++) all[i].classList.remove("active");
-        var nav = document.querySelectorAll(".navBtn");
-        for(var j=0;j<nav.length;j++) nav[j].classList.remove("active");
-        $("section-" + section).classList.add("active");
-        var btn = document.querySelector('.navBtn[data-section="' + section + '"]');
+      function showApp(){
+        $("loginView").classList.add("hidden");
+        $("appView").classList.remove("hidden");
+      }
+
+      function showLogin(){
+        $("appView").classList.add("hidden");
+        $("loginView").classList.remove("hidden");
+      }
+
+      function showSection(name){
+        state.currentSection = name;
+        var secs = document.querySelectorAll(".section");
+        for(var i=0;i<secs.length;i++) secs[i].classList.remove("active");
+        var navs = document.querySelectorAll(".navBtn");
+        for(var j=0;j<navs.length;j++) navs[j].classList.remove("active");
+
+        var sec = $("section-" + name);
+        if(sec) sec.classList.add("active");
+
+        var btn = document.querySelector('.navBtn[data-section="' + name + '"]');
         if(btn) btn.classList.add("active");
       }
 
       async function login(){
-        clearMsg("loginMsg");
-        var username = $("loginUsername").value;
-        var password = $("loginPassword").value;
-
-        try{
-          var j = await fetch(API, {
-            method:"POST",
-            headers:{ "Content-Type":"application/json" },
-            body: JSON.stringify({ action:"login", username:username, password:password })
-          }).then(function(r){ return r.json(); });
-
-          if(!j || j.ok !== true || !j.token){
-            throw new Error((j && j.error) || "login_failed");
-          }
-
-          state.token = j.token;
-          localStorage.setItem("sn_admin_token", state.token);
-          await loadMe();
-          showView("app");
-          applyPermissions();
-          await loadDashboard();
-        }catch(e){
-          setMsg("error", "Login failed: " + e.message, "loginMsg");
-        }
-      }
-
-      async function loadMe(){
-        var j = await api("me");
-        state.me = j;
-      }
-
-      async function logout(){
-        try{ await api("logout"); }catch(e){}
-        state.token = "";
-        state.me = null;
-        localStorage.removeItem("sn_admin_token");
-        $("loginPassword").value = "";
-        showView("login");
-      }
-
-      function setGlobalStatePill(label, statusClass){
-        var el = $("globalStatePill");
-        if(!el) return;
-        el.innerHTML = esc(label);
-        el.style.borderColor = statusClass === "bad" ? "rgba(255,100,100,.3)" : statusClass === "warn" ? "rgba(255,207,90,.3)" : "rgba(0,229,255,.25)";
+        loginMsg("notice", "Logging in...");
+        var username = $("loginUsername").value.trim();
+        var password = $("loginPassword").value.trim();
+        var j = await api("login", { username: username, password: password });
+        setToken(j.token || "");
+        state.me = j.admin || null;
+        $("topUser").textContent = (state.me && state.me.username) || "—";
+        $("topRole").textContent = (state.me && state.me.role) || "—";
+        $("topBuild").textContent = j.build || CURRENT_BUILD;
+        lockUiForRole();
+        showApp();
+        clearMsg();
+        await loadDashboard();
+        await loadLauncherStatus();
       }
 
       async function tryLoadSession(){
-        if(!state.token){
-          showView("login");
+        var tok = localStorage.getItem(TOKEN_KEY) || "";
+        if(!tok){
+          loginMsg("notice", "No saved session found.");
           return;
         }
+        state.token = tok;
         try{
-          await loadMe();
-          showView("app");
-          applyPermissions();
+          var j = await api("me");
+          state.me = j.admin || null;
+          $("topUser").textContent = (state.me && state.me.username) || "—";
+          $("topRole").textContent = (state.me && state.me.role) || "—";
+          $("topBuild").textContent = j.build || CURRENT_BUILD;
+          lockUiForRole();
+          showApp();
+          clearMsg();
           await loadDashboard();
+          await loadLauncherStatus();
         }catch(e){
-          localStorage.removeItem("sn_admin_token");
-          state.token = "";
-          showView("login");
+          setToken("");
+          loginMsg("error", "Saved session failed: " + e.message);
+          showLogin();
         }
+      }
+
+      async function logout(){
+        try{ await api("logout"); }catch(_){}
+        setToken("");
+        state.me = null;
+        showLogin();
+        loginMsg("success", "Logged out.");
       }
 
       async function loadDashboard(){
-        clearMsg();
         var j = await api("dashboard");
         var d = j.dashboard || {};
-        var s = d.services || {};
-        var c = d.counts || {};
-        var l = d.launcher || {};
-        var a = d.analyticsToday || {};
+        var counts = d.counts || {};
+        var sv = d.services || {};
+        var lx = d.launcher || {};
+        var today = d.analyticsToday || {};
 
-        $("d_api").innerHTML = s.api && s.api.online ? '<span class="ok">Online</span>' : '<span class="bad">Offline</span>';
-        $("d_public").innerHTML = s.publicSite && s.publicSite.online ? '<span class="ok">Online</span>' : '<span class="warn">Unknown</span>';
-        $("d_redis").innerHTML = s.redis && s.redis.online ? '<span class="ok">Online</span>' : '<span class="bad">Offline</span>';
-        $("d_launcher").innerHTML = l.paused ? '<span class="warn">Paused</span>' : (l.maintenanceMode ? '<span class="warn">Maintenance</span>' : '<span class="ok">Live</span>');
+        $("dashActiveSessions").textContent = counts.activeSessions || 0;
+        $("dashFreeKeys").textContent = counts.freeKeys || 0;
+        $("dashCustomKeys").textContent = counts.customKeys || 0;
+        $("dashDownloads").textContent = counts.downloads || 0;
+        $("dashVisitors").textContent = counts.visitors || 0;
+        $("dashTrusted").textContent = counts.trustedVisitors || 0;
+        $("dashBannedHwids").textContent = counts.bannedHwids || 0;
+        $("dashSuspiciousHwids").textContent = counts.suspiciousHwids || 0;
 
-        $("d_sessions").textContent = c.activeSessions || 0;
-        $("d_freekeys").textContent = c.freeKeys || 0;
-        $("d_customkeys").textContent = c.customKeys || 0;
-        $("d_banned").textContent = c.bannedHwids || 0;
+        $("dashboardStatusBox").innerHTML =
+          '<div>API Online</div><div>' + esc(yesNo(!!(sv.api && sv.api.online))) + '</div>' +
+          '<div>Redis Online</div><div>' + esc(yesNo(!!(sv.redis && sv.redis.online))) + '</div>' +
+          '<div>Public Site</div><div>' + esc((sv.publicSite && sv.publicSite.status) || "unknown") + '</div>' +
+          '<div>Required Min Version</div><div>' + esc((sv.launcherVersion && sv.launcherVersion.requiredMinVersion) || "—") + '</div>' +
+          '<div>Cached version.txt</div><div>' + esc((sv.launcherVersion && sv.launcherVersion.cachedVersionTxt) || "—") + '</div>' +
+          '<div>Paused</div><div>' + esc(yesNo(lx.paused)) + '</div>' +
+          '<div>Pause Reason</div><div>' + esc(lx.pausedReason || "—") + '</div>' +
+          '<div>Maintenance Mode</div><div>' + esc(yesNo(lx.maintenanceMode)) + '</div>' +
+          '<div>Maintenance Message</div><div>' + esc(lx.maintenanceMessage || "—") + '</div>' +
+          '<div>Disable All Keys</div><div>' + esc(yesNo(lx.disableAllKeys)) + '</div>' +
+          '<div>Support Email</div><div>' + esc(lx.supportEmail || "—") + '</div>' +
+          '<div>Discord URL</div><div class="code">' + esc(lx.discordUrl || "—") + '</div>' +
+          '<div>Default Start URL</div><div class="code">' + esc(lx.defaultStartUrl || "—") + '</div>' +
+          '<div>Submit URL</div><div class="code">' + esc(lx.submitUrl || "—") + '</div>' +
+          '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(lx.cleanupOldPromptEnabled)) + '</div>' +
+          '<div>Public Banner Enabled</div><div>' + esc(yesNo(lx.publicBannerEnabled)) + '</div>' +
+          '<div>Public Modal Enabled</div><div>' + esc(yesNo(lx.publicModalEnabled)) + '</div>' +
+          '<div>Public Poll Enabled</div><div>' + esc(yesNo(lx.publicPollEnabled)) + '</div>' +
+          '<div>Quick Links Count</div><div>' + esc(lx.quickLinksCount || 0) + '</div>';
 
-        $("dashboardLauncherState").innerHTML =
-          '<div>Paused</div><div>' + esc(yesNo(l.paused)) + '</div>' +
-          '<div>Paused Reason</div><div>' + esc(l.pausedReason || "—") + '</div>' +
-          '<div>Maintenance Mode</div><div>' + esc(yesNo(l.maintenanceMode)) + '</div>' +
-          '<div>Maintenance Message</div><div>' + esc(l.maintenanceMessage || "—") + '</div>' +
-          '<div>Disable All Keys</div><div>' + esc(yesNo(l.disableAllKeys)) + '</div>' +
-          '<div>Required Min Version</div><div>' + esc((s.launcherVersion && s.launcherVersion.requiredMinVersion) || "v13.13.15") + '</div>' +
-          '<div>Cached Version Txt</div><div>' + esc((s.launcherVersion && s.launcherVersion.cachedVersionTxt) || "—") + '</div>' +
-          '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(l.cleanupOldPromptEnabled)) + '</div>' +
-          '<div>Cleanup Prompt Message</div><div>' + esc(l.cleanupOldPromptMessage || "—") + '</div>' +
-          '<div>Cleanup Prompt Force Once</div><div>' + esc(l.cleanupOldPromptForceOnce ? ts(l.cleanupOldPromptForceOnce) : "—") + '</div>';
+        $("dashboardTodayBox").innerHTML =
+          '<div>Key Checks</div><div>' + esc(today.keyChecks || 0) + '</div>' +
+          '<div>Verify Attempts</div><div>' + esc(today.verifyAttempts || 0) + '</div>' +
+          '<div>Launch Attempts</div><div>' + esc(today.launchAttempts || 0) + '</div>' +
+          '<div>Launch Failures</div><div>' + esc(today.launchFailures || 0) + '</div>' +
+          '<div>UI Challenges</div><div>' + esc(today.uiChallenges || 0) + '</div>' +
+          '<div>Free Keys Generated</div><div>' + esc(today.freeKeysGenerated || 0) + '</div>' +
+          '<div>Sessions Ended</div><div>' + esc(today.sessionsEnded || 0) + '</div>' +
+          '<div>Admin Login Failures</div><div>' + esc(today.adminLoginFailures || 0) + '</div>' +
+          '<div>Public Events</div><div>' + esc(today.publicEvents || 0) + '</div>' +
+          '<div>Poll Votes</div><div>' + esc(today.pollVotes || 0) + '</div>' +
+          '<div>Banner Dismissals</div><div>' + esc(today.bannerDismissals || 0) + '</div>' +
+          '<div>Cleanup Runs</div><div>' + esc(today.cleanupRuns || 0) + '</div>';
 
-        $("dashboardToday").innerHTML =
-          '<div>Key Checks</div><div>' + esc(a.keyChecks || 0) + '</div>' +
-          '<div>Verify Attempts</div><div>' + esc(a.verifyAttempts || 0) + '</div>' +
-          '<div>Launch Attempts</div><div>' + esc(a.launchAttempts || 0) + '</div>' +
-          '<div>Launch Failures</div><div>' + esc(a.launchFailures || 0) + '</div>' +
-          '<div>Free Keys Generated</div><div>' + esc(a.freeKeysGenerated || 0) + '</div>' +
-          '<div>Sessions Ended</div><div>' + esc(a.sessionsEnded || 0) + '</div>' +
-          '<div>Admin Login Failures</div><div>' + esc(a.adminLoginFailures || 0) + '</div>';
-
-        var stateLabel = l.paused ? "System: Paused" : (l.maintenanceMode ? "System: Maintenance" : "System: Live");
-        setGlobalStatePill(stateLabel, l.paused || l.maintenanceMode ? "warn" : "ok");
-      }
-
-      async function refreshCurrentSection(){
-        var s = state.currentSection;
-        if(s === "dashboard") return loadDashboard();
-        if(s === "sessions") return loadSessions();
-        if(s === "keys") return loadCustomKeys();
-        if(s === "freekeys") return loadFreeKeys();
-        if(s === "launcher") return loadLauncherStatus();
-        if(s === "hwid") return;
-        if(s === "accounts") return loadAdminAccounts();
-        if(s === "config") return loadConfig();
-        if(s === "analytics") return loadAnalytics();
-        if(s === "alerts") return loadAlerts();
-        if(s === "audit") return loadAudit();
+        $("dashboardPlanBox").innerHTML =
+          '<div>FREE Active</div><div>' + esc((counts.activeByPlan && counts.activeByPlan.free) || 0) + '</div>' +
+          '<div>BASIC Active</div><div>' + esc((counts.activeByPlan && counts.activeByPlan.basic) || 0) + '</div>' +
+          '<div>PRO Active</div><div>' + esc((counts.activeByPlan && counts.activeByPlan.pro) || 0) + '</div>';
       }
 
       async function loadSessions(){
         var j = await api("sessions_list", {
-          license: $("sessLicense").value.trim(),
-          plan: $("sessPlan").value.trim(),
-          clientId: $("sessClient").value.trim(),
-          hwidHash: $("sessHwid").value.trim(),
-          search: $("sessSearch").value.trim()
+          search: $("sessionsSearch").value.trim(),
+          license: $("sessionsLicense").value.trim(),
+          plan: $("sessionsPlan").value,
+          clientId: $("sessionsClientId").value.trim(),
+          hwidHash: $("sessionsHwid").value.trim()
         });
-
         var rows = j.items || [];
-        var html = "";
-        if(!rows.length){
-          html = '<tr><td colspan="8" class="muted">No active sessions found.</td></tr>';
-        } else {
-          for(var i=0;i<rows.length;i++){
-            var r = rows[i];
-            html += '<tr>' +
-              '<td class="code">' + esc(r.license) + '</td>' +
-              '<td>' + esc(r.plan) + '</td>' +
-              '<td class="code">' + esc(r.sessionId) + '</td>' +
-              '<td class="code">' + esc(r.clientId) + '</td>' +
-              '<td class="code">' + esc(r.hwidHash) + '</td>' +
-              '<td>' + esc(ts(r.lastSeen)) + '</td>' +
-              '<td>' + esc(ts(r.exp)) + '</td>' +
-              '<td>' +
-                '<button class="btnSmDanger ownerOnly inlineEndSession" data-license="' + esc(r.license) + '" data-session="' + esc(r.sessionId) + '">End</button>' +
-              '</td>' +
-            '</tr>';
-          }
-        }
-        $("sessionsTbody").innerHTML = html;
-        applyPermissions();
-
-        var btns = document.querySelectorAll(".inlineEndSession");
-        for(var b=0;b<btns.length;b++){
-          btns[b].onclick = async function(){
-            if(!isOwner()) return;
-            var lic = this.getAttribute("data-license");
-            var sid = this.getAttribute("data-session");
-            if(!confirm("End session " + sid + " for " + lic + "?")) return;
-            await api("session_end_one", { license: lic, sessionId: sid });
-            await loadSessions();
-            await loadDashboard();
-          };
-        }
+        $("sessionsTbody").innerHTML = rows.length ? rows.map(function(x){
+          return '<tr>' +
+            '<td class="code">' + esc(x.license || "—") + '</td>' +
+            '<td>' + esc(x.plan || "—") + '</td>' +
+            '<td class="code">' + esc(x.sessionId || "—") + '</td>' +
+            '<td class="code">' + esc(x.clientId || "—") + '</td>' +
+            '<td class="code">' + esc(x.hwidHash || "—") + '</td>' +
+            '<td>' + esc(ts(x.lastSeen)) + '</td>' +
+            '<td>' + esc(ts(x.exp)) + '</td>' +
+            '<td class="code">' + esc(x.ip || "—") + '</td>' +
+            '<td><button class="btnSmDanger" onclick="window.__snEndSession(\'' + escJs(x.license) + '\',\'' + escJs(x.sessionId) + '\')">End</button></td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="9" class="muted">No sessions found.</td></tr>';
       }
 
       async function keySearch(){
-        var lic = $("keySearchLicense").value.trim();
-        if(!lic) throw new Error("missing_license");
-        state.lastKeyLookup = lic;
-        var j = await api("key_search", { license: lic });
+        var license = $("keyLicense").value.trim();
+        if(!license) throw new Error("missing_license");
+        var j = await api("key_search", { license: license });
         if(!j.exists){
-          $("keySearchResult").innerHTML = '<div class="error">Key not found.</div>';
+          $("keySearchBox").innerHTML = '<div>Result</div><div>Key not found.</div>';
           return;
         }
         var k = j.key || {};
-        $("keySearchResult").innerHTML =
-          '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
-            '<div class="kv">' +
-              '<div>License</div><div class="code">' + esc(k.license) + '</div>' +
-              '<div>Source</div><div>' + esc(k.source) + '</div>' +
-              '<div>Plan</div><div>' + esc(k.plan) + '</div>' +
-              '<div>Disabled</div><div>' + esc(yesNo(k.disabled)) + '</div>' +
-              '<div>TTL Seconds</div><div>' + esc(k.ttlSeconds) + '</div>' +
-              '<div>Session Limit</div><div>' + esc(k.sessionLimit) + '</div>' +
-              '<div>Max Devices</div><div>' + esc(k.maxDevices) + '</div>' +
-              '<div>Expiry</div><div>' + esc(k.exp ? ts(k.exp) : "—") + '</div>' +
-              '<div>Active Sessions</div><div>' + esc(k.activeSessions || 0) + '</div>' +
-              '<div>HWIDs</div><div class="code">' + esc((k.hwids || []).join(", ") || "—") + '</div>' +
-              '<div>Note</div><div>' + esc(k.note || "—") + '</div>' +
-            '</div>' +
-          '</div>';
+        $("keySearchBox").innerHTML =
+          '<div>License</div><div class="code">' + esc(k.license || "—") + '</div>' +
+          '<div>Source</div><div>' + esc(k.source || "—") + '</div>' +
+          '<div>Plan</div><div>' + esc(k.plan || "—") + '</div>' +
+          '<div>Disabled</div><div>' + esc(yesNo(k.disabled)) + '</div>' +
+          '<div>TTL Seconds</div><div>' + esc(k.ttlSeconds || 0) + '</div>' +
+          '<div>Session Limit</div><div>' + esc(k.sessionLimit || 0) + '</div>' +
+          '<div>Max Devices</div><div>' + esc(k.maxDevices || 0) + '</div>' +
+          '<div>Active Sessions</div><div>' + esc(k.activeSessions || 0) + '</div>' +
+          '<div>HWIDs</div><div class="code">' + esc((k.hwids || []).join(", ") || "—") + '</div>' +
+          '<div>Tier</div><div>' + esc(k.tier || "—") + '</div>' +
+          '<div>Note</div><div>' + esc(k.note || "—") + '</div>';
       }
 
-      async function disableKey(){ await api("key_disable", { license: state.lastKeyLookup || $("keySearchLicense").value.trim() }); await keySearch(); }
-      async function enableKey(){ await api("key_enable", { license: state.lastKeyLookup || $("keySearchLicense").value.trim() }); await keySearch(); }
-      async function resetKeyHwids(){ await api("key_reset_hwid_bindings", { license: state.lastKeyLookup || $("keySearchLicense").value.trim() }); await keySearch(); }
+      async function disableKey(){
+        var license = $("keyLicense").value.trim();
+        if(!license) throw new Error("missing_license");
+        await api("key_disable", { license: license });
+        setMsg("success", "Key disabled.");
+        await keySearch();
+      }
 
-      function customPayload(){
-        return {
-          license: $("customLicense").value.trim(),
-          plan: $("customPlan").value.trim(),
+      async function enableKey(){
+        var license = $("keyLicense").value.trim();
+        if(!license) throw new Error("missing_license");
+        await api("key_enable", { license: license });
+        setMsg("success", "Key enabled.");
+        await keySearch();
+      }
+
+      async function resetKeyHwids(){
+        var license = $("keyLicense").value.trim();
+        if(!license) throw new Error("missing_license");
+        if(!confirm("Reset all HWID bindings for this key?")) return;
+        await api("key_reset_hwid_bindings", { license: license });
+        setMsg("success", "Key HWID bindings reset.");
+        await keySearch();
+      }
+
+      async function createCustomKey(){
+        var license = $("customLicense").value.trim();
+        await api("key_create_custom", {
+          license: license,
+          plan: $("customPlan").value,
           ttlSeconds: $("customTtl").value.trim(),
           sessionLimit: $("customSessions").value.trim(),
           maxDevices: $("customDevices").value.trim(),
           exp: $("customExp").value.trim(),
           note: $("customNote").value.trim()
-        };
+        });
+        setMsg("success", "Custom key created.");
+        await loadCustomKeys();
       }
 
-      async function createCustomKey(){ await api("key_create_custom", customPayload()); await loadCustomKeys(); }
-      async function updateCustomKey(){ await api("key_update_custom", customPayload()); await loadCustomKeys(); }
-      async function deleteCustomKey(){ await api("key_delete_custom", { license: $("customLicense").value.trim() }); await loadCustomKeys(); }
+      async function updateCustomKey(){
+        var license = $("customLicense").value.trim();
+        await api("key_update_custom", {
+          license: license,
+          plan: $("customPlan").value,
+          ttlSeconds: $("customTtl").value.trim(),
+          sessionLimit: $("customSessions").value.trim(),
+          maxDevices: $("customDevices").value.trim(),
+          exp: $("customExp").value.trim(),
+          note: $("customNote").value.trim()
+        });
+        setMsg("success", "Custom key updated.");
+        await loadCustomKeys();
+      }
+
+      async function deleteCustomKey(){
+        var license = $("customLicense").value.trim();
+        if(!license) throw new Error("missing_license");
+        if(!confirm("Delete this custom key?")) return;
+        await api("key_delete_custom", { license: license });
+        setMsg("success", "Custom key deleted.");
+        await loadCustomKeys();
+      }
 
       async function loadCustomKeys(){
         var j = await api("keys_list_custom");
         var rows = j.items || [];
-        var html = "";
-        if(!rows.length){
-          html = '<tr><td colspan="8" class="muted">No custom keys found.</td></tr>';
-        } else {
-          for(var i=0;i<rows.length;i++){
-            var r = rows[i];
-            html += '<tr>' +
-              '<td class="code">' + esc(r.license) + '</td>' +
-              '<td>' + esc(r.plan) + '</td>' +
-              '<td>' + esc(r.ttlSeconds) + '</td>' +
-              '<td>' + esc(r.sessionLimit) + '</td>' +
-              '<td>' + esc(r.maxDevices) + '</td>' +
-              '<td>' + esc(r.exp ? ts(r.exp) : "—") + '</td>' +
-              '<td>' + esc(r.createdBy || "—") + '</td>' +
-              '<td>' + esc(r.note || "—") + '</td>' +
-            '</tr>';
-          }
-        }
-        $("customKeysTbody").innerHTML = html;
+        $("customKeysTbody").innerHTML = rows.length ? rows.map(function(x){
+          return '<tr>' +
+            '<td class="code">' + esc(x.license || "—") + '</td>' +
+            '<td>' + esc(x.plan || "—") + '</td>' +
+            '<td>' + esc(x.ttlSeconds || 0) + '</td>' +
+            '<td>' + esc(x.sessionLimit || 0) + '</td>' +
+            '<td>' + esc(x.maxDevices || 0) + '</td>' +
+            '<td>' + esc(x.exp ? ts(x.exp) : "—") + '</td>' +
+            '<td>' + esc(ts(x.createdAt)) + '</td>' +
+            '<td>' + esc(x.createdBy || "—") + '</td>' +
+            '<td>' + esc(x.note || "—") + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="9" class="muted">No custom keys found.</td></tr>';
+      }
+
+      async function addFreeKey(){
+        var j = await api("freekey_add", {
+          license: $("freeKeyLicense").value.trim(),
+          ttlSeconds: $("freeKeyTtl").value.trim(),
+          tier: $("freeKeyTier").value.trim()
+        });
+        setMsg("success", "Free key added: " + (j.license || ""));
+        await loadFreeKeys();
+      }
+
+      async function removeFreeKey(){
+        var license = $("freeKeyLicense").value.trim();
+        if(!license) throw new Error("missing_license");
+        await api("freekey_remove", { license: license });
+        setMsg("success", "Free key removed.");
+        await loadFreeKeys();
+      }
+
+      async function expireAllFreeKeys(){
+        if(!confirm("Expire all free keys?")) return;
+        await api("freekeys_expire_all");
+        setMsg("success", "All free keys expired.");
+        await loadFreeKeys();
       }
 
       async function loadFreeKeys(){
         var j = await api("freekeys_list");
         var rows = j.items || [];
-        var html = "";
-        if(!rows.length){
-          html = '<tr><td colspan="6" class="muted">No free keys found.</td></tr>';
-        } else {
-          for(var i=0;i<rows.length;i++){
-            var r = rows[i];
-            html += '<tr>' +
-              '<td class="code">' + esc(r.license) + '</td>' +
-              '<td>' + esc(r.tier || "—") + '</td>' +
-              '<td>' + esc(r.ttlSeconds) + '</td>' +
-              '<td>' + esc(r.exp ? ts(r.exp) : "—") + '</td>' +
-              '<td>' + esc(r.createdAt ? ts(r.createdAt) : "—") + '</td>' +
-              '<td>' + esc(r.createdBy || "—") + '</td>' +
-            '</tr>';
-          }
-        }
-        $("freeKeysTbody").innerHTML = html;
+        $("freeKeysTbody").innerHTML = rows.length ? rows.map(function(x){
+          return '<tr>' +
+            '<td class="code">' + esc(x.license || "—") + '</td>' +
+            '<td>' + esc(x.tier || "—") + '</td>' +
+            '<td>' + esc(x.ttlSeconds || 0) + '</td>' +
+            '<td>' + esc(ts(x.exp)) + '</td>' +
+            '<td>' + esc(ts(x.createdAt)) + '</td>' +
+            '<td>' + esc(x.createdBy || "—") + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="6" class="muted">No free keys found.</td></tr>';
       }
 
-      async function addFreeKey(){
-        await api("freekey_add", {
-          license: $("freeAddLicense").value.trim(),
-          ttlSeconds: $("freeAddTtl").value.trim(),
-          tier: $("freeAddTier").value.trim()
+      async function pauseLauncher(){
+        await api("launcher_pause", { reason: $("pauseReason").value.trim() });
+        setMsg("success", "Launcher paused.");
+        await loadLauncherStatus();
+        await loadDashboard();
+      }
+
+      async function unpauseLauncher(){
+        await api("launcher_unpause");
+        setMsg("success", "Launcher unpaused.");
+        await loadLauncherStatus();
+        await loadDashboard();
+      }
+
+      async function setMinVersion(){
+        await api("launcher_set_min_version", { version: $("minVersion").value.trim() });
+        setMsg("success", "Minimum version updated.");
+        await loadLauncherStatus();
+        await loadDashboard();
+      }
+
+      async function setMaintenanceMessage(){
+        await api("launcher_set_maintenance_message", { message: $("maintenanceMsg").value.trim() });
+        setMsg("success", "Maintenance message updated.");
+        await loadLauncherStatus();
+        await loadDashboard();
+      }
+
+      async function saveRuntimeConfig(){
+        await api("launcher_set_runtime_config", {
+          supportEmail: $("runtimeSupportEmail").value.trim(),
+          discordUrl: $("runtimeDiscordUrl").value.trim(),
+          defaultStartUrl: $("runtimeStartUrl").value.trim(),
+          submitUrl: $("runtimeSubmitUrl").value.trim()
         });
-        await loadFreeKeys();
+        setMsg("success", "Runtime config saved.");
+        await loadLauncherStatus();
+        await loadDashboard();
       }
-
-      async function removeFreeKey(){ await api("freekey_remove", { license: $("freeRemoveLicense").value.trim() }); await loadFreeKeys(); }
-      async function expireAllFreeKeys(){ if(!confirm("Expire all free keys?")) return; await api("freekeys_expire_all"); await loadFreeKeys(); }
 
       async function loadLauncherStatus(){
         var j = await api("launcher_status");
-        var l = j.launcher || {};
+        var lx = j.launcher || {};
+
+        $("pauseReason").value = lx.pausedReason || "";
+        $("minVersion").value = lx.minVersion || "";
+        $("maintenanceMsg").value = lx.maintenanceMessage || "";
+        $("runtimeSupportEmail").value = lx.launcherSupportEmail || "";
+        $("runtimeDiscordUrl").value = lx.launcherDiscordUrl || "";
+        $("runtimeStartUrl").value = lx.launcherDefaultStartUrl || "";
+        $("runtimeSubmitUrl").value = lx.launcherSubmitUrl || "/api/ui";
+
         $("launcherStatusBox").innerHTML =
-          '<div class="kv">' +
-            '<div>Paused</div><div>' + esc(yesNo(l.paused)) + '</div>' +
-            '<div>Paused Reason</div><div>' + esc(l.pausedReason || "—") + '</div>' +
-            '<div>Disable All</div><div>' + esc(yesNo(l.disableAll)) + '</div>' +
-            '<div>Maintenance</div><div>' + esc(yesNo(l.maintenanceMode)) + '</div>' +
-            '<div>Maintenance Message</div><div>' + esc(l.maintenanceMessage || "—") + '</div>' +
-            '<div>Min Version</div><div>' + esc(l.minVersion || "—") + '</div>' +
-            '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(l.cleanupOldPromptEnabled)) + '</div>' +
-            '<div>Cleanup Prompt Message</div><div>' + esc(l.cleanupOldPromptMessage || "—") + '</div>' +
-            '<div>Cleanup Prompt Force Once</div><div>' + esc(l.cleanupOldPromptForceOnce ? ts(l.cleanupOldPromptForceOnce) : "—") + '</div>' +
-          '</div>';
+          '<div>Paused</div><div>' + esc(yesNo(lx.paused)) + '</div>' +
+          '<div>Pause Reason</div><div>' + esc(lx.pausedReason || "—") + '</div>' +
+          '<div>Disable All</div><div>' + esc(yesNo(lx.disableAll)) + '</div>' +
+          '<div>Maintenance Mode</div><div>' + esc(yesNo(lx.maintenanceMode)) + '</div>' +
+          '<div>Maintenance Message</div><div>' + esc(lx.maintenanceMessage || "—") + '</div>' +
+          '<div>Minimum Version</div><div>' + esc(lx.minVersion || "—") + '</div>' +
+          '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(lx.cleanupOldPromptEnabled)) + '</div>' +
+          '<div>Cleanup Message</div><div>' + esc(lx.cleanupOldPromptMessage || "—") + '</div>' +
+          '<div>Cleanup Force Once</div><div>' + esc(lx.cleanupOldPromptForceOnce ? ts(lx.cleanupOldPromptForceOnce) : "—") + '</div>' +
+          '<div>Support Email</div><div>' + esc(lx.launcherSupportEmail || "—") + '</div>' +
+          '<div>Discord URL</div><div class="code">' + esc(lx.launcherDiscordUrl || "—") + '</div>' +
+          '<div>Default Start URL</div><div class="code">' + esc(lx.launcherDefaultStartUrl || "—") + '</div>' +
+          '<div>Submit URL</div><div class="code">' + esc(lx.launcherSubmitUrl || "—") + '</div>' +
+          '<div>Banner Enabled</div><div>' + esc(yesNo(lx.publicBannerEnabled)) + '</div>' +
+          '<div>Modal Enabled</div><div>' + esc(yesNo(lx.publicModalEnabled)) + '</div>' +
+          '<div>Poll Enabled</div><div>' + esc(yesNo(lx.publicPollEnabled)) + '</div>' +
+          '<div>Quick Links Count</div><div>' + esc((lx.launcherQuickLinks || []).length || 0) + '</div>';
       }
 
       async function loadCleanupPrompt(){
         var j = await api("launcher_cleanup_prompt_get");
         var c = j.cleanupPrompt || {};
-        $("cleanupPromptEnabled").value = c.enabled ? "1" : "0";
-        $("cleanupPromptMessage").value = c.message || "";
-        $("cleanupPromptStatusBox").innerHTML =
-          '<div class="kv">' +
-            '<div>Enabled</div><div>' + esc(yesNo(c.enabled)) + '</div>' +
-            '<div>Message</div><div>' + esc(c.message || "—") + '</div>' +
-            '<div>Force Once</div><div>' + esc(c.forceOnce ? ts(c.forceOnce) : "—") + '</div>' +
-          '</div>';
+        $("cleanupEnabled").value = c.enabled ? "1" : "0";
+        $("cleanupMessage").value = c.message || "";
+        $("cleanupForceOnce").value = c.forceOnce ? ts(c.forceOnce) : "";
+        $("cleanupScanPaths").value = toLines(c.scanPaths || []);
+        $("cleanupNameHints").value = toLines(c.nameHints || []);
       }
 
       async function saveCleanupPrompt(){
         await api("launcher_cleanup_prompt_set", {
-          enabled: $("cleanupPromptEnabled").value === "1",
-          message: $("cleanupPromptMessage").value.trim()
+          enabled: boolFromInput($("cleanupEnabled").value),
+          message: $("cleanupMessage").value,
+          scanPaths: fromLines($("cleanupScanPaths").value),
+          nameHints: fromLines($("cleanupNameHints").value)
         });
+        setMsg("success", "Cleanup prompt config saved.");
         await loadCleanupPrompt();
         await loadLauncherStatus();
-        await loadDashboard();
       }
 
       async function bumpCleanupPrompt(){
         await api("launcher_cleanup_prompt_bump");
+        setMsg("success", "Cleanup prompt force-once bumped.");
         await loadCleanupPrompt();
         await loadLauncherStatus();
+      }
+
+      async function saveBanner(){
+        await api("launcher_public_banner_set", {
+          enabled: boolFromInput($("bannerEnabled").value),
+          id: $("bannerId").value.trim(),
+          title: $("bannerTitle").value.trim(),
+          text: $("bannerText").value,
+          mode: $("bannerMode").value,
+          dismissable: boolFromInput($("bannerDismissable").value)
+        });
+        setMsg("success", "Banner saved.");
+        await loadConfig();
         await loadDashboard();
       }
 
-      async function pauseLauncher(){ await api("launcher_pause", { reason: $("pauseReason").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
-      async function unpauseLauncher(){ await api("launcher_unpause"); await loadLauncherStatus(); await loadDashboard(); }
-      async function setMinVersion(){ await api("launcher_set_min_version", { version: $("minVersion").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
-      async function setMaintenanceMessage(){ await api("launcher_set_maintenance_message", { message: $("maintenanceMessage").value.trim() }); await loadLauncherStatus(); await loadDashboard(); }
-
-      async function searchHwid(){
-        var lic = $("hwidLicense").value.trim();
-        var hw = $("hwidHash").value.trim();
-        state.lastHwidLookup = hw;
-        var j = await api("hwid_search", { license: lic, hwidHash: hw });
-        var r = j.result || {};
-        var byH = r.byHwid || {};
-        var html =
-          '<div>HWID Hash</div><div class="code">' + esc(byH.hwidHash || "—") + '</div>' +
-          '<div>Banned</div><div>' + esc(yesNo(byH.banned)) + '</div>' +
-          '<div>Suspicious</div><div>' + esc(yesNo(byH.suspicious)) + '</div>' +
-          '<div>Ban Info</div><div>' + esc(byH.banInfo ? JSON.stringify(byH.banInfo) : "—") + '</div>' +
-          '<div>Suspicious Info</div><div>' + esc(byH.suspiciousInfo ? JSON.stringify(byH.suspiciousInfo) : "—") + '</div>' +
-          '<div>Licenses Tied</div><div class="code">' + esc((byH.licenses || []).join(", ") || "—") + '</div>' +
-          '<div>Current Active Sessions</div><div>' + esc((byH.sessions || []).length) + '</div>';
-
-        if(r.byLicense && r.byLicense[0]){
-          html += '<div>License HWIDs</div><div class="code">' + esc((r.byLicense[0].hwids || []).join(", ") || "—") + '</div>';
-        }
-
-        $("hwidSearchResult").innerHTML = html;
-
-        var sessions = byH.sessions || [];
-        var rel = "";
-        if(r.byLicense && r.byLicense.length){
-          for(var i=0;i<r.byLicense.length;i++){
-            rel += '<div class="panel" style="margin-bottom:10px;padding:12px;background:#0a1322;">' +
-              '<b>License:</b> <span class="code">' + esc(r.byLicense[i].license) + '</span><br>' +
-              '<b>HWIDs:</b> <span class="code">' + esc((r.byLicense[i].hwids || []).join(", ") || "—") + '</span><br>' +
-              '<b>Sessions:</b> ' + esc((r.byLicense[i].sessions || []).length) +
-            '</div>';
-          }
-        }
-        if(sessions.length){
-          rel += '<div class="tableWrap"><table><thead><tr><th>License</th><th>Session</th><th>Client</th><th>Last Seen</th></tr></thead><tbody>';
-          for(var s=0;s<sessions.length;s++){
-            rel += '<tr><td class="code">' + esc(sessions[s].license) + '</td><td class="code">' + esc(sessions[s].sessionId) + '</td><td class="code">' + esc(sessions[s].clientId) + '</td><td>' + esc(ts(sessions[s].lastSeen)) + '</td></tr>';
-          }
-          rel += '</tbody></table></div>';
-        }
-        if(!rel) rel = '<div class="muted">No relations found.</div>';
-        $("hwidRelationsBox").innerHTML = rel;
+      async function clearBanner(){
+        await api("launcher_public_banner_clear");
+        setMsg("success", "Banner cleared.");
+        await loadConfig();
+        await loadDashboard();
       }
 
-      async function banHwid(){ await api("hwid_ban", { hwidHash: $("hwidHash").value.trim(), reason: $("hwidReason").value.trim() }); await searchHwid(); }
-      async function unbanHwid(){ await api("hwid_unban", { hwidHash: $("hwidHash").value.trim() }); await searchHwid(); }
-      async function markSuspicious(){ await api("hwid_mark_suspicious", { hwidHash: $("hwidHash").value.trim(), reason: $("hwidReason").value.trim() }); await searchHwid(); }
-      async function disconnectHwid(){ await api("sessions_end_by_hwid", { hwidHash: $("hwidHash").value.trim() }); await searchHwid(); await loadDashboard(); }
+      async function saveModal(){
+        await api("launcher_public_modal_set", {
+          enabled: boolFromInput($("modalEnabled").value),
+          id: $("modalId").value.trim(),
+          title: $("modalTitle").value.trim(),
+          text: $("modalText").value,
+          buttons: parseJsonMaybe($("modalButtons").value, [])
+        });
+        setMsg("success", "Modal saved.");
+        await loadConfig();
+        await loadDashboard();
+      }
+
+      async function clearModal(){
+        await api("launcher_public_modal_clear");
+        setMsg("success", "Modal cleared.");
+        await loadConfig();
+        await loadDashboard();
+      }
+
+      async function savePoll(){
+        await api("launcher_public_poll_set", {
+          enabled: boolFromInput($("pollEnabled").value),
+          id: $("pollId").value.trim(),
+          question: $("pollQuestion").value.trim(),
+          options: fromLines($("pollOptions").value)
+        });
+        setMsg("success", "Poll saved.");
+        await loadConfig();
+        await loadDashboard();
+      }
+
+      async function clearPoll(){
+        await api("launcher_public_poll_clear");
+        setMsg("success", "Poll cleared.");
+        await loadConfig();
+        await loadDashboard();
+      }
+
+      async function saveQuickLinks(){
+        await api("launcher_quick_links_set", {
+          links: parseJsonMaybe($("quickLinks").value, [])
+        });
+        setMsg("success", "Quick links saved.");
+        await loadConfig();
+        await loadDashboard();
+      }
+
+      async function clearQuickLinks(){
+        await api("launcher_quick_links_clear");
+        setMsg("success", "Quick links cleared.");
+        await loadConfig();
+        await loadDashboard();
+      }
+
+      async function loadPollResults(){
+        var j = await api("launcher_public_poll_results", {
+          pollId: $("pollResultsId").value.trim()
+        });
+        var p = j.poll || {};
+        var votes = p.votes || {};
+        var options = Array.isArray(p.options) ? p.options : [];
+
+        var html =
+          '<div>Poll ID</div><div class="code">' + esc(p.pollId || "—") + '</div>' +
+          '<div>Question</div><div>' + esc(p.question || "—") + '</div>' +
+          '<div>Options</div><div>' + esc(options.join(" | ") || "—") + '</div>';
+
+        for(var i=0;i<options.length;i++){
+          var opt = options[i];
+          html += '<div>Votes: ' + esc(opt) + '</div><div>' + esc(votes[opt] || 0) + '</div>';
+        }
+
+        $("pollResultsBox").innerHTML = html;
+      }
+
+      async function resetPollResults(){
+        if(!confirm("Reset votes for this poll?")) return;
+        await api("launcher_public_poll_reset", {
+          pollId: $("pollResultsId").value.trim()
+        });
+        setMsg("success", "Poll votes reset.");
+        await loadPollResults();
+      }
+
+      async function loadEvents(){
+        var j = await api("launcher_public_events_list", {
+          limit: $("eventsLimit").value.trim() || "50"
+        });
+        var rows = j.items || [];
+        $("eventsTbody").innerHTML = rows.length ? rows.map(function(x){
+          return '<tr>' +
+            '<td>' + esc(ts(x.ts)) + '</td>' +
+            '<td>' + esc(x.kind || "—") + '</td>' +
+            '<td class="code">' + esc(x.clientId || "—") + '</td>' +
+            '<td class="code">' + esc(x.hwid || "—") + '</td>' +
+            '<td>' + esc(x.version || "—") + '</td>' +
+            '<td class="code">' + esc(JSON.stringify(x.data || {})) + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="6" class="muted">No events found.</td></tr>';
+      }
+
+      async function clearEvents(){
+        if(!confirm("Clear the public events feed?")) return;
+        await api("launcher_public_events_clear");
+        setMsg("success", "Public events feed cleared.");
+        await loadEvents();
+      }
+
+      async function searchHwid(){
+        var j = await api("hwid_search", {
+          license: $("hwidLicense").value.trim(),
+          hwidHash: $("hwidValue").value.trim()
+        });
+        var r = j.result || {};
+        var byHwid = r.byHwid || {};
+        var byLicense = Array.isArray(r.byLicense) ? r.byLicense : [];
+
+        var html = "";
+        if($("hwidLicense").value.trim()){
+          var item = byLicense[0] || {};
+          html += '<div>License</div><div class="code">' + esc(item.license || "—") + '</div>';
+          html += '<div>Bound HWIDs</div><div class="code">' + esc((item.hwids || []).join(", ") || "—") + '</div>';
+          html += '<div>Active Sessions</div><div>' + esc((item.sessions || []).length || 0) + '</div>';
+        }
+        if($("hwidValue").value.trim()){
+          html += '<div>HWID</div><div class="code">' + esc(byHwid.hwidHash || "—") + '</div>';
+          html += '<div>Banned</div><div>' + esc(yesNo(byHwid.banned)) + '</div>';
+          html += '<div>Suspicious</div><div>' + esc(yesNo(byHwid.suspicious)) + '</div>';
+          html += '<div>Known Licenses</div><div class="code">' + esc((byHwid.licenses || []).join(", ") || "—") + '</div>';
+          html += '<div>Active Sessions</div><div>' + esc((byHwid.sessions || []).length || 0) + '</div>';
+        }
+        $("hwidSearchBox").innerHTML = html || '<div>Result</div><div>No data.</div>';
+      }
+
+      async function banHwid(){
+        var hw = $("hwidValue").value.trim();
+        if(!hw) throw new Error("missing_hwid_hash");
+        await api("hwid_ban", { hwidHash: hw, reason: $("hwidReason").value.trim() });
+        setMsg("success", "HWID banned.");
+        await searchHwid();
+      }
+
+      async function unbanHwid(){
+        var hw = $("hwidValue").value.trim();
+        if(!hw) throw new Error("missing_hwid_hash");
+        await api("hwid_unban", { hwidHash: hw });
+        setMsg("success", "HWID unbanned.");
+        await searchHwid();
+      }
+
+      async function markSuspicious(){
+        var hw = $("hwidValue").value.trim();
+        if(!hw) throw new Error("missing_hwid_hash");
+        await api("hwid_mark_suspicious", { hwidHash: hw, reason: $("hwidReason").value.trim() });
+        setMsg("success", "HWID marked suspicious.");
+        await searchHwid();
+      }
+
+      async function disconnectHwid(){
+        var hw = $("hwidValue").value.trim();
+        if(!hw) throw new Error("missing_hwid_hash");
+        if(!confirm("Disconnect all sessions for this HWID?")) return;
+        await api("sessions_end_by_hwid", { hwidHash: hw });
+        setMsg("success", "Sessions disconnected for HWID.");
+        await searchHwid();
+        await loadDashboard();
+      }
 
       async function loadAdminAccounts(){
         var j = await api("admin_accounts_list");
-        var a = j.accounts || [];
-        var s = j.activeSessions || [];
+        var accounts = j.accounts || [];
+        var sessions = j.activeSessions || [];
 
-        $("adminAccountsTbody").innerHTML = a.length ? a.map(function(x){
-          return '<tr><td>' + esc(x.username) + '</td><td>' + esc(x.role) + '</td><td>' + esc(yesNo(x.disabled)) + '</td></tr>';
-        }).join("") : '<tr><td colspan="3" class="muted">No accounts found.</td></tr>';
+        $("accountsTbody").innerHTML = accounts.length ? accounts.map(function(x){
+          return '<tr>' +
+            '<td>' + esc(x.username || "—") + '</td>' +
+            '<td>' + esc(x.role || "—") + '</td>' +
+            '<td>' + esc(yesNo(x.disabled)) + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="3" class="muted">No account rows.</td></tr>';
 
-        $("adminActiveTbody").innerHTML = s.length ? s.map(function(x){
-          return '<tr><td>' + esc(x.username) + '</td><td>' + esc(x.role) + '</td><td>' + esc(x.ip || "—") + '</td><td>' + esc(ts(x.createdAt)) + '</td><td>' + esc(ts(x.exp)) + '</td></tr>';
-        }).join("") : '<tr><td colspan="5" class="muted">No active admin sessions.</td></tr>';
+        $("adminSessionsTbody").innerHTML = sessions.length ? sessions.map(function(x){
+          return '<tr>' +
+            '<td>' + esc(x.username || "—") + '</td>' +
+            '<td>' + esc(x.role || "—") + '</td>' +
+            '<td class="code">' + esc(x.tokenTail || "—") + '</td>' +
+            '<td>' + esc(ts(x.createdAt)) + '</td>' +
+            '<td>' + esc(ts(x.exp)) + '</td>' +
+            '<td class="code">' + esc(x.ip || "—") + '</td>' +
+          '</tr>';
+        }).join("") : '<tr><td colspan="6" class="muted">No active admin sessions.</td></tr>';
       }
 
       async function forceLogoutAdmins(){
         if(!confirm("Force logout all admin sessions?")) return;
         await api("admin_force_logout_all");
-        alert("All admin sessions were revoked. You will need to log in again.");
-        await logout();
+        setMsg("success", "All admin sessions were logged out.");
+        await loadAdminAccounts();
       }
 
       async function loadConfig(){
         var j = await api("config_get");
         var c = j.config || {};
         var p = c.currentPlanDefaults || {};
-        var f = c.featureToggles || {};
         var cleanup = c.cleanupOldPrompt || {};
+        var runtime = c.runtimeConfig || {};
+        var banner = c.publicBanner || {};
+        var modal = c.publicModal || {};
+        var poll = c.publicPoll || {};
+        var links = c.quickLinks || [];
+        var f = c.featureToggles || {};
+
         $("configBox").innerHTML =
-          '<div class="cols2">' +
-            '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
-              '<h3>Plan Defaults</h3>' +
-              '<div class="kv">' +
-                '<div>FREE TTL</div><div>' + esc((p.free && p.free.ttlSeconds) || "—") + '</div>' +
-                '<div>FREE Sessions</div><div>' + esc((p.free && p.free.sessionLimit) || "—") + '</div>' +
-                '<div>FREE Devices</div><div>' + esc((p.free && p.free.maxDevices) || "—") + '</div>' +
-                '<div>BASIC TTL</div><div>' + esc((p.basic && p.basic.ttlSeconds) || "—") + '</div>' +
-                '<div>BASIC Sessions</div><div>' + esc((p.basic && p.basic.sessionLimit) || "—") + '</div>' +
-                '<div>BASIC Devices</div><div>' + esc((p.basic && p.basic.maxDevices) || "—") + '</div>' +
-                '<div>PRO TTL</div><div>' + esc((p.pro && p.pro.ttlSeconds) || "—") + '</div>' +
-                '<div>PRO Sessions</div><div>' + esc((p.pro && p.pro.sessionLimit) || "—") + '</div>' +
-                '<div>PRO Devices</div><div>' + esc((p.pro && p.pro.maxDevices) || "—") + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="panel" style="margin:0;padding:12px;background:#0a1322;">' +
-              '<h3>Globals</h3>' +
-              '<div class="kv">' +
-                '<div>Launcher Force Version</div><div>' + esc(c.launcherForceVersionValue || "—") + '</div>' +
-                '<div>Maintenance Message</div><div>' + esc(c.maintenanceMessageText || "—") + '</div>' +
-                '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(cleanup.enabled)) + '</div>' +
-                '<div>Cleanup Prompt Message</div><div>' + esc(cleanup.message || "—") + '</div>' +
-                '<div>Cleanup Prompt Force Once</div><div>' + esc(cleanup.forceOnce ? ts(cleanup.forceOnce) : "—") + '</div>' +
-                '<div>Paused</div><div>' + esc(yesNo(f.paused)) + '</div>' +
-                '<div>Maintenance Mode</div><div>' + esc(yesNo(f.maintenanceMode)) + '</div>' +
-                '<div>Disable All Keys</div><div>' + esc(yesNo(f.disableAllKeys)) + '</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>';
+          '<div>FREE TTL</div><div>' + esc((p.free && p.free.ttlSeconds) || "—") + '</div>' +
+          '<div>FREE Sessions</div><div>' + esc((p.free && p.free.sessionLimit) || "—") + '</div>' +
+          '<div>FREE Devices</div><div>' + esc((p.free && p.free.maxDevices) || "—") + '</div>' +
+          '<div>BASIC TTL</div><div>' + esc((p.basic && p.basic.ttlSeconds) || "—") + '</div>' +
+          '<div>BASIC Sessions</div><div>' + esc((p.basic && p.basic.sessionLimit) || "—") + '</div>' +
+          '<div>BASIC Devices</div><div>' + esc((p.basic && p.basic.maxDevices) || "—") + '</div>' +
+          '<div>PRO TTL</div><div>' + esc((p.pro && p.pro.ttlSeconds) || "—") + '</div>' +
+          '<div>PRO Sessions</div><div>' + esc((p.pro && p.pro.sessionLimit) || "—") + '</div>' +
+          '<div>PRO Devices</div><div>' + esc((p.pro && p.pro.maxDevices) || "—") + '</div>' +
+
+          '<div>Launcher Force Version</div><div>' + esc(c.launcherForceVersionValue || "—") + '</div>' +
+          '<div>Maintenance Message</div><div>' + esc(c.maintenanceMessageText || "—") + '</div>' +
+
+          '<div>Cleanup Enabled</div><div>' + esc(yesNo(cleanup.enabled)) + '</div>' +
+          '<div>Cleanup Message</div><div>' + esc(cleanup.message || "—") + '</div>' +
+          '<div>Cleanup Force Once</div><div>' + esc(cleanup.forceOnce ? ts(cleanup.forceOnce) : "—") + '</div>' +
+          '<div>Cleanup Scan Paths</div><div class="code">' + esc((cleanup.scanPaths || []).join(", ") || "—") + '</div>' +
+          '<div>Cleanup Name Hints</div><div class="code">' + esc((cleanup.nameHints || []).join(", ") || "—") + '</div>' +
+
+          '<div>Support Email</div><div>' + esc(runtime.supportEmail || "—") + '</div>' +
+          '<div>Discord URL</div><div class="code">' + esc(runtime.discordUrl || "—") + '</div>' +
+          '<div>Default Start URL</div><div class="code">' + esc(runtime.defaultStartUrl || "—") + '</div>' +
+          '<div>Submit URL</div><div class="code">' + esc(runtime.submitUrl || "—") + '</div>' +
+
+          '<div>Banner Enabled</div><div>' + esc(yesNo(banner.enabled)) + '</div>' +
+          '<div>Banner ID</div><div class="code">' + esc(banner.id || "—") + '</div>' +
+          '<div>Banner Title</div><div>' + esc(banner.title || "—") + '</div>' +
+          '<div>Banner Text</div><div>' + esc(banner.text || "—") + '</div>' +
+          '<div>Banner Mode</div><div>' + esc(banner.mode || "—") + '</div>' +
+          '<div>Banner Dismissable</div><div>' + esc(yesNo(banner.dismissable)) + '</div>' +
+
+          '<div>Modal Enabled</div><div>' + esc(yesNo(modal.enabled)) + '</div>' +
+          '<div>Modal ID</div><div class="code">' + esc(modal.id || "—") + '</div>' +
+          '<div>Modal Title</div><div>' + esc(modal.title || "—") + '</div>' +
+          '<div>Modal Text</div><div>' + esc(modal.text || "—") + '</div>' +
+          '<div>Modal Buttons</div><div class="code">' + esc(JSON.stringify(modal.buttons || [])) + '</div>' +
+
+          '<div>Poll Enabled</div><div>' + esc(yesNo(poll.enabled)) + '</div>' +
+          '<div>Poll ID</div><div class="code">' + esc(poll.id || "—") + '</div>' +
+          '<div>Poll Question</div><div>' + esc(poll.question || "—") + '</div>' +
+          '<div>Poll Options</div><div class="code">' + esc((poll.options || []).join(" | ") || "—") + '</div>' +
+
+          '<div>Quick Links</div><div class="code">' + esc(JSON.stringify(links)) + '</div>' +
+
+          '<div>Paused</div><div>' + esc(yesNo(f.paused)) + '</div>' +
+          '<div>Maintenance Mode</div><div>' + esc(yesNo(f.maintenanceMode)) + '</div>' +
+          '<div>Disable All Keys</div><div>' + esc(yesNo(f.disableAllKeys)) + '</div>';
+
+        $("bannerEnabled").value = banner.enabled ? "1" : "0";
+        $("bannerDismissable").value = banner.dismissable ? "1" : "0";
+        $("bannerId").value = banner.id || "";
+        $("bannerTitle").value = banner.title || "";
+        $("bannerText").value = banner.text || "";
+        $("bannerMode").value = banner.mode || "info";
+
+        $("modalEnabled").value = modal.enabled ? "1" : "0";
+        $("modalId").value = modal.id || "";
+        $("modalTitle").value = modal.title || "";
+        $("modalText").value = modal.text || "";
+        $("modalButtons").value = JSON.stringify(modal.buttons || [], null, 2);
+
+        $("pollEnabled").value = poll.enabled ? "1" : "0";
+        $("pollId").value = poll.id || "";
+        $("pollQuestion").value = poll.question || "";
+        $("pollOptions").value = Array.isArray(poll.options) ? poll.options.join("\n") : "";
+
+        $("quickLinks").value = JSON.stringify(links || [], null, 2);
+        $("pollResultsId").value = poll.id || "";
       }
 
       async function loadAnalytics(){
@@ -1316,7 +1910,12 @@
           '<div>Launch Failures Today</div><div>' + esc(a.launchFailuresToday || 0) + '</div>' +
           '<div>Free Keys Generated Today</div><div>' + esc(a.freeKeysGeneratedToday || 0) + '</div>' +
           '<div>Sessions Ended Today</div><div>' + esc(a.sessionsEndedToday || 0) + '</div>' +
-          '<div>Admin Login Failures Today</div><div>' + esc(a.adminLoginFailuresToday || 0) + '</div>';
+          '<div>Admin Login Failures Today</div><div>' + esc(a.adminLoginFailuresToday || 0) + '</div>' +
+          '<div>UI Challenges Today</div><div>' + esc(a.uiChallengesToday || 0) + '</div>' +
+          '<div>Public Events Today</div><div>' + esc(a.publicEventsToday || 0) + '</div>' +
+          '<div>Poll Votes Today</div><div>' + esc(a.pollVotesToday || 0) + '</div>' +
+          '<div>Banner Dismissals Today</div><div>' + esc(a.bannerDismissalsToday || 0) + '</div>' +
+          '<div>Cleanup Runs Today</div><div>' + esc(a.cleanupRunsToday || 0) + '</div>';
       }
 
       async function loadAlerts(){
@@ -1349,12 +1948,87 @@
         }).join("") : '<tr><td colspan="7" class="muted">No audit entries found.</td></tr>';
       }
 
-      async function disableAllKeys(){ if(!confirm("Disable all keys?")) return; await api("emergency_disable_all_keys"); await loadDashboard(); }
-      async function enableAllKeys(){ await api("emergency_enable_all_keys"); await loadDashboard(); }
-      async function emergencyPause(){ if(!confirm("Pause all launches?")) return; await api("emergency_pause_all_launches"); await loadDashboard(); }
-      async function emergencyEndSessions(){ if(!confirm("End all sessions now?")) return; await api("emergency_end_all_sessions"); await loadDashboard(); }
-      async function emergencyClearNonces(){ if(!confirm("Clear all launch nonces?")) return; await api("emergency_clear_launch_nonces"); }
-      async function setEmergencyBanner(){ await api("emergency_set_banner", { message: $("emergencyBanner").value.trim() }); await loadDashboard(); }
+      async function disableAllKeys(){
+        if(!confirm("Disable all keys?")) return;
+        await api("emergency_disable_all_keys");
+        setMsg("success", "All keys disabled.");
+        await loadDashboard();
+        await loadLauncherStatus();
+      }
+
+      async function enableAllKeys(){
+        await api("emergency_enable_all_keys");
+        setMsg("success", "All keys enabled.");
+        await loadDashboard();
+        await loadLauncherStatus();
+      }
+
+      async function emergencyPause(){
+        if(!confirm("Pause all launches?")) return;
+        await api("emergency_pause_all_launches");
+        setMsg("success", "All launches paused.");
+        await loadDashboard();
+        await loadLauncherStatus();
+      }
+
+      async function emergencyEndSessions(){
+        if(!confirm("End all sessions now?")) return;
+        await api("emergency_end_all_sessions");
+        setMsg("success", "All sessions ended.");
+        await loadDashboard();
+        if(state.currentSection === "sessions") await loadSessions();
+      }
+
+      async function emergencyClearNonces(){
+        if(!confirm("Clear all launch nonces?")) return;
+        await api("emergency_clear_launch_nonces");
+        setMsg("success", "Launch nonces cleared.");
+      }
+
+      async function setEmergencyBanner(){
+        await api("emergency_set_banner", { message: $("emergencyBanner").value.trim() });
+        setMsg("success", "Emergency banner set.");
+        await loadDashboard();
+        await loadLauncherStatus();
+      }
+
+      function escJs(v){
+        return String(v == null ? "" : v)
+          .replace(/\\/g,"\\\\")
+          .replace(/'/g,"\\'")
+          .replace(/\r/g,"")
+          .replace(/\n/g,"");
+      }
+
+      window.__snEndSession = async function(license, sessionId){
+        try{
+          if(!confirm("End this session?")) return;
+          await api("session_end_one", { license: license, sessionId: sessionId });
+          setMsg("success", "Session ended.");
+          await loadSessions();
+          await loadDashboard();
+        }catch(e){
+          handleErr(e);
+        }
+      };
+
+      async function refreshCurrentSection(){
+        clearMsg();
+        if(state.currentSection === "dashboard") return loadDashboard();
+        if(state.currentSection === "sessions") return loadSessions();
+        if(state.currentSection === "keys") return loadCustomKeys();
+        if(state.currentSection === "freekeys") return loadFreeKeys();
+        if(state.currentSection === "launcher") return loadLauncherStatus();
+        if(state.currentSection === "publicui") return loadConfig();
+        if(state.currentSection === "cleanup") return loadCleanupPrompt();
+        if(state.currentSection === "events"){ await loadPollResults(); return loadEvents(); }
+        if(state.currentSection === "hwid") return Promise.resolve();
+        if(state.currentSection === "accounts") return loadAdminAccounts();
+        if(state.currentSection === "config") return loadConfig();
+        if(state.currentSection === "analytics") return loadAnalytics();
+        if(state.currentSection === "alerts") return loadAlerts();
+        if(state.currentSection === "audit") return loadAudit();
+      }
 
       function bind(){
         $("btnLogin").onclick = function(){ login().catch(handleErr); };
@@ -1365,7 +2039,7 @@
         for(var i=0;i<nav.length;i++){
           nav[i].onclick = function(){
             var sec = this.getAttribute("data-section");
-            if(isOther() && ["sessions","keys","freekeys","hwid","accounts","config","analytics","audit","emergency"].indexOf(sec) !== -1){
+            if(isOther() && ["sessions","keys","freekeys","launcher","publicui","cleanup","events","hwid","accounts","config","analytics","audit","emergency"].indexOf(sec) !== -1){
               alert("This section is locked for the Other profile.");
               return;
             }
@@ -1377,7 +2051,7 @@
         $("refreshAll").onclick = function(){ refreshCurrentSection().catch(handleErr); };
 
         $("btnLoadSessions").onclick = function(){ loadSessions().catch(handleErr); };
-        $("btnEndAllSessions").onclick = function(){ if(confirm("End all active sessions?")) api("sessions_end_all").then(loadSessions).then(loadDashboard).catch(handleErr); };
+        $("btnEndAllSessions").onclick = function(){ emergencyEndSessions().catch(handleErr); };
 
         $("btnKeySearch").onclick = function(){ keySearch().catch(handleErr); };
         $("btnDisableKey").onclick = function(){ disableKey().catch(handleErr); };
@@ -1398,10 +2072,25 @@
         $("btnSetMinVersion").onclick = function(){ setMinVersion().catch(handleErr); };
         $("btnSetMaintenanceMsg").onclick = function(){ setMaintenanceMessage().catch(handleErr); };
         $("btnLauncherStatus").onclick = function(){ loadLauncherStatus().catch(handleErr); };
+        $("btnSaveRuntimeConfig").onclick = function(){ saveRuntimeConfig().catch(handleErr); };
 
         $("btnLoadCleanupPrompt").onclick = function(){ loadCleanupPrompt().catch(handleErr); };
         $("btnSaveCleanupPrompt").onclick = function(){ saveCleanupPrompt().catch(handleErr); };
         $("btnBumpCleanupPrompt").onclick = function(){ bumpCleanupPrompt().catch(handleErr); };
+
+        $("btnSaveBanner").onclick = function(){ saveBanner().catch(handleErr); };
+        $("btnClearBanner").onclick = function(){ clearBanner().catch(handleErr); };
+        $("btnSaveModal").onclick = function(){ saveModal().catch(handleErr); };
+        $("btnClearModal").onclick = function(){ clearModal().catch(handleErr); };
+        $("btnSavePoll").onclick = function(){ savePoll().catch(handleErr); };
+        $("btnClearPoll").onclick = function(){ clearPoll().catch(handleErr); };
+        $("btnSaveQuickLinks").onclick = function(){ saveQuickLinks().catch(handleErr); };
+        $("btnClearQuickLinks").onclick = function(){ clearQuickLinks().catch(handleErr); };
+
+        $("btnLoadPollResults").onclick = function(){ loadPollResults().catch(handleErr); };
+        $("btnResetPollResults").onclick = function(){ resetPollResults().catch(handleErr); };
+        $("btnLoadEvents").onclick = function(){ loadEvents().catch(handleErr); };
+        $("btnClearEvents").onclick = function(){ clearEvents().catch(handleErr); };
 
         $("btnSearchHwid").onclick = function(){ searchHwid().catch(handleErr); };
         $("btnBanHwid").onclick = function(){ banHwid().catch(handleErr); };
