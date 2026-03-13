@@ -59,8 +59,9 @@
     .logoutBtn:hover{background:#183050}
 
     .loginWrap{
-      min-height:calc(100vh - 36px);
-      display:flex;align-items:center;justify-content:center
+      min-height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      padding:18px
     }
     .loginCard{
       width:min(560px,95vw);background:linear-gradient(180deg,#0d1b2d 0%,#0f2239 100%);
@@ -247,7 +248,7 @@
       <div class="topbar">
         <div class="brand">
           <div style="font-size:24px;font-weight:900"><b>ScriptNova</b> Admin Panel</div>
-          <div class="sub">Bootstrap-ready controls, sessions, keys, public launcher UI, votes, cleanup, analytics</div>
+          <div class="sub">Client ID controls, remote commands, sessions, keys, launcher UI, cleanup, analytics, alerts, audit, emergency tools</div>
         </div>
         <div class="topright">
           <div class="pill"><span class="statusdot"></span> <span id="topRole">Unknown</span></div>
@@ -273,6 +274,8 @@
           <button class="navBtn" data-section="cleanup">Cleanup Prompt <span class="small">Old HTA cleanup controls</span></button>
           <button class="navBtn" data-section="events">Public Events / Votes <span class="small">View feed, poll results, reset</span></button>
           <button class="navBtn" data-section="hwid">HWID Controls <span class="small">Search, ban, suspicious, disconnect</span></button>
+          <button class="navBtn" data-section="client">Client ID Controls <span class="small">SN-XXXX lookup, block, disconnect, notes</span></button>
+          <button class="navBtn" data-section="remote">Remote Commands <span class="small">Queue Chrome/UI commands by target</span></button>
           <button class="navBtn" data-section="accounts">Admin Accounts <span class="small">List sessions, force logout</span></button>
           <button class="navBtn" data-section="config">Config View <span class="small">Current runtime / bootstrap state</span></button>
           <button class="navBtn" data-section="analytics">Analytics <span class="small">Traffic + launcher event counts</span></button>
@@ -341,6 +344,10 @@
                 <input id="sessionsClientId" class="field" placeholder="ClientId" />
                 <input id="sessionsHwid" class="field" placeholder="HWID hash" />
                 <button id="btnLoadSessions" class="btn">Load Sessions</button>
+                <button id="btnEndByClientSessions" class="btnWarn">End By Client</button>
+                <button id="btnEndByLicenseSessions" class="btnWarn">End By Key</button>
+                <button id="btnLoadStaleSessions" class="btn2">Load Stale</button>
+                <button id="btnCleanStaleSessions" class="btnDanger">Clean Stale</button>
                 <button id="btnEndAllSessions" class="btnDanger">End All Sessions</button>
               </div>
               <div class="tableWrap">
@@ -390,6 +397,52 @@
               </div>
 
               <div class="panel">
+                <h3>Key Meta / Risk Controls</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="keyMetaTag">Tag</label>
+                    <input id="keyMetaTag" class="field" placeholder="vip / reseller / risky" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="keyMetaRisk">Risk</label>
+                    <select id="keyMetaRisk" class="select">
+                      <option value="">None</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="keyMetaPlan">Plan Override</label>
+                    <select id="keyMetaPlan" class="select">
+                      <option value="">None</option>
+                      <option value="free">FREE</option>
+                      <option value="basic">BASIC</option>
+                      <option value="pro">PRO</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="keyMetaTtl">TTL Override</label>
+                    <input id="keyMetaTtl" class="field" placeholder="Seconds override" />
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="tag"><input id="keyMetaPaused" type="checkbox" /> Pause this key</label>
+                </div>
+                <div class="fieldWrap" style="margin-top:10px;">
+                  <label class="label" for="keyMetaSuspendMessage">Suspend Message</label>
+                  <input id="keyMetaSuspendMessage" class="field" placeholder="Shown if you later wire this into launcher checks" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="keyMetaNote">Admin Note</label>
+                  <textarea id="keyMetaNote" class="text small" placeholder="Internal key note"></textarea>
+                </div>
+                <button id="btnSaveKeyMeta" class="btn">Save Key Meta</button>
+              </div>
+
+              <div class="panel">
                 <h3>Create / Update Custom Key</h3>
                 <div class="grid2">
                   <div class="fieldWrap">
@@ -421,25 +474,27 @@
                 </div>
                 <div class="grid2">
                   <div class="fieldWrap">
-                    <label class="label" for="customExp">Absolute Expiry Unix (optional)</label>
-                    <input id="customExp" class="field" placeholder="0 for none" />
+                    <label class="label" for="customExp">Expiration Unix Timestamp (optional)</label>
+                    <input id="customExp" class="field" placeholder="Optional absolute expiry time" />
                   </div>
                   <div class="fieldWrap">
                     <label class="label" for="customNote">Note</label>
-                    <input id="customNote" class="field" placeholder="Internal note" />
+                    <input id="customNote" class="field" placeholder="Admin note" />
                   </div>
                 </div>
                 <div class="row">
-                  <button id="btnCreateCustomKey" class="btn">Create Custom Key</button>
-                  <button id="btnUpdateCustomKey" class="btn2">Update Custom Key</button>
-                  <button id="btnDeleteCustomKey" class="btnDanger">Delete Custom Key</button>
-                  <button id="btnLoadCustomKeys" class="btnSm">Load All Custom Keys</button>
+                  <button id="btnCreateCustomKey" class="btn">Create</button>
+                  <button id="btnUpdateCustomKey" class="btn2">Update</button>
+                  <button id="btnDeleteCustomKey" class="btnDanger">Delete</button>
                 </div>
               </div>
             </div>
 
             <div class="panel">
-              <h3>Custom Keys</h3>
+              <div class="row" style="align-items:center;">
+                <h3 style="margin:0;">Custom Keys</h3>
+                <button id="btnLoadCustomKeys" class="btnSm right">Load Custom Keys</button>
+              </div>
               <div class="tableWrap">
                 <table>
                   <thead>
@@ -449,7 +504,7 @@
                       <th>TTL</th>
                       <th>Sessions</th>
                       <th>Devices</th>
-                      <th>Exp</th>
+                      <th>Expires</th>
                       <th>Created</th>
                       <th>By</th>
                       <th>Note</th>
@@ -466,7 +521,7 @@
           <section id="section-freekeys" class="section">
             <div class="sectionHead">
               <h2>Free Keys</h2>
-              <p>Manage FREE keys stored in Redis.</p>
+              <p>View current free keys, add one manually, remove one, or expire all.</p>
             </div>
 
             <div class="cols2">
@@ -475,7 +530,7 @@
                 <div class="grid3">
                   <div class="fieldWrap">
                     <label class="label" for="freeKeyLicense">License</label>
-                    <input id="freeKeyLicense" class="field" placeholder="Leave blank to auto-generate" />
+                    <input id="freeKeyLicense" class="field" placeholder="FREE-..." />
                   </div>
                   <div class="fieldWrap">
                     <label class="label" for="freeKeyTtl">TTL Seconds</label>
@@ -483,36 +538,34 @@
                   </div>
                   <div class="fieldWrap">
                     <label class="label" for="freeKeyTier">Tier</label>
-                    <input id="freeKeyTier" class="field" placeholder="15m / 35m / 2h" />
+                    <select id="freeKeyTier" class="select">
+                      <option value="15m">15m</option>
+                      <option value="35m">35m</option>
+                      <option value="2h">2h</option>
+                    </select>
                   </div>
                 </div>
                 <div class="row">
                   <button id="btnAddFreeKey" class="btn">Add Free Key</button>
-                  <button id="btnRemoveFreeKey" class="btnWarn">Remove Free Key</button>
-                  <button id="btnExpireAllFreeKeys" class="btnDanger">Expire All Free Keys</button>
-                  <button id="btnLoadFreeKeys" class="btnSm">Load Free Keys</button>
+                  <button id="btnRemoveFreeKey" class="btnDanger">Remove Free Key</button>
+                  <button id="btnExpireAllFreeKeys" class="btnWarn">Expire All Free Keys</button>
                 </div>
               </div>
 
               <div class="panel">
-                <h3>Quick Tier Hints</h3>
-                <div class="kv">
-                  <div>15m</div><div>900 seconds</div>
-                  <div>35m</div><div>2100 seconds</div>
-                  <div>2h</div><div>7200 seconds</div>
-                </div>
+                <h3>Current Free Keys</h3>
+                <button id="btnLoadFreeKeys" class="btn">Load Free Keys</button>
               </div>
             </div>
 
             <div class="panel">
-              <h3>Active Free Keys</h3>
               <div class="tableWrap">
                 <table>
                   <thead>
                     <tr>
                       <th>License</th>
                       <th>Tier</th>
-                      <th>TTL Left</th>
+                      <th>TTL</th>
                       <th>Expires</th>
                       <th>Created</th>
                       <th>By</th>
@@ -529,68 +582,65 @@
           <section id="section-launcher" class="section">
             <div class="sectionHead">
               <h2>Launcher Controls</h2>
-              <p>Pause/unpause, min version, maintenance message, and runtime config.</p>
+              <p>Pause/unpause launcher, set min version, maintenance message, and runtime config.</p>
             </div>
 
             <div class="cols2">
               <div class="panel">
-                <h3>Core Launcher Controls</h3>
+                <h3>Pause / Version / Maintenance</h3>
                 <div class="fieldWrap">
                   <label class="label" for="pauseReason">Pause Reason</label>
-                  <input id="pauseReason" class="field" placeholder="Reason shown during pause" />
+                  <input id="pauseReason" class="field" placeholder="Optional reason shown to users" />
                 </div>
                 <div class="row">
                   <button id="btnPauseLauncher" class="btnWarn">Pause Launcher</button>
                   <button id="btnUnpauseLauncher" class="btn2">Unpause Launcher</button>
-                  <button id="btnLauncherStatus" class="btnSm">Load Status</button>
                 </div>
-
                 <div class="spacer"></div>
 
                 <div class="fieldWrap">
                   <label class="label" for="minVersion">Minimum Version</label>
-                  <input id="minVersion" class="field" placeholder="v13.13.15" />
+                  <input id="minVersion" class="field" placeholder="v13.13.16" />
                 </div>
-                <button id="btnSetMinVersion" class="btn">Set Minimum Version</button>
+                <button id="btnSetMinVersion" class="btn">Set Min Version</button>
 
                 <div class="spacer"></div>
 
                 <div class="fieldWrap">
-                  <label class="label" for="maintenanceMsg">Maintenance Message</label>
-                  <textarea id="maintenanceMsg" class="text" placeholder="Message shown when maintenance mode is active"></textarea>
+                  <label class="label" for="maintenanceMessage">Maintenance Message</label>
+                  <textarea id="maintenanceMessage" class="text small" placeholder="Leave blank to clear maintenance mode"></textarea>
                 </div>
-                <button id="btnSetMaintenanceMsg" class="btnWarn">Set Maintenance Message</button>
+                <button id="btnSetMaintenanceMsg" class="btnDanger">Set Maintenance Message</button>
               </div>
 
               <div class="panel">
                 <h3>Runtime Config</h3>
-                <div class="grid2">
-                  <div class="fieldWrap">
-                    <label class="label" for="runtimeSupportEmail">Support Email</label>
-                    <input id="runtimeSupportEmail" class="field" placeholder="gomegaassist@gmail.com" />
-                  </div>
-                  <div class="fieldWrap">
-                    <label class="label" for="runtimeDiscordUrl">Discord URL</label>
-                    <input id="runtimeDiscordUrl" class="field" placeholder="https://discord.gg/..." />
-                  </div>
+                <div class="fieldWrap">
+                  <label class="label" for="supportEmail">Support Email</label>
+                  <input id="supportEmail" class="field" placeholder="support@example.com" />
                 </div>
-                <div class="grid2">
-                  <div class="fieldWrap">
-                    <label class="label" for="runtimeStartUrl">Default Start URL</label>
-                    <input id="runtimeStartUrl" class="field" placeholder="https://..." />
-                  </div>
-                  <div class="fieldWrap">
-                    <label class="label" for="runtimeSubmitUrl">Submit URL</label>
-                    <input id="runtimeSubmitUrl" class="field" placeholder="/api/ui" />
-                  </div>
+                <div class="fieldWrap">
+                  <label class="label" for="discordUrl">Discord URL</label>
+                  <input id="discordUrl" class="field" placeholder="https://discord.gg/..." />
                 </div>
-                <button id="btnSaveRuntimeConfig" class="btn">Save Runtime Config</button>
-
-                <div class="spacer"></div>
-
-                <h3>Launcher Status</h3>
-                <div id="launcherStatusBox" class="kv"></div>
+                <div class="fieldWrap">
+                  <label class="label" for="defaultStartUrl">Default Start URL</label>
+                  <input id="defaultStartUrl" class="field" placeholder="https://..." />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="submitUrl">Submit URL</label>
+                  <input id="submitUrl" class="field" placeholder="/api/ui" />
+                </div>
+                <div class="row">
+                  <button id="btnSaveRuntimeConfig" class="btn">Save Runtime Config</button>
+                  <button id="btnLauncherStatus" class="btn2">Reload Launcher Status</button>
+                </div>
               </div>
+            </div>
+
+            <div class="panel">
+              <h3>Status</h3>
+              <div id="launcherStatusBox" class="kv"></div>
             </div>
           </section>
 
@@ -602,13 +652,36 @@
 
             <div class="cols2">
               <div class="panel">
-                <h3>Public Banner</h3>
+                <h3>Banner</h3>
                 <div class="grid2">
                   <div class="fieldWrap">
                     <label class="label" for="bannerEnabled">Enabled</label>
                     <select id="bannerEnabled" class="select">
                       <option value="1">Yes</option>
                       <option value="0">No</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="bannerId">Banner ID</label>
+                    <input id="bannerId" class="field" placeholder="banner_spring_notice" />
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="bannerTitle">Title</label>
+                  <input id="bannerTitle" class="field" placeholder="Important Notice" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="bannerText">Text</label>
+                  <textarea id="bannerText" class="text small" placeholder="Banner text shown in the launcher"></textarea>
+                </div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="bannerMode">Mode</label>
+                    <select id="bannerMode" class="select">
+                      <option value="info">Info</option>
+                      <option value="success">Success</option>
+                      <option value="warning">Warning</option>
+                      <option value="danger">Danger</option>
                     </select>
                   </div>
                   <div class="fieldWrap">
@@ -619,29 +692,6 @@
                     </select>
                   </div>
                 </div>
-                <div class="grid2">
-                  <div class="fieldWrap">
-                    <label class="label" for="bannerId">Banner ID</label>
-                    <input id="bannerId" class="field" placeholder="banner_update_1" />
-                  </div>
-                  <div class="fieldWrap">
-                    <label class="label" for="bannerMode">Mode</label>
-                    <select id="bannerMode" class="select">
-                      <option value="info">info</option>
-                      <option value="success">success</option>
-                      <option value="warning">warning</option>
-                      <option value="danger">danger</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="fieldWrap">
-                  <label class="label" for="bannerTitle">Title</label>
-                  <input id="bannerTitle" class="field" placeholder="Important notice" />
-                </div>
-                <div class="fieldWrap">
-                  <label class="label" for="bannerText">Text</label>
-                  <textarea id="bannerText" class="text" placeholder="Banner text shown in launcher"></textarea>
-                </div>
                 <div class="row">
                   <button id="btnSaveBanner" class="btn">Save Banner</button>
                   <button id="btnClearBanner" class="btnDanger">Clear Banner</button>
@@ -649,7 +699,7 @@
               </div>
 
               <div class="panel">
-                <h3>Public Modal</h3>
+                <h3>Modal</h3>
                 <div class="grid2">
                   <div class="fieldWrap">
                     <label class="label" for="modalEnabled">Enabled</label>
@@ -660,20 +710,20 @@
                   </div>
                   <div class="fieldWrap">
                     <label class="label" for="modalId">Modal ID</label>
-                    <input id="modalId" class="field" placeholder="modal_news_1" />
+                    <input id="modalId" class="field" placeholder="modal_update_1" />
                   </div>
                 </div>
                 <div class="fieldWrap">
                   <label class="label" for="modalTitle">Title</label>
-                  <input id="modalTitle" class="field" placeholder="Launcher message" />
+                  <input id="modalTitle" class="field" placeholder="Modal Title" />
                 </div>
                 <div class="fieldWrap">
                   <label class="label" for="modalText">Text</label>
-                  <textarea id="modalText" class="text" placeholder="Big message shown inside launcher modal"></textarea>
+                  <textarea id="modalText" class="text" placeholder="Modal message text"></textarea>
                 </div>
                 <div class="fieldWrap">
                   <label class="label" for="modalButtons">Buttons JSON</label>
-                  <textarea id="modalButtons" class="text small" placeholder='[{"label":"Open Discord","action":"open","url":"https://discord.gg/...","style":"normal"},{"label":"Close","action":"close","style":"normal"}]'></textarea>
+                  <textarea id="modalButtons" class="text small" placeholder='[{"label":"Open Support","action":"open","url":"https://..."}]'></textarea>
                 </div>
                 <div class="row">
                   <button id="btnSaveModal" class="btn">Save Modal</button>
@@ -684,7 +734,7 @@
 
             <div class="cols2">
               <div class="panel">
-                <h3>Public Poll / Votes</h3>
+                <h3>Poll</h3>
                 <div class="grid2">
                   <div class="fieldWrap">
                     <label class="label" for="pollEnabled">Enabled</label>
@@ -714,10 +764,9 @@
 
               <div class="panel">
                 <h3>Quick Links</h3>
-                <p>JSON array of launcher quick links.</p>
                 <div class="fieldWrap">
                   <label class="label" for="quickLinks">Quick Links JSON</label>
-                  <textarea id="quickLinks" class="text" placeholder='[{"label":"Discord","url":"https://discord.gg/...","icon":"discord","mode":"external"},{"label":"Download Page","url":"https://scriptnovaa.com/download","icon":"download","mode":"external"}]'></textarea>
+                  <textarea id="quickLinks" class="text" placeholder='[{"label":"Support","url":"https://discord.gg/...","icon":"help","mode":"external"}]'></textarea>
                 </div>
                 <div class="row">
                   <button id="btnSaveQuickLinks" class="btn">Save Quick Links</button>
@@ -730,46 +779,47 @@
           <section id="section-cleanup" class="section">
             <div class="sectionHead">
               <h2>Cleanup Prompt</h2>
-              <p>Control the old HTA cleanup prompt and make it more reliable with extra scan paths and name hints.</p>
+              <p>Control the remote cleanup prompt for old launcher copies, scan paths, and file hints.</p>
             </div>
 
-            <div class="panel">
-              <div class="grid2">
-                <div class="fieldWrap">
-                  <label class="label" for="cleanupEnabled">Enabled</label>
-                  <select id="cleanupEnabled" class="select">
-                    <option value="1">Yes</option>
-                    <option value="0">No</option>
-                  </select>
+            <div class="cols2">
+              <div class="panel">
+                <h3>Prompt Settings</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="cleanupEnabled">Enabled</label>
+                    <select id="cleanupEnabled" class="select">
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="cleanupForceOnce">Force Once Stamp</label>
+                    <input id="cleanupForceOnce" class="field" readonly />
+                  </div>
                 </div>
                 <div class="fieldWrap">
-                  <label class="label" for="cleanupForceOnce">Force Once Status</label>
-                  <input id="cleanupForceOnce" class="field" placeholder="Read-only" disabled />
+                  <label class="label" for="cleanupMessage">Message</label>
+                  <textarea id="cleanupMessage" class="text small" placeholder="Owner recommends deleting old local ScriptNova copies."></textarea>
                 </div>
-              </div>
-
-              <div class="fieldWrap">
-                <label class="label" for="cleanupMessage">Cleanup Message</label>
-                <textarea id="cleanupMessage" class="text" placeholder="Owner recommends deleting old ScriptNova launcher copies from Desktop and Downloads."></textarea>
-              </div>
-
-              <div class="cols2">
                 <div class="fieldWrap">
                   <label class="label" for="cleanupScanPaths">Extra Scan Paths</label>
-                  <textarea id="cleanupScanPaths" class="text small" placeholder='One per line&#10;C:\Users\%USERNAME%\Desktop&#10;C:\Users\%USERNAME%\Downloads'></textarea>
-                  <div class="help">These are extra folders the HTA can scan for old launcher copies.</div>
+                  <textarea id="cleanupScanPaths" class="text small" placeholder="One path per line"></textarea>
                 </div>
                 <div class="fieldWrap">
-                  <label class="label" for="cleanupNameHints">Name Hints</label>
-                  <textarea id="cleanupNameHints" class="text small" placeholder='One per line&#10;ScriptNova&#10;ScriptNova Launcher&#10;ScriptNova Browser Launcher'></textarea>
-                  <div class="help">Use name fragments the cleanup scan should treat as likely old HTA copies.</div>
+                  <label class="label" for="cleanupNameHints">Extra Name Hints</label>
+                  <textarea id="cleanupNameHints" class="text small" placeholder="One hint per line"></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSaveCleanupPrompt" class="btn">Save Cleanup Prompt</button>
+                  <button id="btnBumpCleanupPrompt" class="btnWarn">Force Prompt Once</button>
+                  <button id="btnLoadCleanupPrompt" class="btn2">Reload</button>
                 </div>
               </div>
 
-              <div class="row">
-                <button id="btnLoadCleanupPrompt" class="btnSm">Load Cleanup Config</button>
-                <button id="btnSaveCleanupPrompt" class="btn">Save Cleanup Config</button>
-                <button id="btnBumpCleanupPrompt" class="btnWarn">Force Show Once</button>
+              <div class="panel">
+                <h3>Current Cleanup State</h3>
+                <div id="cleanupBox" class="kv"></div>
               </div>
             </div>
           </section>
@@ -782,40 +832,32 @@
 
             <div class="cols2">
               <div class="panel">
-                <div class="row" style="align-items:center;">
-                  <h3 style="margin:0;">Poll Results</h3>
-                  <button id="btnLoadPollResults" class="btnSm right">Load Results</button>
-                  <button id="btnResetPollResults" class="btnSmDanger">Reset Votes</button>
-                </div>
-                <div class="grid2">
-                  <div class="fieldWrap">
-                    <label class="label" for="pollResultsId">Poll ID</label>
-                    <input id="pollResultsId" class="field" placeholder="Leave blank to use current poll" />
-                  </div>
-                  <div class="fieldWrap">
-                    <label class="label" for="eventsLimit">Events Limit</label>
-                    <input id="eventsLimit" class="field" value="50" />
-                  </div>
+                <h3>Poll Results</h3>
+                <div class="toolbar">
+                  <input id="pollResultsId" class="field" placeholder="Leave blank to use current poll" />
+                  <button id="btnLoadPollResults" class="btn">Load Poll Results</button>
+                  <button id="btnResetPollResults" class="btnDanger">Reset Poll Votes</button>
                 </div>
                 <div id="pollResultsBox" class="kv"></div>
               </div>
 
               <div class="panel">
-                <div class="row" style="align-items:center;">
-                  <h3 style="margin:0;">Public Events Feed</h3>
-                  <button id="btnLoadEvents" class="btnSm right">Load Events</button>
-                  <button id="btnClearEvents" class="btnSmDanger">Clear Feed</button>
+                <h3>Public Events Feed</h3>
+                <div class="toolbar">
+                  <input id="eventsLimit" class="field" value="50" />
+                  <button id="btnLoadEvents" class="btn">Load Events</button>
+                  <button id="btnClearEvents" class="btnDanger">Clear Events Feed</button>
                 </div>
                 <div class="tableWrap">
                   <table>
                     <thead>
                       <tr>
                         <th>Time</th>
-                        <th>Kind</th>
+                        <th>Type</th>
+                        <th>Target</th>
+                        <th>Value</th>
                         <th>Client</th>
-                        <th>HWID</th>
-                        <th>Version</th>
-                        <th>Data</th>
+                        <th>Raw</th>
                       </tr>
                     </thead>
                     <tbody id="eventsTbody">
@@ -830,7 +872,7 @@
           <section id="section-hwid" class="section">
             <div class="sectionHead">
               <h2>HWID Controls</h2>
-              <p>Search by license or HWID hash, then ban, unban, mark suspicious, or disconnect.</p>
+              <p>Search by license or HWID hash, then ban, unban, mark suspicious, disconnect, add notes, set cooldowns, or deny launches.</p>
             </div>
 
             <div class="cols2">
@@ -855,7 +897,7 @@
                 <h3>Actions</h3>
                 <div class="fieldWrap">
                   <label class="label" for="hwidReason">Reason</label>
-                  <input id="hwidReason" class="field" placeholder="Reason for ban or suspicious mark" />
+                  <input id="hwidReason" class="field" placeholder="Reason for ban, suspicious mark, cooldown, or disconnect" />
                 </div>
                 <div class="row">
                   <button id="btnBanHwid" class="btnDanger">Ban HWID</button>
@@ -863,6 +905,195 @@
                   <button id="btnMarkSuspicious" class="btnWarn">Mark Suspicious</button>
                   <button id="btnDisconnectHwid" class="btnSmDanger">Disconnect Sessions by HWID</button>
                 </div>
+                <div class="spacer"></div>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="hwidNote">Device Note</label>
+                    <textarea id="hwidNote" class="text small" placeholder="Internal note for this HWID"></textarea>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="hwidCooldownMinutes">Cooldown Minutes</label>
+                    <input id="hwidCooldownMinutes" class="field" value="60" />
+                    <label class="label" for="hwidDenyMinutes" style="margin-top:10px;">Deny Minutes</label>
+                    <input id="hwidDenyMinutes" class="field" value="60" />
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="hwidDenyMessage">Custom Launch Deny Message</label>
+                  <input id="hwidDenyMessage" class="field" placeholder="Message shown when this HWID is denied" />
+                </div>
+                <div class="row">
+                  <button id="btnSetHwidNote" class="btn">Save HWID Note</button>
+                  <button id="btnSetHwidCooldown" class="btnWarn">Set Cooldown</button>
+                  <button id="btnSetHwidDeny" class="btnDanger">Set Deny Message</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-client" class="section">
+            <div class="sectionHead">
+              <h2>Client ID Controls</h2>
+              <p>Search and manage SN-XXXX style client IDs, see linked data, end sessions, block, flag, and clear bindings.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Client Lookup</h3>
+                <div class="fieldWrap">
+                  <label class="label" for="clientIdValue">Client ID</label>
+                  <input id="clientIdValue" class="field code" placeholder="SN-XXXX" />
+                </div>
+                <div class="row">
+                  <button id="btnLookupClient" class="btn">Lookup Client</button>
+                  <button id="btnEndClientSessions" class="btnDanger">End Sessions</button>
+                  <button id="btnClearClientBinding" class="btnWarn">Clear Binding</button>
+                </div>
+                <div class="spacer"></div>
+                <div id="clientLookupBox" class="kv"></div>
+              </div>
+
+              <div class="panel">
+                <h3>Client Actions</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="clientBlockMinutes">Block Minutes</label>
+                    <input id="clientBlockMinutes" class="field" value="60" />
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="clientActionReason">Reason</label>
+                    <input id="clientActionReason" class="field" placeholder="Reason / note for block or suspicious" />
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="clientNote">Admin Note</label>
+                  <textarea id="clientNote" class="text small" placeholder="Internal client note"></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSaveClientNote" class="btn">Save Note</button>
+                  <button id="btnBlockClient" class="btnWarn">Block Client</button>
+                  <button id="btnUnblockClient" class="btn2">Unblock Client</button>
+                  <button id="btnFlagClient" class="btnDanger">Mark Suspicious</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Cross Lookup</h3>
+              <p>Search one value and see matching client, HWID, license, or session information.</p>
+              <div class="toolbar">
+                <input id="lookupAnyValue" class="field" placeholder="Client ID / HWID / License / Session ID" />
+                <button id="btnLookupAny" class="btn">Run Lookup</button>
+              </div>
+              <div id="lookupAnyBox" class="kv"></div>
+            </div>
+          </section>
+
+          <section id="section-remote" class="section">
+            <div class="sectionHead">
+              <h2>Remote Commands</h2>
+              <p>Queue remote launcher commands for everyone, one client ID, one HWID, or one key. Current HTA may ignore unsupported commands, but they are stored and ready.</p>
+            </div>
+
+            <div class="cols2">
+              <div class="panel">
+                <h3>Send Command</h3>
+                <div class="grid2">
+                  <div class="fieldWrap">
+                    <label class="label" for="remoteTargetType">Target Type</label>
+                    <select id="remoteTargetType" class="select">
+                      <option value="global">Everyone</option>
+                      <option value="client">Client ID</option>
+                      <option value="hwid">HWID</option>
+                      <option value="key">Key / License</option>
+                    </select>
+                  </div>
+                  <div class="fieldWrap">
+                    <label class="label" for="remoteCommandType">Command</label>
+                    <select id="remoteCommandType" class="select">
+                      <option value="close_chrome_soft">Close Chrome Soft</option>
+                      <option value="close_chrome_hard">Close Chrome Hard</option>
+                      <option value="disconnect">Disconnect</option>
+                      <option value="refresh_ui">Refresh UI</option>
+                      <option value="refresh_bootstrap">Refresh Bootstrap</option>
+                      <option value="show_message">Show Message</option>
+                      <option value="show_banner">Show Banner</option>
+                      <option value="force_reverify">Force Reverify</option>
+                      <option value="require_relaunch">Require Relaunch</option>
+                      <option value="open_support">Open Support</option>
+                      <option value="open_download">Open Download</option>
+                      <option value="open_url">Open URL</option>
+                      <option value="cleanup_prompt">Cleanup Prompt</option>
+                      <option value="update_check">Update Check</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="remoteTargetValue">Target Value</label>
+                  <input id="remoteTargetValue" class="field" placeholder="Leave blank for global, or enter SN-XXXX / HWID / license" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="remoteReason">Reason</label>
+                  <input id="remoteReason" class="field" placeholder="Reason shown in logs" />
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="remoteMessage">Message</label>
+                  <textarea id="remoteMessage" class="text small" placeholder="Optional message to send with the command"></textarea>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="remoteUrl">URL</label>
+                  <input id="remoteUrl" class="field" placeholder="Optional URL for open_url or message buttons" />
+                </div>
+                <div class="row">
+                  <label class="tag"><input id="remoteCloseAndEnd" type="checkbox" /> Close and end session</label>
+                  <label class="tag"><input id="remoteBlockUntilRefresh" type="checkbox" /> Block until refresh</label>
+                </div>
+                <div class="spacer"></div>
+                <div class="row">
+                  <button id="btnSendRemoteCommand" class="btnDanger">Send Remote Command</button>
+                  <button id="btnLoadRemoteCommands" class="btn">Load Target Commands</button>
+                </div>
+              </div>
+
+              <div class="panel">
+                <h3>Global Extras</h3>
+                <div class="row">
+                  <label class="tag"><input id="allowlistMode" type="checkbox" /> Allowlist Mode</label>
+                </div>
+                <div class="fieldWrap" style="margin-top:10px;">
+                  <label class="label" for="rotatingAnnouncement">Rotating Announcement</label>
+                  <textarea id="rotatingAnnouncement" class="text small" placeholder="Short rotating announcement text"></textarea>
+                </div>
+                <div class="fieldWrap">
+                  <label class="label" for="oneTimeAnnouncement">One-Time Announcement</label>
+                  <textarea id="oneTimeAnnouncement" class="text small" placeholder="One-time launcher announcement"></textarea>
+                </div>
+                <div class="row">
+                  <button id="btnSaveGlobalExtras" class="btn">Save Global Extras</button>
+                </div>
+                <div class="spacer"></div>
+                <div id="remoteExtrasBox" class="kv"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Recent Target Commands</h3>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Created</th>
+                      <th>Type</th>
+                      <th>Target</th>
+                      <th>Command</th>
+                      <th>Message</th>
+                      <th>Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody id="remoteCommandsTbody">
+                    <tr><td colspan="6" class="muted">No commands loaded.</td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </section>
@@ -982,13 +1213,13 @@
           <section id="section-audit" class="section">
             <div class="sectionHead">
               <h2>Audit Log</h2>
-              <p>Recent admin actions recorded by the backend.</p>
+              <p>Recent admin actions and write operations.</p>
             </div>
 
             <div class="panel">
               <div class="toolbar">
-                <input id="auditLimit" class="field" value="50" />
-                <button id="btnLoadAudit" class="btn">Load Audit Log</button>
+                <input id="auditLimit" class="field" value="100" />
+                <button id="btnLoadAudit" class="btn">Load Audit</button>
               </div>
               <div class="tableWrap">
                 <table>
@@ -996,15 +1227,15 @@
                     <tr>
                       <th>Time</th>
                       <th>Type</th>
-                      <th>Actor</th>
-                      <th>Role</th>
                       <th>Action</th>
+                      <th>Actor</th>
                       <th>Target</th>
                       <th>Success</th>
+                      <th>Raw</th>
                     </tr>
                   </thead>
                   <tbody id="auditTbody">
-                    <tr><td colspan="7" class="muted">No audit rows loaded.</td></tr>
+                    <tr><td colspan="7" class="muted">No audit log loaded.</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1014,7 +1245,7 @@
           <section id="section-emergency" class="section">
             <div class="sectionHead">
               <h2>Emergency Tools</h2>
-              <p>High-impact actions. Owner-only in the backend.</p>
+              <p>Use carefully. These actions affect the entire launcher system.</p>
             </div>
 
             <div class="panel">
@@ -1025,12 +1256,14 @@
                 <button id="btnEmergencyEndSessions" class="btnDanger">End All Sessions</button>
                 <button id="btnEmergencyClearNonces" class="btnWarn">Clear Launch Nonces</button>
               </div>
+
               <div class="spacer"></div>
+
               <div class="fieldWrap">
                 <label class="label" for="emergencyBanner">Emergency Banner / Maintenance Message</label>
-                <textarea id="emergencyBanner" class="text" placeholder="Emergency message shown to users"></textarea>
+                <textarea id="emergencyBanner" class="text small" placeholder="System-wide emergency message"></textarea>
               </div>
-              <button id="btnSetEmergencyBanner" class="btnWarn">Set Emergency Banner</button>
+              <button id="btnSetEmergencyBanner" class="btnDanger">Set Emergency Banner</button>
             </div>
           </section>
         </div>
@@ -1040,15 +1273,12 @@
 
   <script>
     (function(){
-      "use strict";
-
       var API = "https://api.scriptnovaa.com/api/admin";
-      var TOKEN_KEY = "sn_admin_token";
-      var CURRENT_BUILD = "admin-html-2026-03-10b";
+      var LS_TOKEN = "sn_admin_token_v2";
       var state = {
         token: "",
         me: null,
-        build: CURRENT_BUILD,
+        build: "",
         currentSection: "dashboard"
       };
 
@@ -1063,50 +1293,35 @@
           .replace(/'/g,"&#39;");
       }
 
-      function ts(v){
-        var n = parseInt(v,10);
-        if(!n) return "—";
-        try{
-          return new Date(n*1000).toLocaleString();
-        }catch(_){
-          return String(v);
-        }
+      function asBool(v){
+        return v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true" || String(v).toLowerCase() === "yes";
       }
 
       function yesNo(v){ return v ? "Yes" : "No"; }
 
-      function boolFromInput(v){
-        return String(v) === "1" || String(v).toLowerCase() === "true" || String(v).toLowerCase() === "yes";
+      function ts(sec){
+        sec = parseInt(sec || 0, 10);
+        if(!sec) return "—";
+        try { return new Date(sec * 1000).toLocaleString(); }
+        catch(e){ return String(sec); }
       }
 
-      function toLines(arr){
-        return Array.isArray(arr) ? arr.join("\n") : "";
+      function lines(v){
+        return String(v || "").split(/\r?\n/g).map(function(x){ return x.trim(); }).filter(Boolean);
       }
 
-      function fromLines(txt){
-        return String(txt || "")
-          .split(/\r?\n/g)
-          .map(function(x){ return x.trim(); })
-          .filter(Boolean);
+      function tryJsonParse(v, fallback){
+        try{ return JSON.parse(v); }catch(e){ return fallback; }
       }
 
-      function parseJsonMaybe(txt, fallback){
-        try{
-          if(typeof txt === "object") return txt;
-          if(!String(txt || "").trim()) return fallback;
-          return JSON.parse(txt);
-        }catch(_){
-          return fallback;
-        }
+      function setBox(id, type, msg){
+        var el = $(id);
+        el.className = type;
+        el.textContent = msg;
       }
 
-      function setMsg(kind, text){
-        var box = $("msgBox");
-        box.className = "";
-        if(kind === "error") box.classList.add("error");
-        else if(kind === "success") box.classList.add("success");
-        else box.classList.add("notice");
-        box.textContent = text;
+      function setMsg(type, msg){
+        setBox("msgBox", type, msg);
       }
 
       function clearMsg(){
@@ -1114,88 +1329,102 @@
         $("msgBox").textContent = "";
       }
 
-      function loginMsg(kind, text){
-        var box = $("loginMsg");
-        box.className = "";
-        if(kind === "error") box.classList.add("error");
-        else if(kind === "success") box.classList.add("success");
-        else box.classList.add("notice");
-        box.textContent = text;
+      function setLoginMsg(type, msg){
+        setBox("loginMsg", type, msg);
       }
 
-      function setToken(token){
-        state.token = token || "";
-        if(state.token) localStorage.setItem(TOKEN_KEY, state.token);
-        else localStorage.removeItem(TOKEN_KEY);
+      function clearLoginMsg(){
+        $("loginMsg").className = "hidden";
+        $("loginMsg").textContent = "";
       }
 
-      function role(){ return state.me && state.me.role ? String(state.me.role) : ""; }
-      function isOwner(){ return role() === "owner"; }
-      function isUlises(){ return role() === "ulises"; }
-      function isOther(){ return role() === "other"; }
-
-      function lockUiForRole(){
-        var sections = ["sessions","keys","freekeys","launcher","publicui","cleanup","events","hwid","accounts","config","analytics","alerts","audit","emergency"];
-        for(var i=0;i<sections.length;i++){
-          var sec = sections[i];
-          var btn = document.querySelector('.navBtn[data-section="' + sec + '"]');
-          if(!btn) continue;
-
-          btn.classList.remove("locked");
-          if(isOther()){
-            if(["dashboard","alerts"].indexOf(sec) === -1){
-              btn.classList.add("locked");
-            }
-          }else if(isUlises()){
-            if(["accounts","emergency"].indexOf(sec) !== -1){
-              btn.classList.add("locked");
-            }
-          }
-        }
-      }
+      function isOwner(){ return !!(state.me && state.me.role === "owner"); }
+      function isUlises(){ return !!(state.me && state.me.role === "ulises"); }
+      function isOther(){ return !!(state.me && state.me.role === "other"); }
 
       async function api(action, params){
         params = params || {};
-        var isPost = action === "login" || action.indexOf("_set") !== -1 || action.indexOf("_clear") !== -1 || action.indexOf("_add") !== -1 || action.indexOf("_remove") !== -1 || action.indexOf("_create") !== -1 || action.indexOf("_update") !== -1 || action.indexOf("_delete") !== -1 || action.indexOf("_disable") !== -1 || action.indexOf("_enable") !== -1 || action.indexOf("_pause") !== -1 || action.indexOf("_unpause") !== -1 || action.indexOf("_bump") !== -1 || action.indexOf("_reset") !== -1 || action.indexOf("_ban") !== -1 || action.indexOf("_unban") !== -1 || action.indexOf("_mark") !== -1 || action.indexOf("_logout") !== -1 || action.indexOf("_expire") !== -1 || action.indexOf("_force") !== -1 || action.indexOf("_end") !== -1;
-        var headers = { "Content-Type": "application/json" };
-        if(state.token) headers["Authorization"] = "Bearer " + state.token;
-
-        var resp;
-        if(isPost){
-          resp = await fetch(API, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(Object.assign({}, params, { action: action }))
-          });
-        }else{
-          var qs = new URLSearchParams(Object.assign({}, params, { action: action }));
-          resp = await fetch(API + "?" + qs.toString(), {
-            method: "GET",
-            headers: headers
-          });
+        params.action = action;
+        var r = await fetch(API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + state.token
+          },
+          body: JSON.stringify(params)
+        });
+        var j = await r.json().catch(function(){ return {}; });
+        if (!r.ok || !j.ok) {
+          throw new Error((j && j.error) ? j.error : ("http_" + r.status));
         }
-
-        var json = {};
-        try{ json = await resp.json(); }catch(_){}
-
-        if(!resp.ok || !json.ok){
-          throw new Error((json && (json.error || json.message)) || ("HTTP " + resp.status));
+        if (j.build) {
+          state.build = j.build;
+          $("topBuild").textContent = j.build;
         }
-
-        if(json.build) {
-          state.build = json.build;
-          $("topBuild").textContent = json.build;
-        }
-
-        return json;
+        return j;
       }
 
-      function showApp(){
+      async function login(){
+        clearLoginMsg();
+        var username = $("loginUsername").value.trim();
+        var password = $("loginPassword").value;
+        var r = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "login",
+            username: username,
+            password: password
+          })
+        });
+        var j = await r.json().catch(function(){ return {}; });
+        if (!r.ok || !j.ok) throw new Error((j && j.error) ? j.error : "login_failed");
+
+        state.token = j.token || "";
+        state.me = j.me || null;
+        state.build = j.build || "";
+        localStorage.setItem(LS_TOKEN, state.token);
+
+        $("topUser").textContent = state.me && state.me.username ? state.me.username : "—";
+        $("topRole").textContent = state.me && state.me.role ? state.me.role : "—";
+        $("topBuild").textContent = state.build || "—";
+
         $("loginView").classList.add("hidden");
         $("appView").classList.remove("hidden");
+        clearMsg();
+        applyPermissions();
+        await loadDashboard();
+        await loadConfig();
       }
 
-      function showLogin(){
+      async function trySavedSession(){
+        clearLoginMsg();
+        var token = localStorage.getItem(LS_TOKEN) || "";
+        if (!token) return;
+        state.token = token;
+        try {
+          var j = await api("me");
+          state.me = j.me || null;
+          $("topUser").textContent = state.me && state.me.username ? state.me.username : "—";
+          $("topRole").textContent = state.me && state.me.role ? state.me.role : "—";
+          $("loginView").classList.add("hidden");
+          $("appView").classList.remove("hidden");
+          clearMsg();
+          applyPermissions();
+          await loadDashboard();
+          await loadConfig();
+        } catch (e) {
+          localStorage.removeItem(LS_TOKEN);
+          state.token = "";
+          state.me = null;
+        }
+      }
+
+      async function logout(){
+        try { await api("logout"); } catch(e) {}
+        localStorage.removeItem(LS_TOKEN);
+        state.token = "";
+        state.me = null;
         $("appView").classList.add("hidden");
         $("loginView").classList.remove("hidden");
       }
@@ -1203,927 +1432,1253 @@
       function showSection(name){
         state.currentSection = name;
         var secs = document.querySelectorAll(".section");
-        for(var i=0;i<secs.length;i++) secs[i].classList.remove("active");
+        for (var i=0;i<secs.length;i++) secs[i].classList.remove("active");
         var navs = document.querySelectorAll(".navBtn");
-        for(var j=0;j<navs.length;j++) navs[j].classList.remove("active");
-
+        for (var j=0;j<navs.length;j++) navs[j].classList.remove("active");
         var sec = $("section-" + name);
-        if(sec) sec.classList.add("active");
-
+        if (sec) sec.classList.add("active");
         var btn = document.querySelector('.navBtn[data-section="' + name + '"]');
-        if(btn) btn.classList.add("active");
+        if (btn) btn.classList.add("active");
       }
 
-      async function login(){
-        loginMsg("notice", "Logging in...");
-        var username = $("loginUsername").value.trim();
-        var password = $("loginPassword").value.trim();
-        var j = await api("login", { username: username, password: password });
-        setToken(j.token || "");
-        state.me = j.admin || null;
-        $("topUser").textContent = (state.me && state.me.username) || "—";
-        $("topRole").textContent = (state.me && state.me.role) || "—";
-        $("topBuild").textContent = j.build || CURRENT_BUILD;
-        lockUiForRole();
-        showApp();
-        clearMsg();
-        await loadDashboard();
-        await loadLauncherStatus();
+      function lockSection(sectionId){
+        var el = $("section-" + sectionId);
+        if (el) el.classList.add("locked");
       }
 
-      async function tryLoadSession(){
-        var tok = localStorage.getItem(TOKEN_KEY) || "";
-        if(!tok){
-          loginMsg("notice", "No saved session found.");
+      function unlockSection(sectionId){
+        var el = $("section-" + sectionId);
+        if (el) el.classList.remove("locked");
+      }
+
+      function applyPermissions(){
+        var allSections = ["dashboard","sessions","keys","freekeys","launcher","publicui","cleanup","events","hwid","client","remote","accounts","config","analytics","alerts","audit","emergency"];
+        allSections.forEach(unlockSection);
+
+        if (isOwner()) return;
+
+        if (isUlises()) {
+          ["launcher","publicui","cleanup","client","remote","accounts","config","emergency"].forEach(lockSection);
+          disableButtons([
+            "btnPauseLauncher","btnUnpauseLauncher","btnSetMinVersion","btnSetMaintenanceMsg","btnSaveRuntimeConfig",
+            "btnSaveBanner","btnClearBanner","btnSaveModal","btnClearModal","btnSavePoll","btnClearPoll","btnSaveQuickLinks","btnClearQuickLinks",
+            "btnSaveCleanupPrompt","btnBumpCleanupPrompt",
+            "btnSaveClientNote","btnBlockClient","btnUnblockClient","btnFlagClient","btnEndClientSessions","btnClearClientBinding",
+            "btnSendRemoteCommand","btnSaveGlobalExtras",
+            "btnForceLogoutAdmins",
+            "btnDisableAllKeys","btnEnableAllKeys","btnEmergencyPause","btnEmergencyEndSessions","btnEmergencyClearNonces","btnSetEmergencyBanner",
+            "btnDisableKey","btnEnableKey","btnResetKeyHwids","btnSaveKeyMeta","btnCreateCustomKey","btnUpdateCustomKey","btnDeleteCustomKey",
+            "btnAddFreeKey","btnRemoveFreeKey","btnExpireAllFreeKeys",
+            "btnBanHwid","btnUnbanHwid","btnMarkSuspicious","btnDisconnectHwid","btnSetHwidNote","btnSetHwidCooldown","btnSetHwidDeny",
+            "btnEndAllSessions","btnEndByClientSessions","btnEndByLicenseSessions","btnCleanStaleSessions"
+          ]);
           return;
         }
-        state.token = tok;
-        try{
-          var j = await api("me");
-          state.me = j.admin || null;
-          $("topUser").textContent = (state.me && state.me.username) || "—";
-          $("topRole").textContent = (state.me && state.me.role) || "—";
-          $("topBuild").textContent = j.build || CURRENT_BUILD;
-          lockUiForRole();
-          showApp();
-          clearMsg();
-          await loadDashboard();
-          await loadLauncherStatus();
-        }catch(e){
-          setToken("");
-          loginMsg("error", "Saved session failed: " + e.message);
-          showLogin();
+
+        if (isOther()) {
+          ["sessions","keys","freekeys","launcher","publicui","cleanup","events","hwid","client","remote","accounts","config","analytics","audit","emergency"].forEach(lockSection);
+          disableButtons([
+            "btnLoadSessions","btnEndByClientSessions","btnEndByLicenseSessions","btnLoadStaleSessions","btnCleanStaleSessions","btnEndAllSessions",
+            "btnKeySearch","btnDisableKey","btnEnableKey","btnResetKeyHwids","btnSaveKeyMeta","btnCreateCustomKey","btnUpdateCustomKey","btnDeleteCustomKey","btnLoadCustomKeys",
+            "btnAddFreeKey","btnRemoveFreeKey","btnExpireAllFreeKeys","btnLoadFreeKeys",
+            "btnPauseLauncher","btnUnpauseLauncher","btnSetMinVersion","btnSetMaintenanceMsg","btnSaveRuntimeConfig","btnLauncherStatus",
+            "btnSaveBanner","btnClearBanner","btnSaveModal","btnClearModal","btnSavePoll","btnClearPoll","btnSaveQuickLinks","btnClearQuickLinks",
+            "btnSaveCleanupPrompt","btnBumpCleanupPrompt","btnLoadCleanupPrompt",
+            "btnLoadPollResults","btnResetPollResults","btnLoadEvents","btnClearEvents",
+            "btnSearchHwid","btnBanHwid","btnUnbanHwid","btnMarkSuspicious","btnDisconnectHwid","btnSetHwidNote","btnSetHwidCooldown","btnSetHwidDeny",
+            "btnLookupClient","btnEndClientSessions","btnClearClientBinding","btnSaveClientNote","btnBlockClient","btnUnblockClient","btnFlagClient","btnLookupAny",
+            "btnSendRemoteCommand","btnLoadRemoteCommands","btnSaveGlobalExtras",
+            "btnLoadAdminAccounts","btnForceLogoutAdmins",
+            "btnLoadConfig","btnLoadAnalytics","btnLoadAudit",
+            "btnDisableAllKeys","btnEnableAllKeys","btnEmergencyPause","btnEmergencyEndSessions","btnEmergencyClearNonces","btnSetEmergencyBanner"
+          ]);
         }
       }
 
-      async function logout(){
-        try{ await api("logout"); }catch(_){}
-        setToken("");
-        state.me = null;
-        showLogin();
-        loginMsg("success", "Logged out.");
+      function disableButtons(ids){
+        ids.forEach(function(id){
+          var el = $(id);
+          if (el) el.disabled = true;
+        });
+      }
+
+      function kvHtml(obj){
+        var out = [];
+        Object.keys(obj || {}).forEach(function(k){
+          var v = obj[k];
+          if (typeof v === "object" && v !== null) v = JSON.stringify(v);
+          out.push("<div>" + esc(k) + "</div><div>" + esc(v) + "</div>");
+        });
+        return out.join("");
+      }
+
+      function safeErrorMessage(err){
+        return err && err.message ? err.message : String(err || "unknown_error");
       }
 
       async function loadDashboard(){
-        var j = await api("dashboard");
-        var d = j.dashboard || {};
-        var counts = d.counts || {};
-        var sv = d.services || {};
-        var lx = d.launcher || {};
-        var today = d.analyticsToday || {};
+        try{
+          var j = await api("dashboard");
+          var s = j.summary || {};
+          $("dashActiveSessions").textContent = (s.counts && s.counts.activeSessions) || 0;
+          $("dashFreeKeys").textContent = (s.counts && s.counts.freeKeys) || 0;
+          $("dashCustomKeys").textContent = (s.counts && s.counts.customKeys) || 0;
+          $("dashDownloads").textContent = (s.counts && s.counts.downloads) || 0;
+          $("dashVisitors").textContent = (s.counts && s.counts.visitors) || 0;
+          $("dashTrusted").textContent = (s.counts && s.counts.trusted) || 0;
+          $("dashBannedHwids").textContent = (s.counts && s.counts.bannedHwids) || 0;
+          $("dashSuspiciousHwids").textContent = (s.counts && s.counts.suspiciousHwids) || 0;
 
-        $("dashActiveSessions").textContent = counts.activeSessions || 0;
-        $("dashFreeKeys").textContent = counts.freeKeys || 0;
-        $("dashCustomKeys").textContent = counts.customKeys || 0;
-        $("dashDownloads").textContent = counts.downloads || 0;
-        $("dashVisitors").textContent = counts.visitors || 0;
-        $("dashTrusted").textContent = counts.trustedVisitors || 0;
-        $("dashBannedHwids").textContent = counts.bannedHwids || 0;
-        $("dashSuspiciousHwids").textContent = counts.suspiciousHwids || 0;
+          $("dashboardStatusBox").innerHTML = kvHtml({
+            paused: yesNo(s.launcherStatus && s.launcherStatus.paused),
+            pausedReason: (s.launcherStatus && s.launcherStatus.pausedReason) || "",
+            maintenanceMode: yesNo(s.launcherStatus && s.launcherStatus.maintenanceMode),
+            maintenanceMessage: (s.launcherStatus && s.launcherStatus.maintenanceMessage) || "",
+            minVersion: (s.launcherStatus && s.launcherStatus.minVersion) || "",
+            supportEmail: (s.launcherStatus && s.launcherStatus.supportEmail) || "",
+            discordUrl: (s.launcherStatus && s.launcherStatus.discordUrl) || "",
+            defaultStartUrl: (s.launcherStatus && s.launcherStatus.defaultStartUrl) || "",
+            submitUrl: (s.launcherStatus && s.launcherStatus.submitUrl) || "",
+            cleanupOldPromptEnabled: yesNo(s.launcherStatus && s.launcherStatus.cleanupOldPromptEnabled),
+            publicBannerEnabled: yesNo(s.launcherStatus && s.launcherStatus.publicBannerEnabled),
+            publicModalEnabled: yesNo(s.launcherStatus && s.launcherStatus.publicModalEnabled),
+            publicPollEnabled: yesNo(s.launcherStatus && s.launcherStatus.publicPollEnabled),
+            quickLinksCount: (s.launcherStatus && s.launcherStatus.quickLinksCount) || 0,
+            disableAllKeys: yesNo(s.launcherStatus && s.launcherStatus.disableAllKeys)
+          });
 
-        $("dashboardStatusBox").innerHTML =
-          '<div>API Online</div><div>' + esc(yesNo(!!(sv.api && sv.api.online))) + '</div>' +
-          '<div>Redis Online</div><div>' + esc(yesNo(!!(sv.redis && sv.redis.online))) + '</div>' +
-          '<div>Public Site</div><div>' + esc((sv.publicSite && sv.publicSite.status) || "unknown") + '</div>' +
-          '<div>Required Min Version</div><div>' + esc((sv.launcherVersion && sv.launcherVersion.requiredMinVersion) || "—") + '</div>' +
-          '<div>Cached version.txt</div><div>' + esc((sv.launcherVersion && sv.launcherVersion.cachedVersionTxt) || "—") + '</div>' +
-          '<div>Paused</div><div>' + esc(yesNo(lx.paused)) + '</div>' +
-          '<div>Pause Reason</div><div>' + esc(lx.pausedReason || "—") + '</div>' +
-          '<div>Maintenance Mode</div><div>' + esc(yesNo(lx.maintenanceMode)) + '</div>' +
-          '<div>Maintenance Message</div><div>' + esc(lx.maintenanceMessage || "—") + '</div>' +
-          '<div>Disable All Keys</div><div>' + esc(yesNo(lx.disableAllKeys)) + '</div>' +
-          '<div>Support Email</div><div>' + esc(lx.supportEmail || "—") + '</div>' +
-          '<div>Discord URL</div><div class="code">' + esc(lx.discordUrl || "—") + '</div>' +
-          '<div>Default Start URL</div><div class="code">' + esc(lx.defaultStartUrl || "—") + '</div>' +
-          '<div>Submit URL</div><div class="code">' + esc(lx.submitUrl || "—") + '</div>' +
-          '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(lx.cleanupOldPromptEnabled)) + '</div>' +
-          '<div>Public Banner Enabled</div><div>' + esc(yesNo(lx.publicBannerEnabled)) + '</div>' +
-          '<div>Public Modal Enabled</div><div>' + esc(yesNo(lx.publicModalEnabled)) + '</div>' +
-          '<div>Public Poll Enabled</div><div>' + esc(yesNo(lx.publicPollEnabled)) + '</div>' +
-          '<div>Quick Links Count</div><div>' + esc(lx.quickLinksCount || 0) + '</div>';
-
-        $("dashboardTodayBox").innerHTML =
-          '<div>Key Checks</div><div>' + esc(today.keyChecks || 0) + '</div>' +
-          '<div>Verify Attempts</div><div>' + esc(today.verifyAttempts || 0) + '</div>' +
-          '<div>Launch Attempts</div><div>' + esc(today.launchAttempts || 0) + '</div>' +
-          '<div>Launch Failures</div><div>' + esc(today.launchFailures || 0) + '</div>' +
-          '<div>UI Challenges</div><div>' + esc(today.uiChallenges || 0) + '</div>' +
-          '<div>Free Keys Generated</div><div>' + esc(today.freeKeysGenerated || 0) + '</div>' +
-          '<div>Sessions Ended</div><div>' + esc(today.sessionsEnded || 0) + '</div>' +
-          '<div>Admin Login Failures</div><div>' + esc(today.adminLoginFailures || 0) + '</div>' +
-          '<div>Public Events</div><div>' + esc(today.publicEvents || 0) + '</div>' +
-          '<div>Poll Votes</div><div>' + esc(today.pollVotes || 0) + '</div>' +
-          '<div>Banner Dismissals</div><div>' + esc(today.bannerDismissals || 0) + '</div>' +
-          '<div>Cleanup Runs</div><div>' + esc(today.cleanupRuns || 0) + '</div>';
-
-        $("dashboardPlanBox").innerHTML =
-          '<div>FREE Active</div><div>' + esc((counts.activeByPlan && counts.activeByPlan.free) || 0) + '</div>' +
-          '<div>BASIC Active</div><div>' + esc((counts.activeByPlan && counts.activeByPlan.basic) || 0) + '</div>' +
-          '<div>PRO Active</div><div>' + esc((counts.activeByPlan && counts.activeByPlan.pro) || 0) + '</div>';
+          $("dashboardTodayBox").innerHTML = kvHtml((s.today || {}));
+          $("dashboardPlanBox").innerHTML = kvHtml((s.counts && s.counts.activeByPlan) || {});
+          $("launcherStatusBox").innerHTML = $("dashboardStatusBox").innerHTML;
+        }catch(err){
+          setMsg("error","Dashboard load failed: " + safeErrorMessage(err));
+        }
       }
 
-      async function loadSessions(){
-        var j = await api("sessions_list", {
-          search: $("sessionsSearch").value.trim(),
-          license: $("sessionsLicense").value.trim(),
-          plan: $("sessionsPlan").value,
-          clientId: $("sessionsClientId").value.trim(),
-          hwidHash: $("sessionsHwid").value.trim()
-        });
-        var rows = j.items || [];
-        $("sessionsTbody").innerHTML = rows.length ? rows.map(function(x){
-          return '<tr>' +
-            '<td class="code">' + esc(x.license || "—") + '</td>' +
-            '<td>' + esc(x.plan || "—") + '</td>' +
-            '<td class="code">' + esc(x.sessionId || "—") + '</td>' +
-            '<td class="code">' + esc(x.clientId || "—") + '</td>' +
-            '<td class="code">' + esc(x.hwidHash || "—") + '</td>' +
-            '<td>' + esc(ts(x.lastSeen)) + '</td>' +
-            '<td>' + esc(ts(x.exp)) + '</td>' +
-            '<td class="code">' + esc(x.ip || "—") + '</td>' +
-            '<td><button class="btnSmDanger" onclick="window.__snEndSession(\'' + escJs(x.license) + '\',\'' + escJs(x.sessionId) + '\')">End</button></td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="9" class="muted">No sessions found.</td></tr>';
+      async function loadSessions(useStale){
+        try{
+          var j;
+          if (useStale) {
+            j = await api("sessions_list_stale", {
+              olderThanMinutes: 20
+            });
+          } else {
+            j = await api("sessions_list", {
+              search: $("sessionsSearch").value.trim(),
+              license: $("sessionsLicense").value.trim(),
+              plan: $("sessionsPlan").value,
+              clientId: $("sessionsClientId").value.trim(),
+              hwidHash: $("sessionsHwid").value.trim()
+            });
+          }
+          var rows = j.items || [];
+          if (!rows.length) {
+            $("sessionsTbody").innerHTML = '<tr><td colspan="9" class="muted">No sessions found.</td></tr>';
+            return;
+          }
+          $("sessionsTbody").innerHTML = rows.map(function(r){
+            return '<tr>' +
+              '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.plan) + '</td>' +
+              '<td class="code">' + esc(r.sessionId) + '</td>' +
+              '<td class="code">' + esc(r.clientId || "") + '</td>' +
+              '<td class="code">' + esc(r.hwidHash || "") + '</td>' +
+              '<td>' + esc(ts(r.lastSeen)) + '</td>' +
+              '<td>' + esc(ts(r.exp)) + '</td>' +
+              '<td class="code">' + esc(r.ip || "") + '</td>' +
+              '<td><button class="btnSmDanger" data-end-license="' + esc(r.license) + '" data-end-session="' + esc(r.sessionId) + '">End</button></td>' +
+            '</tr>';
+          }).join("");
+          bindSessionEndButtons();
+        }catch(err){
+          setMsg("error","Sessions load failed: " + safeErrorMessage(err));
+        }
+      }
+
+      function bindSessionEndButtons(){
+        var btns = document.querySelectorAll("[data-end-license]");
+        for (var i=0;i<btns.length;i++) {
+          btns[i].onclick = async function(){
+            if (!confirm("End this session?")) return;
+            try{
+              await api("session_end_one", {
+                license: this.getAttribute("data-end-license"),
+                sessionId: this.getAttribute("data-end-session")
+              });
+              setMsg("success","Session ended.");
+              await loadSessions(false);
+              await loadDashboard();
+            }catch(err){
+              setMsg("error","End session failed: " + safeErrorMessage(err));
+            }
+          };
+        }
       }
 
       async function keySearch(){
-        var license = $("keyLicense").value.trim();
-        if(!license) throw new Error("missing_license");
-        var j = await api("key_search", { license: license });
-        if(!j.exists){
-          $("keySearchBox").innerHTML = '<div>Result</div><div>Key not found.</div>';
-          return;
+        try{
+          var lic = $("keyLicense").value.trim();
+          var j = await api("key_search", { license: lic });
+          if (!j.exists) {
+            $("keySearchBox").innerHTML = '<div>Status</div><div>Not found</div>';
+            return;
+          }
+          var key = j.key || {};
+          $("keySearchBox").innerHTML = kvHtml({
+            license: key.license || "",
+            source: key.source || "",
+            plan: key.plan || "",
+            disabled: yesNo(key.disabled),
+            ttlSeconds: key.ttlSeconds || 0,
+            sessionLimit: key.sessionLimit || 0,
+            maxDevices: key.maxDevices || 0,
+            exp: ts(key.exp || 0),
+            activeSessions: key.activeSessions || 0,
+            tier: key.tier || "",
+            note: key.note || "",
+            hwids: (key.hwids || []).join(", "),
+            meta: JSON.stringify(key.meta || {})
+          });
+          $("customLicense").value = key.license || "";
+        }catch(err){
+          setMsg("error","Key search failed: " + safeErrorMessage(err));
         }
-        var k = j.key || {};
-        $("keySearchBox").innerHTML =
-          '<div>License</div><div class="code">' + esc(k.license || "—") + '</div>' +
-          '<div>Source</div><div>' + esc(k.source || "—") + '</div>' +
-          '<div>Plan</div><div>' + esc(k.plan || "—") + '</div>' +
-          '<div>Disabled</div><div>' + esc(yesNo(k.disabled)) + '</div>' +
-          '<div>TTL Seconds</div><div>' + esc(k.ttlSeconds || 0) + '</div>' +
-          '<div>Session Limit</div><div>' + esc(k.sessionLimit || 0) + '</div>' +
-          '<div>Max Devices</div><div>' + esc(k.maxDevices || 0) + '</div>' +
-          '<div>Active Sessions</div><div>' + esc(k.activeSessions || 0) + '</div>' +
-          '<div>HWIDs</div><div class="code">' + esc((k.hwids || []).join(", ") || "—") + '</div>' +
-          '<div>Tier</div><div>' + esc(k.tier || "—") + '</div>' +
-          '<div>Note</div><div>' + esc(k.note || "—") + '</div>';
-      }
-
-      async function disableKey(){
-        var license = $("keyLicense").value.trim();
-        if(!license) throw new Error("missing_license");
-        await api("key_disable", { license: license });
-        setMsg("success", "Key disabled.");
-        await keySearch();
-      }
-
-      async function enableKey(){
-        var license = $("keyLicense").value.trim();
-        if(!license) throw new Error("missing_license");
-        await api("key_enable", { license: license });
-        setMsg("success", "Key enabled.");
-        await keySearch();
-      }
-
-      async function resetKeyHwids(){
-        var license = $("keyLicense").value.trim();
-        if(!license) throw new Error("missing_license");
-        if(!confirm("Reset all HWID bindings for this key?")) return;
-        await api("key_reset_hwid_bindings", { license: license });
-        setMsg("success", "Key HWID bindings reset.");
-        await keySearch();
-      }
-
-      async function createCustomKey(){
-        var license = $("customLicense").value.trim();
-        await api("key_create_custom", {
-          license: license,
-          plan: $("customPlan").value,
-          ttlSeconds: $("customTtl").value.trim(),
-          sessionLimit: $("customSessions").value.trim(),
-          maxDevices: $("customDevices").value.trim(),
-          exp: $("customExp").value.trim(),
-          note: $("customNote").value.trim()
-        });
-        setMsg("success", "Custom key created.");
-        await loadCustomKeys();
-      }
-
-      async function updateCustomKey(){
-        var license = $("customLicense").value.trim();
-        await api("key_update_custom", {
-          license: license,
-          plan: $("customPlan").value,
-          ttlSeconds: $("customTtl").value.trim(),
-          sessionLimit: $("customSessions").value.trim(),
-          maxDevices: $("customDevices").value.trim(),
-          exp: $("customExp").value.trim(),
-          note: $("customNote").value.trim()
-        });
-        setMsg("success", "Custom key updated.");
-        await loadCustomKeys();
-      }
-
-      async function deleteCustomKey(){
-        var license = $("customLicense").value.trim();
-        if(!license) throw new Error("missing_license");
-        if(!confirm("Delete this custom key?")) return;
-        await api("key_delete_custom", { license: license });
-        setMsg("success", "Custom key deleted.");
-        await loadCustomKeys();
       }
 
       async function loadCustomKeys(){
-        var j = await api("keys_list_custom");
-        var rows = j.items || [];
-        $("customKeysTbody").innerHTML = rows.length ? rows.map(function(x){
-          return '<tr>' +
-            '<td class="code">' + esc(x.license || "—") + '</td>' +
-            '<td>' + esc(x.plan || "—") + '</td>' +
-            '<td>' + esc(x.ttlSeconds || 0) + '</td>' +
-            '<td>' + esc(x.sessionLimit || 0) + '</td>' +
-            '<td>' + esc(x.maxDevices || 0) + '</td>' +
-            '<td>' + esc(x.exp ? ts(x.exp) : "—") + '</td>' +
-            '<td>' + esc(ts(x.createdAt)) + '</td>' +
-            '<td>' + esc(x.createdBy || "—") + '</td>' +
-            '<td>' + esc(x.note || "—") + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="9" class="muted">No custom keys found.</td></tr>';
-      }
-
-      async function addFreeKey(){
-        var j = await api("freekey_add", {
-          license: $("freeKeyLicense").value.trim(),
-          ttlSeconds: $("freeKeyTtl").value.trim(),
-          tier: $("freeKeyTier").value.trim()
-        });
-        setMsg("success", "Free key added: " + (j.license || ""));
-        await loadFreeKeys();
-      }
-
-      async function removeFreeKey(){
-        var license = $("freeKeyLicense").value.trim();
-        if(!license) throw new Error("missing_license");
-        await api("freekey_remove", { license: license });
-        setMsg("success", "Free key removed.");
-        await loadFreeKeys();
-      }
-
-      async function expireAllFreeKeys(){
-        if(!confirm("Expire all free keys?")) return;
-        await api("freekeys_expire_all");
-        setMsg("success", "All free keys expired.");
-        await loadFreeKeys();
+        try{
+          var j = await api("keys_list_custom");
+          var rows = j.items || [];
+          if (!rows.length) {
+            $("customKeysTbody").innerHTML = '<tr><td colspan="9" class="muted">No custom keys found.</td></tr>';
+            return;
+          }
+          $("customKeysTbody").innerHTML = rows.map(function(r){
+            return '<tr>' +
+              '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.plan) + '</td>' +
+              '<td>' + esc(r.ttlSeconds) + '</td>' +
+              '<td>' + esc(r.sessionLimit) + '</td>' +
+              '<td>' + esc(r.maxDevices) + '</td>' +
+              '<td>' + esc(ts(r.exp)) + '</td>' +
+              '<td>' + esc(ts(r.createdAt)) + '</td>' +
+              '<td>' + esc(r.createdBy || "") + '</td>' +
+              '<td>' + esc(r.note || "") + '</td>' +
+            '</tr>';
+          }).join("");
+        }catch(err){
+          setMsg("error","Custom keys load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadFreeKeys(){
-        var j = await api("freekeys_list");
-        var rows = j.items || [];
-        $("freeKeysTbody").innerHTML = rows.length ? rows.map(function(x){
-          return '<tr>' +
-            '<td class="code">' + esc(x.license || "—") + '</td>' +
-            '<td>' + esc(x.tier || "—") + '</td>' +
-            '<td>' + esc(x.ttlSeconds || 0) + '</td>' +
-            '<td>' + esc(ts(x.exp)) + '</td>' +
-            '<td>' + esc(ts(x.createdAt)) + '</td>' +
-            '<td>' + esc(x.createdBy || "—") + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="6" class="muted">No free keys found.</td></tr>';
-      }
-
-      async function pauseLauncher(){
-        await api("launcher_pause", { reason: $("pauseReason").value.trim() });
-        setMsg("success", "Launcher paused.");
-        await loadLauncherStatus();
-        await loadDashboard();
-      }
-
-      async function unpauseLauncher(){
-        await api("launcher_unpause");
-        setMsg("success", "Launcher unpaused.");
-        await loadLauncherStatus();
-        await loadDashboard();
-      }
-
-      async function setMinVersion(){
-        await api("launcher_set_min_version", { version: $("minVersion").value.trim() });
-        setMsg("success", "Minimum version updated.");
-        await loadLauncherStatus();
-        await loadDashboard();
-      }
-
-      async function setMaintenanceMessage(){
-        await api("launcher_set_maintenance_message", { message: $("maintenanceMsg").value.trim() });
-        setMsg("success", "Maintenance message updated.");
-        await loadLauncherStatus();
-        await loadDashboard();
-      }
-
-      async function saveRuntimeConfig(){
-        await api("launcher_set_runtime_config", {
-          supportEmail: $("runtimeSupportEmail").value.trim(),
-          discordUrl: $("runtimeDiscordUrl").value.trim(),
-          defaultStartUrl: $("runtimeStartUrl").value.trim(),
-          submitUrl: $("runtimeSubmitUrl").value.trim()
-        });
-        setMsg("success", "Runtime config saved.");
-        await loadLauncherStatus();
-        await loadDashboard();
-      }
-
-      async function loadLauncherStatus(){
-        var j = await api("launcher_status");
-        var lx = j.launcher || {};
-
-        $("pauseReason").value = lx.pausedReason || "";
-        $("minVersion").value = lx.minVersion || "";
-        $("maintenanceMsg").value = lx.maintenanceMessage || "";
-        $("runtimeSupportEmail").value = lx.launcherSupportEmail || "";
-        $("runtimeDiscordUrl").value = lx.launcherDiscordUrl || "";
-        $("runtimeStartUrl").value = lx.launcherDefaultStartUrl || "";
-        $("runtimeSubmitUrl").value = lx.launcherSubmitUrl || "/api/ui";
-
-        $("launcherStatusBox").innerHTML =
-          '<div>Paused</div><div>' + esc(yesNo(lx.paused)) + '</div>' +
-          '<div>Pause Reason</div><div>' + esc(lx.pausedReason || "—") + '</div>' +
-          '<div>Disable All</div><div>' + esc(yesNo(lx.disableAll)) + '</div>' +
-          '<div>Maintenance Mode</div><div>' + esc(yesNo(lx.maintenanceMode)) + '</div>' +
-          '<div>Maintenance Message</div><div>' + esc(lx.maintenanceMessage || "—") + '</div>' +
-          '<div>Minimum Version</div><div>' + esc(lx.minVersion || "—") + '</div>' +
-          '<div>Cleanup Prompt Enabled</div><div>' + esc(yesNo(lx.cleanupOldPromptEnabled)) + '</div>' +
-          '<div>Cleanup Message</div><div>' + esc(lx.cleanupOldPromptMessage || "—") + '</div>' +
-          '<div>Cleanup Force Once</div><div>' + esc(lx.cleanupOldPromptForceOnce ? ts(lx.cleanupOldPromptForceOnce) : "—") + '</div>' +
-          '<div>Support Email</div><div>' + esc(lx.launcherSupportEmail || "—") + '</div>' +
-          '<div>Discord URL</div><div class="code">' + esc(lx.launcherDiscordUrl || "—") + '</div>' +
-          '<div>Default Start URL</div><div class="code">' + esc(lx.launcherDefaultStartUrl || "—") + '</div>' +
-          '<div>Submit URL</div><div class="code">' + esc(lx.launcherSubmitUrl || "—") + '</div>' +
-          '<div>Banner Enabled</div><div>' + esc(yesNo(lx.publicBannerEnabled)) + '</div>' +
-          '<div>Modal Enabled</div><div>' + esc(yesNo(lx.publicModalEnabled)) + '</div>' +
-          '<div>Poll Enabled</div><div>' + esc(yesNo(lx.publicPollEnabled)) + '</div>' +
-          '<div>Quick Links Count</div><div>' + esc((lx.launcherQuickLinks || []).length || 0) + '</div>';
+        try{
+          var j = await api("freekeys_list");
+          var rows = j.items || [];
+          if (!rows.length) {
+            $("freeKeysTbody").innerHTML = '<tr><td colspan="6" class="muted">No free keys found.</td></tr>';
+            return;
+          }
+          $("freeKeysTbody").innerHTML = rows.map(function(r){
+            return '<tr>' +
+              '<td class="code">' + esc(r.license) + '</td>' +
+              '<td>' + esc(r.tier || "") + '</td>' +
+              '<td>' + esc(r.ttlSeconds || 0) + '</td>' +
+              '<td>' + esc(ts(r.exp)) + '</td>' +
+              '<td>' + esc(ts(r.createdAt)) + '</td>' +
+              '<td>' + esc(r.createdBy || "") + '</td>' +
+            '</tr>';
+          }).join("");
+        }catch(err){
+          setMsg("error","Free keys load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadCleanupPrompt(){
-        var j = await api("launcher_cleanup_prompt_get");
-        var c = j.cleanupPrompt || {};
-        $("cleanupEnabled").value = c.enabled ? "1" : "0";
-        $("cleanupMessage").value = c.message || "";
-        $("cleanupForceOnce").value = c.forceOnce ? ts(c.forceOnce) : "";
-        $("cleanupScanPaths").value = toLines(c.scanPaths || []);
-        $("cleanupNameHints").value = toLines(c.nameHints || []);
-      }
-
-      async function saveCleanupPrompt(){
-        await api("launcher_cleanup_prompt_set", {
-          enabled: boolFromInput($("cleanupEnabled").value),
-          message: $("cleanupMessage").value,
-          scanPaths: fromLines($("cleanupScanPaths").value),
-          nameHints: fromLines($("cleanupNameHints").value)
-        });
-        setMsg("success", "Cleanup prompt config saved.");
-        await loadCleanupPrompt();
-        await loadLauncherStatus();
-      }
-
-      async function bumpCleanupPrompt(){
-        await api("launcher_cleanup_prompt_bump");
-        setMsg("success", "Cleanup prompt force-once bumped.");
-        await loadCleanupPrompt();
-        await loadLauncherStatus();
-      }
-
-      async function saveBanner(){
-        await api("launcher_public_banner_set", {
-          enabled: boolFromInput($("bannerEnabled").value),
-          id: $("bannerId").value.trim(),
-          title: $("bannerTitle").value.trim(),
-          text: $("bannerText").value,
-          mode: $("bannerMode").value,
-          dismissable: boolFromInput($("bannerDismissable").value)
-        });
-        setMsg("success", "Banner saved.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function clearBanner(){
-        await api("launcher_public_banner_clear");
-        setMsg("success", "Banner cleared.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function saveModal(){
-        await api("launcher_public_modal_set", {
-          enabled: boolFromInput($("modalEnabled").value),
-          id: $("modalId").value.trim(),
-          title: $("modalTitle").value.trim(),
-          text: $("modalText").value,
-          buttons: parseJsonMaybe($("modalButtons").value, [])
-        });
-        setMsg("success", "Modal saved.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function clearModal(){
-        await api("launcher_public_modal_clear");
-        setMsg("success", "Modal cleared.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function savePoll(){
-        await api("launcher_public_poll_set", {
-          enabled: boolFromInput($("pollEnabled").value),
-          id: $("pollId").value.trim(),
-          question: $("pollQuestion").value.trim(),
-          options: fromLines($("pollOptions").value)
-        });
-        setMsg("success", "Poll saved.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function clearPoll(){
-        await api("launcher_public_poll_clear");
-        setMsg("success", "Poll cleared.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function saveQuickLinks(){
-        await api("launcher_quick_links_set", {
-          links: parseJsonMaybe($("quickLinks").value, [])
-        });
-        setMsg("success", "Quick links saved.");
-        await loadConfig();
-        await loadDashboard();
-      }
-
-      async function clearQuickLinks(){
-        await api("launcher_quick_links_clear");
-        setMsg("success", "Quick links cleared.");
-        await loadConfig();
-        await loadDashboard();
+        try{
+          var j = await api("launcher_cleanup_prompt_get");
+          var p = j.prompt || {};
+          $("cleanupEnabled").value = p.enabled ? "1" : "0";
+          $("cleanupMessage").value = p.message || "";
+          $("cleanupForceOnce").value = p.forceOnce || 0;
+          $("cleanupScanPaths").value = (p.scanPaths || []).join("\n");
+          $("cleanupNameHints").value = (p.nameHints || []).join("\n");
+          $("cleanupBox").innerHTML = kvHtml({
+            enabled: yesNo(p.enabled),
+            message: p.message || "",
+            forceOnce: p.forceOnce || 0,
+            scanPaths: (p.scanPaths || []).join(", "),
+            nameHints: (p.nameHints || []).join(", ")
+          });
+        }catch(err){
+          setMsg("error","Cleanup prompt load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadPollResults(){
-        var j = await api("launcher_public_poll_results", {
-          pollId: $("pollResultsId").value.trim()
-        });
-        var p = j.poll || {};
-        var votes = p.votes || {};
-        var options = Array.isArray(p.options) ? p.options : [];
-
-        var html =
-          '<div>Poll ID</div><div class="code">' + esc(p.pollId || "—") + '</div>' +
-          '<div>Question</div><div>' + esc(p.question || "—") + '</div>' +
-          '<div>Options</div><div>' + esc(options.join(" | ") || "—") + '</div>';
-
-        for(var i=0;i<options.length;i++){
-          var opt = options[i];
-          html += '<div>Votes: ' + esc(opt) + '</div><div>' + esc(votes[opt] || 0) + '</div>';
+        try{
+          var j = await api("launcher_public_poll_results", {
+            pollId: $("pollResultsId").value.trim()
+          });
+          var p = j.poll || {};
+          var votes = p.votes || {};
+          var box = {
+            pollId: p.pollId || "",
+            question: p.question || "",
+            options: (p.options || []).join(", "),
+            totalVotes: p.totalVotes || 0,
+            votes: JSON.stringify(votes)
+          };
+          $("pollResultsBox").innerHTML = kvHtml(box);
+        }catch(err){
+          setMsg("error","Poll results load failed: " + safeErrorMessage(err));
         }
-
-        $("pollResultsBox").innerHTML = html;
-      }
-
-      async function resetPollResults(){
-        if(!confirm("Reset votes for this poll?")) return;
-        await api("launcher_public_poll_reset", {
-          pollId: $("pollResultsId").value.trim()
-        });
-        setMsg("success", "Poll votes reset.");
-        await loadPollResults();
       }
 
       async function loadEvents(){
-        var j = await api("launcher_public_events_list", {
-          limit: $("eventsLimit").value.trim() || "50"
-        });
-        var rows = j.items || [];
-        $("eventsTbody").innerHTML = rows.length ? rows.map(function(x){
-          return '<tr>' +
-            '<td>' + esc(ts(x.ts)) + '</td>' +
-            '<td>' + esc(x.kind || "—") + '</td>' +
-            '<td class="code">' + esc(x.clientId || "—") + '</td>' +
-            '<td class="code">' + esc(x.hwid || "—") + '</td>' +
-            '<td>' + esc(x.version || "—") + '</td>' +
-            '<td class="code">' + esc(JSON.stringify(x.data || {})) + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="6" class="muted">No events found.</td></tr>';
-      }
-
-      async function clearEvents(){
-        if(!confirm("Clear the public events feed?")) return;
-        await api("launcher_public_events_clear");
-        setMsg("success", "Public events feed cleared.");
-        await loadEvents();
-      }
-
-      async function searchHwid(){
-        var j = await api("hwid_search", {
-          license: $("hwidLicense").value.trim(),
-          hwidHash: $("hwidValue").value.trim()
-        });
-        var r = j.result || {};
-        var byHwid = r.byHwid || {};
-        var byLicense = Array.isArray(r.byLicense) ? r.byLicense : [];
-
-        var html = "";
-        if($("hwidLicense").value.trim()){
-          var item = byLicense[0] || {};
-          html += '<div>License</div><div class="code">' + esc(item.license || "—") + '</div>';
-          html += '<div>Bound HWIDs</div><div class="code">' + esc((item.hwids || []).join(", ") || "—") + '</div>';
-          html += '<div>Active Sessions</div><div>' + esc((item.sessions || []).length || 0) + '</div>';
+        try{
+          var j = await api("launcher_public_events_list", {
+            limit: parseInt($("eventsLimit").value || "50", 10) || 50
+          });
+          var rows = j.items || [];
+          if (!rows.length) {
+            $("eventsTbody").innerHTML = '<tr><td colspan="6" class="muted">No events found.</td></tr>';
+            return;
+          }
+          $("eventsTbody").innerHTML = rows.map(function(r){
+            return '<tr>' +
+              '<td>' + esc(ts(r.ts || r.createdAt || 0)) + '</td>' +
+              '<td>' + esc(r.type || "") + '</td>' +
+              '<td>' + esc(r.target || r.action || "") + '</td>' +
+              '<td>' + esc(r.value || r.option || r.message || "") + '</td>' +
+              '<td class="code">' + esc(r.clientId || r.cid || "") + '</td>' +
+              '<td class="code">' + esc(JSON.stringify(r)) + '</td>' +
+            '</tr>';
+          }).join("");
+        }catch(err){
+          setMsg("error","Events load failed: " + safeErrorMessage(err));
         }
-        if($("hwidValue").value.trim()){
-          html += '<div>HWID</div><div class="code">' + esc(byHwid.hwidHash || "—") + '</div>';
-          html += '<div>Banned</div><div>' + esc(yesNo(byHwid.banned)) + '</div>';
-          html += '<div>Suspicious</div><div>' + esc(yesNo(byHwid.suspicious)) + '</div>';
-          html += '<div>Known Licenses</div><div class="code">' + esc((byHwid.licenses || []).join(", ") || "—") + '</div>';
-          html += '<div>Active Sessions</div><div>' + esc((byHwid.sessions || []).length || 0) + '</div>';
+      }
+
+      async function hwidSearch(){
+        try{
+          var j = await api("hwid_search", {
+            license: $("hwidLicense").value.trim(),
+            hwidHash: $("hwidValue").value.trim()
+          });
+          var result = j.result || {};
+          var byHwid = result.byHwid || {};
+          $("hwidSearchBox").innerHTML = kvHtml({
+            hwidHash: byHwid.hwidHash || "",
+            banned: yesNo(byHwid.banned),
+            suspicious: yesNo(byHwid.suspicious),
+            licenses: (byHwid.licenses || []).join(", "),
+            sessionCount: (byHwid.sessions || []).length,
+            banInfo: JSON.stringify(byHwid.banInfo || {}),
+            suspiciousInfo: JSON.stringify(byHwid.suspiciousInfo || {}),
+            noteInfo: JSON.stringify(byHwid.noteInfo || {}),
+            cooldownInfo: JSON.stringify(byHwid.cooldownInfo || {}),
+            denyInfo: JSON.stringify(byHwid.denyInfo || {})
+          });
+        }catch(err){
+          setMsg("error","HWID search failed: " + safeErrorMessage(err));
         }
-        $("hwidSearchBox").innerHTML = html || '<div>Result</div><div>No data.</div>';
       }
 
-      async function banHwid(){
-        var hw = $("hwidValue").value.trim();
-        if(!hw) throw new Error("missing_hwid_hash");
-        await api("hwid_ban", { hwidHash: hw, reason: $("hwidReason").value.trim() });
-        setMsg("success", "HWID banned.");
-        await searchHwid();
+      async function clientLookup(){
+        try{
+          var clientId = $("clientIdValue").value.trim();
+          var j = await api("client_lookup", { clientId: clientId });
+          var r = j.result || {};
+          $("clientLookupBox").innerHTML = kvHtml({
+            clientId: r.clientId || "",
+            live: yesNo(r.live),
+            linkedHWIDs: (r.linkedHWIDs || []).join(", "),
+            linkedLicenses: (r.linkedLicenses || []).join(", "),
+            currentSession: r.currentSession || "",
+            lastPing: ts(r.lastPing || 0),
+            launcherVersion: r.launcherVersion || "",
+            plan: r.plan || "",
+            startUrl: r.startUrl || "",
+            note: JSON.stringify(r.note || {}),
+            block: JSON.stringify(r.block || {}),
+            suspicious: JSON.stringify(r.suspicious || {}),
+            sessionCount: (r.sessions || []).length,
+            recentCommands: (r.recentCommands || []).length
+          });
+          $("clientNote").value = (r.note && r.note.note) ? r.note.note : "";
+        }catch(err){
+          setMsg("error","Client lookup failed: " + safeErrorMessage(err));
+        }
       }
 
-      async function unbanHwid(){
-        var hw = $("hwidValue").value.trim();
-        if(!hw) throw new Error("missing_hwid_hash");
-        await api("hwid_unban", { hwidHash: hw });
-        setMsg("success", "HWID unbanned.");
-        await searchHwid();
+      async function lookupAny(){
+        try{
+          var j = await api("lookup_any", { query: $("lookupAnyValue").value.trim() });
+          $("lookupAnyBox").innerHTML = kvHtml({
+            query: j.result && j.result.query || "",
+            byClient: JSON.stringify(j.result && j.result.byClient || null),
+            byHWID: JSON.stringify(j.result && j.result.byHWID || null),
+            byLicense: JSON.stringify(j.result && j.result.byLicense || null),
+            bySession: JSON.stringify(j.result && j.result.bySession || null)
+          });
+        }catch(err){
+          setMsg("error","Cross lookup failed: " + safeErrorMessage(err));
+        }
       }
 
-      async function markSuspicious(){
-        var hw = $("hwidValue").value.trim();
-        if(!hw) throw new Error("missing_hwid_hash");
-        await api("hwid_mark_suspicious", { hwidHash: hw, reason: $("hwidReason").value.trim() });
-        setMsg("success", "HWID marked suspicious.");
-        await searchHwid();
-      }
-
-      async function disconnectHwid(){
-        var hw = $("hwidValue").value.trim();
-        if(!hw) throw new Error("missing_hwid_hash");
-        if(!confirm("Disconnect all sessions for this HWID?")) return;
-        await api("sessions_end_by_hwid", { hwidHash: hw });
-        setMsg("success", "Sessions disconnected for HWID.");
-        await searchHwid();
-        await loadDashboard();
+      async function loadRemoteCommands(){
+        try{
+          var j = await api("remote_commands_list", {
+            targetType: $("remoteTargetType").value,
+            targetValue: $("remoteTargetValue").value.trim(),
+            limit: 25
+          });
+          var rows = j.items || [];
+          if (!rows.length) {
+            $("remoteCommandsTbody").innerHTML = '<tr><td colspan="6" class="muted">No commands found.</td></tr>';
+            return;
+          }
+          $("remoteCommandsTbody").innerHTML = rows.map(function(r){
+            return '<tr>' +
+              '<td>' + esc(ts(r.createdAt || 0)) + '</td>' +
+              '<td>' + esc(r.targetType || "") + '</td>' +
+              '<td class="code">' + esc(r.targetValue || "all") + '</td>' +
+              '<td>' + esc(r.commandType || "") + '</td>' +
+              '<td>' + esc((r.payload && r.payload.message) || "") + '</td>' +
+              '<td>' + esc((r.payload && r.payload.reason) || "") + '</td>' +
+            '</tr>';
+          }).join("");
+        }catch(err){
+          setMsg("error","Remote commands load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadAdminAccounts(){
-        var j = await api("admin_accounts_list");
-        var accounts = j.accounts || [];
-        var sessions = j.activeSessions || [];
+        try{
+          var j = await api("admin_accounts_list");
+          var accounts = j.accounts || [];
+          var sessions = j.sessions || [];
 
-        $("accountsTbody").innerHTML = accounts.length ? accounts.map(function(x){
-          return '<tr>' +
-            '<td>' + esc(x.username || "—") + '</td>' +
-            '<td>' + esc(x.role || "—") + '</td>' +
-            '<td>' + esc(yesNo(x.disabled)) + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="3" class="muted">No account rows.</td></tr>';
+          $("accountsTbody").innerHTML = accounts.length ? accounts.map(function(a){
+            return '<tr>' +
+              '<td>' + esc(a.username || "") + '</td>' +
+              '<td>' + esc(a.role || "") + '</td>' +
+              '<td>' + esc(yesNo(a.disabled)) + '</td>' +
+            '</tr>';
+          }).join("") : '<tr><td colspan="3" class="muted">No account data.</td></tr>';
 
-        $("adminSessionsTbody").innerHTML = sessions.length ? sessions.map(function(x){
-          return '<tr>' +
-            '<td>' + esc(x.username || "—") + '</td>' +
-            '<td>' + esc(x.role || "—") + '</td>' +
-            '<td class="code">' + esc(x.tokenTail || "—") + '</td>' +
-            '<td>' + esc(ts(x.createdAt)) + '</td>' +
-            '<td>' + esc(ts(x.exp)) + '</td>' +
-            '<td class="code">' + esc(x.ip || "—") + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="6" class="muted">No active admin sessions.</td></tr>';
-      }
-
-      async function forceLogoutAdmins(){
-        if(!confirm("Force logout all admin sessions?")) return;
-        await api("admin_force_logout_all");
-        setMsg("success", "All admin sessions were logged out.");
-        await loadAdminAccounts();
+          $("adminSessionsTbody").innerHTML = sessions.length ? sessions.map(function(s){
+            return '<tr>' +
+              '<td>' + esc(s.username || "") + '</td>' +
+              '<td>' + esc(s.role || "") + '</td>' +
+              '<td class="code">' + esc(s.tokenTail || "") + '</td>' +
+              '<td>' + esc(ts(s.createdAt || 0)) + '</td>' +
+              '<td>' + esc(ts(s.exp || 0)) + '</td>' +
+              '<td class="code">' + esc(s.ip || "") + '</td>' +
+            '</tr>';
+          }).join("") : '<tr><td colspan="6" class="muted">No admin sessions.</td></tr>';
+        }catch(err){
+          setMsg("error","Admin accounts load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadConfig(){
-        var j = await api("config_get");
-        var c = j.config || {};
-        var p = c.currentPlanDefaults || {};
-        var cleanup = c.cleanupOldPrompt || {};
-        var runtime = c.runtimeConfig || {};
-        var banner = c.publicBanner || {};
-        var modal = c.publicModal || {};
-        var poll = c.publicPoll || {};
-        var links = c.quickLinks || [];
-        var f = c.featureToggles || {};
+        try{
+          var j = await api("config_get");
+          var c = (j.config && j.config.launcher) || {};
+          $("configBox").innerHTML = kvHtml(c);
 
-        $("configBox").innerHTML =
-          '<div>FREE TTL</div><div>' + esc((p.free && p.free.ttlSeconds) || "—") + '</div>' +
-          '<div>FREE Sessions</div><div>' + esc((p.free && p.free.sessionLimit) || "—") + '</div>' +
-          '<div>FREE Devices</div><div>' + esc((p.free && p.free.maxDevices) || "—") + '</div>' +
-          '<div>BASIC TTL</div><div>' + esc((p.basic && p.basic.ttlSeconds) || "—") + '</div>' +
-          '<div>BASIC Sessions</div><div>' + esc((p.basic && p.basic.sessionLimit) || "—") + '</div>' +
-          '<div>BASIC Devices</div><div>' + esc((p.basic && p.basic.maxDevices) || "—") + '</div>' +
-          '<div>PRO TTL</div><div>' + esc((p.pro && p.pro.ttlSeconds) || "—") + '</div>' +
-          '<div>PRO Sessions</div><div>' + esc((p.pro && p.pro.sessionLimit) || "—") + '</div>' +
-          '<div>PRO Devices</div><div>' + esc((p.pro && p.pro.maxDevices) || "—") + '</div>' +
+          $("pauseReason").value = c.pausedReason || "";
+          $("minVersion").value = c.minVersion || "";
+          $("maintenanceMessage").value = c.maintenanceMessage || "";
+          $("supportEmail").value = c.supportEmail || "";
+          $("discordUrl").value = c.discordUrl || "";
+          $("defaultStartUrl").value = c.defaultStartUrl || "";
+          $("submitUrl").value = c.submitUrl || "";
 
-          '<div>Launcher Force Version</div><div>' + esc(c.launcherForceVersionValue || "—") + '</div>' +
-          '<div>Maintenance Message</div><div>' + esc(c.maintenanceMessageText || "—") + '</div>' +
+          $("cleanupEnabled").value = c.cleanupOldPromptEnabled ? "1" : "0";
+          $("cleanupMessage").value = c.cleanupOldPromptMessage || "";
+          $("cleanupForceOnce").value = c.cleanupOldPromptForceOnce || 0;
+          $("cleanupScanPaths").value = (c.cleanupOldScanPaths || []).join("\n");
+          $("cleanupNameHints").value = (c.cleanupOldNameHints || []).join("\n");
 
-          '<div>Cleanup Enabled</div><div>' + esc(yesNo(cleanup.enabled)) + '</div>' +
-          '<div>Cleanup Message</div><div>' + esc(cleanup.message || "—") + '</div>' +
-          '<div>Cleanup Force Once</div><div>' + esc(cleanup.forceOnce ? ts(cleanup.forceOnce) : "—") + '</div>' +
-          '<div>Cleanup Scan Paths</div><div class="code">' + esc((cleanup.scanPaths || []).join(", ") || "—") + '</div>' +
-          '<div>Cleanup Name Hints</div><div class="code">' + esc((cleanup.nameHints || []).join(", ") || "—") + '</div>' +
+          $("bannerEnabled").value = c.publicBannerEnabled ? "1" : "0";
+          $("bannerId").value = c.publicBannerId || "";
+          $("bannerTitle").value = c.publicBannerTitle || "";
+          $("bannerText").value = c.publicBannerText || "";
+          $("bannerMode").value = c.publicBannerMode || "info";
+          $("bannerDismissable").value = c.publicBannerDismissable ? "1" : "0";
 
-          '<div>Support Email</div><div>' + esc(runtime.supportEmail || "—") + '</div>' +
-          '<div>Discord URL</div><div class="code">' + esc(runtime.discordUrl || "—") + '</div>' +
-          '<div>Default Start URL</div><div class="code">' + esc(runtime.defaultStartUrl || "—") + '</div>' +
-          '<div>Submit URL</div><div class="code">' + esc(runtime.submitUrl || "—") + '</div>' +
+          $("modalEnabled").value = c.publicModalEnabled ? "1" : "0";
+          $("modalId").value = c.publicModalId || "";
+          $("modalTitle").value = c.publicModalTitle || "";
+          $("modalText").value = c.publicModalText || "";
+          $("modalButtons").value = JSON.stringify(c.publicModalButtons || [], null, 2);
 
-          '<div>Banner Enabled</div><div>' + esc(yesNo(banner.enabled)) + '</div>' +
-          '<div>Banner ID</div><div class="code">' + esc(banner.id || "—") + '</div>' +
-          '<div>Banner Title</div><div>' + esc(banner.title || "—") + '</div>' +
-          '<div>Banner Text</div><div>' + esc(banner.text || "—") + '</div>' +
-          '<div>Banner Mode</div><div>' + esc(banner.mode || "—") + '</div>' +
-          '<div>Banner Dismissable</div><div>' + esc(yesNo(banner.dismissable)) + '</div>' +
+          $("pollEnabled").value = c.publicPollEnabled ? "1" : "0";
+          $("pollId").value = c.publicPollId || "";
+          $("pollQuestion").value = c.publicPollQuestion || "";
+          $("pollOptions").value = (c.publicPollOptions || []).join("\n");
 
-          '<div>Modal Enabled</div><div>' + esc(yesNo(modal.enabled)) + '</div>' +
-          '<div>Modal ID</div><div class="code">' + esc(modal.id || "—") + '</div>' +
-          '<div>Modal Title</div><div>' + esc(modal.title || "—") + '</div>' +
-          '<div>Modal Text</div><div>' + esc(modal.text || "—") + '</div>' +
-          '<div>Modal Buttons</div><div class="code">' + esc(JSON.stringify(modal.buttons || [])) + '</div>' +
+          $("quickLinks").value = JSON.stringify(c.quickLinks || [], null, 2);
 
-          '<div>Poll Enabled</div><div>' + esc(yesNo(poll.enabled)) + '</div>' +
-          '<div>Poll ID</div><div class="code">' + esc(poll.id || "—") + '</div>' +
-          '<div>Poll Question</div><div>' + esc(poll.question || "—") + '</div>' +
-          '<div>Poll Options</div><div class="code">' + esc((poll.options || []).join(" | ") || "—") + '</div>' +
+          $("allowlistMode").checked = !!c.allowlistMode;
+          $("rotatingAnnouncement").value = c.rotatingAnnouncement || "";
+          $("oneTimeAnnouncement").value = c.oneTimeAnnouncement || "";
 
-          '<div>Quick Links</div><div class="code">' + esc(JSON.stringify(links)) + '</div>' +
+          $("launcherStatusBox").innerHTML = kvHtml({
+            paused: yesNo(c.paused),
+            pausedReason: c.pausedReason || "",
+            maintenanceMode: yesNo(c.maintenanceMode),
+            maintenanceMessage: c.maintenanceMessage || "",
+            minVersion: c.minVersion || "",
+            disableAllKeys: yesNo(c.disableAllKeys),
+            supportEmail: c.supportEmail || "",
+            discordUrl: c.discordUrl || "",
+            defaultStartUrl: c.defaultStartUrl || "",
+            submitUrl: c.submitUrl || "",
+            cleanupOldPromptEnabled: yesNo(c.cleanupOldPromptEnabled),
+            publicBannerEnabled: yesNo(c.publicBannerEnabled),
+            publicModalEnabled: yesNo(c.publicModalEnabled),
+            publicPollEnabled: yesNo(c.publicPollEnabled),
+            quickLinksCount: c.quickLinksCount || 0,
+            allowlistMode: yesNo(c.allowlistMode),
+            rotatingAnnouncement: c.rotatingAnnouncement || "",
+            oneTimeAnnouncement: c.oneTimeAnnouncement || ""
+          });
 
-          '<div>Paused</div><div>' + esc(yesNo(f.paused)) + '</div>' +
-          '<div>Maintenance Mode</div><div>' + esc(yesNo(f.maintenanceMode)) + '</div>' +
-          '<div>Disable All Keys</div><div>' + esc(yesNo(f.disableAllKeys)) + '</div>';
+          $("cleanupBox").innerHTML = kvHtml({
+            enabled: yesNo(c.cleanupOldPromptEnabled),
+            message: c.cleanupOldPromptMessage || "",
+            forceOnce: c.cleanupOldPromptForceOnce || 0,
+            scanPaths: (c.cleanupOldScanPaths || []).join(", "),
+            nameHints: (c.cleanupOldNameHints || []).join(", ")
+          });
 
-        $("bannerEnabled").value = banner.enabled ? "1" : "0";
-        $("bannerDismissable").value = banner.dismissable ? "1" : "0";
-        $("bannerId").value = banner.id || "";
-        $("bannerTitle").value = banner.title || "";
-        $("bannerText").value = banner.text || "";
-        $("bannerMode").value = banner.mode || "info";
-
-        $("modalEnabled").value = modal.enabled ? "1" : "0";
-        $("modalId").value = modal.id || "";
-        $("modalTitle").value = modal.title || "";
-        $("modalText").value = modal.text || "";
-        $("modalButtons").value = JSON.stringify(modal.buttons || [], null, 2);
-
-        $("pollEnabled").value = poll.enabled ? "1" : "0";
-        $("pollId").value = poll.id || "";
-        $("pollQuestion").value = poll.question || "";
-        $("pollOptions").value = Array.isArray(poll.options) ? poll.options.join("\n") : "";
-
-        $("quickLinks").value = JSON.stringify(links || [], null, 2);
-        $("pollResultsId").value = poll.id || "";
+          $("remoteExtrasBox").innerHTML = kvHtml({
+            allowlistMode: yesNo(c.allowlistMode),
+            rotatingAnnouncement: c.rotatingAnnouncement || "",
+            oneTimeAnnouncement: c.oneTimeAnnouncement || ""
+          });
+        }catch(err){
+          setMsg("error","Config load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadAnalytics(){
-        var j = await api("analytics_summary");
-        var a = j.analytics || {};
-        $("analyticsBox").innerHTML =
-          '<div>Total Visitors</div><div>' + esc(a.totalVisitors || 0) + '</div>' +
-          '<div>Trusted Visitors</div><div>' + esc(a.trustedVisitors || 0) + '</div>' +
-          '<div>Total Downloads</div><div>' + esc(a.totalDownloads || 0) + '</div>' +
-          '<div>Key Checks Today</div><div>' + esc(a.keyChecksToday || 0) + '</div>' +
-          '<div>Verify Attempts Today</div><div>' + esc(a.verifyAttemptsToday || 0) + '</div>' +
-          '<div>Launch Attempts Today</div><div>' + esc(a.launchAttemptsToday || 0) + '</div>' +
-          '<div>Launch Failures Today</div><div>' + esc(a.launchFailuresToday || 0) + '</div>' +
-          '<div>Free Keys Generated Today</div><div>' + esc(a.freeKeysGeneratedToday || 0) + '</div>' +
-          '<div>Sessions Ended Today</div><div>' + esc(a.sessionsEndedToday || 0) + '</div>' +
-          '<div>Admin Login Failures Today</div><div>' + esc(a.adminLoginFailuresToday || 0) + '</div>' +
-          '<div>UI Challenges Today</div><div>' + esc(a.uiChallengesToday || 0) + '</div>' +
-          '<div>Public Events Today</div><div>' + esc(a.publicEventsToday || 0) + '</div>' +
-          '<div>Poll Votes Today</div><div>' + esc(a.pollVotesToday || 0) + '</div>' +
-          '<div>Banner Dismissals Today</div><div>' + esc(a.bannerDismissalsToday || 0) + '</div>' +
-          '<div>Cleanup Runs Today</div><div>' + esc(a.cleanupRunsToday || 0) + '</div>';
+        try{
+          var j = await api("analytics_summary");
+          $("analyticsBox").innerHTML = kvHtml(j.analytics || {});
+        }catch(err){
+          setMsg("error","Analytics load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadAlerts(){
-        var j = await api("alerts_list", { limit: $("alertsLimit").value.trim() || "50" });
-        var rows = j.items || [];
-        $("alertsTbody").innerHTML = rows.length ? rows.map(function(x){
-          return '<tr>' +
-            '<td>' + esc(ts(x.ts)) + '</td>' +
-            '<td>' + esc(x.type || "—") + '</td>' +
-            '<td>' + esc(x.level || "—") + '</td>' +
-            '<td>' + esc(x.actor || x.license || "—") + '</td>' +
-            '<td class="code">' + esc(JSON.stringify(x)) + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="5" class="muted">No alerts found.</td></tr>';
+        try{
+          var j = await api("alerts_list", {
+            limit: parseInt($("alertsLimit").value || "50", 10) || 50
+          });
+          var rows = j.items || [];
+          $("alertsTbody").innerHTML = rows.length ? rows.map(function(r){
+            return '<tr>' +
+              '<td>' + esc(ts(r.ts || 0)) + '</td>' +
+              '<td>' + esc(r.type || "") + '</td>' +
+              '<td>' + esc(r.level || "") + '</td>' +
+              '<td>' + esc(r.actor || "") + '</td>' +
+              '<td class="code">' + esc(JSON.stringify(r)) + '</td>' +
+            '</tr>';
+          }).join("") : '<tr><td colspan="5" class="muted">No alerts found.</td></tr>';
+        }catch(err){
+          setMsg("error","Alerts load failed: " + safeErrorMessage(err));
+        }
       }
 
       async function loadAudit(){
-        var j = await api("audit_list", { limit: $("auditLimit").value.trim() || "50" });
-        var rows = j.items || [];
-        $("auditTbody").innerHTML = rows.length ? rows.map(function(x){
-          return '<tr>' +
-            '<td>' + esc(ts(x.ts)) + '</td>' +
-            '<td>' + esc(x.type || "—") + '</td>' +
-            '<td>' + esc(x.actor || "—") + '</td>' +
-            '<td>' + esc(x.role || "—") + '</td>' +
-            '<td>' + esc(x.action || "—") + '</td>' +
-            '<td class="code">' + esc(x.target || "—") + '</td>' +
-            '<td>' + esc(yesNo(x.success !== false)) + '</td>' +
-          '</tr>';
-        }).join("") : '<tr><td colspan="7" class="muted">No audit entries found.</td></tr>';
-      }
-
-      async function disableAllKeys(){
-        if(!confirm("Disable all keys?")) return;
-        await api("emergency_disable_all_keys");
-        setMsg("success", "All keys disabled.");
-        await loadDashboard();
-        await loadLauncherStatus();
-      }
-
-      async function enableAllKeys(){
-        await api("emergency_enable_all_keys");
-        setMsg("success", "All keys enabled.");
-        await loadDashboard();
-        await loadLauncherStatus();
-      }
-
-      async function emergencyPause(){
-        if(!confirm("Pause all launches?")) return;
-        await api("emergency_pause_all_launches");
-        setMsg("success", "All launches paused.");
-        await loadDashboard();
-        await loadLauncherStatus();
-      }
-
-      async function emergencyEndSessions(){
-        if(!confirm("End all sessions now?")) return;
-        await api("emergency_end_all_sessions");
-        setMsg("success", "All sessions ended.");
-        await loadDashboard();
-        if(state.currentSection === "sessions") await loadSessions();
-      }
-
-      async function emergencyClearNonces(){
-        if(!confirm("Clear all launch nonces?")) return;
-        await api("emergency_clear_launch_nonces");
-        setMsg("success", "Launch nonces cleared.");
-      }
-
-      async function setEmergencyBanner(){
-        await api("emergency_set_banner", { message: $("emergencyBanner").value.trim() });
-        setMsg("success", "Emergency banner set.");
-        await loadDashboard();
-        await loadLauncherStatus();
-      }
-
-      function escJs(v){
-        return String(v == null ? "" : v)
-          .replace(/\\/g,"\\\\")
-          .replace(/'/g,"\\'")
-          .replace(/\r/g,"")
-          .replace(/\n/g,"");
-      }
-
-      window.__snEndSession = async function(license, sessionId){
         try{
-          if(!confirm("End this session?")) return;
-          await api("session_end_one", { license: license, sessionId: sessionId });
-          setMsg("success", "Session ended.");
-          await loadSessions();
-          await loadDashboard();
-        }catch(e){
-          handleErr(e);
+          var j = await api("audit_list", {
+            limit: parseInt($("auditLimit").value || "100", 10) || 100
+          });
+          var rows = j.items || [];
+          $("auditTbody").innerHTML = rows.length ? rows.map(function(r){
+            return '<tr>' +
+              '<td>' + esc(ts(r.ts || 0)) + '</td>' +
+              '<td>' + esc(r.type || "") + '</td>' +
+              '<td>' + esc(r.action || "") + '</td>' +
+              '<td>' + esc(r.actor || "") + '</td>' +
+              '<td class="code">' + esc(r.target || "") + '</td>' +
+              '<td>' + esc(yesNo(r.success)) + '</td>' +
+              '<td class="code">' + esc(JSON.stringify(r)) + '</td>' +
+            '</tr>';
+          }).join("") : '<tr><td colspan="7" class="muted">No audit records found.</td></tr>';
+        }catch(err){
+          setMsg("error","Audit load failed: " + safeErrorMessage(err));
         }
-      };
-
-      async function refreshCurrentSection(){
-        clearMsg();
-        if(state.currentSection === "dashboard") return loadDashboard();
-        if(state.currentSection === "sessions") return loadSessions();
-        if(state.currentSection === "keys") return loadCustomKeys();
-        if(state.currentSection === "freekeys") return loadFreeKeys();
-        if(state.currentSection === "launcher") return loadLauncherStatus();
-        if(state.currentSection === "publicui") return loadConfig();
-        if(state.currentSection === "cleanup") return loadCleanupPrompt();
-        if(state.currentSection === "events"){ await loadPollResults(); return loadEvents(); }
-        if(state.currentSection === "hwid") return Promise.resolve();
-        if(state.currentSection === "accounts") return loadAdminAccounts();
-        if(state.currentSection === "config") return loadConfig();
-        if(state.currentSection === "analytics") return loadAnalytics();
-        if(state.currentSection === "alerts") return loadAlerts();
-        if(state.currentSection === "audit") return loadAudit();
       }
 
-      function bind(){
-        $("btnLogin").onclick = function(){ login().catch(handleErr); };
-        $("btnLoadDashboard").onclick = function(){ tryLoadSession().catch(handleErr); };
-        $("btnLogout").onclick = function(){ logout().catch(handleErr); };
+      async function bindActions(){
+        $("btnLogin").onclick = async function(){
+          try{
+            await login();
+            setLoginMsg("success","Login successful.");
+          }catch(err){
+            setLoginMsg("error","Login failed: " + safeErrorMessage(err));
+          }
+        };
 
-        var nav = document.querySelectorAll(".navBtn");
-        for(var i=0;i<nav.length;i++){
-          nav[i].onclick = function(){
-            var sec = this.getAttribute("data-section");
-            if(isOther() && ["sessions","keys","freekeys","launcher","publicui","cleanup","events","hwid","accounts","config","analytics","audit","emergency"].indexOf(sec) !== -1){
-              alert("This section is locked for the Other profile.");
-              return;
-            }
-            showSection(sec);
-          };
-        }
+        $("btnLoadDashboard").onclick = async function(){
+          try{
+            await trySavedSession();
+            if (state.token) setLoginMsg("success","Loaded saved session.");
+            else setLoginMsg("error","No valid saved session found.");
+          }catch(err){
+            setLoginMsg("error","Saved session failed: " + safeErrorMessage(err));
+          }
+        };
 
-        $("refreshDashboard").onclick = function(){ loadDashboard().catch(handleErr); };
-        $("refreshAll").onclick = function(){ refreshCurrentSection().catch(handleErr); };
+        $("btnLogout").onclick = logout;
+        $("refreshAll").onclick = async function(){
+          clearMsg();
+          await loadDashboard();
+          await loadConfig();
+          if (state.currentSection === "sessions") await loadSessions(false);
+          if (state.currentSection === "keys") await loadCustomKeys();
+          if (state.currentSection === "freekeys") await loadFreeKeys();
+          if (state.currentSection === "cleanup") await loadCleanupPrompt();
+          if (state.currentSection === "events") { await loadPollResults(); await loadEvents(); }
+          if (state.currentSection === "accounts") await loadAdminAccounts();
+          if (state.currentSection === "analytics") await loadAnalytics();
+          if (state.currentSection === "alerts") await loadAlerts();
+          if (state.currentSection === "audit") await loadAudit();
+          if (state.currentSection === "remote") await loadRemoteCommands();
+        };
 
-        $("btnLoadSessions").onclick = function(){ loadSessions().catch(handleErr); };
-        $("btnEndAllSessions").onclick = function(){ emergencyEndSessions().catch(handleErr); };
+        document.querySelectorAll(".navBtn").forEach(function(btn){
+          btn.onclick = function(){ showSection(btn.getAttribute("data-section")); };
+        });
 
-        $("btnKeySearch").onclick = function(){ keySearch().catch(handleErr); };
-        $("btnDisableKey").onclick = function(){ disableKey().catch(handleErr); };
-        $("btnEnableKey").onclick = function(){ enableKey().catch(handleErr); };
-        $("btnResetKeyHwids").onclick = function(){ resetKeyHwids().catch(handleErr); };
-        $("btnCreateCustomKey").onclick = function(){ createCustomKey().catch(handleErr); };
-        $("btnUpdateCustomKey").onclick = function(){ updateCustomKey().catch(handleErr); };
-        $("btnDeleteCustomKey").onclick = function(){ deleteCustomKey().catch(handleErr); };
-        $("btnLoadCustomKeys").onclick = function(){ loadCustomKeys().catch(handleErr); };
+        $("refreshDashboard").onclick = loadDashboard;
 
-        $("btnAddFreeKey").onclick = function(){ addFreeKey().catch(handleErr); };
-        $("btnRemoveFreeKey").onclick = function(){ removeFreeKey().catch(handleErr); };
-        $("btnExpireAllFreeKeys").onclick = function(){ expireAllFreeKeys().catch(handleErr); };
-        $("btnLoadFreeKeys").onclick = function(){ loadFreeKeys().catch(handleErr); };
+        $("btnLoadSessions").onclick = function(){ loadSessions(false); };
+        $("btnLoadStaleSessions").onclick = function(){ loadSessions(true); };
 
-        $("btnPauseLauncher").onclick = function(){ pauseLauncher().catch(handleErr); };
-        $("btnUnpauseLauncher").onclick = function(){ unpauseLauncher().catch(handleErr); };
-        $("btnSetMinVersion").onclick = function(){ setMinVersion().catch(handleErr); };
-        $("btnSetMaintenanceMsg").onclick = function(){ setMaintenanceMessage().catch(handleErr); };
-        $("btnLauncherStatus").onclick = function(){ loadLauncherStatus().catch(handleErr); };
-        $("btnSaveRuntimeConfig").onclick = function(){ saveRuntimeConfig().catch(handleErr); };
+        $("btnEndAllSessions").onclick = async function(){
+          if (!confirm("End ALL active sessions?")) return;
+          try{
+            var j = await api("sessions_end_all");
+            setMsg("success","Ended " + (j.ended || 0) + " sessions.");
+            await loadSessions(false);
+            await loadDashboard();
+          }catch(err){ setMsg("error","End all sessions failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnLoadCleanupPrompt").onclick = function(){ loadCleanupPrompt().catch(handleErr); };
-        $("btnSaveCleanupPrompt").onclick = function(){ saveCleanupPrompt().catch(handleErr); };
-        $("btnBumpCleanupPrompt").onclick = function(){ bumpCleanupPrompt().catch(handleErr); };
+        $("btnEndByClientSessions").onclick = async function(){
+          var cid = $("sessionsClientId").value.trim();
+          if (!cid) return setMsg("error","Enter a client ID first.");
+          if (!confirm("End all sessions for this client ID?")) return;
+          try{
+            var j = await api("sessions_end_by_client", { clientId: cid });
+            setMsg("success","Ended " + (j.ended || 0) + " sessions for " + cid + ".");
+            await loadSessions(false);
+            await loadDashboard();
+          }catch(err){ setMsg("error","End by client failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnSaveBanner").onclick = function(){ saveBanner().catch(handleErr); };
-        $("btnClearBanner").onclick = function(){ clearBanner().catch(handleErr); };
-        $("btnSaveModal").onclick = function(){ saveModal().catch(handleErr); };
-        $("btnClearModal").onclick = function(){ clearModal().catch(handleErr); };
-        $("btnSavePoll").onclick = function(){ savePoll().catch(handleErr); };
-        $("btnClearPoll").onclick = function(){ clearPoll().catch(handleErr); };
-        $("btnSaveQuickLinks").onclick = function(){ saveQuickLinks().catch(handleErr); };
-        $("btnClearQuickLinks").onclick = function(){ clearQuickLinks().catch(handleErr); };
+        $("btnEndByLicenseSessions").onclick = async function(){
+          var license = $("sessionsLicense").value.trim();
+          if (!license) return setMsg("error","Enter a license filter first.");
+          if (!confirm("End all sessions for this key?")) return;
+          try{
+            var j = await api("sessions_end_by_license", { license: license });
+            setMsg("success","Ended " + (j.ended || 0) + " sessions for " + license + ".");
+            await loadSessions(false);
+            await loadDashboard();
+          }catch(err){ setMsg("error","End by license failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnLoadPollResults").onclick = function(){ loadPollResults().catch(handleErr); };
-        $("btnResetPollResults").onclick = function(){ resetPollResults().catch(handleErr); };
-        $("btnLoadEvents").onclick = function(){ loadEvents().catch(handleErr); };
-        $("btnClearEvents").onclick = function(){ clearEvents().catch(handleErr); };
+        $("btnCleanStaleSessions").onclick = async function(){
+          if (!confirm("Clean stale sessions older than 20 minutes?")) return;
+          try{
+            var j = await api("sessions_cleanup_stale", { olderThanMinutes: 20 });
+            setMsg("success","Cleaned " + (j.ended || 0) + " stale sessions.");
+            await loadSessions(true);
+            await loadDashboard();
+          }catch(err){ setMsg("error","Clean stale failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnSearchHwid").onclick = function(){ searchHwid().catch(handleErr); };
-        $("btnBanHwid").onclick = function(){ banHwid().catch(handleErr); };
-        $("btnUnbanHwid").onclick = function(){ unbanHwid().catch(handleErr); };
-        $("btnMarkSuspicious").onclick = function(){ markSuspicious().catch(handleErr); };
-        $("btnDisconnectHwid").onclick = function(){ disconnectHwid().catch(handleErr); };
+        $("btnKeySearch").onclick = keySearch;
+        $("btnDisableKey").onclick = async function(){
+          try{
+            await api("key_disable", { license: $("keyLicense").value.trim() });
+            setMsg("success","Key disabled.");
+            await keySearch();
+          }catch(err){ setMsg("error","Disable key failed: " + safeErrorMessage(err)); }
+        };
+        $("btnEnableKey").onclick = async function(){
+          try{
+            await api("key_enable", { license: $("keyLicense").value.trim() });
+            setMsg("success","Key enabled.");
+            await keySearch();
+          }catch(err){ setMsg("error","Enable key failed: " + safeErrorMessage(err)); }
+        };
+        $("btnResetKeyHwids").onclick = async function(){
+          if (!confirm("Reset all HWID bindings for this key?")) return;
+          try{
+            await api("key_reset_hwid_bindings", { license: $("keyLicense").value.trim() });
+            setMsg("success","HWID bindings reset.");
+            await keySearch();
+          }catch(err){ setMsg("error","Reset HWID bindings failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnLoadAdminAccounts").onclick = function(){ loadAdminAccounts().catch(handleErr); };
-        $("btnForceLogoutAdmins").onclick = function(){ forceLogoutAdmins().catch(handleErr); };
+        $("btnSaveKeyMeta").onclick = async function(){
+          try{
+            var j = await api("key_meta_set", {
+              license: $("keyLicense").value.trim(),
+              paused: $("keyMetaPaused").checked ? 1 : 0,
+              suspendMessage: $("keyMetaSuspendMessage").value.trim(),
+              tag: $("keyMetaTag").value.trim(),
+              risk: $("keyMetaRisk").value,
+              note: $("keyMetaNote").value.trim(),
+              planOverride: $("keyMetaPlan").value,
+              ttlOverride: $("keyMetaTtl").value.trim()
+            });
+            setMsg("success","Key meta saved.");
+            await keySearch();
+          }catch(err){ setMsg("error","Save key meta failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnLoadConfig").onclick = function(){ loadConfig().catch(handleErr); };
-        $("btnLoadAnalytics").onclick = function(){ loadAnalytics().catch(handleErr); };
-        $("btnLoadAlerts").onclick = function(){ loadAlerts().catch(handleErr); };
-        $("btnLoadAudit").onclick = function(){ loadAudit().catch(handleErr); };
+        $("btnCreateCustomKey").onclick = async function(){
+          try{
+            await api("key_create_custom", {
+              license: $("customLicense").value.trim(),
+              plan: $("customPlan").value,
+              ttlSeconds: $("customTtl").value.trim(),
+              sessionLimit: $("customSessions").value.trim(),
+              maxDevices: $("customDevices").value.trim(),
+              exp: $("customExp").value.trim(),
+              note: $("customNote").value.trim()
+            });
+            setMsg("success","Custom key created.");
+            await loadCustomKeys();
+          }catch(err){ setMsg("error","Create custom key failed: " + safeErrorMessage(err)); }
+        };
 
-        $("btnDisableAllKeys").onclick = function(){ disableAllKeys().catch(handleErr); };
-        $("btnEnableAllKeys").onclick = function(){ enableAllKeys().catch(handleErr); };
-        $("btnEmergencyPause").onclick = function(){ emergencyPause().catch(handleErr); };
-        $("btnEmergencyEndSessions").onclick = function(){ emergencyEndSessions().catch(handleErr); };
-        $("btnEmergencyClearNonces").onclick = function(){ emergencyClearNonces().catch(handleErr); };
-        $("btnSetEmergencyBanner").onclick = function(){ setEmergencyBanner().catch(handleErr); };
+        $("btnUpdateCustomKey").onclick = async function(){
+          try{
+            await api("key_update_custom", {
+              license: $("customLicense").value.trim(),
+              plan: $("customPlan").value,
+              ttlSeconds: $("customTtl").value.trim(),
+              sessionLimit: $("customSessions").value.trim(),
+              maxDevices: $("customDevices").value.trim(),
+              exp: $("customExp").value.trim(),
+              note: $("customNote").value.trim()
+            });
+            setMsg("success","Custom key updated.");
+            await loadCustomKeys();
+          }catch(err){ setMsg("error","Update custom key failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnDeleteCustomKey").onclick = async function(){
+          if (!confirm("Delete this custom key?")) return;
+          try{
+            await api("key_delete_custom", { license: $("customLicense").value.trim() });
+            setMsg("success","Custom key deleted.");
+            await loadCustomKeys();
+          }catch(err){ setMsg("error","Delete custom key failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadCustomKeys").onclick = loadCustomKeys;
+
+        $("btnAddFreeKey").onclick = async function(){
+          try{
+            var j = await api("freekey_add", {
+              license: $("freeKeyLicense").value.trim(),
+              ttlSeconds: $("freeKeyTtl").value.trim(),
+              tier: $("freeKeyTier").value
+            });
+            setMsg("success","Free key added: " + (j.license || ""));
+            await loadFreeKeys();
+          }catch(err){ setMsg("error","Add free key failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnRemoveFreeKey").onclick = async function(){
+          try{
+            await api("freekey_remove", { license: $("freeKeyLicense").value.trim() });
+            setMsg("success","Free key removed.");
+            await loadFreeKeys();
+          }catch(err){ setMsg("error","Remove free key failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnExpireAllFreeKeys").onclick = async function(){
+          if (!confirm("Expire all free keys?")) return;
+          try{
+            var j = await api("freekeys_expire_all");
+            setMsg("success","Expired " + (j.expired || 0) + " free keys.");
+            await loadFreeKeys();
+          }catch(err){ setMsg("error","Expire all free keys failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadFreeKeys").onclick = loadFreeKeys;
+
+        $("btnPauseLauncher").onclick = async function(){
+          try{
+            await api("launcher_pause", { reason: $("pauseReason").value.trim() });
+            setMsg("success","Launcher paused.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Pause launcher failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnUnpauseLauncher").onclick = async function(){
+          try{
+            await api("launcher_unpause");
+            setMsg("success","Launcher unpaused.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Unpause launcher failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSetMinVersion").onclick = async function(){
+          try{
+            await api("launcher_set_min_version", { version: $("minVersion").value.trim() });
+            setMsg("success","Min version updated.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Set min version failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSetMaintenanceMsg").onclick = async function(){
+          try{
+            await api("launcher_set_maintenance_message", { message: $("maintenanceMessage").value.trim() });
+            setMsg("success","Maintenance message updated.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Set maintenance message failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSaveRuntimeConfig").onclick = async function(){
+          try{
+            await api("launcher_set_runtime_config", {
+              supportEmail: $("supportEmail").value.trim(),
+              discordUrl: $("discordUrl").value.trim(),
+              defaultStartUrl: $("defaultStartUrl").value.trim(),
+              submitUrl: $("submitUrl").value.trim()
+            });
+            setMsg("success","Runtime config saved.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Save runtime config failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLauncherStatus").onclick = async function(){
+          try{
+            await loadDashboard();
+            await loadConfig();
+            setMsg("success","Launcher status reloaded.");
+          }catch(err){ setMsg("error","Reload launcher status failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadCleanupPrompt").onclick = loadCleanupPrompt;
+
+        $("btnSaveCleanupPrompt").onclick = async function(){
+          try{
+            await api("launcher_cleanup_prompt_set", {
+              enabled: $("cleanupEnabled").value,
+              message: $("cleanupMessage").value.trim(),
+              scanPaths: lines($("cleanupScanPaths").value),
+              nameHints: lines($("cleanupNameHints").value)
+            });
+            setMsg("success","Cleanup prompt saved.");
+            await loadCleanupPrompt();
+            await loadConfig();
+          }catch(err){ setMsg("error","Save cleanup prompt failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnBumpCleanupPrompt").onclick = async function(){
+          try{
+            await api("launcher_cleanup_prompt_bump");
+            setMsg("success","Cleanup prompt force-once bumped.");
+            await loadCleanupPrompt();
+            await loadConfig();
+          }catch(err){ setMsg("error","Bump cleanup prompt failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSaveBanner").onclick = async function(){
+          try{
+            await api("launcher_public_banner_set", {
+              enabled: $("bannerEnabled").value,
+              id: $("bannerId").value.trim(),
+              title: $("bannerTitle").value.trim(),
+              text: $("bannerText").value.trim(),
+              mode: $("bannerMode").value,
+              dismissable: $("bannerDismissable").value
+            });
+            setMsg("success","Banner saved.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Save banner failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnClearBanner").onclick = async function(){
+          try{
+            await api("launcher_public_banner_clear");
+            setMsg("success","Banner cleared.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Clear banner failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSaveModal").onclick = async function(){
+          try{
+            await api("launcher_public_modal_set", {
+              enabled: $("modalEnabled").value,
+              id: $("modalId").value.trim(),
+              title: $("modalTitle").value.trim(),
+              text: $("modalText").value.trim(),
+              buttons: tryJsonParse($("modalButtons").value, [])
+            });
+            setMsg("success","Modal saved.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Save modal failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnClearModal").onclick = async function(){
+          try{
+            await api("launcher_public_modal_clear");
+            setMsg("success","Modal cleared.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Clear modal failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSavePoll").onclick = async function(){
+          try{
+            await api("launcher_public_poll_set", {
+              enabled: $("pollEnabled").value,
+              id: $("pollId").value.trim(),
+              question: $("pollQuestion").value.trim(),
+              options: lines($("pollOptions").value)
+            });
+            setMsg("success","Poll saved.");
+            await loadConfig();
+            await loadPollResults();
+          }catch(err){ setMsg("error","Save poll failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnClearPoll").onclick = async function(){
+          try{
+            await api("launcher_public_poll_clear");
+            setMsg("success","Poll cleared.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Clear poll failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSaveQuickLinks").onclick = async function(){
+          try{
+            await api("launcher_quick_links_set", {
+              links: tryJsonParse($("quickLinks").value, [])
+            });
+            setMsg("success","Quick links saved.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Save quick links failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnClearQuickLinks").onclick = async function(){
+          try{
+            await api("launcher_quick_links_clear");
+            setMsg("success","Quick links cleared.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Clear quick links failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadPollResults").onclick = loadPollResults;
+
+        $("btnResetPollResults").onclick = async function(){
+          try{
+            await api("launcher_public_poll_reset", {
+              pollId: $("pollResultsId").value.trim()
+            });
+            setMsg("success","Poll votes reset.");
+            await loadPollResults();
+          }catch(err){ setMsg("error","Reset poll votes failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadEvents").onclick = loadEvents;
+
+        $("btnClearEvents").onclick = async function(){
+          try{
+            await api("launcher_public_events_clear");
+            setMsg("success","Public events feed cleared.");
+            await loadEvents();
+          }catch(err){ setMsg("error","Clear events failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSearchHwid").onclick = hwidSearch;
+
+        $("btnBanHwid").onclick = async function(){
+          try{
+            await api("hwid_ban", {
+              hwidHash: $("hwidValue").value.trim(),
+              reason: $("hwidReason").value.trim()
+            });
+            setMsg("success","HWID banned.");
+            await hwidSearch();
+            await loadDashboard();
+          }catch(err){ setMsg("error","Ban HWID failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnUnbanHwid").onclick = async function(){
+          try{
+            await api("hwid_unban", {
+              hwidHash: $("hwidValue").value.trim()
+            });
+            setMsg("success","HWID unbanned.");
+            await hwidSearch();
+            await loadDashboard();
+          }catch(err){ setMsg("error","Unban HWID failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnMarkSuspicious").onclick = async function(){
+          try{
+            await api("hwid_mark_suspicious", {
+              hwidHash: $("hwidValue").value.trim(),
+              reason: $("hwidReason").value.trim()
+            });
+            setMsg("success","HWID marked suspicious.");
+            await hwidSearch();
+            await loadDashboard();
+          }catch(err){ setMsg("error","Mark suspicious failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnDisconnectHwid").onclick = async function(){
+          try{
+            var j = await api("sessions_end_by_hwid", {
+              hwidHash: $("hwidValue").value.trim()
+            });
+            setMsg("success","Disconnected " + (j.ended || 0) + " session(s) by HWID.");
+            await hwidSearch();
+            await loadSessions(false);
+            await loadDashboard();
+          }catch(err){ setMsg("error","Disconnect by HWID failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSetHwidNote").onclick = async function(){
+          try{
+            await api("hwid_note_set", {
+              hwidHash: $("hwidValue").value.trim(),
+              note: $("hwidNote").value.trim()
+            });
+            setMsg("success","HWID note saved.");
+            await hwidSearch();
+          }catch(err){ setMsg("error","Save HWID note failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSetHwidCooldown").onclick = async function(){
+          try{
+            await api("hwid_cooldown_set", {
+              hwidHash: $("hwidValue").value.trim(),
+              minutes: $("hwidCooldownMinutes").value.trim(),
+              reason: $("hwidReason").value.trim()
+            });
+            setMsg("success","HWID cooldown set.");
+            await hwidSearch();
+          }catch(err){ setMsg("error","Set HWID cooldown failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSetHwidDeny").onclick = async function(){
+          try{
+            await api("hwid_deny_message_set", {
+              hwidHash: $("hwidValue").value.trim(),
+              minutes: $("hwidDenyMinutes").value.trim(),
+              message: $("hwidDenyMessage").value.trim()
+            });
+            setMsg("success","HWID deny message set.");
+            await hwidSearch();
+          }catch(err){ setMsg("error","Set HWID deny failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLookupClient").onclick = clientLookup;
+
+        $("btnEndClientSessions").onclick = async function(){
+          try{
+            var j = await api("sessions_end_by_client", {
+              clientId: $("clientIdValue").value.trim()
+            });
+            setMsg("success","Ended " + (j.ended || 0) + " session(s) for client.");
+            await clientLookup();
+            await loadSessions(false);
+            await loadDashboard();
+          }catch(err){ setMsg("error","End client sessions failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnClearClientBinding").onclick = async function(){
+          try{
+            var j = await api("client_clear_binding", {
+              clientId: $("clientIdValue").value.trim()
+            });
+            setMsg("success","Cleared " + (j.changed || 0) + " client binding(s).");
+            await clientLookup();
+          }catch(err){ setMsg("error","Clear client binding failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSaveClientNote").onclick = async function(){
+          try{
+            await api("client_note_set", {
+              clientId: $("clientIdValue").value.trim(),
+              note: $("clientNote").value.trim()
+            });
+            setMsg("success","Client note saved.");
+            await clientLookup();
+          }catch(err){ setMsg("error","Save client note failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnBlockClient").onclick = async function(){
+          try{
+            await api("client_block", {
+              clientId: $("clientIdValue").value.trim(),
+              minutes: $("clientBlockMinutes").value.trim(),
+              reason: $("clientActionReason").value.trim()
+            });
+            setMsg("success","Client blocked.");
+            await clientLookup();
+          }catch(err){ setMsg("error","Block client failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnUnblockClient").onclick = async function(){
+          try{
+            await api("client_unblock", {
+              clientId: $("clientIdValue").value.trim()
+            });
+            setMsg("success","Client unblocked.");
+            await clientLookup();
+          }catch(err){ setMsg("error","Unblock client failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnFlagClient").onclick = async function(){
+          try{
+            await api("client_mark_suspicious", {
+              clientId: $("clientIdValue").value.trim(),
+              reason: $("clientActionReason").value.trim()
+            });
+            setMsg("success","Client marked suspicious.");
+            await clientLookup();
+          }catch(err){ setMsg("error","Mark client suspicious failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLookupAny").onclick = lookupAny;
+
+        $("btnSendRemoteCommand").onclick = async function(){
+          try{
+            var j = await api("remote_command_push", {
+              targetType: $("remoteTargetType").value,
+              targetValue: $("remoteTargetValue").value.trim(),
+              commandType: $("remoteCommandType").value,
+              reason: $("remoteReason").value.trim(),
+              message: $("remoteMessage").value.trim(),
+              url: $("remoteUrl").value.trim(),
+              closeAndEndSession: $("remoteCloseAndEnd").checked ? 1 : 0,
+              blockUntilRefresh: $("remoteBlockUntilRefresh").checked ? 1 : 0
+            });
+            setMsg("success","Remote command queued." + (j.ended ? " Ended " + j.ended + " session(s)." : ""));
+            await loadRemoteCommands();
+            await loadDashboard();
+          }catch(err){ setMsg("error","Send remote command failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadRemoteCommands").onclick = loadRemoteCommands;
+
+        $("btnSaveGlobalExtras").onclick = async function(){
+          try{
+            await api("launcher_global_extras_set", {
+              allowlistMode: $("allowlistMode").checked ? 1 : 0,
+              rotatingAnnouncement: $("rotatingAnnouncement").value.trim(),
+              oneTimeAnnouncement: $("oneTimeAnnouncement").value.trim()
+            });
+            setMsg("success","Global extras saved.");
+            await loadConfig();
+          }catch(err){ setMsg("error","Save global extras failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadAdminAccounts").onclick = loadAdminAccounts;
+
+        $("btnForceLogoutAdmins").onclick = async function(){
+          if (!confirm("Force logout all admin sessions?")) return;
+          try{
+            var j = await api("admin_force_logout_all");
+            setMsg("success","Forced logout for " + (j.count || 0) + " admin session(s).");
+            await loadAdminAccounts();
+          }catch(err){ setMsg("error","Force logout admins failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnLoadConfig").onclick = loadConfig;
+        $("btnLoadAnalytics").onclick = loadAnalytics;
+        $("btnLoadAlerts").onclick = loadAlerts;
+        $("btnLoadAudit").onclick = loadAudit;
+
+        $("btnDisableAllKeys").onclick = async function(){
+          if (!confirm("Disable ALL keys?")) return;
+          try{
+            await api("emergency_disable_all_keys");
+            setMsg("success","All keys disabled.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Disable all keys failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnEnableAllKeys").onclick = async function(){
+          try{
+            await api("emergency_enable_all_keys");
+            setMsg("success","All keys enabled.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Enable all keys failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnEmergencyPause").onclick = async function(){
+          if (!confirm("Pause all launches?")) return;
+          try{
+            await api("emergency_pause_all_launches");
+            setMsg("success","All launches paused.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Emergency pause failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnEmergencyEndSessions").onclick = async function(){
+          if (!confirm("End all sessions?")) return;
+          try{
+            var j = await api("emergency_end_all_sessions");
+            setMsg("success","Ended " + (j.ended || 0) + " session(s).");
+            await loadSessions(false);
+            await loadDashboard();
+          }catch(err){ setMsg("error","Emergency end sessions failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnEmergencyClearNonces").onclick = async function(){
+          if (!confirm("Clear all launch nonces?")) return;
+          try{
+            var j = await api("emergency_clear_launch_nonces");
+            setMsg("success","Cleared " + (j.cleared || 0) + " launch nonce(s).");
+          }catch(err){ setMsg("error","Clear nonces failed: " + safeErrorMessage(err)); }
+        };
+
+        $("btnSetEmergencyBanner").onclick = async function(){
+          try{
+            await api("emergency_set_banner", {
+              message: $("emergencyBanner").value.trim()
+            });
+            setMsg("success","Emergency banner updated.");
+            await loadDashboard();
+            await loadConfig();
+          }catch(err){ setMsg("error","Set emergency banner failed: " + safeErrorMessage(err)); }
+        };
 
         $("loginPassword").addEventListener("keydown", function(e){
-          if(e.key === "Enter") login().catch(handleErr);
+          if (e.key === "Enter") $("btnLogin").click();
         });
       }
 
-      function handleErr(e){
-        setMsg("error", "Error: " + (e && e.message ? e.message : String(e)));
-      }
-
-      bind();
-      tryLoadSession();
+      bindActions();
+      trySavedSession();
     })();
   </script>
 </body>
