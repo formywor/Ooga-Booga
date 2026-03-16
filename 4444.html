@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Project IDE</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --border: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: 58px 1fr 28px;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      min-width: 0;
+    }
+
+    .brand-badge {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      box-shadow: 0 0 20px rgba(56,189,248,0.6);
+      flex: 0 0 auto;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-weight: 500;
+      margin-left: 8px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    button, select, input[type="text"], input[type="file"] {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover {
+      border-color: #64748b;
+      transform: translateY(-1px);
+    }
+
+    button.primary {
+      background: #0c4a6e;
+      border-color: #0369a1;
+    }
+
+    button.good {
+      background: #14532d;
+      border-color: #22c55e;
+    }
+
+    button.warn {
+      background: #78350f;
+      border-color: var(--warn);
+    }
+
+    button.danger {
+      background: #7f1d1d;
+      border-color: var(--danger);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 42%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sidebar, .editor-pane, .preview-pane {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: #020617;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+    }
+
+    .sidebar-section {
+      padding: 12px;
+      border-bottom: 1px solid rgba(51,65,85,0.65);
+    }
+
+    .sidebar h2,
+    .editor-header h2,
+    .preview-header h2 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #cbd5e1;
+      letter-spacing: 0.02em;
+    }
+
+    .project-name {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    .file-actions,
+    .import-actions {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file-list {
+      overflow: auto;
+      padding: 8px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px;
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+
+    .file-item:hover {
+      background: rgba(148,163,184,0.08);
+      border-color: rgba(148,163,184,0.12);
+    }
+
+    .file-item.active {
+      background: rgba(56,189,248,0.12);
+      border-color: rgba(56,189,248,0.5);
+    }
+
+    .file-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .file-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 14px;
+    }
+
+    .file-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .file-delete {
+      border: 1px solid rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.08);
+      color: #fecaca;
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    .editor-pane {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+    }
+
+    .editor-header,
+    .preview-header {
+      padding: 12px;
+      border-bottom: 1px solid rgba(51,65,85,0.65);
+      background: rgba(2,6,23,0.5);
+    }
+
+    .editor-info {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .filename-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      padding: 12px;
+      border-bottom: 1px solid rgba(51,65,85,0.65);
+    }
+
+    .filename-input {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: 0;
+      outline: none;
+      background: #0b1220;
+      color: #e2e8f0;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      tab-size: 2;
+    }
+
+    .preview-pane {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      background: #0b1220;
+    }
+
+    .preview-controls {
+      padding: 12px;
+      border-bottom: 1px solid rgba(51,65,85,0.65);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: white;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 12px;
+      border-top: 1px solid var(--border);
+      background: #020617;
+      color: var(--muted);
+      font-size: 12px;
+      gap: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .status {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 250px 1fr;
+        grid-template-rows: 1fr 40%;
+      }
+
+      .preview-pane {
+        grid-column: 1 / -1;
+        border-top: 1px solid var(--border);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        grid-template-rows: auto 1fr 28px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 220px 1fr 40%;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .editor-pane {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge"></div>
+      <div>
+        Mini Project IDE
+        <small>single-file project editor</small>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button id="newProjectBtn">New Project</button>
+      <button id="saveProjectBtn">Save Browser Copy</button>
+      <button id="importJsonBtn">Import Project</button>
+      <button id="downloadFileBtn">Download Current File</button>
+      <button id="downloadZipBtn" class="good">Download ZIP</button>
+      <input id="importInput" class="hidden" type="file" accept=".json,application/json" />
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="sidebar-section">
+        <h2>Project</h2>
+        <input id="projectName" class="project-name" type="text" placeholder="My project" />
+      </section>
+
+      <section class="sidebar-section">
+        <h2>Files</h2>
+        <div class="file-actions">
+          <button id="newFileBtn" class="primary">New File</button>
+          <button id="duplicateFileBtn">Duplicate File</button>
+        </div>
+      </section>
+
+      <section id="fileList" class="file-list"></section>
+
+      <section class="sidebar-section">
+        <h2>Import / Export</h2>
+        <div class="import-actions">
+          <button id="exportJsonBtn">Export Project JSON</button>
+          <span class="muted">JSON is useful for saving and reloading projects in this page.</span>
+        </div>
+      </section>
+    </aside>
+
+    <section class="editor-pane">
+      <div class="editor-header">
+        <h2>Editor</h2>
+        <div class="editor-info">
+          <span id="activeFileLabel" class="pill">No file selected</span>
+          <span id="fileTypeLabel" class="pill">type: unknown</span>
+        </div>
+      </div>
+
+      <div class="filename-row">
+        <input id="filenameInput" class="filename-input" type="text" placeholder="index.html" />
+        <button id="renameFileBtn">Rename</button>
+        <button id="deleteFileBtn" class="danger">Delete</button>
+      </div>
+
+      <textarea id="editor" spellcheck="false" placeholder="Create a file to start coding..."></textarea>
+    </section>
+
+    <section class="preview-pane">
+      <div class="preview-header">
+        <h2>Preview</h2>
+      </div>
+
+      <div class="preview-controls">
+        <button id="runPreviewBtn" class="primary">Run Preview</button>
+        <button id="autoPreviewBtn">Auto Preview: Off</button>
+        <select id="previewTarget">
+          <option value="auto">Auto detect</option>
+          <option value="index.html">index.html</option>
+          <option value="current">Current file if HTML</option>
+        </select>
+        <span class="muted">HTML preview works best when your main file is index.html.</span>
+      </div>
+
+      <iframe id="previewFrame" class="preview-frame"></iframe>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div id="status" class="status">Ready.</div>
+    <div class="muted">Tip: use this page to build your extension files, then export as ZIP.</div>
+  </footer>
+
+  <script>
+    const STORAGE_KEY = "mini-project-ide-state-v1";
+
+    const state = {
+      projectName: "My Project",
+      files: [
+        {
+          id: crypto.randomUUID(),
+          name: "index.html",
+          content: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello</title>
+</head>
+<body>
+  <h1>Hello from Mini Project IDE</h1>
+  <p>Edit this file and click Run Preview.</p>
+</body>
+</html>`
+        }
+      ],
+      activeFileId: null,
+      autoPreview: false
+    };
+
+    const els = {
+      projectName: document.getElementById("projectName"),
+      fileList: document.getElementById("fileList"),
+      editor: document.getElementById("editor"),
+      filenameInput: document.getElementById("filenameInput"),
+      activeFileLabel: document.getElementById("activeFileLabel"),
+      fileTypeLabel: document.getElementById("fileTypeLabel"),
+      previewFrame: document.getElementById("previewFrame"),
+      previewTarget: document.getElementById("previewTarget"),
+      status: document.getElementById("status"),
+      autoPreviewBtn: document.getElementById("autoPreviewBtn"),
+      importInput: document.getElementById("importInput")
+    };
+
+    function setStatus(message) {
+      els.status.textContent = message;
+    }
+
+    function saveToBrowser() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setStatus("Saved in browser.");
+    }
+
+    function loadFromBrowser() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        if (!state.activeFileId && state.files.length) state.activeFileId = state.files[0].id;
+        renderAll();
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        state.projectName = parsed.projectName || "My Project";
+        state.files = Array.isArray(parsed.files) && parsed.files.length ? parsed.files : state.files;
+        state.activeFileId = parsed.activeFileId || state.files[0]?.id || null;
+        state.autoPreview = !!parsed.autoPreview;
+        renderAll();
+        setStatus("Loaded saved browser copy.");
+      } catch (err) {
+        console.error(err);
+        if (!state.activeFileId && state.files.length) state.activeFileId = state.files[0].id;
+        renderAll();
+        setStatus("Could not load saved project.");
+      }
+    }
+
+    function getActiveFile() {
+      return state.files.find(f => f.id === state.activeFileId) || null;
+    }
+
+    function getFileExtension(name) {
+      const parts = name.split(".");
+      return parts.length > 1 ? parts.pop().toLowerCase() : "";
+    }
+
+    function inferFileType(name) {
+      const ext = getFileExtension(name);
+      if (ext === "html") return "HTML";
+      if (ext === "css") return "CSS";
+      if (ext === "js") return "JavaScript";
+      if (ext === "json") return "JSON";
+      if (ext === "md") return "Markdown";
+      if (ext === "txt") return "Text";
+      return ext ? ext.toUpperCase() : "Unknown";
+    }
+
+    function escapeHtml(str) {
+      return (str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderFileList() {
+      els.fileList.innerHTML = "";
+
+      for (const file of state.files) {
+        const item = document.createElement("div");
+        item.className = "file-item" + (file.id === state.activeFileId ? " active" : "");
+
+        const left = document.createElement("div");
+        left.className = "file-main";
+        left.innerHTML = `
+          <div class="file-name">${escapeHtml(file.name)}</div>
+          <div class="file-meta">${inferFileType(file.name)} • ${file.content.length} chars</div>
+        `;
+        left.addEventListener("click", () => {
+          selectFile(file.id);
+        });
+
+        const del = document.createElement("button");
+        del.className = "file-delete";
+        del.textContent = "✕";
+        del.title = "Delete file";
+        del.addEventListener("click", (e) => {
+          e.stopPropagation();
+          deleteFile(file.id);
+        });
+
+        item.appendChild(left);
+        item.appendChild(del);
+        els.fileList.appendChild(item);
+      }
+    }
+
+    function renderEditor() {
+      const file = getActiveFile();
+
+      if (!file) {
+        els.editor.value = "";
+        els.filenameInput.value = "";
+        els.editor.placeholder = "Create a file to start coding...";
+        els.activeFileLabel.textContent = "No file selected";
+        els.fileTypeLabel.textContent = "type: unknown";
+        return;
+      }
+
+      els.editor.value = file.content;
+      els.filenameInput.value = file.name;
+      els.activeFileLabel.textContent = file.name;
+      els.fileTypeLabel.textContent = "type: " + inferFileType(file.name).toLowerCase();
+    }
+
+    function renderProjectName() {
+      els.projectName.value = state.projectName;
+    }
+
+    function renderAutoPreviewButton() {
+      els.autoPreviewBtn.textContent = "Auto Preview: " + (state.autoPreview ? "On" : "Off");
+    }
+
+    function renderAll() {
+      renderProjectName();
+      renderFileList();
+      renderEditor();
+      renderAutoPreviewButton();
+    }
+
+    function selectFile(fileId) {
+      state.activeFileId = fileId;
+      renderAll();
+      saveToBrowser();
+      setStatus("Opened file.");
+      if (state.autoPreview) runPreview();
+    }
+
+    function ensureUniqueFilename(name, ignoreId = null) {
+      const trimmed = (name || "").trim();
+      if (!trimmed) return null;
+
+      const exists = state.files.some(f => f.id !== ignoreId && f.name.toLowerCase() === trimmed.toLowerCase());
+      if (!exists) return trimmed;
+
+      const dotIndex = trimmed.lastIndexOf(".");
+      const base = dotIndex > 0 ? trimmed.slice(0, dotIndex) : trimmed;
+      const ext = dotIndex > 0 ? trimmed.slice(dotIndex) : "";
+
+      let i = 2;
+      let candidate = `${base}-${i}${ext}`;
+      while (state.files.some(f => f.id !== ignoreId && f.name.toLowerCase() === candidate.toLowerCase())) {
+        i++;
+        candidate = `${base}-${i}${ext}`;
+      }
+      return candidate;
+    }
+
+    function createFile() {
+      const name = prompt("Enter a file name:", "new-file.js");
+      if (!name) return;
+
+      const finalName = ensureUniqueFilename(name);
+      if (!finalName) return;
+
+      const starter = getStarterContent(finalName);
+      const file = {
+        id: crypto.randomUUID(),
+        name: finalName,
+        content: starter
+      };
+
+      state.files.push(file);
+      state.activeFileId = file.id;
+      renderAll();
+      saveToBrowser();
+      setStatus(`Created ${finalName}.`);
+      if (state.autoPreview) runPreview();
+    }
+
+    function getStarterContent(filename) {
+      const ext = getFileExtension(filename);
+
+      if (ext === "html") {
+        return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${filename}</title>
+</head>
+<body>
+  
+</body>
+</html>`;
+      }
+
+      if (ext === "css") {
+        return `body {
+  font-family: Arial, sans-serif;
+}`;
+      }
+
+      if (ext === "js") {
+        return `console.log("Hello from ${filename}");`;
+      }
+
+      if (ext === "json") {
+        return `{\n  "name": "${filename}"\n}`;
+      }
+
+      if (ext === "md") {
+        return `# ${filename}`;
+      }
+
+      return "";
+    }
+
+    function deleteFile(fileId = state.activeFileId) {
+      const file = state.files.find(f => f.id === fileId);
+      if (!file) return;
+
+      if (state.files.length === 1) {
+        alert("You need at least one file in the project.");
+        return;
+      }
+
+      const ok = confirm(`Delete ${file.name}?`);
+      if (!ok) return;
+
+      state.files = state.files.filter(f => f.id !== fileId);
+
+      if (state.activeFileId === fileId) {
+        state.activeFileId = state.files[0]?.id || null;
+      }
+
+      renderAll();
+      saveToBrowser();
+      setStatus(`Deleted ${file.name}.`);
+      if (state.autoPreview) runPreview();
+    }
+
+    function duplicateActiveFile() {
+      const file = getActiveFile();
+      if (!file) return;
+
+      const copyName = ensureUniqueFilename(file.name.replace(/(\.[^.]+)?$/, "-copy$1"));
+      const newFile = {
+        id: crypto.randomUUID(),
+        name: copyName,
+        content: file.content
+      };
+
+      state.files.push(newFile);
+      state.activeFileId = newFile.id;
+      renderAll();
+      saveToBrowser();
+      setStatus(`Duplicated ${file.name}.`);
+    }
+
+    function renameActiveFile() {
+      const file = getActiveFile();
+      if (!file) return;
+
+      const newNameRaw = els.filenameInput.value.trim();
+      if (!newNameRaw) {
+        alert("Filename cannot be empty.");
+        els.filenameInput.value = file.name;
+        return;
+      }
+
+      const newName = ensureUniqueFilename(newNameRaw, file.id);
+      file.name = newName;
+      renderAll();
+      saveToBrowser();
+      setStatus(`Renamed file to ${newName}.`);
+      if (state.autoPreview) runPreview();
+    }
+
+    function updateEditorContent() {
+      const file = getActiveFile();
+      if (!file) return;
+
+      file.content = els.editor.value;
+      saveToBrowser();
+
+      if (state.autoPreview) {
+        runPreview();
+      } else {
+        setStatus(`Updated ${file.name}.`);
+      }
+    }
+
+    function getPreviewHtml() {
+      const mode = els.previewTarget.value;
+      const active = getActiveFile();
+
+      if (mode === "current") {
+        if (!active || getFileExtension(active.name) !== "html") {
+          return defaultPreviewMessage("Current file is not an HTML file.");
+        }
+        return active.content;
+      }
+
+      const indexFile = state.files.find(f => f.name.toLowerCase() === "index.html");
+
+      if (mode === "index.html") {
+        if (!indexFile) return defaultPreviewMessage("No index.html file found.");
+        return indexFile.content;
+      }
+
+      if (active && getFileExtension(active.name) === "html") {
+        return active.content;
+      }
+
+      if (indexFile) return indexFile.content;
+
+      return defaultPreviewMessage("No previewable HTML file found.");
+    }
+
+    function defaultPreviewMessage(message) {
+      return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Preview</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 24px;
+      color: #111827;
+    }
+    .box {
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f9fafb;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Preview unavailable</h2>
+    <p>${escapeHtml(message)}</p>
+    <p>Create or open an HTML file and click Run Preview.</p>
+  </div>
+</body>
+</html>`;
+    }
+
+    function runPreview() {
+      const html = getPreviewHtml();
+      els.previewFrame.srcdoc = html;
+      setStatus("Preview updated.");
+    }
+
+    function toggleAutoPreview() {
+      state.autoPreview = !state.autoPreview;
+      renderAutoPreviewButton();
+      saveToBrowser();
+      setStatus(`Auto Preview ${state.autoPreview ? "enabled" : "disabled"}.`);
+      if (state.autoPreview) runPreview();
+    }
+
+    function newProject() {
+      const ok = confirm("Start a new project? This replaces the current project in the page.");
+      if (!ok) return;
+
+      state.projectName = "My Project";
+      state.files = [
+        {
+          id: crypto.randomUUID(),
+          name: "index.html",
+          content: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>New Project</title>
+</head>
+<body>
+  <h1>New Project</h1>
+</body>
+</html>`
+        }
+      ];
+      state.activeFileId = state.files[0].id;
+      state.autoPreview = false;
+      renderAll();
+      saveToBrowser();
+      runPreview();
+      setStatus("Started a new project.");
+    }
+
+    function projectToJson() {
+      return JSON.stringify({
+        projectName: state.projectName,
+        files: state.files,
+        activeFileId: state.activeFileId,
+        autoPreview: state.autoPreview
+      }, null, 2);
+    }
+
+    function downloadBlob(filename, blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function exportProjectJson() {
+      const blob = new Blob([projectToJson()], { type: "application/json" });
+      const safeName = (state.projectName || "project").replace(/[^\w\-]+/g, "-");
+      downloadBlob(`${safeName || "project"}.json`, blob);
+      setStatus("Exported project JSON.");
+    }
+
+    function importProjectFromFile(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!parsed || !Array.isArray(parsed.files) || !parsed.files.length) {
+            throw new Error("Invalid project file.");
+          }
+
+          state.projectName = parsed.projectName || "Imported Project";
+          state.files = parsed.files.map(f => ({
+            id: f.id || crypto.randomUUID(),
+            name: f.name || "untitled.txt",
+            content: typeof f.content === "string" ? f.content : ""
+          }));
+          state.activeFileId = parsed.activeFileId || state.files[0].id;
+          state.autoPreview = !!parsed.autoPreview;
+
+          renderAll();
+          saveToBrowser();
+          runPreview();
+          setStatus("Imported project.");
+        } catch (err) {
+          console.error(err);
+          alert("Could not import this JSON project file.");
+          setStatus("Import failed.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadCurrentFile() {
+      const file = getActiveFile();
+      if (!file) {
+        alert("No file selected.");
+        return;
+      }
+
+      const blob = new Blob([file.content], { type: "text/plain;charset=utf-8" });
+      downloadBlob(file.name, blob);
+      setStatus(`Downloaded ${file.name}.`);
+    }
+
+    async function downloadZip() {
+      if (!window.JSZip) {
+        alert("ZIP library did not load. Check your internet connection and refresh the page.");
+        return;
+      }
+
+      const zip = new JSZip();
+      const folderName = (state.projectName || "project").replace(/[^\w\-]+/g, "-") || "project";
+      const root = zip.folder(folderName);
+
+      for (const file of state.files) {
+        root.file(file.name, file.content);
+      }
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      downloadBlob(`${folderName}.zip`, blob);
+      setStatus("Downloaded ZIP.");
+    }
+
+    function wireEvents() {
+      document.getElementById("newFileBtn").addEventListener("click", createFile);
+      document.getElementById("duplicateFileBtn").addEventListener("click", duplicateActiveFile);
+      document.getElementById("renameFileBtn").addEventListener("click", renameActiveFile);
+      document.getElementById("deleteFileBtn").addEventListener("click", () => deleteFile());
+      document.getElementById("runPreviewBtn").addEventListener("click", runPreview);
+      document.getElementById("autoPreviewBtn").addEventListener("click", toggleAutoPreview);
+      document.getElementById("newProjectBtn").addEventListener("click", newProject);
+      document.getElementById("saveProjectBtn").addEventListener("click", saveToBrowser);
+      document.getElementById("exportJsonBtn").addEventListener("click", exportProjectJson);
+      document.getElementById("downloadFileBtn").addEventListener("click", downloadCurrentFile);
+      document.getElementById("downloadZipBtn").addEventListener("click", downloadZip);
+      document.getElementById("importJsonBtn").addEventListener("click", () => els.importInput.click());
+
+      els.importInput.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) importProjectFromFile(file);
+        e.target.value = "";
+      });
+
+      els.projectName.addEventListener("input", () => {
+        state.projectName = els.projectName.value;
+        saveToBrowser();
+      });
+
+      els.filenameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          renameActiveFile();
+        }
+      });
+
+      let saveTimer = null;
+      els.editor.addEventListener("input", () => {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(updateEditorContent, 120);
+      });
+
+      els.previewTarget.addEventListener("change", () => {
+        if (state.autoPreview) runPreview();
+      });
+
+      window.addEventListener("keydown", (e) => {
+        const isMac = navigator.platform.toUpperCase().includes("MAC");
+        const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+        if (cmdOrCtrl && e.key.toLowerCase() === "s") {
+          e.preventDefault();
+          saveToBrowser();
+        }
+
+        if (cmdOrCtrl && e.key.toLowerCase() === "enter") {
+          e.preventDefault();
+          runPreview();
+        }
+      });
+    }
+
+    loadFromBrowser();
+    wireEvents();
+    if (!state.activeFileId && state.files.length) state.activeFileId = state.files[0].id;
+    renderAll();
+    runPreview();
+  </script>
+</body>
+</html>
