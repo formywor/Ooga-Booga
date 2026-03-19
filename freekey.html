@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>ScriptNova — FREE Key Generator</title>
   <style>
     :root{
@@ -10,7 +10,6 @@
       --bg2:#0d1420;
       --panel:#101828;
       --panel2:#0f1726;
-      --panel3:#0b1220;
       --border:#22314a;
       --text:#eaf2ff;
       --muted:#9fb2d6;
@@ -19,69 +18,114 @@
       --danger:#ff6a6a;
       --dangerBg:rgba(255,106,106,.10);
       --good:#00ffaa;
-      --goodBg:rgba(0,255,170,.08);
+      --goodBg:rgba(0,255,170,.09);
       --warn:#ffd166;
+      --warnBg:rgba(255,209,102,.10);
       --shadow:0 18px 40px rgba(0,0,0,.28);
-      --radius:18px;
+      --cardGlow:0 0 24px rgba(0,229,255,.06);
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ margin:0; padding:0; }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ margin:0; padding:0; scroll-behavior:smooth; }
     body{
       font-family:Segoe UI,Tahoma,Arial,sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(0,229,255,.08), transparent 22%),
-        radial-gradient(circle at top right, rgba(103,242,255,.05), transparent 20%),
-        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 100%);
       color:var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(0,229,255,.10), transparent 22%),
+        radial-gradient(circle at 100% 0%, rgba(103,242,255,.06), transparent 20%),
+        radial-gradient(circle at 50% 100%, rgba(0,255,170,.04), transparent 18%),
+        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 55%, #09101b 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.015), rgba(255,255,255,0)),
+        repeating-linear-gradient(
+          180deg,
+          rgba(255,255,255,.015) 0px,
+          rgba(255,255,255,.015) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      opacity:.18;
+      z-index:0;
     }
 
     .wrap{
-      max-width:1020px;
+      position:relative;
+      z-index:1;
+      max-width:1220px;
       margin:0 auto;
       padding:24px;
     }
 
     .hero{
+      position:relative;
       border:1px solid var(--border);
       background:linear-gradient(180deg,#111b2a 0%, #0f1726 100%);
-      border-radius:22px;
+      border-radius:24px;
       padding:22px;
-      box-shadow:0 0 20px rgba(0,229,255,.07), var(--shadow);
+      box-shadow:var(--cardGlow), var(--shadow);
+      overflow:hidden;
+      animation:fadeUp .45s ease;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      top:-80px;
+      right:-60px;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(0,229,255,.14), transparent 65%);
+      pointer-events:none;
     }
 
     .title{
-      font-size:28px;
+      font-size:30px;
       font-weight:900;
       letter-spacing:.2px;
+      line-height:1.1;
     }
+
     .title b{
       color:var(--accent);
-      text-shadow:0 0 14px rgba(0,229,255,.16);
+      text-shadow:0 0 16px rgba(0,229,255,.18);
     }
 
     .sub{
-      margin-top:8px;
+      margin-top:9px;
       color:var(--muted);
-      line-height:1.5;
-      max-width:820px;
+      line-height:1.55;
+      max-width:900px;
+      font-size:14px;
     }
 
     .heroRow{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-top:12px;
+      margin-top:14px;
     }
 
     .pill{
-      display:inline-block;
-      padding:7px 11px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.10);
       background:#0c1422;
       color:var(--muted);
       font-size:12px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
     }
 
     .card{
@@ -91,6 +135,7 @@
       border-radius:22px;
       padding:16px;
       box-shadow:var(--shadow);
+      animation:fadeUp .5s ease;
     }
 
     .card h3{
@@ -110,28 +155,42 @@
 
     .gridInfo{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:12px;
-      margin-top:12px;
+      margin-top:14px;
     }
 
     .miniStat{
       border:1px solid var(--border);
-      background:#0b1220;
+      background:linear-gradient(180deg,#0b1220 0%, #0a111d 100%);
       border-radius:16px;
       padding:12px;
+      min-height:88px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      transition:transform .16s ease, border-color .16s ease;
     }
+
+    .miniStat:hover{
+      transform:translateY(-2px);
+      border-color:#2d4262;
+    }
+
     .miniStat .k{
       font-size:11px;
       color:var(--muted);
       text-transform:uppercase;
       letter-spacing:.7px;
     }
+
     .miniStat .v{
       margin-top:8px;
       font-size:16px;
       font-weight:800;
       color:var(--text);
+      line-height:1.2;
+      word-break:break-word;
     }
 
     .btn{
@@ -145,35 +204,53 @@
       letter-spacing:.7px;
       text-transform:uppercase;
       cursor:pointer;
-      transition:transform .06s ease, background .14s ease, opacity .14s ease;
+      transition:transform .08s ease, background .14s ease, opacity .14s ease, box-shadow .14s ease;
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
     }
-    .btn:hover{ background:linear-gradient(180deg,#15405c 0%, #12354d 100%); }
-    .btn:active{ transform:translateY(1px); }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; }
+
+    .btn:hover{
+      background:linear-gradient(180deg,#15405c 0%, #12354d 100%);
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .btn:active{ transform:translateY(1px) scale(.99); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
 
     .btn.secondary{
       border:1px solid rgba(255,255,255,.14);
       background:linear-gradient(180deg,#121b2b 0%, #101927 100%);
     }
-    .btn.secondary:hover{ background:linear-gradient(180deg,#182437 0%, #152133 100%); }
+
+    .btn.secondary:hover{
+      background:linear-gradient(180deg,#182437 0%, #152133 100%);
+    }
 
     .btn.good{
       border:1px solid rgba(0,255,170,.35);
       background:linear-gradient(180deg,#10392f 0%, #0d2d26 100%);
     }
-    .btn.good:hover{ background:linear-gradient(180deg,#155144 0%, #114238 100%); }
 
-    .btn.warn{
-      border:1px solid rgba(255,209,102,.35);
-      background:linear-gradient(180deg,#4a3812 0%, #392a0d 100%);
+    .btn.good:hover{
+      background:linear-gradient(180deg,#155144 0%, #114238 100%);
     }
-    .btn.warn:hover{ background:linear-gradient(180deg,#5b4416 0%, #473311 100%); }
+
+    .btn.gold{
+      border:1px solid rgba(255,209,102,.35);
+      background:linear-gradient(180deg,#473611 0%, #36270d 100%);
+    }
+
+    .btn.gold:hover{
+      background:linear-gradient(180deg,#5c4515 0%, #473311 100%);
+    }
 
     .btn.danger{
       border:1px solid rgba(255,106,106,.35);
       background:linear-gradient(180deg,#4d2020 0%, #3a1717 100%);
     }
-    .btn.danger:hover{ background:linear-gradient(180deg,#5d2626 0%, #492020 100%); }
+
+    .btn.danger:hover{
+      background:linear-gradient(180deg,#5d2626 0%, #492020 100%);
+    }
 
     .box{
       width:100%;
@@ -185,32 +262,47 @@
       font-size:16px;
       font-family:Consolas, monospace;
       outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .box:focus{
+      border-color:#32618b;
+      box-shadow:0 0 0 4px rgba(0,229,255,.08);
     }
 
     .note{
       color:var(--muted);
       font-size:12px;
-      line-height:1.45;
+      line-height:1.5;
       margin-top:8px;
     }
 
-    .err,.ok{
-      padding:12px;
+    .err,.ok,.warnBox{
+      padding:12px 13px;
       border-radius:14px;
       display:none;
       white-space:pre-wrap;
       line-height:1.45;
       font-size:13px;
+      animation:fadeUp .24s ease;
     }
+
     .err{
       color:#ffd2d2;
       background:var(--dangerBg);
       border:1px solid rgba(255,106,106,.55);
     }
+
     .ok{
       color:#c9ffe2;
       background:var(--goodBg);
       border:1px solid rgba(0,255,170,.35);
+    }
+
+    .warnBox{
+      color:#ffe9b3;
+      background:var(--warnBg);
+      border:1px solid rgba(255,209,102,.35);
     }
 
     a{ color:var(--accent2); }
@@ -220,22 +312,29 @@
       gap:10px;
       align-items:flex-start;
       margin:10px 0;
-      padding:10px;
+      padding:12px;
       border:1px solid rgba(255,255,255,.06);
       border-radius:14px;
       background:#0b1220;
+      transition:border-color .15s ease, transform .15s ease;
     }
+
+    .chk:hover{
+      border-color:#29415f;
+      transform:translateY(-1px);
+    }
+
     .chk input{
       margin-top:3px;
-      transform:scale(1.05);
+      transform:scale(1.08);
+      accent-color:#00e5ff;
     }
 
     .small{ font-size:12px; color:var(--muted); }
-    .dangerText{ color:var(--danger); }
 
     .plans{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
       gap:14px;
       margin-top:14px;
     }
@@ -245,9 +344,15 @@
       background:linear-gradient(180deg,#0c1422 0%, #0a111d 100%);
       border-radius:22px;
       padding:16px;
-      box-shadow:0 0 16px rgba(0,229,255,.04), var(--shadow);
+      box-shadow:var(--cardGlow), var(--shadow);
       position:relative;
       overflow:hidden;
+      animation:fadeUp .55s ease;
+    }
+
+    .plan.special{
+      border-color:#5f4a16;
+      box-shadow:0 0 24px rgba(255,209,102,.06), var(--shadow);
     }
 
     .plan::before{
@@ -258,6 +363,10 @@
       height:2px;
       background:linear-gradient(90deg,transparent, rgba(0,229,255,.65), transparent);
       opacity:.35;
+    }
+
+    .plan.special::before{
+      background:linear-gradient(90deg,transparent, rgba(255,209,102,.8), transparent);
     }
 
     .plan h4{
@@ -275,12 +384,34 @@
       text-shadow:0 0 14px rgba(0,229,255,.12);
     }
 
+    .plan.special .time{
+      color:#ffd166;
+      text-shadow:0 0 14px rgba(255,209,102,.14);
+    }
+
     .plan .desc{
       margin-top:8px;
       color:var(--muted);
       font-size:13px;
-      line-height:1.5;
-      min-height:50px;
+      line-height:1.55;
+      min-height:60px;
+    }
+
+    .metaRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .metaPill{
+      font-size:11px;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,.08);
+      color:#dcedff;
+      background:#0b1422;
+      border-radius:999px;
+      padding:6px 9px;
     }
 
     .meter{
@@ -291,14 +422,29 @@
       border:1px solid var(--border);
       background:#071019;
       overflow:hidden;
+      position:relative;
     }
 
     .fill{
       height:100%;
       width:0%;
       background:linear-gradient(90deg,#00e5ff,#00ffaa);
-      transition:width .18s ease;
+      transition:width .22s ease;
       box-shadow:0 0 14px rgba(0,229,255,.18);
+      position:relative;
+    }
+
+    .special .fill{
+      background:linear-gradient(90deg,#ffd166,#ffb347);
+      box-shadow:0 0 14px rgba(255,209,102,.18);
+    }
+
+    .fill::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+      animation:shine 1.8s linear infinite;
     }
 
     .stat{
@@ -333,6 +479,12 @@
       padding:6px 9px;
     }
 
+    .badge.gold{
+      color:#fff2cf;
+      border-color:rgba(255,209,102,.25);
+      background:#221a09;
+    }
+
     .footerSorry{
       text-align:center;
       margin-top:16px;
@@ -343,10 +495,124 @@
       padding-top:14px;
     }
 
+    .keyCard{
+      position:relative;
+      overflow:hidden;
+    }
+
+    .keyCard.flash{
+      animation:keyFlash .9s ease;
+    }
+
+    .celebrate{
+      display:none;
+      margin-top:12px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(0,255,170,.26);
+      background:linear-gradient(180deg, rgba(0,255,170,.12), rgba(0,255,170,.05));
+      color:#d6fff0;
+      font-weight:800;
+      animation:fadeUp .35s ease;
+    }
+
+    .celebrate.show{
+      display:block;
+    }
+
+    .celebrate .big{
+      font-size:18px;
+      margin-bottom:6px;
+    }
+
+    .redirectHint{
+      margin-top:10px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,209,102,.25);
+      background:rgba(255,209,102,.07);
+      color:#ffe9b3;
+      font-size:12px;
+      line-height:1.5;
+      display:none;
+    }
+
+    .redirectHint.show{
+      display:block;
+      animation:fadeUp .22s ease;
+    }
+
+    .stickyTop{
+      position:sticky;
+      top:10px;
+      z-index:4;
+    }
+
+    .glowDot{
+      display:inline-block;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 10px rgba(0,255,170,.7);
+      margin-right:8px;
+      vertical-align:middle;
+      animation:pulse 1.5s infinite;
+    }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(10px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+
+    @keyframes pulse{
+      0%{ transform:scale(1); opacity:1; }
+      50%{ transform:scale(1.25); opacity:.75; }
+      100%{ transform:scale(1); opacity:1; }
+    }
+
+    @keyframes keyFlash{
+      0%{ box-shadow:0 0 0 rgba(0,255,170,0), var(--shadow); }
+      30%{ box-shadow:0 0 0 6px rgba(0,255,170,.08), 0 0 40px rgba(0,255,170,.12), var(--shadow); }
+      100%{ box-shadow:var(--shadow); }
+    }
+
+    @keyframes shine{
+      0%{ transform:translateX(-120%); }
+      100%{ transform:translateX(120%); }
+    }
+
+    @media (max-width:900px){
+      .gridInfo{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+
     @media (max-width:760px){
       .wrap{ padding:14px; }
       .title{ font-size:24px; }
+      .hero{ padding:16px; border-radius:20px; }
+      .card, .plan{ border-radius:18px; }
       .gridInfo{ grid-template-columns:1fr; }
+      .btn{
+        width:100%;
+        min-height:48px;
+        font-size:12px;
+      }
+      .row{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .heroRow{ gap:8px; }
+      .pill{ font-size:11px; }
+      .plan .time{ font-size:25px; }
+      .box{ font-size:15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *, *::before, *::after{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
     }
   </style>
 </head>
@@ -356,15 +622,18 @@
       <div class="title"><b>ScriptNova</b> — FREE Key Generator</div>
       <div class="sub">
         Choose your FREE key tier below. Only <b>one active FREE key</b> can exist on this browser at a time.
-        If you already made one, it will stay here after refresh until it expires.
+        Progress is saved locally on this device. Complete redirect steps to unlock higher free tiers.
       </div>
 
       <div class="heroRow">
+        <span class="pill">4m FREE</span>
         <span class="pill">15m FREE</span>
         <span class="pill">35m FREE</span>
+        <span class="pill">1h FREE</span>
         <span class="pill">2h FREE</span>
-        <span class="pill">Saved key recovery</span>
-        <span class="pill">Progress save</span>
+        <span class="pill">3h FREE</span>
+        <span class="pill">6h FREE</span>
+        <span class="pill">10h Special</span>
       </div>
 
       <div class="gridInfo">
@@ -380,10 +649,14 @@
           <div class="k">Unlock Status</div>
           <div class="v" id="infoUnlock">Ready</div>
         </div>
+        <div class="miniStat">
+          <div class="k">Device Status</div>
+          <div class="v"><span class="glowDot"></span><span id="deviceStatus">Saved locally</span></div>
+        </div>
       </div>
     </div>
 
-    <div class="card">
+    <div class="card stickyTop">
       <h3>Step Checklist</h3>
 
       <div class="chk">
@@ -405,27 +678,54 @@
       <div class="chk">
         <input id="c3" type="checkbox"/>
         <div>
-          <div>I understand FREE keys are limited to 1 session.</div>
-          <div class="small">If too many sessions are active, launch may be blocked.</div>
+          <div>I understand FREE tiers can have different session limits.</div>
+          <div class="small">Most free tiers are 1 session. The special tier is shown as 4 sessions.</div>
         </div>
       </div>
 
       <div id="err" class="err" style="margin-top:10px;"></div>
       <div id="ok" class="ok" style="margin-top:10px;"></div>
+      <div id="warnBox" class="warnBox" style="margin-top:10px;"></div>
     </div>
 
     <div class="plans">
       <div class="plan">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Instant</span>
+          <span class="badge">Quick Unlock</span>
+        </div>
+        <div class="time">4 Minutes</div>
+        <div class="desc">Fast starter free key.</div>
+        <div class="metaRow">
+          <span class="metaPill">2 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
+        <div class="meter"><div id="fill4m" class="fill"></div></div>
+        <div class="stat"><span id="stat4m">0 / 2 redirects completed</span></div>
+        <div class="unlockText" id="unlock4m">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn4mRedirect" class="btn secondary" onclick="doRedirectStep('4m')">Open Redirect</button>
+          <button id="btn4m" class="btn good" onclick="generateTierKey('4m')" disabled>Generate 4m Key</button>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="planTopRow">
+          <h4>FREE Key</h4>
+          <span class="badge">Starter</span>
         </div>
         <div class="time">15 Minutes</div>
-        <div class="desc">Instant free key. No redirects required.</div>
-        <div class="stat">Requirement: instant</div>
-        <div class="unlockText" id="unlock15">Ready to generate</div>
+        <div class="desc">A basic free key after a small unlock requirement.</div>
+        <div class="metaRow">
+          <span class="metaPill">10 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
+        <div class="meter"><div id="fill15m" class="fill"></div></div>
+        <div class="stat"><span id="stat15m">0 / 10 redirects completed</span></div>
+        <div class="unlockText" id="unlock15m">Locked</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn15" class="btn good" onclick="generateTierKey('15m')">Generate 15m Key</button>
+          <button id="btn15mRedirect" class="btn secondary" onclick="doRedirectStep('15m')">Open Redirect</button>
+          <button id="btn15m" class="btn good" onclick="generateTierKey('15m')" disabled>Generate 15m Key</button>
         </div>
       </div>
 
@@ -435,14 +735,37 @@
           <span class="badge">Tier Unlock</span>
         </div>
         <div class="time">35 Minutes</div>
-        <div class="desc">Unlock after completing <b>45 redirects</b>.</div>
-        <div class="meter"><div id="fill35" class="fill"></div></div>
-        <div class="stat"><span id="stat35">0 / 45 redirects completed</span></div>
-        <div class="unlockText" id="unlock35">Locked</div>
+        <div class="desc">A longer free session after more progress.</div>
+        <div class="metaRow">
+          <span class="metaPill">45 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
+        <div class="meter"><div id="fill35m" class="fill"></div></div>
+        <div class="stat"><span id="stat35m">0 / 45 redirects completed</span></div>
+        <div class="unlockText" id="unlock35m">Locked</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn35Redirect" class="btn secondary" onclick="doRedirectStep('35m')">Open Redirect</button>
-          <button id="btn35Auto" class="btn secondary" onclick="autoRedirect('35m')">Auto Redirect</button>
-          <button id="btn35Generate" class="btn" onclick="generateTierKey('35m')" disabled>Generate 35m Key</button>
+          <button id="btn35mRedirect" class="btn secondary" onclick="doRedirectStep('35m')">Open Redirect</button>
+          <button id="btn35m" class="btn" onclick="generateTierKey('35m')" disabled>Generate 35m Key</button>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="planTopRow">
+          <h4>FREE Key</h4>
+          <span class="badge">Requested</span>
+        </div>
+        <div class="time">1 Hour</div>
+        <div class="desc">A stronger free key with a medium unlock amount.</div>
+        <div class="metaRow">
+          <span class="metaPill">65 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
+        <div class="meter"><div id="fill1h" class="fill"></div></div>
+        <div class="stat"><span id="stat1h">0 / 65 redirects completed</span></div>
+        <div class="unlockText" id="unlock1h">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn1hRedirect" class="btn secondary" onclick="doRedirectStep('1h')">Open Redirect</button>
+          <button id="btn1h" class="btn" onclick="generateTierKey('1h')" disabled>Generate 1h Key</button>
         </div>
       </div>
 
@@ -452,33 +775,112 @@
           <span class="badge">Tier Unlock</span>
         </div>
         <div class="time">2 Hours</div>
-        <div class="desc">Unlock after completing <b>100 redirects</b>.</div>
+        <div class="desc">Longer unlock path for a longer free key.</div>
+        <div class="metaRow">
+          <span class="metaPill">100 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
         <div class="meter"><div id="fill2h" class="fill"></div></div>
         <div class="stat"><span id="stat2h">0 / 100 redirects completed</span></div>
         <div class="unlockText" id="unlock2h">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn2hRedirect" class="btn secondary" onclick="doRedirectStep('2h')">Open Redirect</button>
-          <button id="btn2hAuto" class="btn secondary" onclick="autoRedirect('2h')">Auto Redirect</button>
-          <button id="btn2hGenerate" class="btn" onclick="generateTierKey('2h')" disabled>Generate 2h Key</button>
+          <button id="btn2h" class="btn" onclick="generateTierKey('2h')" disabled>Generate 2h Key</button>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="planTopRow">
+          <h4>FREE Key</h4>
+          <span class="badge">Extended</span>
+        </div>
+        <div class="time">3 Hours</div>
+        <div class="desc">A harder unlock for users who want more time.</div>
+        <div class="metaRow">
+          <span class="metaPill">135 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
+        <div class="meter"><div id="fill3h" class="fill"></div></div>
+        <div class="stat"><span id="stat3h">0 / 135 redirects completed</span></div>
+        <div class="unlockText" id="unlock3h">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn3hRedirect" class="btn secondary" onclick="doRedirectStep('3h')">Open Redirect</button>
+          <button id="btn3h" class="btn" onclick="generateTierKey('3h')" disabled>Generate 3h Key</button>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="planTopRow">
+          <h4>FREE Key</h4>
+          <span class="badge">Big Unlock</span>
+        </div>
+        <div class="time">6 Hours</div>
+        <div class="desc">High effort, much longer free access.</div>
+        <div class="metaRow">
+          <span class="metaPill">220 redirects</span>
+          <span class="metaPill">1 session</span>
+        </div>
+        <div class="meter"><div id="fill6h" class="fill"></div></div>
+        <div class="stat"><span id="stat6h">0 / 220 redirects completed</span></div>
+        <div class="unlockText" id="unlock6h">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn6hRedirect" class="btn secondary" onclick="doRedirectStep('6h')">Open Redirect</button>
+          <button id="btn6h" class="btn" onclick="generateTierKey('6h')" disabled>Generate 6h Key</button>
+        </div>
+      </div>
+
+      <div class="plan special">
+        <div class="planTopRow">
+          <h4>Special FREE Key</h4>
+          <span class="badge gold">Special</span>
+        </div>
+        <div class="time">10 Hours</div>
+        <div class="desc">Special free option. Shows as a bigger unlock with support for up to <b>4 sessions</b> if your backend allows it.</div>
+        <div class="metaRow">
+          <span class="metaPill">350 redirects</span>
+          <span class="metaPill">4 sessions</span>
+        </div>
+        <div class="meter"><div id="fill10h4s" class="fill"></div></div>
+        <div class="stat"><span id="stat10h4s">0 / 350 redirects completed</span></div>
+        <div class="unlockText" id="unlock10h4s">Locked</div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btn10h4sRedirect" class="btn secondary" onclick="doRedirectStep('10h4s')">Open Redirect</button>
+          <button id="btn10h4s" class="btn gold" onclick="generateTierKey('10h4s')" disabled>Generate Special Key</button>
         </div>
       </div>
     </div>
 
-    <div class="card">
+    <div class="card keyCard" id="keySection">
       <h3>Your FREE Key</h3>
       <input id="keyBox" class="box" type="text" value="" placeholder="Choose a tier..." readonly />
       <div class="row" style="margin-top:10px;">
         <button class="btn" onclick="copyKey()">Copy</button>
+        <button class="btn secondary" onclick="selectKey()">Select Key</button>
         <div class="note">Expires in: <b id="ttl">—</b></div>
       </div>
+
+      <div class="note" style="margin-top:8px;">
+        Sessions: <b id="sessionInfo">—</b>
+      </div>
+
+      <div id="celebrate" class="celebrate">
+        <div class="big">Congratulations — key made.</div>
+        <div>Scroll down to copy it, save it, and use it before it expires.</div>
+      </div>
+
       <div class="note" id="statusNote">
         Open the launcher, paste the key, click <b>Save</b>, then <b>Launch</b>.
+      </div>
+
+      <div id="redirectHint" class="redirectHint">
+        Tip: On phones and some browsers, redirects are more reliable when opened from a button tap. If a page opens in the same tab, come back here after it loads and continue.
       </div>
     </div>
 
     <div class="row" style="margin-top:12px;">
       <a class="btn" href="/" style="text-decoration:none; display:inline-block;">Back Home</a>
       <button class="btn secondary" onclick="resetRedirectProgress()">Reset Redirect Progress</button>
+      <button class="btn danger" onclick="clearSavedKeyOnly()">Clear Saved Key</button>
     </div>
 
     <div class="note" style="text-align:center; margin-top:14px;">
@@ -495,49 +897,56 @@
     const API = "https://api.scriptnovaa.com/api/freekey";
     const REDIRECT_URL = "https://omg10.com/4/10708386";
 
-    const LS_KEY = "sn_freekey_v3";
-    const LS_PROGRESS = "sn_freekey_progress_v3";
-    const LS_AUTO = "sn_freekey_auto_v3";
+    const LS_KEY = "sn_freekey_v5";
+    const LS_PROGRESS = "sn_freekey_progress_v5";
 
     const CLICK_COOLDOWN_MS = 4000;
-    const REDIRECT_STEP_COOLDOWN_MS = 1000;
-    const AUTO_REDIRECT_DELAY_MS = 350;
+    const REDIRECT_STEP_COOLDOWN_MS = 1200;
 
     const TIER_CONFIG = {
-      "15m": { label: "15 Minutes", ttl: 900, needed: 0 },
-      "35m": { label: "35 Minutes", ttl: 2100, needed: 45 },
-      "2h":  { label: "2 Hours", ttl: 7200, needed: 100 }
+      "4m":    { label: "4 Minutes", ttl: 240, needed: 2, sessions: 1, button: "Generate 4m Key" },
+      "15m":   { label: "15 Minutes", ttl: 900, needed: 10, sessions: 1, button: "Generate 15m Key" },
+      "35m":   { label: "35 Minutes", ttl: 2100, needed: 45, sessions: 1, button: "Generate 35m Key" },
+      "1h":    { label: "1 Hour", ttl: 3600, needed: 65, sessions: 1, button: "Generate 1h Key" },
+      "2h":    { label: "2 Hours", ttl: 7200, needed: 100, sessions: 1, button: "Generate 2h Key" },
+      "3h":    { label: "3 Hours", ttl: 10800, needed: 135, sessions: 1, button: "Generate 3h Key" },
+      "6h":    { label: "6 Hours", ttl: 21600, needed: 220, sessions: 1, button: "Generate 6h Key" },
+      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 350, sessions: 4, button: "Generate Special Key" }
     };
 
-    let autoRunning = { "35m": false, "2h": false };
+    const TIER_ORDER = ["4m","15m","35m","1h","2h","3h","6h","10h4s"];
+
     let cooldownUntil = 0;
     let redirectCooldownUntil = 0;
     let expEpoch = 0;
     let timer = null;
-    let autoTimers = { "35m": null, "2h": null };
+
+    function byId(id){ return document.getElementById(id); }
+    function nowSec(){ return Math.floor(Date.now()/1000); }
 
     function showErr(msg){
-      const el = document.getElementById("err");
-      const ok = document.getElementById("ok");
-      ok.style.display = "none";
+      byId("ok").style.display = "none";
+      byId("warnBox").style.display = "none";
+      const el = byId("err");
       el.style.display = "block";
       el.textContent = String(msg || "Unknown error");
     }
 
     function showOk(msg){
-      const el = document.getElementById("ok");
-      const err = document.getElementById("err");
-      err.style.display = "none";
+      byId("err").style.display = "none";
+      byId("warnBox").style.display = "none";
+      const el = byId("ok");
       el.style.display = "block";
       el.textContent = String(msg || "");
     }
 
-    function clearMessages(){
-      document.getElementById("err").style.display = "none";
-      document.getElementById("ok").style.display = "none";
+    function showWarn(msg){
+      byId("err").style.display = "none";
+      byId("ok").style.display = "none";
+      const el = byId("warnBox");
+      el.style.display = "block";
+      el.textContent = String(msg || "");
     }
-
-    function nowSec(){ return Math.floor(Date.now()/1000); }
 
     function readSaved(){
       try{
@@ -548,21 +957,23 @@
         return {
           key: String(j.key),
           exp: Number(j.exp),
-          tier: String(j.tier || "15m"),
-          ttlSeconds: Number(j.ttlSeconds || 900)
+          tier: String(j.tier || ""),
+          ttlSeconds: Number(j.ttlSeconds || 0),
+          sessions: Number(j.sessions || 1)
         };
       }catch(e){
         return null;
       }
     }
 
-    function saveKey(key, exp, tier, ttlSeconds){
+    function saveKey(key, exp, tier, ttlSeconds, sessions){
       try{
         localStorage.setItem(LS_KEY, JSON.stringify({
           key,
           exp,
           tier,
-          ttlSeconds
+          ttlSeconds,
+          sessions
         }));
       }catch(e){}
     }
@@ -571,33 +982,20 @@
       try{ localStorage.removeItem(LS_KEY); }catch(e){}
     }
 
+    function clearSavedKeyOnly(){
+      clearSaved();
+      clearKeyUi();
+      refreshButtons();
+      renderProgress();
+      showOk("Saved key cleared from this browser.");
+      byId("statusNote").textContent = "Choose a tier and generate a key.";
+      byId("celebrate").classList.remove("show");
+    }
+
     function hasActiveKey(){
       const s = readSaved();
       if(!s) return false;
       return s.exp > nowSec();
-    }
-
-    function readProgress(){
-      try{
-        const raw = localStorage.getItem(LS_PROGRESS);
-        if(!raw) return { "35m": 0, "2h": 0 };
-        const j = JSON.parse(raw);
-        return {
-          "35m": clampProgress("35m", j["35m"]),
-          "2h": clampProgress("2h", j["2h"])
-        };
-      }catch(e){
-        return { "35m": 0, "2h": 0 };
-      }
-    }
-
-    function saveProgress(p){
-      try{
-        localStorage.setItem(LS_PROGRESS, JSON.stringify({
-          "35m": clampProgress("35m", p["35m"]),
-          "2h": clampProgress("2h", p["2h"])
-        }));
-      }catch(e){}
     }
 
     function clampProgress(tier, value){
@@ -605,16 +1003,46 @@
       return Math.min(n, TIER_CONFIG[tier].needed);
     }
 
+    function emptyProgressObject(){
+      const out = {};
+      for(const tier of TIER_ORDER) out[tier] = 0;
+      return out;
+    }
+
+    function readProgress(){
+      try{
+        const raw = localStorage.getItem(LS_PROGRESS);
+        if(!raw) return emptyProgressObject();
+        const j = JSON.parse(raw);
+        const out = {};
+        for(const tier of TIER_ORDER){
+          out[tier] = clampProgress(tier, j[tier]);
+        }
+        return out;
+      }catch(e){
+        return emptyProgressObject();
+      }
+    }
+
+    function saveProgress(p){
+      try{
+        const out = {};
+        for(const tier of TIER_ORDER){
+          out[tier] = clampProgress(tier, p[tier]);
+        }
+        localStorage.setItem(LS_PROGRESS, JSON.stringify(out));
+      }catch(e){}
+    }
+
     function resetRedirectProgress(silent = false){
-      saveProgress({ "35m": 0, "2h": 0 });
-      stopAllAutoRedirects();
+      saveProgress(emptyProgressObject());
       renderProgress();
       if(!silent && !hasActiveKey()) showOk("Redirect progress reset.");
     }
 
     function resetOnlyTierProgress(tier){
       const p = readProgress();
-      if(tier === "35m" || tier === "2h"){
+      if(TIER_CONFIG[tier]){
         p[tier] = 0;
         saveProgress(p);
       }
@@ -622,13 +1050,10 @@
     }
 
     function checklistOk(){
-      return document.getElementById("c1").checked &&
-             document.getElementById("c2").checked &&
-             document.getElementById("c3").checked;
+      return byId("c1").checked && byId("c2").checked && byId("c3").checked;
     }
 
     function tierUnlocked(tier){
-      if(tier === "15m") return true;
       const p = readProgress();
       return (p[tier] || 0) >= TIER_CONFIG[tier].needed;
     }
@@ -648,17 +1073,19 @@
       return true;
     }
 
-    function setKeyUi(key, exp){
-      document.getElementById("keyBox").value = key || "";
+    function setKeyUi(key, exp, sessions = 1){
+      byId("keyBox").value = key || "";
       expEpoch = Number(exp || 0);
+      byId("sessionInfo").textContent = String(sessions || 1);
       startCountdown();
       updateInfoBar();
     }
 
     function clearKeyUi(){
-      document.getElementById("keyBox").value = "";
+      byId("keyBox").value = "";
       expEpoch = 0;
-      document.getElementById("ttl").textContent = "—";
+      byId("ttl").textContent = "—";
+      byId("sessionInfo").textContent = "—";
       updateInfoBar();
     }
 
@@ -667,35 +1094,32 @@
       if(!s) return;
 
       if(s.exp > nowSec()){
-        setKeyUi(s.key, s.exp);
+        setKeyUi(s.key, s.exp, s.sessions || 1);
         showOk("You already generated a FREE key. Use it until it expires.");
-        document.getElementById("statusNote").textContent =
+        byId("statusNote").textContent =
           "You already have a FREE key saved on this device. Use it until it expires, then you can generate a new one.";
       } else {
         clearSaved();
       }
     }
 
+    function domKey(tier){
+      return tier.replace(/[^a-zA-Z0-9]/g, "");
+    }
+
     function updatePlanUi(tier, current, needed){
-      const pct = Math.max(0, Math.min(100, needed <= 0 ? 100 : (current / needed) * 100));
-
-      if(tier === "35m"){
-        document.getElementById("fill35").style.width = pct + "%";
-        document.getElementById("stat35").textContent = current + " / " + needed + " redirects completed";
-        document.getElementById("unlock35").textContent = current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects");
-      }
-
-      if(tier === "2h"){
-        document.getElementById("fill2h").style.width = pct + "%";
-        document.getElementById("stat2h").textContent = current + " / " + needed + " redirects completed";
-        document.getElementById("unlock2h").textContent = current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects");
-      }
+      const key = domKey(tier);
+      const pct = Math.max(0, Math.min(100, (current / needed) * 100));
+      byId("fill" + key).style.width = pct + "%";
+      byId("stat" + key).textContent = current + " / " + needed + " redirects completed";
+      byId("unlock" + key).textContent = current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects");
     }
 
     function renderProgress(){
       const p = readProgress();
-      updatePlanUi("35m", p["35m"], TIER_CONFIG["35m"].needed);
-      updatePlanUi("2h", p["2h"], TIER_CONFIG["2h"].needed);
+      for(const tier of TIER_ORDER){
+        updatePlanUi(tier, p[tier], TIER_CONFIG[tier].needed);
+      }
       refreshButtons();
       updateInfoBar();
     }
@@ -704,64 +1128,62 @@
       const saved = readSaved();
       const p = readProgress();
 
-      document.getElementById("infoCurrentKey").textContent = saved && saved.exp > nowSec()
+      byId("infoCurrentKey").textContent = saved && saved.exp > nowSec()
         ? (saved.tier + " key active")
         : "None";
 
-      document.getElementById("infoExpires").textContent = saved && saved.exp > nowSec()
-        ? document.getElementById("ttl").textContent
+      byId("infoExpires").textContent = saved && saved.exp > nowSec()
+        ? byId("ttl").textContent
         : "—";
 
-      if (hasActiveKey()) {
-        document.getElementById("infoUnlock").textContent = "Active key in use";
-      } else if (tierUnlocked("2h")) {
-        document.getElementById("infoUnlock").textContent = "2h unlocked";
-      } else if (tierUnlocked("35m")) {
-        document.getElementById("infoUnlock").textContent = "35m unlocked";
+      if(hasActiveKey()){
+        byId("infoUnlock").textContent = "Active key in use";
       } else {
-        document.getElementById("infoUnlock").textContent =
-          p["35m"] + "/45 • " + p["2h"] + "/100";
+        let bestUnlocked = null;
+        for(let i = TIER_ORDER.length - 1; i >= 0; i--){
+          const tier = TIER_ORDER[i];
+          if(tierUnlocked(tier)){
+            bestUnlocked = tier;
+            break;
+          }
+        }
+
+        if(bestUnlocked){
+          byId("infoUnlock").textContent = TIER_CONFIG[bestUnlocked].label + " unlocked";
+        } else {
+          byId("infoUnlock").textContent =
+            p["4m"] + "/2 • " +
+            p["15m"] + "/10 • " +
+            p["35m"] + "/45 • " +
+            p["1h"] + "/65";
+        }
       }
+
+      byId("deviceStatus").textContent = "Saved locally";
     }
 
     function refreshButtons(){
       const active = hasActiveKey();
 
-      const btn15 = document.getElementById("btn15");
-      const btn35Redirect = document.getElementById("btn35Redirect");
-      const btn35Auto = document.getElementById("btn35Auto");
-      const btn35Generate = document.getElementById("btn35Generate");
-      const btn2hRedirect = document.getElementById("btn2hRedirect");
-      const btn2hAuto = document.getElementById("btn2hAuto");
-      const btn2hGenerate = document.getElementById("btn2hGenerate");
+      for(const tier of TIER_ORDER){
+        const key = domKey(tier);
+        const genBtn = byId("btn" + key);
+        const redirBtn = byId("btn" + key + "Redirect");
 
-      btn15.disabled = !canGenerateTier("15m");
-      btn35Redirect.disabled = !canDoRedirect();
-      btn35Auto.disabled = !canDoRedirect() && !autoRunning["35m"];
-      btn2hRedirect.disabled = !canDoRedirect();
-      btn2hAuto.disabled = !canDoRedirect() && !autoRunning["2h"];
-      btn35Generate.disabled = !canGenerateTier("35m");
-      btn2hGenerate.disabled = !canGenerateTier("2h");
+        genBtn.disabled = !canGenerateTier(tier);
+        redirBtn.disabled = !canDoRedirect();
 
-      btn35Auto.textContent = autoRunning["35m"] ? "Stop Auto" : "Auto Redirect";
-      btn2hAuto.textContent = autoRunning["2h"] ? "Stop Auto" : "Auto Redirect";
-
-      if(active){
-        btn15.textContent = "Key already generated";
-        btn35Generate.textContent = "Key already generated";
-        btn2hGenerate.textContent = "Key already generated";
-      } else {
-        btn15.textContent = "Generate 15m Key";
-        btn35Generate.textContent = "Generate 35m Key";
-        btn2hGenerate.textContent = "Generate 2h Key";
+        if(active){
+          genBtn.textContent = "Key already generated";
+        } else {
+          genBtn.textContent = TIER_CONFIG[tier].button;
+        }
       }
-
-      document.getElementById("unlock15").textContent = active ? "Blocked while active key exists" : "Ready to generate";
     }
 
     function incrementTierProgress(tier){
       const cfg = TIER_CONFIG[tier];
-      if(!cfg || cfg.needed <= 0) return { current: 0, needed: 0 };
+      if(!cfg) return { current: 0, needed: 0 };
 
       const p = readProgress();
       const cur = clampProgress(tier, p[tier]);
@@ -777,7 +1199,12 @@
       };
     }
 
-    function doRedirectStep(tier, auto = false){
+    function doRedirectStep(tier){
+      if(!TIER_CONFIG[tier]){
+        showErr("Invalid tier.");
+        return false;
+      }
+
       if(!checklistOk()){
         showErr("Complete the checklist first.");
         refreshButtons();
@@ -791,122 +1218,32 @@
       }
 
       if(Date.now() < redirectCooldownUntil){
-        if(!auto) showErr("Please wait a second before opening another redirect.");
+        showWarn("Please wait a moment before opening another redirect.");
         refreshButtons();
         return false;
       }
 
       const cfg = TIER_CONFIG[tier];
-      if(!cfg || cfg.needed <= 0){
-        showErr("Invalid tier.");
-        return false;
-      }
-
       const progress = incrementTierProgress(tier);
       redirectCooldownUntil = Date.now() + REDIRECT_STEP_COOLDOWN_MS;
+
       renderProgress();
+      byId("redirectHint").classList.add("show");
 
-      let opened = false;
+      if(progress.current >= progress.needed){
+        showOk(cfg.label + " tier unlocked. You can generate that key now.");
+        return true;
+      }
+
+      showOk("Redirect counted for " + cfg.label + ". Progress: " + progress.current + " / " + progress.needed);
+
       try{
-        const win = window.open(REDIRECT_URL, "_blank", "noopener,noreferrer");
-        if(win) opened = true;
-      }catch(e){}
-
-      if(!opened){
-        if(auto){
-          showErr("Popup blocked or failed. Enable popups for this site and try again.");
-          stopAutoRedirect(tier);
-          refreshButtons();
-          return false;
-        }
-
-        showOk("Redirect counted for " + cfg.label + ". Opening page...");
-        setTimeout(() => {
-          window.location.href = REDIRECT_URL;
-        }, 120);
-      } else {
-        if(progress.current >= progress.needed){
-          showOk(cfg.label + " tier unlocked. You can generate that key now.");
-        } else {
-          showOk("Redirect counted for " + cfg.label + ". Progress: " + progress.current + " / " + progress.needed);
-        }
+        window.location.assign(REDIRECT_URL);
+      }catch(e){
+        showWarn("Redirect step counted, but the page could not be opened automatically.");
       }
 
       return true;
-    }
-
-    function stopAutoRedirect(tier){
-      autoRunning[tier] = false;
-      if(autoTimers[tier]){
-        clearTimeout(autoTimers[tier]);
-        autoTimers[tier] = null;
-      }
-      saveAutoState();
-      refreshButtons();
-    }
-
-    function stopAllAutoRedirects(){
-      stopAutoRedirect("35m");
-      stopAutoRedirect("2h");
-    }
-
-    function saveAutoState(){
-      try{
-        localStorage.setItem(LS_AUTO, JSON.stringify({
-          "35m": !!autoRunning["35m"],
-          "2h": !!autoRunning["2h"]
-        }));
-      }catch(e){}
-    }
-
-    function autoRedirect(tier){
-      if(autoRunning[tier]){
-        stopAutoRedirect(tier);
-        showOk("Auto redirect stopped for " + TIER_CONFIG[tier].label + ".");
-        return;
-      }
-
-      if(!checklistOk()){
-        showErr("Complete the checklist first.");
-        refreshButtons();
-        return;
-      }
-
-      if(hasActiveKey()){
-        showErr("You already have a FREE key. Use it until it expires.");
-        refreshButtons();
-        return;
-      }
-
-      autoRunning[tier] = true;
-      saveAutoState();
-      refreshButtons();
-      showOk("Auto redirect started for " + TIER_CONFIG[tier].label + ".");
-
-      const run = () => {
-        if(!autoRunning[tier]) return;
-        if(hasActiveKey()){
-          stopAutoRedirect(tier);
-          return;
-        }
-
-        const p = readProgress();
-        if((p[tier] || 0) >= TIER_CONFIG[tier].needed){
-          stopAutoRedirect(tier);
-          showOk(TIER_CONFIG[tier].label + " tier unlocked. You can generate that key now.");
-          return;
-        }
-
-        const worked = doRedirectStep(tier, true);
-        if(!worked){
-          stopAutoRedirect(tier);
-          return;
-        }
-
-        autoTimers[tier] = setTimeout(run, AUTO_REDIRECT_DELAY_MS);
-      };
-
-      run();
     }
 
     async function generateTierKey(tier){
@@ -933,6 +1270,8 @@
         return;
       }
 
+      const cfg = TIER_CONFIG[tier];
+
       try{
         showOk("Generating key...");
         const r = await fetch(API, {
@@ -954,7 +1293,7 @@
 
         const returnedTier = String(j.tier || "").trim() || tier;
         const returnedTtl = Number(j.ttlSeconds || 0);
-        const expectedTtl = TIER_CONFIG[tier].ttl;
+        const expectedTtl = cfg.ttl;
 
         if(returnedTier !== tier || (returnedTtl && returnedTtl !== expectedTtl)){
           showErr(
@@ -967,26 +1306,39 @@
           return;
         }
 
-        saveKey(j.key, Number(j.exp || 0), returnedTier, Number(j.ttlSeconds || expectedTtl));
-        setKeyUi(j.key, Number(j.exp || 0));
+        const sessionCount = Number(j.sessions || cfg.sessions || 1);
+
+        saveKey(j.key, Number(j.exp || 0), returnedTier, Number(j.ttlSeconds || expectedTtl), sessionCount);
+        setKeyUi(j.key, Number(j.exp || 0), sessionCount);
 
         cooldownUntil = Date.now() + CLICK_COOLDOWN_MS;
-        stopAllAutoRedirects();
+        resetOnlyTierProgress(tier);
 
-        if(tier === "35m" || tier === "2h"){
-          resetOnlyTierProgress(tier);
-        }
-
-        showOk("Done. " + TIER_CONFIG[tier].label + " key created and saved to this browser.");
-        document.getElementById("statusNote").textContent =
+        showOk("Done. " + cfg.label + " key created and saved to this browser.");
+        byId("statusNote").textContent =
           "This key is saved on this device. If you refresh or go offline, it will still be here until it expires.";
 
+        triggerCelebrate();
         refreshButtons();
         updateInfoBar();
       }catch(e){
         showErr("Failed: api_offline");
         refreshButtons();
       }
+    }
+
+    function triggerCelebrate(){
+      const keySection = byId("keySection");
+      const celebrate = byId("celebrate");
+
+      celebrate.classList.add("show");
+      keySection.classList.remove("flash");
+      void keySection.offsetWidth;
+      keySection.classList.add("flash");
+
+      setTimeout(() => {
+        keySection.scrollIntoView({ behavior:"smooth", block:"center" });
+      }, 120);
     }
 
     function startCountdown(){
@@ -996,7 +1348,7 @@
     }
 
     function updateCountdown(){
-      const ttlEl = document.getElementById("ttl");
+      const ttlEl = byId("ttl");
       if(!expEpoch){
         ttlEl.textContent = "—";
         updateInfoBar();
@@ -1026,8 +1378,8 @@
         }
         clearKeyUi();
         showErr("Expired. You can generate a new FREE key now.");
-        document.getElementById("statusNote").textContent =
-          "Your FREE key expired. You can generate a new one.";
+        byId("statusNote").textContent = "Your FREE key expired. You can generate a new one.";
+        byId("celebrate").classList.remove("show");
         refreshButtons();
         clearInterval(timer);
         timer = null;
@@ -1035,14 +1387,14 @@
     }
 
     async function copyKey(){
-      const v = document.getElementById("keyBox").value;
+      const v = byId("keyBox").value;
       if(!v){ showErr("No key to copy."); return; }
 
       try{
         await navigator.clipboard.writeText(v);
         showOk("Copied.");
       }catch(e){
-        const box = document.getElementById("keyBox");
+        const box = byId("keyBox");
         box.focus();
         box.select();
         try{
@@ -1054,9 +1406,20 @@
       }
     }
 
-    document.getElementById("c1").addEventListener("change", refreshButtons);
-    document.getElementById("c2").addEventListener("change", refreshButtons);
-    document.getElementById("c3").addEventListener("change", refreshButtons);
+    function selectKey(){
+      const box = byId("keyBox");
+      if(!box.value){
+        showErr("No key to select.");
+        return;
+      }
+      box.focus();
+      box.select();
+      showOk("Key selected.");
+    }
+
+    byId("c1").addEventListener("change", refreshButtons);
+    byId("c2").addEventListener("change", refreshButtons);
+    byId("c3").addEventListener("change", refreshButtons);
 
     loadExistingKeyIntoUi();
     renderProgress();
@@ -1066,7 +1429,7 @@
     setInterval(function(){
       refreshButtons();
       updateInfoBar();
-    }, 500);
+    }, 700);
   </script>
 </body>
 </html>
