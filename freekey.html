@@ -283,6 +283,8 @@
       cursor:pointer;
       transition:transform .08s ease, background .14s ease, opacity .14s ease, box-shadow .14s ease, filter .16s ease;
       box-shadow:0 6px 18px rgba(0,0,0,.18);
+      text-decoration:none;
+      text-align:center;
     }
 
     .btn:hover{
@@ -385,11 +387,16 @@
 
     a{ color:var(--accent2); }
 
+    .checkGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
     .chk{
       display:flex;
       gap:10px;
       align-items:flex-start;
-      margin:10px 0;
       padding:12px;
       border:1px solid rgba(255,255,255,.06);
       border-radius:14px;
@@ -409,6 +416,25 @@
     }
 
     .small{ font-size:12px; color:var(--muted); }
+
+    .termsBox{
+      margin-top:12px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,#0b1220 0%, #0a111d 100%);
+    }
+
+    .funFact{
+      margin-top:10px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,209,102,.22);
+      background:rgba(255,209,102,.07);
+      color:#ffe9b3;
+      font-size:12px;
+      line-height:1.55;
+    }
 
     .plans{
       display:grid;
@@ -648,12 +674,6 @@
       animation:fadeUp .22s ease;
     }
 
-    .stickyTop{
-      position:sticky;
-      top:10px;
-      z-index:4;
-    }
-
     .glowDot{
       display:inline-block;
       width:8px;
@@ -808,6 +828,7 @@
 
     @media (max-width:1000px){
       .heroBottom{ grid-template-columns:1fr; }
+      .checkGrid{ grid-template-columns:1fr; }
     }
 
     @media (max-width:900px){
@@ -864,7 +885,7 @@
       <div class="title"><b>ScriptNova</b> — FREE Key Generator</div>
       <div class="sub">
         Choose your FREE key tier below. Only <b>one active FREE key</b> can exist on this browser at a time.
-        Progress is saved locally on this device. Complete redirect steps to unlock higher free tiers.
+        Redirect progress is saved <b>only in this browser</b>, so it stays even if the page code changes later.
       </div>
 
       <div class="heroRow">
@@ -912,36 +933,73 @@
       </div>
     </div>
 
-    <div class="card stickyTop">
+    <div class="card">
       <h3>Step Checklist</h3>
 
-      <div class="chk">
-        <input id="c1" type="checkbox"/>
-        <div>
-          <div>I agree to use ScriptNova responsibly.</div>
-          <div class="small">No misuse. Violations may be blocked.</div>
+      <div class="checkGrid">
+        <div class="chk">
+          <input id="c1" type="checkbox" />
+          <div>
+            <div>I agree to use ScriptNova responsibly.</div>
+            <div class="small">No misuse. Abuse can be blocked.</div>
+          </div>
+        </div>
+
+        <div class="chk">
+          <input id="c2" type="checkbox" />
+          <div>
+            <div>I understand FREE keys expire after their selected time.</div>
+            <div class="small">After expiry, you need a new FREE key.</div>
+          </div>
+        </div>
+
+        <div class="chk">
+          <input id="c3" type="checkbox" />
+          <div>
+            <div>I understand only one active FREE key can exist on this browser at a time.</div>
+            <div class="small">You must wait for expiry or clear the saved one.</div>
+          </div>
+        </div>
+
+        <div class="chk">
+          <input id="c4" type="checkbox" />
+          <div>
+            <div>I understand redirect progress is stored only in my browser.</div>
+            <div class="small">No backend save is used for redirect progress.</div>
+          </div>
+        </div>
+
+        <div class="chk">
+          <input id="c5" type="checkbox" />
+          <div>
+            <div>I allow redirect pages to open in a new tab.</div>
+            <div class="small">If popups are blocked, allow them for better redirect counting.</div>
+          </div>
+        </div>
+
+        <div class="chk">
+          <input id="c6" type="checkbox" />
+          <div>
+            <div>I agree to the Browser Terms.</div>
+            <div class="small">Please open and read the terms before continuing.</div>
+          </div>
         </div>
       </div>
 
-      <div class="chk">
-        <input id="c2" type="checkbox"/>
-        <div>
-          <div>I understand FREE keys expire after their selected time.</div>
-          <div class="small">After expiry, new sessions require a new key.</div>
+      <div class="termsBox">
+        <div class="row">
+          <a class="btn secondary" href="https://scriptnovaa.com/browserterms" target="_blank" rel="noreferrer">Open Browser Terms</a>
+          <button class="btn secondary" type="button" onclick="markTermsViewed()">I Read The Terms</button>
+        </div>
+
+        <div class="funFact">
+          <b>Fun fact:</b> ScriptNova uses a browser launcher built with a <b>.hta</b> file.
         </div>
       </div>
 
-      <div class="chk">
-        <input id="c3" type="checkbox"/>
-        <div>
-          <div>I understand FREE tiers can have different session limits.</div>
-          <div class="small">Most free tiers are 1 session. The special tier is shown as 4 sessions.</div>
-        </div>
-      </div>
-
-      <div id="err" class="err" style="margin-top:10px;"></div>
-      <div id="ok" class="ok" style="margin-top:10px;"></div>
-      <div id="warnBox" class="warnBox" style="margin-top:10px;"></div>
+      <div id="err" class="err" style="margin-top:12px;"></div>
+      <div id="ok" class="ok" style="margin-top:12px;"></div>
+      <div id="warnBox" class="warnBox" style="margin-top:12px;"></div>
     </div>
 
     <div class="smartRow">
@@ -1009,11 +1067,11 @@
         <div class="time">35 Minutes</div>
         <div class="desc">A longer free session after more progress.</div>
         <div class="metaRow">
-          <span class="metaPill">45 redirects</span>
+          <span class="metaPill">50 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill35m" class="fill"></div></div>
-        <div class="stat"><span id="stat35m">0 / 45 redirects completed</span></div>
+        <div class="stat"><span id="stat35m">0 / 50 redirects completed</span></div>
         <div class="unlockText" id="unlock35m">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn35mRedirect" class="btn secondary" onclick="doRedirectStep('35m')">Open Redirect</button>
@@ -1029,11 +1087,11 @@
         <div class="time">1 Hour</div>
         <div class="desc">A stronger free key with a medium unlock amount.</div>
         <div class="metaRow">
-          <span class="metaPill">65 redirects</span>
+          <span class="metaPill">75 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill1h" class="fill"></div></div>
-        <div class="stat"><span id="stat1h">0 / 65 redirects completed</span></div>
+        <div class="stat"><span id="stat1h">0 / 75 redirects completed</span></div>
         <div class="unlockText" id="unlock1h">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn1hRedirect" class="btn secondary" onclick="doRedirectStep('1h')">Open Redirect</button>
@@ -1049,11 +1107,11 @@
         <div class="time">2 Hours</div>
         <div class="desc">Longer unlock path for a longer free key.</div>
         <div class="metaRow">
-          <span class="metaPill">100 redirects</span>
+          <span class="metaPill">120 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill2h" class="fill"></div></div>
-        <div class="stat"><span id="stat2h">0 / 100 redirects completed</span></div>
+        <div class="stat"><span id="stat2h">0 / 120 redirects completed</span></div>
         <div class="unlockText" id="unlock2h">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn2hRedirect" class="btn secondary" onclick="doRedirectStep('2h')">Open Redirect</button>
@@ -1069,11 +1127,11 @@
         <div class="time">3 Hours</div>
         <div class="desc">A harder unlock for users who want more time.</div>
         <div class="metaRow">
-          <span class="metaPill">135 redirects</span>
+          <span class="metaPill">150 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill3h" class="fill"></div></div>
-        <div class="stat"><span id="stat3h">0 / 135 redirects completed</span></div>
+        <div class="stat"><span id="stat3h">0 / 150 redirects completed</span></div>
         <div class="unlockText" id="unlock3h">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn3hRedirect" class="btn secondary" onclick="doRedirectStep('3h')">Open Redirect</button>
@@ -1089,11 +1147,11 @@
         <div class="time">6 Hours</div>
         <div class="desc">High effort, much longer free access.</div>
         <div class="metaRow">
-          <span class="metaPill">220 redirects</span>
+          <span class="metaPill">250 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill6h" class="fill"></div></div>
-        <div class="stat"><span id="stat6h">0 / 220 redirects completed</span></div>
+        <div class="stat"><span id="stat6h">0 / 250 redirects completed</span></div>
         <div class="unlockText" id="unlock6h">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn6hRedirect" class="btn secondary" onclick="doRedirectStep('6h')">Open Redirect</button>
@@ -1109,11 +1167,11 @@
         <div class="time">10 Hours</div>
         <div class="desc">Special free option. Shows as a bigger unlock with support for up to <b>4 sessions</b> if your backend allows it.</div>
         <div class="metaRow">
-          <span class="metaPill">350 redirects</span>
+          <span class="metaPill">400 redirects</span>
           <span class="metaPill">4 sessions</span>
         </div>
         <div class="meter"><div id="fill10h4s" class="fill"></div></div>
-        <div class="stat"><span id="stat10h4s">0 / 350 redirects completed</span></div>
+        <div class="stat"><span id="stat10h4s">0 / 400 redirects completed</span></div>
         <div class="unlockText" id="unlock10h4s">Locked</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn10h4sRedirect" class="btn secondary" onclick="doRedirectStep('10h4s')">Open Redirect</button>
@@ -1146,12 +1204,12 @@
       </div>
 
       <div id="redirectHint" class="redirectHint">
-        Redirects now try to open in a <b>new tab</b>. If your browser blocks popups, allow popups for this page or tap the redirect button again.
+        Redirects try to open in a <b>new tab</b>. If your browser blocks popups, allow them for this page and try again.
       </div>
     </div>
 
     <div class="row" style="margin-top:12px;">
-      <a class="btn" href="/" style="text-decoration:none; display:inline-block;">Back Home</a>
+      <a class="btn" href="/" style="display:inline-block;">Back Home</a>
       <button class="btn secondary" onclick="resetRedirectProgress()">Reset Redirect Progress</button>
       <button class="btn danger" onclick="clearSavedKeyOnly()">Clear Saved Key</button>
     </div>
@@ -1175,9 +1233,13 @@
     const API = "https://api.scriptnovaa.com/api/freekey";
     const REDIRECT_URL = "https://omg10.com/4/10708386";
 
-    const LS_KEY = "sn_freekey_v6";
-    const LS_PROGRESS = "sn_freekey_progress_v6";
-    const LS_META = "sn_freekey_meta_v6";
+    const LS_KEY = "sn_freekey_current";
+    const LS_PROGRESS = "sn_freekey_progress_current";
+    const LS_META = "sn_freekey_meta_current";
+
+    const LEGACY_LS_KEYS = ["sn_freekey_v6", "sn_freekey_v5"];
+    const LEGACY_LS_PROGRESS_KEYS = ["sn_freekey_progress_v6", "sn_freekey_progress_v5"];
+    const LEGACY_LS_META_KEYS = ["sn_freekey_meta_v6"];
 
     const CLICK_COOLDOWN_MS = 4000;
     const REDIRECT_STEP_COOLDOWN_MS = 1200;
@@ -1185,12 +1247,12 @@
     const TIER_CONFIG = {
       "4m":    { label: "4 Minutes", ttl: 240, needed: 2, sessions: 1, button: "Generate 4m Key" },
       "15m":   { label: "15 Minutes", ttl: 900, needed: 10, sessions: 1, button: "Generate 15m Key" },
-      "35m":   { label: "35 Minutes", ttl: 2100, needed: 45, sessions: 1, button: "Generate 35m Key" },
-      "1h":    { label: "1 Hour", ttl: 3600, needed: 65, sessions: 1, button: "Generate 1h Key" },
-      "2h":    { label: "2 Hours", ttl: 7200, needed: 100, sessions: 1, button: "Generate 2h Key" },
-      "3h":    { label: "3 Hours", ttl: 10800, needed: 135, sessions: 1, button: "Generate 3h Key" },
-      "6h":    { label: "6 Hours", ttl: 21600, needed: 220, sessions: 1, button: "Generate 6h Key" },
-      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 350, sessions: 4, button: "Generate Special Key" }
+      "35m":   { label: "35 Minutes", ttl: 2100, needed: 50, sessions: 1, button: "Generate 35m Key" },
+      "1h":    { label: "1 Hour", ttl: 3600, needed: 75, sessions: 1, button: "Generate 1h Key" },
+      "2h":    { label: "2 Hours", ttl: 7200, needed: 120, sessions: 1, button: "Generate 2h Key" },
+      "3h":    { label: "3 Hours", ttl: 10800, needed: 150, sessions: 1, button: "Generate 3h Key" },
+      "6h":    { label: "6 Hours", ttl: 21600, needed: 250, sessions: 1, button: "Generate 6h Key" },
+      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 400, sessions: 4, button: "Generate Special Key" }
     };
 
     const TIER_ORDER = ["4m","15m","35m","1h","2h","3h","6h","10h4s"];
@@ -1211,9 +1273,7 @@
       byId("toastText").textContent = text || "";
       toast.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2200);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
     }
 
     function showErr(msg){
@@ -1243,6 +1303,40 @@
       showToast("warn", "Notice", String(msg || ""));
     }
 
+    function migrateLocalStorage(){
+      try{
+        if(!localStorage.getItem(LS_KEY)){
+          for(const k of LEGACY_LS_KEYS){
+            const oldVal = localStorage.getItem(k);
+            if(oldVal){
+              localStorage.setItem(LS_KEY, oldVal);
+              break;
+            }
+          }
+        }
+
+        if(!localStorage.getItem(LS_PROGRESS)){
+          for(const k of LEGACY_LS_PROGRESS_KEYS){
+            const oldVal = localStorage.getItem(k);
+            if(oldVal){
+              localStorage.setItem(LS_PROGRESS, oldVal);
+              break;
+            }
+          }
+        }
+
+        if(!localStorage.getItem(LS_META)){
+          for(const k of LEGACY_LS_META_KEYS){
+            const oldVal = localStorage.getItem(k);
+            if(oldVal){
+              localStorage.setItem(LS_META, oldVal);
+              break;
+            }
+          }
+        }
+      }catch(e){}
+    }
+
     function saveMeta(meta){
       try{
         localStorage.setItem(LS_META, JSON.stringify(meta || {}));
@@ -1265,6 +1359,17 @@
       meta.lastTs = Date.now();
       saveMeta(meta);
       byId("lastAction").textContent = meta.lastAction || "Waiting for your first action.";
+    }
+
+    function markTermsViewed(){
+      const meta = readMeta();
+      meta.termsViewed = true;
+      saveMeta(meta);
+      byId("c6").checked = true;
+      setLastAction("Browser Terms marked as read.");
+      refreshButtons();
+      updateInfoBar();
+      showOk("Browser Terms marked as read.");
     }
 
     function markRedirectHistory(){
@@ -1347,8 +1452,7 @@
 
     function hasActiveKey(){
       const s = readSaved();
-      if(!s) return false;
-      return s.exp > nowSec();
+      return !!(s && s.exp > nowSec());
     }
 
     function clampProgress(tier, value){
@@ -1404,7 +1508,12 @@
     }
 
     function checklistOk(){
-      return byId("c1").checked && byId("c2").checked && byId("c3").checked;
+      return byId("c1").checked &&
+             byId("c2").checked &&
+             byId("c3").checked &&
+             byId("c4").checked &&
+             byId("c5").checked &&
+             byId("c6").checked;
     }
 
     function tierUnlocked(tier){
@@ -1427,7 +1536,7 @@
       return true;
     }
 
-    function setKeyUi(key, exp, sessions = 1){
+    function setKeyUi(key, exp, sessions){
       byId("keyBox").value = key || "";
       expEpoch = Number(exp || 0);
       byId("sessionInfo").textContent = String(sessions || 1);
@@ -1449,7 +1558,6 @@
 
       if(s.exp > nowSec()){
         setKeyUi(s.key, s.exp, s.sessions || 1);
-        showOk("You already generated a FREE key. Use it until it expires.");
         byId("statusNote").textContent =
           "You already have a FREE key saved on this device. Use it until it expires, then you can generate a new one.";
         setLastAction("Loaded saved " + (s.tier || "FREE") + " key.");
@@ -1486,27 +1594,21 @@
     function getNextTier(){
       const p = readProgress();
       for(const tier of TIER_ORDER){
-        if((p[tier] || 0) < TIER_CONFIG[tier].needed){
-          return tier;
-        }
+        if((p[tier] || 0) < TIER_CONFIG[tier].needed) return tier;
       }
       return null;
     }
 
     function totalNeededAll(){
       let total = 0;
-      for(const tier of TIER_ORDER){
-        total += TIER_CONFIG[tier].needed;
-      }
+      for(const tier of TIER_ORDER) total += TIER_CONFIG[tier].needed;
       return total;
     }
 
     function totalProgressAll(){
       const p = readProgress();
       let total = 0;
-      for(const tier of TIER_ORDER){
-        total += Number(p[tier] || 0);
-      }
+      for(const tier of TIER_ORDER) total += Number(p[tier] || 0);
       return total;
     }
 
@@ -1519,15 +1621,14 @@
 
       const nextTier = getNextTier();
       if(!checklistOk()){
-        byId("nextTierSummary").textContent = "Complete all 3 checklist items to start opening redirects.";
+        byId("nextTierSummary").textContent = "Complete all checklist items and open the Browser Terms to start.";
       } else if(hasActiveKey()){
         const s = readSaved();
         byId("nextTierSummary").textContent = "You already have an active " + ((s && s.tier) || "FREE") + " key on this browser.";
       } else if(nextTier){
         const p = readProgress();
         const left = Math.max(0, TIER_CONFIG[nextTier].needed - (p[nextTier] || 0));
-        byId("nextTierSummary").textContent =
-          TIER_CONFIG[nextTier].label + " is your next target • " + left + " redirects left";
+        byId("nextTierSummary").textContent = TIER_CONFIG[nextTier].label + " is your next target • " + left + " redirects left";
       } else {
         byId("nextTierSummary").textContent = "All listed tiers are fully unlocked on this browser.";
       }
@@ -1547,7 +1648,7 @@
       const p = readProgress();
 
       byId("infoCurrentKey").textContent = saved && saved.exp > nowSec()
-        ? (saved.tier + " key active")
+        ? ((saved.tier || "FREE") + " key active")
         : "None";
 
       byId("infoExpires").textContent = saved && saved.exp > nowSec()
@@ -1557,23 +1658,15 @@
       if(hasActiveKey()){
         byId("infoUnlock").textContent = "Active key in use";
       } else {
-        let bestUnlocked = null;
-        for(let i = TIER_ORDER.length - 1; i >= 0; i--){
-          const tier = TIER_ORDER[i];
-          if(tierUnlocked(tier)){
-            bestUnlocked = tier;
-            break;
-          }
-        }
-
+        const bestUnlocked = getBestUnlockedTier();
         if(bestUnlocked){
           byId("infoUnlock").textContent = TIER_CONFIG[bestUnlocked].label + " unlocked";
         } else {
           byId("infoUnlock").textContent =
             p["4m"] + "/2 • " +
             p["15m"] + "/10 • " +
-            p["35m"] + "/45 • " +
-            p["1h"] + "/65";
+            p["35m"] + "/50 • " +
+            p["1h"] + "/75";
         }
       }
 
@@ -1592,17 +1685,12 @@
         genBtn.disabled = !canGenerateTier(tier);
         redirBtn.disabled = !canDoRedirect();
 
-        if(active){
-          genBtn.textContent = "Key already generated";
-        } else {
-          genBtn.textContent = TIER_CONFIG[tier].button;
-        }
+        genBtn.textContent = active ? "Key already generated" : TIER_CONFIG[tier].button;
       }
 
       const nextTier = getNextTier();
       for(const tier of TIER_ORDER){
-        const key = domKey(tier);
-        const plan = byId("plan" + key);
+        const plan = byId("plan" + domKey(tier));
         if(plan){
           plan.classList.toggle("activeTier", nextTier === tier && !hasActiveKey() && checklistOk());
         }
@@ -1628,27 +1716,13 @@
     }
 
     function openRedirectInNewTab(url){
-      let newWin = null;
-
       try{
-        newWin = window.open("", "_blank", "noopener,noreferrer");
-      }catch(e){
-        newWin = null;
-      }
-
-      if(newWin && !newWin.closed){
-        try{
-          newWin.opener = null;
-        }catch(e){}
-        try{
-          newWin.location.replace(url);
+        const w = window.open(url, "_blank", "noopener,noreferrer");
+        if(w){
+          try{ w.opener = null; }catch(e){}
           return true;
-        }catch(e){}
-        try{
-          newWin.location.href = url;
-          return true;
-        }catch(e){}
-      }
+        }
+      }catch(e){}
 
       try{
         const a = document.createElement("a");
@@ -1695,7 +1769,6 @@
 
       markRedirectHistory();
       setLastAction("Redirect counted for " + cfg.label + ".");
-
       renderProgress();
       byId("redirectHint").classList.add("show");
 
@@ -1747,6 +1820,7 @@
       try{
         showOk("Generating key...");
         setLastAction("Generating " + cfg.label + " key...");
+
         const r = await fetch(API, {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
@@ -1791,7 +1865,7 @@
 
         showOk("Done. " + cfg.label + " key created and saved to this browser.");
         byId("statusNote").textContent =
-          "This key is saved on this device. If you refresh or go offline, it will still be here until it expires.";
+          "This key is saved on this device. If you refresh or change page code later, it will still stay here until it expires.";
 
         setLastAction(cfg.label + " key created.");
         triggerCelebrate();
@@ -1833,9 +1907,7 @@
         piece.style.animationDuration = (1.1 + Math.random() * 0.7) + "s";
         root.appendChild(piece);
       }
-      setTimeout(() => {
-        root.innerHTML = "";
-      }, 2200);
+      setTimeout(() => root.innerHTML = "", 2200);
     }
 
     function startCountdown(){
@@ -1860,19 +1932,15 @@
       const m = Math.floor((left % 3600) / 60);
       const s = left % 60;
 
-      if(h > 0){
-        ttlEl.textContent = h + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
-      } else {
-        ttlEl.textContent = m + ":" + String(s).padStart(2,"0");
-      }
+      ttlEl.textContent = h > 0
+        ? h + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0")
+        : m + ":" + String(s).padStart(2,"0");
 
       updateInfoBar();
 
       if(left === 0){
         const saved = readSaved();
-        if(saved && saved.exp <= now){
-          clearSaved();
-        }
+        if(saved && saved.exp <= now) clearSaved();
         clearKeyUi();
         showErr("Expired. You can generate a new FREE key now.");
         byId("statusNote").textContent = "Your FREE key expired. You can generate a new one.";
@@ -1942,22 +2010,18 @@
       updateInfoBar();
     }
 
-    byId("c1").addEventListener("change", function(){
-      setLastAction("Checklist updated.");
-      refreshButtons();
-      updateInfoBar();
-    });
-    byId("c2").addEventListener("change", function(){
-      setLastAction("Checklist updated.");
-      refreshButtons();
-      updateInfoBar();
-    });
-    byId("c3").addEventListener("change", function(){
-      setLastAction("Checklist updated.");
-      refreshButtons();
-      updateInfoBar();
-    });
+    function attachChecklistListeners(){
+      ["c1","c2","c3","c4","c5","c6"].forEach(id => {
+        byId(id).addEventListener("change", function(){
+          setLastAction("Checklist updated.");
+          refreshButtons();
+          updateInfoBar();
+        });
+      });
+    }
 
+    migrateLocalStorage();
+    attachChecklistListeners();
     loadExistingKeyIntoUi();
     renderProgress();
     refreshButtons();
