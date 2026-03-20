@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>ScriptNova — Payment Successful</title>
-  <meta name="description" content="Your ScriptNova payment was successful. View your checkout session status and next steps here." />
+  <meta name="description" content="Your ScriptNova payment was successful. View your purchase status, delivered key, and next steps here." />
   <meta name="robots" content="noindex,nofollow" />
   <meta name="theme-color" content="#0b0f16" />
   <style>
@@ -429,13 +429,14 @@
 
       <div class="title"><b>Thank you</b> — your payment went through</div>
       <div class="sub">
-        Your Stripe checkout finished successfully. This page shows your checkout session id and the next steps.
-        Right now this page works as your success landing page, and later it can also display the delivered key automatically.
+        Your Stripe checkout finished successfully. This page now checks your Stripe purchase status,
+        waits for webhook fulfillment, and shows your delivered ScriptNova key as soon as it is ready.
       </div>
 
       <div class="heroActions">
         <a class="btn" href="/buykeys">Back to Buy Plans</a>
         <a class="btn secondary" href="/download">Go to Download</a>
+        <button class="btn secondary" type="button" onclick="copyDeliveredKey()">Copy Delivered Key</button>
         <button class="btn secondary" type="button" onclick="copySessionId()">Copy Session ID</button>
       </div>
     </div>
@@ -443,8 +444,8 @@
     <div class="grid">
       <div class="card">
         <h3>Status</h3>
-        <div class="bigStat" id="statusText">Success</div>
-        <div class="muted" id="statusSub">Stripe redirected you here after a completed checkout.</div>
+        <div class="bigStat" id="statusText">Loading purchase...</div>
+        <div class="muted" id="statusSub">Checking your Stripe session and waiting for fulfillment if needed.</div>
       </div>
 
       <div class="card">
@@ -455,8 +456,8 @@
 
       <div class="card">
         <h3>Delivery State</h3>
-        <div class="bigStat" id="deliveryState">Success page ready</div>
-        <div class="muted">This page is ready now. Automatic key lookup can be added next.</div>
+        <div class="bigStat" id="deliveryState">Checking webhook result...</div>
+        <div class="muted" id="deliverySub">This page polls the Stripe purchase lookup route until your delivered key is ready.</div>
       </div>
     </div>
 
@@ -466,35 +467,52 @@
       <div class="sessionBox">
         Session source: <b id="sessionSource">Waiting...</b><br>
         URL path: <b>/buykeys/success</b><br>
-        Query value found: <b id="sessionPresent">No</b>
+        Query value found: <b id="sessionPresent">No</b><br>
+        Lookup endpoint: <b>https://stripe.scriptnovaa.com/api/checkout/session</b>
       </div>
 
       <div id="okBox" class="ok">Payment success page loaded correctly.</div>
       <div id="warnBox" class="warn">No session id was found in the URL. That means the page loaded, but Stripe did not send the expected value.</div>
-      <div id="errBox" class="err">Could not copy the session id.</div>
+      <div id="errBox" class="err">Could not copy the requested value.</div>
+    </div>
+
+    <div class="wide panel">
+      <div class="panelTitle">Delivered Key</div>
+      <input id="keyBox" class="box" type="text" readonly value="" placeholder="Waiting for webhook fulfillment..." />
+      <div class="sessionBox">
+        Plan: <b id="planText">Waiting...</b><br>
+        Billing: <b id="billingText">Waiting...</b><br>
+        Sessions: <b id="limitSessions">Waiting...</b><br>
+        Devices: <b id="limitDevices">Waiting...</b><br>
+        Time: <b id="limitTime">Waiting...</b><br>
+        Expiry: <b id="expiryText">Waiting...</b>
+      </div>
+
+      <div id="deliveryOkBox" class="ok">Your key has been delivered and is ready to copy.</div>
+      <div id="deliveryWarnBox" class="warn">Your payment is complete. Waiting for webhook fulfillment to finish writing the delivered key.</div>
     </div>
 
     <div class="wide panel">
       <div class="panelTitle">Next Steps</div>
       <div class="steps">
         <div class="step">
-          <div class="stepTitle">1. Success page is now fixed</div>
-          <div class="muted">Your checkout should no longer land on a 404 page after payment.</div>
+          <div class="stepTitle">1. Payment redirects here</div>
+          <div class="muted">Stripe sends the checkout session id in the URL after a successful checkout.</div>
         </div>
 
         <div class="step">
-          <div class="stepTitle">2. Add Stripe purchase lookup next</div>
-          <div class="muted">The next improvement is a Stripe success API route that reads this session id and returns the purchased plan, order state, and delivered key.</div>
+          <div class="stepTitle">2. Webhook creates the purchased key</div>
+          <div class="muted">The Stripe webhook verifies the event, detects the purchased plan, generates a ScriptNova key, and stores it for lookup.</div>
         </div>
 
         <div class="step">
-          <div class="stepTitle">3. Add automatic key delivery</div>
-          <div class="muted">After the webhook creates the key, this page can fetch it and show a copy button directly here.</div>
+          <div class="stepTitle">3. This page fetches the real result</div>
+          <div class="muted">The success page calls the Stripe lookup route, waits if fulfillment is still finishing, and reveals the delivered key when ready.</div>
         </div>
 
         <div class="step">
-          <div class="stepTitle">4. Test again</div>
-          <div class="muted">Run another Stripe test checkout and make sure it lands here instead of a 404.</div>
+          <div class="stepTitle">4. Copy your key and launch</div>
+          <div class="muted">Once your key appears here, copy it, use the launcher, and keep this page as your purchase receipt reference.</div>
         </div>
       </div>
     </div>
@@ -506,6 +524,10 @@
   </div>
 
   <script>
+    const LOOKUP_URL = "https://stripe.scriptnovaa.com/api/checkout/session";
+    const MAX_LOOKUP_ATTEMPTS = 8;
+    const LOOKUP_DELAY_MS = 2500;
+
     function byId(id){ return document.getElementById(id); }
 
     function getSessionIdFromUrl() {
@@ -524,36 +546,171 @@
       return s.slice(0, 12) + "..." + s.slice(-10);
     }
 
+    function setMsg(id, text, show) {
+      const el = byId(id);
+      if (!el) return;
+      el.textContent = text;
+      el.style.display = show ? "block" : "none";
+    }
+
+    function formatBilling(v) {
+      const s = String(v || "").trim();
+      if (!s) return "Unknown";
+      if (s === "one_time") return "One-Time";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function formatDateTime(sec) {
+      const n = Number(sec || 0);
+      if (!n) return "Not set";
+      try {
+        return new Date(n * 1000).toLocaleString();
+      } catch (e) {
+        return "Not set";
+      }
+    }
+
+    function formatTtl(seconds) {
+      const total = Number(seconds || 0);
+      if (!total) return "Unknown";
+
+      const days = Math.floor(total / 86400);
+      const hours = Math.floor((total % 86400) / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+
+      if (days > 0 && hours > 0) return days + "d " + hours + "h";
+      if (days > 0) return days + "d";
+      if (hours > 0 && minutes > 0) return hours + "h " + minutes + "m";
+      if (hours > 0) return hours + "h";
+      if (minutes > 0) return minutes + "m";
+      return total + "s";
+    }
+
+    function setPendingState(message) {
+      byId("statusText").textContent = "Payment received";
+      byId("statusSub").textContent = message;
+      byId("deliveryState").textContent = "Waiting for webhook";
+      byId("deliverySub").textContent = "The payment is done, but the key is still being written.";
+      byId("planText").textContent = "Pending";
+      byId("billingText").textContent = "Pending";
+      byId("limitSessions").textContent = "Pending";
+      byId("limitDevices").textContent = "Pending";
+      byId("limitTime").textContent = "Pending";
+      byId("expiryText").textContent = "Pending";
+      byId("keyBox").value = "";
+      setMsg("deliveryOkBox", "", false);
+      setMsg("deliveryWarnBox", message || "Waiting for webhook fulfillment to finish writing the delivered key.", true);
+    }
+
+    function applyPurchaseResult(purchase) {
+      const key = purchase && purchase.key ? purchase.key : {};
+      const limits = purchase && purchase.limits ? purchase.limits : {};
+
+      byId("statusText").textContent = "Fulfilled";
+      byId("statusSub").textContent = "Your payment was confirmed and your ScriptNova key was delivered.";
+      byId("deliveryState").textContent = "Key delivered";
+      byId("deliverySub").textContent = "Webhook fulfillment completed successfully.";
+      byId("keyBox").value = String(purchase.deliveredKey || "");
+      byId("planText").textContent = String(purchase.planLabel || purchase.planId || "Unknown");
+      byId("billingText").textContent = formatBilling(purchase.billingMode);
+      byId("limitSessions").textContent = String(limits.sessionLimit || key.sessionLimit || "Unknown");
+      byId("limitDevices").textContent = String(limits.maxDevices || key.maxDevices || "Unknown");
+      byId("limitTime").textContent = formatTtl(limits.ttlSeconds || key.ttlSeconds || 0);
+      byId("expiryText").textContent = formatDateTime(limits.exp || key.exp || 0);
+
+      setMsg("deliveryWarnBox", "", false);
+      setMsg("deliveryOkBox", "Your key has been delivered and is ready to copy.", true);
+      setMsg("okBox", "Purchase lookup completed successfully.", true);
+      setMsg("warnBox", "", false);
+      setMsg("errBox", "", false);
+    }
+
     async function copySessionId() {
       const v = byId("sessionBox").value;
+      return copyValue(v, "Session id copied.", "No session id to copy.");
+    }
+
+    async function copyDeliveredKey() {
+      const v = byId("keyBox").value;
+      return copyValue(v, "Delivered key copied.", "No delivered key is ready yet.");
+    }
+
+    async function copyValue(v, okText, emptyText) {
       if (!v) {
-        byId("errBox").style.display = "block";
-        byId("errBox").textContent = "No session id to copy.";
+        setMsg("errBox", emptyText, true);
         return;
       }
 
-      byId("errBox").style.display = "none";
+      setMsg("errBox", "", false);
 
       try {
         await navigator.clipboard.writeText(v);
-        byId("okBox").style.display = "block";
-        byId("okBox").textContent = "Session id copied.";
+        setMsg("okBox", okText, true);
       } catch (e) {
         try {
-          const box = byId("sessionBox");
+          const box = v === byId("sessionBox").value ? byId("sessionBox") : byId("keyBox");
           box.focus();
           box.select();
           document.execCommand("copy");
-          byId("okBox").style.display = "block";
-          byId("okBox").textContent = "Session id copied.";
+          setMsg("okBox", okText, true);
         } catch (e2) {
-          byId("errBox").style.display = "block";
-          byId("errBox").textContent = "Could not copy the session id.";
+          setMsg("errBox", "Could not copy the requested value.", true);
         }
       }
     }
 
-    function initPage() {
+    async function lookupPurchase(sessionId) {
+      const response = await fetch(LOOKUP_URL + "?session_id=" + encodeURIComponent(sessionId), {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (e) {}
+
+      if (!response.ok && response.status !== 202) {
+        const message = data && data.message ? data.message : (data && data.error ? data.error : "purchase_lookup_failed");
+        throw new Error(message);
+      }
+
+      return data;
+    }
+
+    async function runLookup(sessionId) {
+      for (let attempt = 1; attempt <= MAX_LOOKUP_ATTEMPTS; attempt++) {
+        const result = await lookupPurchase(sessionId);
+
+        if (result && result.found && result.purchase && result.purchase.deliveredKey) {
+          applyPurchaseResult(result.purchase);
+          return;
+        }
+
+        if (result && (result.status === "pending_fulfillment" || result.status === "pending")) {
+          setPendingState(result.message || "Payment is complete. Waiting for webhook fulfillment...");
+        } else if (result && result.status === "waiting_for_payment") {
+          byId("statusText").textContent = "Waiting for payment";
+          byId("statusSub").textContent = "The checkout session exists, but Stripe does not show it as paid yet.";
+          byId("deliveryState").textContent = "Payment not complete";
+          byId("deliverySub").textContent = "This page will not receive a key until payment is marked paid.";
+          setMsg("deliveryWarnBox", result.message || "Checkout session exists, but payment is not marked paid yet.", true);
+          return;
+        } else {
+          setPendingState("Your purchase is still being finalized. Please wait a moment.");
+        }
+
+        if (attempt < MAX_LOOKUP_ATTEMPTS) {
+          await new Promise(function(resolve){ setTimeout(resolve, LOOKUP_DELAY_MS); });
+        }
+      }
+
+      setMsg("deliveryWarnBox", "Payment looks complete, but fulfillment is still pending. Refresh this page in a few seconds if the key has not appeared yet.", true);
+    }
+
+    async function initPage() {
       const sessionId = getSessionIdFromUrl();
 
       byId("sessionBox").value = sessionId;
@@ -562,15 +719,34 @@
 
       if (sessionId) {
         byId("sessionSource").textContent = "URL query";
-        byId("okBox").style.display = "block";
-        byId("okBox").textContent = "Payment success page loaded correctly.";
-        byId("warnBox").style.display = "none";
+        setMsg("okBox", "Payment success page loaded correctly.", true);
+        setMsg("warnBox", "", false);
+        setPendingState("Checking your Stripe purchase now...");
+
+        try {
+          await runLookup(sessionId);
+        } catch (e) {
+          byId("statusText").textContent = "Lookup failed";
+          byId("statusSub").textContent = "The page loaded, but the purchase lookup request failed.";
+          byId("deliveryState").textContent = "Could not load key";
+          byId("deliverySub").textContent = "Check the Stripe service deployment and route path.";
+          setMsg("deliveryWarnBox", "", false);
+          setMsg("errBox", e && e.message ? String(e.message) : "Could not load the purchase result.", true);
+        }
       } else {
         byId("sessionSource").textContent = "Not found";
-        byId("warnBox").style.display = "block";
-        byId("okBox").style.display = "none";
+        setMsg("warnBox", "No session id was found in the URL. That means the page loaded, but Stripe did not send the expected value.", true);
+        setMsg("okBox", "", false);
         byId("statusText").textContent = "Success page loaded";
         byId("statusSub").textContent = "The page works, but no session_id was found in the URL.";
+        byId("deliveryState").textContent = "No session id";
+        byId("deliverySub").textContent = "A lookup cannot run without the checkout session id.";
+        byId("planText").textContent = "Unavailable";
+        byId("billingText").textContent = "Unavailable";
+        byId("limitSessions").textContent = "Unavailable";
+        byId("limitDevices").textContent = "Unavailable";
+        byId("limitTime").textContent = "Unavailable";
+        byId("expiryText").textContent = "Unavailable";
       }
     }
 
