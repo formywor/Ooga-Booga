@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Buy ScriptNova Keys | Free vs BASIC vs PRO vs EXPRESS</title>
-  <meta name="description" content="Compare ScriptNova Free, BASIC, PRO, and EXPRESS plans. View pricing, sessions, total time, eligibility, and key details in one clean comparison page." />
-  <meta name="keywords" content="ScriptNova buy keys, ScriptNova plans, ScriptNova Free, ScriptNova BASIC, ScriptNova PRO, ScriptNova EXPRESS, ScriptNova pricing, buy ScriptNova key" />
+  <title>Buy ScriptNova Keys | FREE vs BASIC vs PRO vs ELITE vs EXPRESS</title>
+  <meta name="description" content="Buy ScriptNova keys with secure Stripe checkout. Compare FREE, BASIC, PRO, ELITE, EXPRESS, and BLACK EXPRESS plans with sessions, time, devices, and yearly savings." />
+  <meta name="keywords" content="ScriptNova buy keys, ScriptNova plans, ScriptNova pricing, Stripe checkout, BASIC key, PRO key, ELITE key, EXPRESS key, BLACK EXPRESS key" />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <meta name="theme-color" content="#0b0f16" />
   <link rel="canonical" href="https://scriptnovaa.com/buykeys" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Buy ScriptNova Keys | Free vs BASIC vs PRO vs EXPRESS" />
-  <meta property="og:description" content="Compare ScriptNova key plans, see feature differences, and find the right option for your budget and usage." />
+  <meta property="og:title" content="Buy ScriptNova Keys | FREE vs BASIC vs PRO vs ELITE vs EXPRESS" />
+  <meta property="og:description" content="Secure Stripe checkout for ScriptNova plans. Compare features, sessions, devices, and yearly savings." />
   <meta property="og:url" content="https://scriptnovaa.com/buykeys" />
   <meta property="og:site_name" content="ScriptNova" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Buy ScriptNova Keys" />
-  <meta name="twitter:description" content="Compare Free, BASIC, PRO, and EXPRESS plans with sessions, time, pricing, and eligibility." />
+  <meta name="twitter:description" content="Compare ScriptNova FREE, BASIC, PRO, ELITE, EXPRESS, and BLACK EXPRESS plans." />
 
   <style>
     :root{
@@ -32,7 +32,9 @@
       --accent2:#7c4dff;
       --good:#00ffb0;
       --warn:#ffbc42;
+      --danger:#ff6a6a;
       --soft:rgba(255,255,255,.05);
+      --shadow:0 18px 42px rgba(0,0,0,.26);
     }
 
     *{ box-sizing:border-box; }
@@ -54,15 +56,15 @@
     a:hover{ text-decoration:underline; }
 
     .wrap{
-      max-width:1240px;
+      max-width:1280px;
       margin:0 auto;
       padding:22px;
     }
 
-    .nav,.hero,.card,.plan,.footer{
+    .nav,.hero,.sectionCard,.plan,.faqItem,.footer{
       opacity:0;
       transform:translateY(14px);
-      animation:fadeUp .75s ease forwards;
+      animation:fadeUp .72s ease forwards;
     }
 
     .nav{
@@ -120,8 +122,9 @@
       align-items:center;
       justify-content:center;
       gap:10px;
-      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease, opacity .15s ease;
       text-decoration:none;
+      min-height:48px;
     }
 
     .btn:hover{
@@ -129,6 +132,13 @@
       transform:translateY(-1px);
       box-shadow:0 12px 24px rgba(0,229,255,.08);
       text-decoration:none;
+    }
+
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
     }
 
     .btn2{
@@ -153,12 +163,12 @@
     }
 
     .hero{
-      animation-delay:.06s;
+      animation-delay:.04s;
       margin-top:14px;
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(16,24,40,.92), rgba(15,23,38,.96));
-      border-radius:24px;
-      padding:26px;
+      border-radius:26px;
+      padding:28px;
       box-shadow:0 0 26px rgba(0,229,255,.08);
       position:relative;
       overflow:hidden;
@@ -177,7 +187,7 @@
     .heroInner{
       position:relative;
       display:grid;
-      grid-template-columns:1.2fr .8fr;
+      grid-template-columns:1.18fr .82fr;
       gap:18px;
     }
 
@@ -220,6 +230,24 @@
       max-width:780px;
     }
 
+    .heroPoints{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .pill{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(12,20,34,.76);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.25px;
+    }
+
     .ctaRow{
       display:flex;
       gap:10px;
@@ -238,6 +266,7 @@
       background:rgba(12,20,34,.72);
       border-radius:20px;
       padding:18px;
+      box-shadow:var(--shadow);
     }
 
     .miniStat .label{
@@ -260,11 +289,90 @@
       line-height:1.55;
     }
 
+    .sectionCard{
+      animation-delay:.08s;
+      margin-top:16px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(16,24,40,.92), rgba(15,23,38,.96));
+      border-radius:24px;
+      padding:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .sectionTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .sectionTitle{
+      font-size:24px;
+      font-weight:1000;
+      letter-spacing:-.4px;
+    }
+
+    .sectionSub{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+      max-width:760px;
+      margin-top:6px;
+    }
+
+    .toggleWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .toggle{
+      display:inline-flex;
+      border:1px solid var(--border);
+      background:rgba(12,20,34,.88);
+      border-radius:16px;
+      padding:4px;
+      gap:4px;
+    }
+
+    .toggle button{
+      appearance:none;
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      padding:11px 14px;
+      border-radius:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      cursor:pointer;
+      transition:background .15s ease, color .15s ease;
+    }
+
+    .toggle button.active{
+      background:linear-gradient(180deg, rgba(0,229,255,.18), rgba(0,229,255,.10));
+      color:var(--text);
+    }
+
+    .saveBadge{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,176,.26);
+      background:rgba(0,255,176,.08);
+      color:#cffff0;
+      font-weight:900;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
     .plans{
       display:grid;
-      grid-template-columns:repeat(4, minmax(0,1fr));
+      grid-template-columns:repeat(3,minmax(0,1fr));
       gap:14px;
-      margin-top:14px;
     }
 
     .plan{
@@ -276,200 +384,287 @@
       position:relative;
       overflow:hidden;
       box-shadow:0 0 16px rgba(0,0,0,.18);
+      transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .plan:hover{
+      transform:translateY(-2px);
+      border-color:#2f4766;
+      box-shadow:0 0 26px rgba(0,229,255,.06), var(--shadow);
+    }
+
+    .plan::before{
+      content:"";
+      position:absolute;
+      inset:auto 0 0 0;
+      height:2px;
+      background:linear-gradient(90deg, transparent, rgba(0,229,255,.65), transparent);
+      opacity:.35;
     }
 
     .plan.popular{
-      border-color:rgba(124,77,255,.45);
-      box-shadow:0 0 30px rgba(124,77,255,.12);
+      border-color:rgba(0,229,255,.38);
+      box-shadow:0 0 24px rgba(0,229,255,.08), var(--shadow);
     }
 
-    .plan.comingsoon{
-      border-color:rgba(255,188,66,.45);
-      box-shadow:0 0 30px rgba(255,188,66,.10);
+    .plan.premium{
+      border-color:rgba(124,77,255,.34);
+      box-shadow:0 0 24px rgba(124,77,255,.08), var(--shadow);
+    }
+
+    .plan.business{
+      border-color:rgba(255,188,66,.30);
+      box-shadow:0 0 24px rgba(255,188,66,.06), var(--shadow);
     }
 
     .tag{
       display:inline-flex;
       align-items:center;
+      gap:8px;
       padding:7px 10px;
       border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(12,20,34,.8);
+      color:var(--muted);
       font-size:11px;
       font-weight:900;
-      letter-spacing:.5px;
       text-transform:uppercase;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-    }
-
-    .tag.popular{
-      color:#fff;
-      border-color:rgba(124,77,255,.45);
-      background:rgba(124,77,255,.18);
-    }
-
-    .tag.warn{
-      color:#fff0d1;
-      border-color:rgba(255,188,66,.45);
-      background:rgba(255,188,66,.18);
+      letter-spacing:.55px;
     }
 
     .planName{
-      margin:14px 0 4px;
-      font-size:28px;
+      margin-top:12px;
+      font-size:24px;
       font-weight:1000;
       letter-spacing:-.5px;
     }
 
-    .price{
-      font-size:30px;
-      font-weight:1000;
-      margin:6px 0 4px;
+    .planDesc{
+      margin-top:8px;
+      color:var(--muted);
+      line-height:1.6;
+      min-height:68px;
+      font-size:14px;
     }
 
-    .price small{
-      font-size:14px;
+    .price{
+      margin-top:14px;
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .amount{
+      font-size:40px;
+      font-weight:1000;
+      line-height:1;
+      letter-spacing:-1px;
+    }
+
+    .per{
       color:var(--muted);
+      font-size:14px;
+      padding-bottom:5px;
       font-weight:700;
     }
 
-    .planSub{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.55;
-      min-height:56px;
+    .yearSave{
+      margin-top:10px;
+      display:none;
+      color:#cffff0;
+      background:rgba(0,255,176,.08);
+      border:1px solid rgba(0,255,176,.22);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.4px;
     }
 
-    .specs{
+    body.yearly .yearSave.show{
+      display:block;
+    }
+
+    .featureList{
+      list-style:none;
       margin:16px 0 0;
       padding:0;
-      list-style:none;
       display:grid;
       gap:10px;
     }
 
-    .specs li{
-      border:1px solid rgba(255,255,255,.08);
-      background:var(--soft);
-      border-radius:14px;
-      padding:10px 12px;
-      color:var(--muted);
+    .featureList li{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color:var(--text);
       font-size:14px;
-      line-height:1.45;
+      line-height:1.5;
     }
 
-    .specs b{ color:var(--text); }
+    .check{
+      width:18px;
+      height:18px;
+      flex:0 0 18px;
+      border-radius:999px;
+      margin-top:1px;
+      background:rgba(0,255,176,.12);
+      border:1px solid rgba(0,255,176,.28);
+      position:relative;
+    }
 
-    .planActions{
+    .check::after{
+      content:"";
+      position:absolute;
+      left:5px;
+      top:2px;
+      width:5px;
+      height:9px;
+      border-right:2px solid var(--good);
+      border-bottom:2px solid var(--good);
+      transform:rotate(40deg);
+    }
+
+    .subtext{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+      min-height:38px;
+    }
+
+    .buyRow{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       margin-top:16px;
     }
 
-    .compareWrap,
-    .infoGrid{
-      display:grid;
-      gap:14px;
-      margin-top:14px;
-    }
-
-    .card{
-      animation-delay:.18s;
-      border:1px solid var(--border);
-      background:rgba(15,23,38,.92);
-      border-radius:22px;
-      padding:18px;
-    }
-
-    .sectionTitle{
-      margin:0 0 12px 0;
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:1px;
+    .loadingText{
+      margin-top:10px;
       color:var(--muted);
+      font-size:12px;
+      min-height:18px;
     }
 
     .compare{
       width:100%;
       border-collapse:collapse;
       overflow:hidden;
-      border-radius:16px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:rgba(12,20,34,.72);
     }
 
     .compare th,
     .compare td{
-      border:1px solid rgba(255,255,255,.08);
-      padding:12px 10px;
+      padding:14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
       text-align:left;
-      vertical-align:top;
       font-size:14px;
+      vertical-align:top;
     }
 
     .compare th{
-      background:rgba(255,255,255,.04);
-      color:var(--text);
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .highlightCol{
+      color:#dff8ff;
+      font-weight:900;
+    }
+
+    .faqGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .faqItem{
+      border:1px solid var(--border);
+      border-radius:20px;
+      background:rgba(12,20,34,.76);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .faqQ{
+      font-size:16px;
+      font-weight:1000;
+      margin-bottom:8px;
+    }
+
+    .faqA{
+      color:var(--muted);
+      line-height:1.65;
+      font-size:14px;
+    }
+
+    .notice{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,188,66,.25);
+      background:rgba(255,188,66,.08);
+      color:#ffe8b2;
+      line-height:1.6;
       font-size:13px;
     }
 
-    .compare td{
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .infoGrid{
-      grid-template-columns:repeat(3, minmax(0,1fr));
-    }
-
-    .infoBox{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      padding:16px;
-      background:rgba(255,255,255,.03);
-    }
-
-    .infoBox h3{
-      margin:0 0 8px;
-      font-size:18px;
-    }
-
-    .infoBox p{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    .faq{
-      display:grid;
-      gap:10px;
-    }
-
-    details{
-      border:1px solid rgba(255,255,255,.10);
+    .toast{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:50;
+      min-width:240px;
+      max-width:360px;
+      padding:14px;
       border-radius:16px;
-      background:rgba(255,255,255,.03);
-      padding:14px 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg,#101828 0%, #0f1726 100%);
+      color:var(--text);
+      box-shadow:var(--shadow);
+      opacity:0;
+      transform:translateY(18px);
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
     }
 
-    summary{
-      cursor:pointer;
-      font-weight:800;
+    .toast.show{
+      opacity:1;
+      transform:translateY(0);
     }
 
-    details p{
+    .toast.good{ border-color:rgba(0,255,176,.35); }
+    .toast.warn{ border-color:rgba(255,188,66,.35); }
+    .toast.err{ border-color:rgba(255,106,106,.45); }
+
+    .toastTitle{
+      font-size:12px;
       color:var(--muted);
-      line-height:1.6;
-      margin:10px 0 0;
-      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.8px;
+      margin-bottom:4px;
     }
 
     .footer{
-      animation-delay:.24s;
-      margin:16px 0 6px;
+      animation-delay:.16s;
+      margin-top:16px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(16,24,40,.86), rgba(15,23,38,.94));
+      border-radius:22px;
+      padding:18px;
       color:var(--muted);
-      font-size:12px;
+      line-height:1.65;
+      font-size:14px;
       text-align:center;
+      box-shadow:var(--shadow);
     }
 
     @keyframes fadeUp{
@@ -477,309 +672,564 @@
       to{ opacity:1; transform:translateY(0); }
     }
 
-    @media(max-width:1100px){
-      .plans{
-        grid-template-columns:repeat(2, minmax(0,1fr));
-      }
+    @media (max-width:1100px){
       .heroInner,
-      .infoGrid{
+      .faqGrid{
         grid-template-columns:1fr;
+      }
+
+      .plans{
+        grid-template-columns:repeat(2,minmax(0,1fr));
       }
     }
 
-    @media(max-width:760px){
-      .plans,
+    @media (max-width:780px){
+      .wrap{ padding:14px; }
+      .hero, .sectionCard, .plan, .faqItem, .footer{ border-radius:20px; }
+      .plans{
+        grid-template-columns:1fr;
+      }
       .miniStats{
         grid-template-columns:1fr;
       }
       .compare{
         display:block;
         overflow-x:auto;
-        white-space:nowrap;
       }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      *{
-        animation:none !important;
-        transition:none !important;
-        scroll-behavior:auto !important;
+      .btn{
+        width:100%;
       }
-      .nav,.hero,.card,.plan,.footer{
-        opacity:1 !important;
-        transform:none !important;
+      .navlinks,
+      .ctaRow,
+      .buyRow{
+        width:100%;
       }
     }
   </style>
-
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Product",
-    "name":"ScriptNova Keys",
-    "description":"Compare ScriptNova Free, BASIC, PRO, and EXPRESS plans with session limits, total time, and pricing.",
-    "brand":{
-      "@type":"Brand",
-      "name":"ScriptNova"
-    }
-  }
-  </script>
 </head>
 <body>
   <div class="wrap">
-    <header class="nav">
+    <div class="nav">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <div class="logo"></div>
         <div>ScriptNova</div>
       </div>
-      <nav class="navlinks">
+
+      <div class="navlinks">
         <a class="btn btnGhost" href="/">Home</a>
         <a class="btn btnGhost" href="/download">Download</a>
         <a class="btn btnGhost" href="/freekey">FREE Key</a>
-        <a class="btn btnGhost" href="/buykeys">Buy Keys</a>
-      </nav>
-    </header>
+        <a class="btn" href="#plans">Buy Plans</a>
+      </div>
+    </div>
 
-    <section class="hero">
+    <div class="hero">
       <div class="heroInner">
         <div>
-          <div class="eyebrow">
-            <span class="dot" aria-hidden="true"></span>
-            Plans • comparisons • simple choices
+          <div class="eyebrow"><span class="dot"></span> Secure Checkout with Stripe</div>
+          <h1>Buy <b>ScriptNova</b> plans with instant delivery</h1>
+          <div class="sub">
+            Skip the FREE unlock grind and go straight to longer time, more sessions, more devices, and faster access.
+            Paid plans use secure Stripe checkout and are built for users who want stronger limits and less hassle.
           </div>
 
-          <h1>Choose the <b>right ScriptNova key</b> for your budget, time, and usage</h1>
-
-          <p class="sub">
-            Compare FREE, BASIC, PRO, and EXPRESS in one clean page. Whether you want the cheapest way to start,
-            a stronger plan with more time, or a business-style option for bigger use, this page makes the differences easy to understand.
-          </p>
+          <div class="heroPoints">
+            <span class="pill">Instant checkout</span>
+            <span class="pill">Automatic delivery ready</span>
+            <span class="pill">Monthly / Yearly options</span>
+            <span class="pill">Business plans included</span>
+          </div>
 
           <div class="ctaRow">
-            <a class="btn" href="/freekey">Get FREE Key</a>
-            <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy Through Discord</a>
-            <a class="btn btnGhost" href="/download">Download Launcher</a>
+            <a class="btn" href="#plans">See Plans</a>
+            <a class="btn btn2" href="/freekey">Use FREE Instead</a>
           </div>
         </div>
 
         <div class="miniStats">
           <div class="miniStat">
-            <div class="label">Best budget choice</div>
-            <div class="value">BASIC</div>
-            <div class="text">Great if you want a low-cost option and do not need a huge amount of time.</div>
+            <div class="label">Starter Paid Plan</div>
+            <div class="value">$4.99</div>
+            <div class="text">BASIC starts cheap and avoids redirect grinding.</div>
           </div>
+
           <div class="miniStat">
-            <div class="label">Best full experience</div>
+            <div class="label">Most Popular</div>
             <div class="value">PRO</div>
-            <div class="text">Much more session time and enough room for up to 4 people to use one key.</div>
+            <div class="text">Longer time, more devices, and better scaling for regular use.</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Business One-Time</div>
+            <div class="value">$89.55</div>
+            <div class="text">EXPRESS is built more for serious use, teams, and larger projects.</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Yearly Savings</div>
+            <div class="value">15%</div>
+            <div class="text">Switch to yearly and save around 15% versus paying monthly all year.</div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section class="plans">
-      <article class="plan">
-        <span class="tag">Starter</span>
-        <div class="planName">FREE</div>
-        <div class="price">$0 <small>free</small></div>
-        <div class="planSub">
-          The easiest way to test ScriptNova and get started with the launcher before moving to a paid plan.
+    <div class="sectionCard" id="plans">
+      <div class="sectionTop">
+        <div>
+          <div class="sectionTitle">Choose your plan</div>
+          <div class="sectionSub">
+            FREE is best for testing. Paid plans are built for smoother daily use. EXPRESS and BLACK EXPRESS are higher-end plans for more serious or larger-scale use.
+          </div>
         </div>
 
-        <ul class="specs">
-          <li><b>Sessions allowed:</b> 1 session</li>
-          <li><b>Total time:</b> 15 minutes</li>
-          <li><b>Price:</b> Free</li>
-          <li><b>Best for:</b> Trying it out and seeing how the launcher works</li>
-        </ul>
-
-        <div class="planActions">
-          <a class="btn" href="/freekey">Get FREE Key</a>
+        <div class="toggleWrap">
+          <div class="toggle">
+            <button id="toggleMonthly" class="active" type="button" onclick="setBilling('monthly')">Monthly / One-Time</button>
+            <button id="toggleYearly" type="button" onclick="setBilling('yearly')">Yearly</button>
+          </div>
+          <div class="saveBadge">Yearly saves 15%</div>
         </div>
-      </article>
+      </div>
 
-      <article class="plan">
-        <span class="tag">Budget pick</span>
-        <div class="planName">BASIC</div>
-        <div class="price">$2 <small>/ month</small></div>
-        <div class="planSub">
-          Good for users who are more on the budget side and want a cheap upgrade over the FREE key.
-        </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="tag">FREE</div>
+          <div class="planName">FREE</div>
+          <div class="planDesc">Best for testing. Browser-limited. Requires unlock redirects and effort to use higher free tiers.</div>
 
-        <ul class="specs">
-          <li><b>Sessions allowed:</b> 2 sessions</li>
-          <li><b>Total time:</b> 32 minutes</li>
-          <li><b>Price:</b> $2 per month</li>
-          <li><b>Best for:</b> Budget users who want more time than FREE without spending much</li>
-        </ul>
+          <div class="price">
+            <div class="amount">$0</div>
+            <div class="per">free</div>
+          </div>
 
-        <div class="planActions">
-          <a class="btn btn2" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy BASIC</a>
-        </div>
-      </article>
+          <ul class="featureList">
+            <li><span class="check"></span><span>Unlock grind required</span></li>
+            <li><span class="check"></span><span>1 session</span></li>
+            <li><span class="check"></span><span>Browser-limited</span></li>
+            <li><span class="check"></span><span>Best for testing</span></li>
+          </ul>
 
-      <article class="plan popular">
-        <span class="tag popular">Most popular</span>
-        <div class="planName">PRO</div>
-        <div class="price">$11 <small>/ month</small></div>
-        <div class="planSub">
-          The all-out experience for users who want much more session time, more flexibility, and enough room for shared use.
+          <div class="subtext">Good for trying ScriptNova, but not the easiest option for regular use.</div>
+
+          <div class="buyRow">
+            <a class="btn btnGhost" href="/freekey">Go to FREE Key</a>
+          </div>
+
+          <div class="loadingText"></div>
         </div>
 
-        <ul class="specs">
-          <li><b>Sessions allowed:</b> 4 sessions</li>
-          <li><b>Total time:</b> 118 hours</li>
-          <li><b>Price:</b> $11 per month</li>
-          <li><b>Best for:</b> People who have the money and want a much bigger plan</li>
-          <li><b>Shared use:</b> Up to 4 people can use the same key for friends</li>
-        </ul>
+        <div class="plan">
+          <div class="tag">Starter Paid</div>
+          <div class="planName">BASIC</div>
+          <div class="planDesc">The easiest upgrade from FREE. Good for people who want more time without spending too much.</div>
 
-        <div class="planActions">
-          <a class="btn" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Buy PRO</a>
+          <div class="price">
+            <div class="amount" data-monthly="$4.99" data-yearly="$50.90">$4.99</div>
+            <div class="per" data-monthly="/ month" data-yearly="/ year">/ month</div>
+          </div>
+
+          <div class="yearSave show">Save 15% yearly</div>
+
+          <ul class="featureList">
+            <li><span class="check"></span><span>3 sessions</span></li>
+            <li><span class="check"></span><span>6 hours total time</span></li>
+            <li><span class="check"></span><span>2 devices</span></li>
+            <li><span class="check"></span><span>No FREE unlock grind</span></li>
+          </ul>
+
+          <div class="subtext">Best for personal use when you want a simple paid option that is clearly better than FREE.</div>
+
+          <div class="buyRow">
+            <button class="btn buyBtn" data-plan-monthly="basic_monthly" data-plan-yearly="basic_yearly">Buy BASIC</button>
+          </div>
+
+          <div class="loadingText"></div>
         </div>
-      </article>
 
-      <article class="plan comingsoon">
-        <span class="tag warn">Not out yet</span>
-        <div class="planName">EXPRESS</div>
-        <div class="price">$89.55 <small>one time</small></div>
-        <div class="planSub">
-          A higher-end business-style plan built more for serious use, teams, and larger projects when it becomes available.
+        <div class="plan popular">
+          <div class="tag">Most Popular</div>
+          <div class="planName">PRO</div>
+          <div class="planDesc">Built for regular users who want a strong jump in time, sessions, and devices with much less friction.</div>
+
+          <div class="price">
+            <div class="amount" data-monthly="$11.99" data-yearly="$122.30">$11.99</div>
+            <div class="per" data-monthly="/ month" data-yearly="/ year">/ month</div>
+          </div>
+
+          <div class="yearSave show">Save 15% yearly</div>
+
+          <ul class="featureList">
+            <li><span class="check"></span><span>6 sessions</span></li>
+            <li><span class="check"></span><span>30 days total time</span></li>
+            <li><span class="check"></span><span>4 devices</span></li>
+            <li><span class="check"></span><span>Best balance of price and power</span></li>
+          </ul>
+
+          <div class="subtext">Best overall value for most buyers.</div>
+
+          <div class="buyRow">
+            <button class="btn buyBtn" data-plan-monthly="pro_monthly" data-plan-yearly="pro_yearly">Buy PRO</button>
+          </div>
+
+          <div class="loadingText"></div>
         </div>
 
-        <ul class="specs">
-          <li><b>Sessions allowed:</b> 725 sessions</li>
-          <li><b>Total time:</b> 5,444 hours</li>
-          <li><b>Price:</b> $89.55 one time</li>
-          <li><b>Best for:</b> Businesses and larger-scale use</li>
-          <li><b>Eligibility:</b> Only ScriptNova developers or people who own a gaming website can purchase when released</li>
-        </ul>
+        <div class="plan premium">
+          <div class="tag">Premium</div>
+          <div class="planName">ELITE</div>
+          <div class="planDesc">A stronger recurring plan for advanced users who want longer time, more devices, and more room to scale.</div>
 
-        <div class="planActions">
-          <a class="btn btnGhost" href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Ask About EXPRESS</a>
+          <div class="price">
+            <div class="amount" data-monthly="$19.99" data-yearly="$203.90">$19.99</div>
+            <div class="per" data-monthly="/ month" data-yearly="/ year">/ month</div>
+          </div>
+
+          <div class="yearSave show">Save 15% yearly</div>
+
+          <ul class="featureList">
+            <li><span class="check"></span><span>10 sessions</span></li>
+            <li><span class="check"></span><span>90 days total time</span></li>
+            <li><span class="check"></span><span>6 devices</span></li>
+            <li><span class="check"></span><span>For heavier or longer-term use</span></li>
+          </ul>
+
+          <div class="subtext">Ideal for advanced users who want much more breathing room than PRO.</div>
+
+          <div class="buyRow">
+            <button class="btn btn2 buyBtn" data-plan-monthly="elite_monthly" data-plan-yearly="elite_yearly">Buy ELITE</button>
+          </div>
+
+          <div class="loadingText"></div>
         </div>
-      </article>
-    </section>
 
-    <section class="card compareWrap">
-      <h2 class="sectionTitle">Plan comparison</h2>
+        <div class="plan business">
+          <div class="tag">Business One-Time</div>
+          <div class="planName">EXPRESS</div>
+          <div class="planDesc">A higher-end business-style plan built more for serious use, teams, and larger projects when available.</div>
+
+          <div class="price">
+            <div class="amount">$89.55</div>
+            <div class="per">one time</div>
+          </div>
+
+          <ul class="featureList">
+            <li><span class="check"></span><span>725 sessions</span></li>
+            <li><span class="check"></span><span>5,444 hours total time</span></li>
+            <li><span class="check"></span><span>Best for businesses and larger-scale use</span></li>
+            <li><span class="check"></span><span>Eligibility limited</span></li>
+          </ul>
+
+          <div class="subtext">Only ScriptNova developers or people who own a gaming website can purchase when released.</div>
+
+          <div class="buyRow">
+            <button class="btn buyBtn" data-plan-monthly="express_one_time" data-plan-yearly="express_one_time">Buy EXPRESS</button>
+          </div>
+
+          <div class="loadingText"></div>
+        </div>
+
+        <div class="plan business premium">
+          <div class="tag">Top Tier One-Time</div>
+          <div class="planName">BLACK EXPRESS</div>
+          <div class="planDesc">The highest-end one-time plan with much larger limits for agencies, advanced operators, and larger serious projects.</div>
+
+          <div class="price">
+            <div class="amount">$149.95</div>
+            <div class="per">one time</div>
+          </div>
+
+          <ul class="featureList">
+            <li><span class="check"></span><span>1,500 sessions</span></li>
+            <li><span class="check"></span><span>12,000 hours total time</span></li>
+            <li><span class="check"></span><span>12 devices</span></li>
+            <li><span class="check"></span><span>Eligibility review required</span></li>
+          </ul>
+
+          <div class="subtext">Built for top-end use cases. Approval and review may be required before final access.</div>
+
+          <div class="buyRow">
+            <button class="btn btn2 buyBtn" data-plan-monthly="black_express_one_time" data-plan-yearly="black_express_one_time">Buy BLACK EXPRESS</button>
+          </div>
+
+          <div class="loadingText"></div>
+        </div>
+      </div>
+
+      <div class="notice">
+        Paid checkout is handled through Stripe. Monthly and yearly plans are recurring billing products.
+        EXPRESS and BLACK EXPRESS are one-time purchases. Business-style plans may require review or eligibility checks before full activation.
+      </div>
+    </div>
+
+    <div class="sectionCard">
+      <div class="sectionTop">
+        <div>
+          <div class="sectionTitle">Quick comparison</div>
+          <div class="sectionSub">
+            FREE is good for testing. Paid plans remove grind and make ScriptNova much easier to use.
+          </div>
+        </div>
+      </div>
+
       <table class="compare">
         <thead>
           <tr>
             <th>Plan</th>
-            <th>Price</th>
             <th>Sessions</th>
-            <th>Total time</th>
-            <th>Best for</th>
-            <th>Status</th>
+            <th>Total Time</th>
+            <th>Devices</th>
+            <th>Best For</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><b>FREE</b></td>
-            <td>$0</td>
+            <td>FREE</td>
             <td>1</td>
-            <td>15 minutes</td>
-            <td>Trying ScriptNova for the first time</td>
-            <td>Available</td>
+            <td>Unlock-based</td>
+            <td>Browser-limited</td>
+            <td>Testing</td>
           </tr>
           <tr>
-            <td><b>BASIC</b></td>
-            <td>$2 / month</td>
+            <td>BASIC</td>
+            <td>3</td>
+            <td>6 hours</td>
             <td>2</td>
-            <td>32 minutes</td>
-            <td>Budget users who want a cheap upgrade</td>
-            <td>Available</td>
+            <td>Cheap paid starter</td>
           </tr>
           <tr>
-            <td><b>PRO</b></td>
-            <td>$11 / month</td>
-            <td>4</td>
-            <td>118 hours</td>
-            <td>Users who want the full experience and much more time</td>
-            <td>Available</td>
+            <td class="highlightCol">PRO</td>
+            <td class="highlightCol">6</td>
+            <td class="highlightCol">30 days</td>
+            <td class="highlightCol">4</td>
+            <td class="highlightCol">Best value for most users</td>
           </tr>
           <tr>
-            <td><b>EXPRESS</b></td>
-            <td>$89.55 one time</td>
+            <td>ELITE</td>
+            <td>10</td>
+            <td>90 days</td>
+            <td>6</td>
+            <td>Advanced longer-term use</td>
+          </tr>
+          <tr>
+            <td>EXPRESS</td>
             <td>725</td>
             <td>5,444 hours</td>
-            <td>Business-style use and larger needs</td>
-            <td>Coming soon</td>
+            <td>Business-style</td>
+            <td>Teams / larger projects</td>
+          </tr>
+          <tr>
+            <td>BLACK EXPRESS</td>
+            <td>1,500</td>
+            <td>12,000 hours</td>
+            <td>12</td>
+            <td>Top-end use cases</td>
           </tr>
         </tbody>
       </table>
-    </section>
+    </div>
 
-    <section class="infoGrid">
-      <div class="card infoBox">
-        <h3>Which plan should I pick?</h3>
-        <p>
-          If you are more into the budget side, go for <b>BASIC</b>. It gives you more than the FREE option while staying cheap.
-          If you just want to test things first, start with <b>FREE</b>.
-        </p>
+    <div class="sectionCard">
+      <div class="sectionTop">
+        <div>
+          <div class="sectionTitle">FAQ</div>
+          <div class="sectionSub">
+            The Stripe service is kept separate so checkout logic does not mix with your launcher/session API.
+          </div>
+        </div>
       </div>
 
-      <div class="card infoBox">
-        <h3>Why choose PRO?</h3>
-        <p>
-          If you have the money and want the all-out experience, <b>PRO</b> is the stronger pick. It has a lot more session time
-          and can be used by up to 4 people on one key for friends.
-        </p>
-      </div>
+      <div class="faqGrid">
+        <div class="faqItem">
+          <div class="faqQ">How does checkout work?</div>
+          <div class="faqA">
+            When you click buy, this page sends your selected plan to the Stripe service on
+            <b>stripe.scriptnovaa.com</b>. That service creates a Stripe Checkout Session and sends you to secure hosted checkout.
+          </div>
+        </div>
 
-      <div class="card infoBox">
-        <h3>What is EXPRESS for?</h3>
-        <p>
-          <b>EXPRESS</b> is more like a business option. It is not out yet, and when it launches it will only be available
-          to ScriptNova developers or people who own a gaming website.
-        </p>
-      </div>
-    </section>
+        <div class="faqItem">
+          <div class="faqQ">Will keys be delivered automatically?</div>
+          <div class="faqA">
+            This page is ready for automatic delivery. The separate Stripe API should create the order, listen for the successful checkout webhook, generate the key, and show it on the success page.
+          </div>
+        </div>
 
-    <section class="card">
-      <h2 class="sectionTitle">More about ScriptNova plans</h2>
-      <p style="color:var(--muted); line-height:1.7; margin:0;">
-        ScriptNova gives users multiple ways to get started. FREE is best for testing. BASIC is the low-cost option for people who want
-        a simple paid upgrade. PRO is the best overall choice for users who want much more value, longer usage time, and more flexibility.
-        EXPRESS is designed more like a serious high-capacity option for business-style use when it becomes available. This page is built to
-        help users compare ScriptNova pricing, ScriptNova plan limits, ScriptNova key sessions, and ScriptNova key time in one easy place.
-      </p>
-    </section>
+        <div class="faqItem">
+          <div class="faqQ">Why separate the Stripe API?</div>
+          <div class="faqA">
+            Keeping payments on a separate subdomain helps keep Stripe secrets, webhooks, checkout sessions, and purchase logic away from the launcher/session API.
+          </div>
+        </div>
 
-    <section class="card">
-      <h2 class="sectionTitle">Frequently asked questions</h2>
-      <div class="faq">
-        <details>
-          <summary>Can I start without paying?</summary>
-          <p>Yes. You can start with the FREE key, which gives 1 session and 15 minutes.</p>
-        </details>
-        <details>
-          <summary>Which plan is best for a low budget?</summary>
-          <p>BASIC is the budget-friendly option and is the best choice if you want a cheap paid plan.</p>
-        </details>
-        <details>
-          <summary>Which plan gives the most value right now?</summary>
-          <p>PRO gives a much bigger amount of time and up to 4 sessions, making it the strongest currently available plan for most users.</p>
-        </details>
-        <details>
-          <summary>Can anyone buy EXPRESS?</summary>
-          <p>No. EXPRESS is not out yet, and when it does release it is intended only for ScriptNova developers or people who own a gaming website.</p>
-        </details>
+        <div class="faqItem">
+          <div class="faqQ">Do yearly plans really save money?</div>
+          <div class="faqA">
+            Yes. The yearly pricing is set to save about 15% compared with paying monthly for a full year.
+          </div>
+        </div>
+
+        <div class="faqItem">
+          <div class="faqQ">Who can buy EXPRESS?</div>
+          <div class="faqA">
+            EXPRESS is meant for serious use, teams, and larger projects. It is limited to ScriptNova developers or people who own a gaming website when released.
+          </div>
+        </div>
+
+        <div class="faqItem">
+          <div class="faqQ">What about BLACK EXPRESS?</div>
+          <div class="faqA">
+            BLACK EXPRESS is the top one-time tier. It is meant for larger serious use cases and may require extra review or eligibility approval before full activation.
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
 
     <div class="footer">
-      © <span id="yr"></span> ScriptNova •
-      <a href="/">Home</a> •
-      <a href="/download">Download</a> •
-      <a href="/freekey">FREE Key</a> •
-      <a href="/buykeys">Buy Keys</a>
+      Need help or questions before buying?
+      Contact <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a>
+      or join the <a href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Discord</a>.
+      <br><br>
+      Stripe is used for secure checkout. Automatic delivery should be handled by your separate Stripe service after successful payment.
     </div>
   </div>
 
+  <div class="toast" id="toast">
+    <div class="toastTitle" id="toastTitle">Notice</div>
+    <div id="toastText"></div>
+  </div>
+
   <script>
-    document.getElementById("yr").textContent = new Date().getFullYear();
+    const STRIPE_API = "https://stripe.scriptnovaa.com/api/checkout/create";
+    const BILLING_STORAGE_KEY = "sn_buykeys_billing_v1";
+
+    let billingMode = "monthly";
+    let toastTimer = null;
+
+    function byId(id){ return document.getElementById(id); }
+
+    function showToast(type, title, text){
+      const toast = byId("toast");
+      toast.className = "toast " + (type || "");
+      byId("toastTitle").textContent = title || "Notice";
+      byId("toastText").textContent = text || "";
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2600);
+    }
+
+    function saveBillingMode(mode){
+      try{
+        localStorage.setItem(BILLING_STORAGE_KEY, mode);
+      }catch(e){}
+    }
+
+    function loadBillingMode(){
+      try{
+        const v = localStorage.getItem(BILLING_STORAGE_KEY);
+        if(v === "yearly" || v === "monthly"){
+          billingMode = v;
+        }
+      }catch(e){}
+    }
+
+    function setBilling(mode){
+      billingMode = mode === "yearly" ? "yearly" : "monthly";
+      saveBillingMode(billingMode);
+
+      byId("toggleMonthly").classList.toggle("active", billingMode === "monthly");
+      byId("toggleYearly").classList.toggle("active", billingMode === "yearly");
+      document.body.classList.toggle("yearly", billingMode === "yearly");
+
+      const amounts = document.querySelectorAll(".amount[data-monthly][data-yearly]");
+      const pers = document.querySelectorAll(".per[data-monthly][data-yearly]");
+
+      amounts.forEach(el => {
+        el.textContent = billingMode === "yearly"
+          ? el.getAttribute("data-yearly")
+          : el.getAttribute("data-monthly");
+      });
+
+      pers.forEach(el => {
+        el.textContent = billingMode === "yearly"
+          ? el.getAttribute("data-yearly")
+          : el.getAttribute("data-monthly");
+      });
+    }
+
+    function setButtonLoading(btn, loading){
+      if(!btn) return;
+      const planCard = btn.closest(".plan");
+      const statusEl = planCard ? planCard.querySelector(".loadingText") : null;
+
+      if(loading){
+        btn.disabled = true;
+        btn.dataset.oldText = btn.textContent;
+        btn.textContent = "Opening Checkout...";
+        if(statusEl) statusEl.textContent = "Creating secure Stripe checkout session...";
+      } else {
+        btn.disabled = false;
+        if(btn.dataset.oldText) btn.textContent = btn.dataset.oldText;
+        if(statusEl) statusEl.textContent = "";
+      }
+    }
+
+    async function startCheckout(btn){
+      if(!btn) return;
+
+      const planId = billingMode === "yearly"
+        ? btn.getAttribute("data-plan-yearly")
+        : btn.getAttribute("data-plan-monthly");
+
+      if(!planId){
+        showToast("err", "Missing Plan", "This button is missing a plan id.");
+        return;
+      }
+
+      setButtonLoading(btn, true);
+
+      try{
+        const res = await fetch(STRIPE_API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            planId,
+            source: "buykeys_html",
+            billingMode,
+            site: "scriptnovaa.com"
+          })
+        });
+
+        const data = await res.json().catch(() => null);
+
+        if(!data || data.ok !== true || !data.url){
+          const err = data && data.error ? data.error : ("http_" + res.status);
+          showToast("err", "Checkout Failed", "Could not open Stripe checkout: " + err);
+          setButtonLoading(btn, false);
+          return;
+        }
+
+        showToast("good", "Redirecting", "Opening secure Stripe checkout...");
+        window.location.href = data.url;
+      }catch(e){
+        showToast("err", "Network Error", "Could not reach the Stripe checkout service.");
+        setButtonLoading(btn, false);
+      }
+    }
+
+    function bindBuyButtons(){
+      document.querySelectorAll(".buyBtn").forEach(btn => {
+        btn.addEventListener("click", () => startCheckout(btn));
+      });
+    }
+
+    loadBillingMode();
+    setBilling(billingMode);
+    bindBuyButtons();
   </script>
 </body>
 </html>
