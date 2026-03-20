@@ -3,44 +3,41 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>ScriptNova — Payment Successful</title>
-  <meta name="description" content="Your ScriptNova payment was successful. View your purchase status, delivered key, and next steps here." />
+  <title>ScriptNova — Thank You</title>
+  <meta name="description" content="Thank you for buying ScriptNova. View your new key and save it in your browser." />
   <meta name="robots" content="noindex,nofollow" />
-  <meta name="theme-color" content="#0b0f16" />
+  <meta name="theme-color" content="#0a0f18" />
   <style>
     :root{
-      --bg:#0b0f16;
-      --bg2:#0d1420;
+      --bg:#0a0f18;
+      --bg2:#0c1320;
       --panel:#101828;
-      --panel2:#0f1726;
+      --panel2:#0d1626;
       --border:#22314a;
-      --text:#eaf2ff;
+      --text:#eef5ff;
       --muted:#9fb2d6;
       --accent:#00e5ff;
       --accent2:#7c4dff;
       --good:#00ffb0;
-      --goodBg:rgba(0,255,176,.10);
+      --good2:#3dffcf;
       --warn:#ffd166;
-      --warnBg:rgba(255,209,102,.10);
-      --danger:#ff6a6a;
-      --dangerBg:rgba(255,106,106,.10);
-      --shadow:0 18px 42px rgba(0,0,0,.26);
-      --glow:0 0 26px rgba(0,229,255,.08);
+      --shadow:0 18px 42px rgba(0,0,0,.30);
+      --glow:0 0 30px rgba(0,229,255,.10);
     }
 
     *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     html,body{ margin:0; padding:0; scroll-behavior:smooth; }
-
     body{
+      min-height:100vh;
       font-family:Segoe UI,Tahoma,Arial,sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at 0% 0%, rgba(0,229,255,.10), transparent 22%),
-        radial-gradient(circle at 100% 0%, rgba(124,77,255,.08), transparent 20%),
-        radial-gradient(circle at 50% 100%, rgba(0,255,176,.04), transparent 18%),
-        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 55%, #09101b 100%);
-      min-height:100vh;
+        radial-gradient(circle at 0% 0%, rgba(0,229,255,.12), transparent 22%),
+        radial-gradient(circle at 100% 0%, rgba(124,77,255,.12), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(0,255,176,.06), transparent 20%),
+        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 55%, #080d15 100%);
       overflow-x:hidden;
+      position:relative;
     }
 
     body::before{
@@ -49,7 +46,7 @@
       inset:0;
       pointer-events:none;
       background:
-        linear-gradient(rgba(255,255,255,.015), rgba(255,255,255,0)),
+        linear-gradient(rgba(255,255,255,.012), rgba(255,255,255,0)),
         repeating-linear-gradient(
           180deg,
           rgba(255,255,255,.015) 0px,
@@ -61,7 +58,7 @@
       z-index:0;
     }
 
-    .bgOrbs{
+    .bg{
       position:fixed;
       inset:0;
       pointer-events:none;
@@ -72,51 +69,89 @@
     .orb{
       position:absolute;
       border-radius:50%;
-      filter:blur(10px);
-      opacity:.16;
-      animation:floatOrb 13s linear infinite;
+      filter:blur(12px);
+      opacity:.18;
+      animation:floatOrb 18s ease-in-out infinite;
     }
 
-    .orb.o1{ width:220px; height:220px; left:-40px; top:8%; background:radial-gradient(circle, rgba(0,229,255,.26), transparent 68%); animation-duration:16s; }
-    .orb.o2{ width:180px; height:180px; right:4%; top:18%; background:radial-gradient(circle, rgba(124,77,255,.20), transparent 70%); animation-duration:18s; }
-    .orb.o3{ width:260px; height:260px; left:18%; bottom:-40px; background:radial-gradient(circle, rgba(0,255,176,.16), transparent 68%); animation-duration:21s; }
-    .orb.o4{ width:140px; height:140px; right:16%; bottom:14%; background:radial-gradient(circle, rgba(255,209,102,.14), transparent 68%); animation-duration:14s; }
+    .orb.o1{
+      width:260px;height:260px;left:-60px;top:4%;
+      background:radial-gradient(circle, rgba(0,229,255,.30), transparent 68%);
+      animation-duration:16s;
+    }
+    .orb.o2{
+      width:220px;height:220px;right:2%;top:16%;
+      background:radial-gradient(circle, rgba(124,77,255,.26), transparent 68%);
+      animation-duration:20s;
+    }
+    .orb.o3{
+      width:300px;height:300px;left:15%;bottom:-80px;
+      background:radial-gradient(circle, rgba(0,255,176,.18), transparent 70%);
+      animation-duration:24s;
+    }
+    .orb.o4{
+      width:180px;height:180px;right:10%;bottom:10%;
+      background:radial-gradient(circle, rgba(255,209,102,.16), transparent 68%);
+      animation-duration:14s;
+    }
+
+    .sparkle{
+      position:absolute;
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:rgba(255,255,255,.85);
+      box-shadow:0 0 18px rgba(255,255,255,.45);
+      animation:twinkle 4s linear infinite;
+      opacity:.7;
+    }
 
     .wrap{
       position:relative;
       z-index:1;
-      max-width:1080px;
+      max-width:1120px;
       margin:0 auto;
       padding:24px;
     }
 
     .hero{
+      position:relative;
+      overflow:hidden;
       border:1px solid var(--border);
       background:linear-gradient(180deg,#111b2a 0%, #0f1726 100%);
-      border-radius:26px;
-      padding:24px;
+      border-radius:28px;
+      padding:28px;
       box-shadow:var(--shadow), var(--glow);
-      overflow:hidden;
-      position:relative;
-      animation:fadeUp .5s ease;
+      animation:fadeUp .7s ease;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:auto -120px -120px auto;
+      width:300px;
+      height:300px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(0,255,176,.18), transparent 70%);
+      pointer-events:none;
     }
 
     .hero::after{
       content:"";
       position:absolute;
-      top:-90px;
-      right:-60px;
-      width:240px;
-      height:240px;
+      top:-120px;
+      left:-120px;
+      width:260px;
+      height:260px;
       border-radius:50%;
-      background:radial-gradient(circle, rgba(0,255,176,.16), transparent 66%);
+      background:radial-gradient(circle, rgba(0,229,255,.15), transparent 70%);
       pointer-events:none;
     }
 
-    .topRow{
+    .brandRow{
       display:flex;
-      justify-content:space-between;
       align-items:center;
+      justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
     }
@@ -125,87 +160,213 @@
       display:flex;
       align-items:center;
       gap:10px;
-      font-weight:900;
+      font-weight:1000;
       letter-spacing:.2px;
     }
 
     .logo{
-      width:36px;
-      height:36px;
-      border-radius:12px;
+      width:40px;
+      height:40px;
+      border-radius:13px;
       border:1px solid rgba(0,229,255,.35);
       background:
-        radial-gradient(12px 12px at 30% 30%, rgba(0,229,255,.95), rgba(0,229,255,0) 60%),
+        radial-gradient(14px 14px at 30% 30%, rgba(0,229,255,.95), rgba(0,229,255,0) 60%),
         radial-gradient(14px 14px at 70% 70%, rgba(124,77,255,.85), rgba(124,77,255,0) 60%),
-        rgba(12,20,34,.9);
-      box-shadow:0 0 18px rgba(0,229,255,.14);
+        rgba(10,19,34,.92);
+      box-shadow:0 0 22px rgba(0,229,255,.15);
     }
 
-    .statusPill{
+    .successPill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 13px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,176,.32);
+      background:rgba(0,255,176,.10);
+      color:#dcfff1;
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+
+    .pulseDot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 14px rgba(0,255,176,.85);
+      animation:pulse 1.6s infinite;
+    }
+
+    .heroTitle{
+      margin-top:18px;
+      font-size:clamp(34px,6vw,62px);
+      line-height:.98;
+      font-weight:1000;
+      letter-spacing:-1.6px;
+    }
+
+    .heroTitle .shine{
+      color:var(--good);
+      text-shadow:0 0 18px rgba(0,255,176,.18);
+    }
+
+    .heroSub{
+      margin-top:14px;
+      max-width:900px;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:16px;
+    }
+
+    .heroMini{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .miniChip{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:#dfe9fb;
+      font-size:13px;
+      font-weight:800;
+      backdrop-filter:blur(4px);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.25fr .95fr;
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .panel{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,var(--panel2) 0%, #0d1522 100%);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      animation:fadeUp .8s ease;
+    }
+
+    .panelTitle{
+      margin:0 0 10px 0;
+      font-size:12px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:900;
+    }
+
+    .keyCard{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(0,255,176,.20);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(0,229,255,.10), transparent 35%),
+        radial-gradient(circle at 100% 100%, rgba(0,255,176,.08), transparent 35%),
+        linear-gradient(180deg,#0d1725 0%, #09101a 100%);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 0 28px rgba(0,255,176,.05);
+    }
+
+    .celebrate{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:8px 12px;
       border-radius:999px;
-      border:1px solid rgba(0,255,176,.28);
-      background:var(--goodBg);
-      color:#d9fff1;
+      background:rgba(255,209,102,.10);
+      border:1px solid rgba(255,209,102,.24);
+      color:#ffe8b2;
       font-size:12px;
       font-weight:900;
       text-transform:uppercase;
       letter-spacing:.6px;
     }
 
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:var(--good);
-      box-shadow:0 0 10px rgba(0,255,176,.8);
-      animation:pulse 1.5s infinite;
-    }
-
-    .title{
-      margin-top:16px;
-      font-size:clamp(30px,5vw,48px);
-      line-height:1.02;
+    .bigMessage{
+      margin-top:14px;
+      font-size:clamp(26px,4vw,38px);
+      line-height:1.08;
       font-weight:1000;
-      letter-spacing:-1px;
+      letter-spacing:-.8px;
     }
 
-    .title b{
-      color:var(--good);
-      text-shadow:0 0 16px rgba(0,255,176,.16);
+    .bigMessage .accent{
+      color:var(--good2);
     }
 
-    .sub{
+    .keyIntro{
       margin-top:10px;
       color:var(--muted);
       line-height:1.65;
-      max-width:860px;
       font-size:15px;
     }
 
-    .heroActions{
+    .keyBoxWrap{
+      margin-top:16px;
+      position:relative;
+    }
+
+    .glowLine{
+      position:absolute;
+      inset:-2px;
+      border-radius:18px;
+      background:linear-gradient(90deg, rgba(0,229,255,.55), rgba(0,255,176,.50), rgba(124,77,255,.55));
+      filter:blur(10px);
+      opacity:.22;
+      animation:glowShift 5s linear infinite;
+      pointer-events:none;
+    }
+
+    .keyBox{
+      position:relative;
+      width:100%;
+      padding:18px 16px;
+      border-radius:18px;
+      border:1px solid rgba(80,123,172,.40);
+      background:#060b12;
+      color:var(--text);
+      font-size:18px;
+      font-family:Consolas, Monaco, monospace;
+      outline:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+      letter-spacing:.6px;
+    }
+
+    .keyBox:focus{
+      border-color:#3d6d98;
+      box-shadow:0 0 0 4px rgba(0,229,255,.08);
+    }
+
+    .actions{
       display:flex;
-      gap:10px;
       flex-wrap:wrap;
-      margin-top:18px;
+      gap:10px;
+      margin-top:14px;
     }
 
     .btn{
       appearance:none;
-      border:1px solid rgba(0,229,255,.45);
+      border:1px solid rgba(0,229,255,.44);
       background:linear-gradient(180deg,#123349 0%, #102a3d 100%);
       color:var(--text);
       padding:12px 14px;
       border-radius:14px;
-      font-weight:900;
+      font-weight:1000;
       letter-spacing:.6px;
       text-transform:uppercase;
       cursor:pointer;
-      transition:transform .08s ease, background .14s ease, opacity .14s ease, box-shadow .14s ease;
-      box-shadow:0 6px 18px rgba(0,0,0,.18);
+      transition:transform .08s ease, background .14s ease, box-shadow .14s ease, opacity .14s ease;
+      box-shadow:0 8px 20px rgba(0,0,0,.20);
       text-decoration:none;
       display:inline-flex;
       align-items:center;
@@ -215,12 +376,12 @@
 
     .btn:hover{
       background:linear-gradient(180deg,#15405c 0%, #12354d 100%);
-      box-shadow:0 10px 24px rgba(0,0,0,.25);
+      box-shadow:0 12px 28px rgba(0,0,0,.25);
       text-decoration:none;
     }
 
     .btn.secondary{
-      border:1px solid rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.12);
       background:linear-gradient(180deg,#121b2b 0%, #101927 100%);
     }
 
@@ -228,34 +389,66 @@
       background:linear-gradient(180deg,#182437 0%, #152133 100%);
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:14px;
-      margin-top:14px;
-    }
-
-    .card{
-      border:1px solid var(--border);
-      background:linear-gradient(180deg,var(--panel2) 0%, #0d1522 100%);
-      border-radius:22px;
-      padding:16px;
-      box-shadow:var(--shadow);
-      animation:fadeUp .55s ease;
-    }
-
-    .card h3{
-      margin:0 0 10px 0;
-      font-size:12px;
-      letter-spacing:.9px;
-      text-transform:uppercase;
+    .tinyNote{
+      margin-top:12px;
       color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
     }
 
-    .bigStat{
-      font-size:20px;
+    .saveBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,176,.24);
+      background:rgba(0,255,176,.08);
+      color:#ddfff1;
+      font-size:13px;
+      font-weight:800;
+    }
+
+    .saveDot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 12px rgba(0,255,176,.7);
+    }
+
+    .statList{
+      display:grid;
+      gap:12px;
+    }
+
+    .statCard{
+      border:1px solid rgba(255,255,255,.08);
+      background:#0b1220;
+      border-radius:18px;
+      padding:14px;
+      transition:transform .12s ease, border-color .12s ease;
+    }
+
+    .statCard:hover{
+      transform:translateY(-2px);
+      border-color:rgba(0,229,255,.18);
+    }
+
+    .statLabel{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.8px;
       font-weight:900;
-      line-height:1.25;
+      margin-bottom:7px;
+    }
+
+    .statValue{
+      font-size:22px;
+      font-weight:1000;
+      line-height:1.2;
       word-break:break-word;
     }
 
@@ -263,134 +456,113 @@
       color:var(--muted);
       font-size:13px;
       line-height:1.55;
+      margin-top:6px;
     }
 
-    .wide{
-      margin-top:14px;
+    .reminder{
+      margin-top:16px;
+      border:1px solid rgba(255,209,102,.24);
+      background:rgba(255,209,102,.08);
+      border-radius:18px;
+      padding:14px;
+      color:#ffe8b2;
+      line-height:1.6;
+      font-size:14px;
+      animation:fadeUp 1s ease;
     }
 
-    .panel{
-      border:1px solid var(--border);
-      background:linear-gradient(180deg,var(--panel2) 0%, #0d1522 100%);
-      border-radius:22px;
-      padding:18px;
-      box-shadow:var(--shadow);
-      animation:fadeUp .6s ease;
-    }
-
-    .panelTitle{
-      margin:0 0 10px 0;
+    .statusText{
+      margin-top:12px;
       font-size:13px;
-      letter-spacing:.9px;
-      text-transform:uppercase;
+      line-height:1.55;
       color:var(--muted);
     }
 
-    .msg,.ok,.warn,.err{
+    .msg{
+      display:none;
+      margin-top:12px;
       padding:12px 13px;
       border-radius:14px;
-      white-space:pre-wrap;
       line-height:1.5;
       font-size:13px;
-      margin-top:10px;
-      display:none;
+      white-space:pre-wrap;
     }
 
     .ok{
-      color:#d6fff0;
-      background:var(--goodBg);
+      color:#d8fff1;
+      background:rgba(0,255,176,.10);
       border:1px solid rgba(0,255,176,.30);
     }
 
     .warn{
       color:#ffe8b2;
-      background:var(--warnBg);
-      border:1px solid rgba(255,209,102,.30);
+      background:rgba(255,209,102,.10);
+      border:1px solid rgba(255,209,102,.28);
     }
 
     .err{
       color:#ffd5d5;
-      background:var(--dangerBg);
-      border:1px solid rgba(255,106,106,.35);
+      background:rgba(255,106,106,.10);
+      border:1px solid rgba(255,106,106,.32);
     }
 
-    .box{
-      width:100%;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:#070b12;
-      color:var(--text);
-      font-size:15px;
-      font-family:Consolas, monospace;
-      outline:none;
-      transition:border-color .15s ease, box-shadow .15s ease;
-    }
-
-    .box:focus{
-      border-color:#32618b;
-      box-shadow:0 0 0 4px rgba(0,229,255,.08);
-    }
-
-    .steps{
-      display:grid;
-      gap:10px;
-      margin-top:10px;
-    }
-
-    .step{
-      border:1px solid rgba(255,255,255,.07);
-      background:#0b1220;
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .stepTitle{
-      font-weight:900;
-      font-size:14px;
-      margin-bottom:6px;
-    }
-
-    .sessionBox{
-      margin-top:10px;
-      padding:12px;
-      border-radius:14px;
-      background:#09111b;
-      border:1px solid rgba(255,255,255,.06);
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-      word-break:break-word;
-    }
-
-    .footerNote{
+    .footer{
       text-align:center;
-      margin-top:14px;
+      margin-top:16px;
       color:var(--muted);
       font-size:12px;
-      line-height:1.55;
+      line-height:1.6;
       border-top:1px solid rgba(255,255,255,.08);
-      padding-top:14px;
+      padding-top:16px;
+    }
+
+    .confetti{
+      position:fixed;
+      top:-20px;
+      width:10px;
+      height:16px;
+      opacity:.8;
+      border-radius:4px;
+      z-index:2;
+      pointer-events:none;
+      animation:fallConfetti linear forwards;
     }
 
     @keyframes fadeUp{
-      from{ opacity:0; transform:translateY(10px); }
+      from{ opacity:0; transform:translateY(12px); }
       to{ opacity:1; transform:translateY(0); }
     }
 
     @keyframes pulse{
       0%{ transform:scale(1); opacity:1; }
-      50%{ transform:scale(1.25); opacity:.75; }
+      50%{ transform:scale(1.28); opacity:.72; }
       100%{ transform:scale(1); opacity:1; }
     }
 
     @keyframes floatOrb{
       0%{ transform:translateY(0) translateX(0) scale(1); }
-      50%{ transform:translateY(-18px) translateX(10px) scale(1.06); }
+      50%{ transform:translateY(-22px) translateX(14px) scale(1.06); }
       100%{ transform:translateY(0) translateX(0) scale(1); }
     }
 
-    @media (max-width:900px){
+    @keyframes twinkle{
+      0%,100%{ transform:scale(.8); opacity:.2; }
+      50%{ transform:scale(1.35); opacity:.95; }
+    }
+
+    @keyframes glowShift{
+      0%{ transform:translateX(-2%); opacity:.18; }
+      50%{ transform:translateX(2%); opacity:.30; }
+      100%{ transform:translateX(-2%); opacity:.18; }
+    }
+
+    @keyframes fallConfetti{
+      0%{ transform:translateY(-20px) rotate(0deg); opacity:0; }
+      8%{ opacity:1; }
+      100%{ transform:translateY(110vh) rotate(720deg); opacity:.9; }
+    }
+
+    @media (max-width:920px){
       .grid{
         grid-template-columns:1fr;
       }
@@ -398,137 +570,164 @@
 
     @media (max-width:760px){
       .wrap{ padding:14px; }
-      .hero{ padding:16px; border-radius:20px; }
-      .panel,.card{ border-radius:18px; }
-      .btn{
-        width:100%;
-      }
-      .heroActions{
-        flex-direction:column;
-      }
+      .hero{ padding:18px; border-radius:22px; }
+      .panel{ border-radius:20px; }
+      .actions{ flex-direction:column; }
+      .btn{ width:100%; }
+      .heroMini{ flex-direction:column; }
     }
   </style>
 </head>
 <body>
-  <div class="bgOrbs" aria-hidden="true">
+  <div class="bg" aria-hidden="true">
     <div class="orb o1"></div>
     <div class="orb o2"></div>
     <div class="orb o3"></div>
     <div class="orb o4"></div>
+
+    <div class="sparkle" style="left:8%;top:12%;animation-delay:.2s;"></div>
+    <div class="sparkle" style="left:18%;top:28%;animation-delay:1.4s;"></div>
+    <div class="sparkle" style="left:72%;top:16%;animation-delay:2.1s;"></div>
+    <div class="sparkle" style="left:84%;top:34%;animation-delay:3.2s;"></div>
+    <div class="sparkle" style="left:62%;top:72%;animation-delay:1.1s;"></div>
+    <div class="sparkle" style="left:28%;top:78%;animation-delay:2.6s;"></div>
   </div>
 
   <div class="wrap">
     <div class="hero">
-      <div class="topRow">
+      <div class="brandRow">
         <div class="brand">
           <div class="logo"></div>
           <div>ScriptNova</div>
         </div>
-        <div class="statusPill"><span class="dot"></span> Payment Successful</div>
+        <div class="successPill"><span class="pulseDot"></span> Purchase Complete</div>
       </div>
 
-      <div class="title"><b>Thank you</b> — your payment went through</div>
-      <div class="sub">
-        Your Stripe checkout finished successfully. This page now checks your Stripe purchase status,
-        waits for webhook fulfillment, and shows your delivered ScriptNova key as soon as it is ready.
+      <div class="heroTitle">
+        Thank you for buying <span class="shine">ScriptNova</span>
       </div>
 
-      <div class="heroActions">
-        <a class="btn" href="/buykeys">Back to Buy Plans</a>
-        <a class="btn secondary" href="/download">Go to Download</a>
-        <button class="btn secondary" type="button" onclick="copyDeliveredKey()">Copy Delivered Key</button>
-        <button class="btn secondary" type="button" onclick="copySessionId()">Copy Session ID</button>
+      <div class="heroSub" id="heroSub">
+        Congrats — here is your new key. You can save it in this browser and use it until you stop paying for it. Enjoy.
+      </div>
+
+      <div class="heroMini">
+        <div class="miniChip">Saved in this browser</div>
+        <div class="miniChip" id="shareChip">Checking share amount...</div>
+        <div class="miniChip" id="planChip">Checking plan...</div>
       </div>
     </div>
 
     <div class="grid">
-      <div class="card">
-        <h3>Status</h3>
-        <div class="bigStat" id="statusText">Loading purchase...</div>
-        <div class="muted" id="statusSub">Checking your Stripe session and waiting for fulfillment if needed.</div>
+      <div class="panel">
+        <div class="panelTitle">Your New Key</div>
+
+        <div class="keyCard">
+          <div class="celebrate">Congrats — your key is ready</div>
+
+          <div class="bigMessage">
+            Here is your key.<br>
+            <span class="accent">Don’t lose it.</span>
+          </div>
+
+          <div class="keyIntro">
+            Save this key somewhere safe. This page can also store it in your browser so it is easier to come back later.
+          </div>
+
+          <div class="keyBoxWrap">
+            <div class="glowLine"></div>
+            <input id="keyBox" class="keyBox" type="text" readonly value="" placeholder="Waiting for your key..." />
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="button" onclick="copyDeliveredKey()">Copy Key</button>
+            <button class="btn secondary" type="button" onclick="saveKeyToBrowser()">Save In Browser</button>
+            <a class="btn secondary" href="/download">Go To Download</a>
+          </div>
+
+          <div class="saveBadge" id="saveBadge" style="display:none;">
+            <span class="saveDot"></span>
+            <span id="saveBadgeText">Saved in this browser.</span>
+          </div>
+
+          <div class="tinyNote" id="tinyNote">
+            This page is waiting for your fulfilled key right now.
+          </div>
+
+          <div id="okBox" class="msg ok">Your new key is ready.</div>
+          <div id="warnBox" class="msg warn">Payment is complete. Waiting for the webhook to finish writing your key.</div>
+          <div id="errBox" class="msg err">Could not load your delivered key.</div>
+        </div>
+
+        <div class="reminder">
+          <b>Important:</b> your key can be shared with <b id="shareAmountText">...</b>. Keep it safe and do not lose it.
+        </div>
+
+        <div class="statusText" id="statusText">
+          Checking purchase status...
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Session ID</h3>
-        <div class="bigStat" id="sessionShort">Loading...</div>
-        <div class="muted">This comes from the <code>session_id</code> in the URL.</div>
-      </div>
+      <div class="panel">
+        <div class="panelTitle">Purchase Details</div>
 
-      <div class="card">
-        <h3>Delivery State</h3>
-        <div class="bigStat" id="deliveryState">Checking webhook result...</div>
-        <div class="muted" id="deliverySub">This page polls the Stripe purchase lookup route until your delivered key is ready.</div>
+        <div class="statList">
+          <div class="statCard">
+            <div class="statLabel">Plan</div>
+            <div class="statValue" id="planText">Waiting...</div>
+            <div class="muted">Your purchased ScriptNova plan.</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Share Amount</div>
+            <div class="statValue" id="devicesText">Waiting...</div>
+            <div class="muted">How many people/devices this key can be shared with.</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Session Limit</div>
+            <div class="statValue" id="sessionsText">Waiting...</div>
+            <div class="muted">Maximum sessions available for this key.</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Time / Duration</div>
+            <div class="statValue" id="timeText">Waiting...</div>
+            <div class="muted">How long this key is valid under the current purchase record.</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Checkout Session</div>
+            <div class="statValue" id="sessionShort">Waiting...</div>
+            <div class="muted">Reference for this Stripe purchase.</div>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:14px;">
+          <button class="btn secondary" type="button" onclick="copySessionId()">Copy Session ID</button>
+          <a class="btn secondary" href="/buykeys">Back To Buy Plans</a>
+        </div>
       </div>
     </div>
 
-    <div class="wide panel">
-      <div class="panelTitle">Checkout Session</div>
-      <input id="sessionBox" class="box" type="text" readonly value="" placeholder="No session id found" />
-      <div class="sessionBox">
-        Session source: <b id="sessionSource">Waiting...</b><br>
-        URL path: <b>/buykeys/success</b><br>
-        Query value found: <b id="sessionPresent">No</b><br>
-        Lookup endpoint: <b>https://stripe.scriptnovaa.com/api/checkout/session</b>
-      </div>
-
-      <div id="okBox" class="ok">Payment success page loaded correctly.</div>
-      <div id="warnBox" class="warn">No session id was found in the URL. That means the page loaded, but Stripe did not send the expected value.</div>
-      <div id="errBox" class="err">Could not copy the requested value.</div>
-    </div>
-
-    <div class="wide panel">
-      <div class="panelTitle">Delivered Key</div>
-      <input id="keyBox" class="box" type="text" readonly value="" placeholder="Waiting for webhook fulfillment..." />
-      <div class="sessionBox">
-        Plan: <b id="planText">Waiting...</b><br>
-        Billing: <b id="billingText">Waiting...</b><br>
-        Sessions: <b id="limitSessions">Waiting...</b><br>
-        Devices: <b id="limitDevices">Waiting...</b><br>
-        Time: <b id="limitTime">Waiting...</b><br>
-        Expiry: <b id="expiryText">Waiting...</b>
-      </div>
-
-      <div id="deliveryOkBox" class="ok">Your key has been delivered and is ready to copy.</div>
-      <div id="deliveryWarnBox" class="warn">Your payment is complete. Waiting for webhook fulfillment to finish writing the delivered key.</div>
-    </div>
-
-    <div class="wide panel">
-      <div class="panelTitle">Next Steps</div>
-      <div class="steps">
-        <div class="step">
-          <div class="stepTitle">1. Payment redirects here</div>
-          <div class="muted">Stripe sends the checkout session id in the URL after a successful checkout.</div>
-        </div>
-
-        <div class="step">
-          <div class="stepTitle">2. Webhook creates the purchased key</div>
-          <div class="muted">The Stripe webhook verifies the event, detects the purchased plan, generates a ScriptNova key, and stores it for lookup.</div>
-        </div>
-
-        <div class="step">
-          <div class="stepTitle">3. This page fetches the real result</div>
-          <div class="muted">The success page calls the Stripe lookup route, waits if fulfillment is still finishing, and reveals the delivered key when ready.</div>
-        </div>
-
-        <div class="step">
-          <div class="stepTitle">4. Copy your key and launch</div>
-          <div class="muted">Once your key appears here, copy it, use the launcher, and keep this page as your purchase receipt reference.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footerNote">
-      Support: <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a> •
+    <div class="footer">
+      Support:
+      <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a>
+      •
       <a href="https://discord.gg/gscGTMVsWE" target="_blank" rel="noreferrer">Discord</a>
     </div>
   </div>
 
   <script>
     const LOOKUP_URL = "https://stripe.scriptnovaa.com/api/checkout/session";
-    const MAX_LOOKUP_ATTEMPTS = 8;
+    const MAX_LOOKUP_ATTEMPTS = 12;
     const LOOKUP_DELAY_MS = 2500;
+    const LOCAL_KEY_NAME = "scriptnova_purchase_key";
+    const LOCAL_KEY_META = "scriptnova_purchase_key_meta";
 
-    function byId(id){ return document.getElementById(id); }
+    function byId(id) {
+      return document.getElementById(id);
+    }
 
     function getSessionIdFromUrl() {
       try {
@@ -553,23 +752,6 @@
       el.style.display = show ? "block" : "none";
     }
 
-    function formatBilling(v) {
-      const s = String(v || "").trim();
-      if (!s) return "Unknown";
-      if (s === "one_time") return "One-Time";
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    }
-
-    function formatDateTime(sec) {
-      const n = Number(sec || 0);
-      if (!n) return "Not set";
-      try {
-        return new Date(n * 1000).toLocaleString();
-      } catch (e) {
-        return "Not set";
-      }
-    }
-
     function formatTtl(seconds) {
       const total = Number(seconds || 0);
       if (!total) return "Unknown";
@@ -586,56 +768,98 @@
       return total + "s";
     }
 
+    function shareAmountText(maxDevices) {
+      const n = Number(maxDevices || 0);
+      if (!n) return "1 person";
+      if (n === 1) return "1 person";
+      return n + " people";
+    }
+
+    function readSavedKey() {
+      try {
+        return {
+          key: String(localStorage.getItem(LOCAL_KEY_NAME) || ""),
+          meta: JSON.parse(localStorage.getItem(LOCAL_KEY_META) || "{}")
+        };
+      } catch (e) {
+        return { key: "", meta: {} };
+      }
+    }
+
+    function saveBrowserBadge(text) {
+      byId("saveBadgeText").textContent = text;
+      byId("saveBadge").style.display = "inline-flex";
+    }
+
+    function hideBrowserBadge() {
+      byId("saveBadge").style.display = "none";
+    }
+
     function setPendingState(message) {
-      byId("statusText").textContent = "Payment received";
-      byId("statusSub").textContent = message;
-      byId("deliveryState").textContent = "Waiting for webhook";
-      byId("deliverySub").textContent = "The payment is done, but the key is still being written.";
-      byId("planText").textContent = "Pending";
-      byId("billingText").textContent = "Pending";
-      byId("limitSessions").textContent = "Pending";
-      byId("limitDevices").textContent = "Pending";
-      byId("limitTime").textContent = "Pending";
-      byId("expiryText").textContent = "Pending";
-      byId("keyBox").value = "";
-      setMsg("deliveryOkBox", "", false);
-      setMsg("deliveryWarnBox", message || "Waiting for webhook fulfillment to finish writing the delivered key.", true);
+      const saved = readSavedKey();
+
+      byId("statusText").textContent = message || "Payment is complete. Waiting for your key to finish processing.";
+      byId("tinyNote").textContent = saved.key
+        ? "A saved key already exists in this browser. This page is still waiting for the newest fulfilled key."
+        : "This page is waiting for your fulfilled key right now.";
+
+      setMsg("warnBox", message || "Payment is complete. Waiting for the webhook to finish writing your key.", true);
+      setMsg("okBox", "", false);
+      setMsg("errBox", "", false);
+
+      if (saved.key) {
+        saveBrowserBadge("A previously saved key exists in this browser.");
+      }
+    }
+
+    function savePurchaseLocally(key, purchase) {
+      try {
+        localStorage.setItem(LOCAL_KEY_NAME, String(key || ""));
+        localStorage.setItem(LOCAL_KEY_META, JSON.stringify({
+          key: String(key || ""),
+          planLabel: String(purchase.planLabel || ""),
+          billingMode: String(purchase.billingMode || ""),
+          sessionId: String(purchase.checkoutSessionId || ""),
+          savedAt: Date.now()
+        }));
+        saveBrowserBadge("Saved in this browser.");
+      } catch (e) {
+        setMsg("errBox", "Your key is ready, but browser save failed on this device.", true);
+      }
     }
 
     function applyPurchaseResult(purchase) {
       const key = purchase && purchase.key ? purchase.key : {};
       const limits = purchase && purchase.limits ? purchase.limits : {};
+      const deliveredKey = String(purchase && purchase.deliveredKey || "");
+      const planLabel = String(purchase && purchase.planLabel || purchase && purchase.planId || "Unknown");
+      const maxDevices = Number(limits.maxDevices || key.maxDevices || 1);
+      const sessionLimit = Number(limits.sessionLimit || key.sessionLimit || 0);
+      const ttlSeconds = Number(limits.ttlSeconds || key.ttlSeconds || 0);
 
-      byId("statusText").textContent = "Fulfilled";
-      byId("statusSub").textContent = "Your payment was confirmed and your ScriptNova key was delivered.";
-      byId("deliveryState").textContent = "Key delivered";
-      byId("deliverySub").textContent = "Webhook fulfillment completed successfully.";
-      byId("keyBox").value = String(purchase.deliveredKey || "");
-      byId("planText").textContent = String(purchase.planLabel || purchase.planId || "Unknown");
-      byId("billingText").textContent = formatBilling(purchase.billingMode);
-      byId("limitSessions").textContent = String(limits.sessionLimit || key.sessionLimit || "Unknown");
-      byId("limitDevices").textContent = String(limits.maxDevices || key.maxDevices || "Unknown");
-      byId("limitTime").textContent = formatTtl(limits.ttlSeconds || key.ttlSeconds || 0);
-      byId("expiryText").textContent = formatDateTime(limits.exp || key.exp || 0);
+      byId("keyBox").value = deliveredKey;
+      byId("planText").textContent = planLabel;
+      byId("devicesText").textContent = shareAmountText(maxDevices);
+      byId("sessionsText").textContent = sessionLimit ? String(sessionLimit) : "Unknown";
+      byId("timeText").textContent = formatTtl(ttlSeconds);
+      byId("shareAmountText").textContent = shareAmountText(maxDevices);
+      byId("shareChip").textContent = "Share with " + shareAmountText(maxDevices);
+      byId("planChip").textContent = planLabel;
+      byId("heroSub").textContent = "Congrats — here is your new key. You can save it in this browser and use it until you stop paying for it. Enjoy. Your key can be shared with " + shareAmountText(maxDevices) + ".";
+      byId("statusText").textContent = "Purchase fulfilled successfully. Your key is ready below.";
+      byId("tinyNote").textContent = "Your key is now ready. Save it somewhere safe and keep it for future use.";
 
-      setMsg("deliveryWarnBox", "", false);
-      setMsg("deliveryOkBox", "Your key has been delivered and is ready to copy.", true);
-      setMsg("okBox", "Purchase lookup completed successfully.", true);
+      savePurchaseLocally(deliveredKey, purchase);
+
       setMsg("warnBox", "", false);
       setMsg("errBox", "", false);
+      setMsg("okBox", "Congrats — here is your new key. Save it somewhere safe.", true);
+
+      spawnConfettiBurst(36);
     }
 
-    async function copySessionId() {
-      const v = byId("sessionBox").value;
-      return copyValue(v, "Session id copied.", "No session id to copy.");
-    }
-
-    async function copyDeliveredKey() {
-      const v = byId("keyBox").value;
-      return copyValue(v, "Delivered key copied.", "No delivered key is ready yet.");
-    }
-
-    async function copyValue(v, okText, emptyText) {
+    async function copyValue(value, okText, emptyText) {
+      const v = String(value || "");
       if (!v) {
         setMsg("errBox", emptyText, true);
         return;
@@ -648,9 +872,11 @@
         setMsg("okBox", okText, true);
       } catch (e) {
         try {
-          const box = v === byId("sessionBox").value ? byId("sessionBox") : byId("keyBox");
-          box.focus();
-          box.select();
+          const box = v === byId("keyBox").value ? byId("keyBox") : null;
+          if (box) {
+            box.focus();
+            box.select();
+          }
           document.execCommand("copy");
           setMsg("okBox", okText, true);
         } catch (e2) {
@@ -659,12 +885,40 @@
       }
     }
 
+    async function copyDeliveredKey() {
+      return copyValue(byId("keyBox").value, "Your new key was copied.", "No delivered key is ready yet.");
+    }
+
+    async function copySessionId() {
+      return copyValue(getSessionIdFromUrl(), "Checkout session id copied.", "No session id was found.");
+    }
+
+    function saveKeyToBrowser() {
+      const key = String(byId("keyBox").value || "");
+      if (!key) {
+        setMsg("errBox", "There is no delivered key ready to save yet.", true);
+        return;
+      }
+
+      try {
+        const meta = readSavedKey().meta || {};
+        localStorage.setItem(LOCAL_KEY_NAME, key);
+        localStorage.setItem(LOCAL_KEY_META, JSON.stringify({
+          ...meta,
+          key,
+          savedAt: Date.now()
+        }));
+        saveBrowserBadge("Saved in this browser.");
+        setMsg("okBox", "Your key was saved in this browser.", true);
+      } catch (e) {
+        setMsg("errBox", "Could not save the key in this browser.", true);
+      }
+    }
+
     async function lookupPurchase(sessionId) {
       const response = await fetch(LOOKUP_URL + "?session_id=" + encodeURIComponent(sessionId), {
         method: "GET",
-        headers: {
-          "Accept": "application/json"
-        }
+        headers: { "Accept": "application/json" }
       });
 
       let data = {};
@@ -690,13 +944,9 @@
         }
 
         if (result && (result.status === "pending_fulfillment" || result.status === "pending")) {
-          setPendingState(result.message || "Payment is complete. Waiting for webhook fulfillment...");
+          setPendingState(result.message || "Payment is complete. Waiting for the webhook to finish writing your key.");
         } else if (result && result.status === "waiting_for_payment") {
-          byId("statusText").textContent = "Waiting for payment";
-          byId("statusSub").textContent = "The checkout session exists, but Stripe does not show it as paid yet.";
-          byId("deliveryState").textContent = "Payment not complete";
-          byId("deliverySub").textContent = "This page will not receive a key until payment is marked paid.";
-          setMsg("deliveryWarnBox", result.message || "Checkout session exists, but payment is not marked paid yet.", true);
+          setPendingState("Your checkout session exists, but payment is not marked complete yet.");
           return;
         } else {
           setPendingState("Your purchase is still being finalized. Please wait a moment.");
@@ -707,46 +957,70 @@
         }
       }
 
-      setMsg("deliveryWarnBox", "Payment looks complete, but fulfillment is still pending. Refresh this page in a few seconds if the key has not appeared yet.", true);
+      setMsg("warnBox", "Your payment looks complete, but your key is still finalizing. Refresh this page in a few seconds if it has not appeared yet.", true);
+    }
+
+    function spawnConfettiBurst(count) {
+      const colors = ["#00e5ff", "#00ffb0", "#7c4dff", "#ffd166", "#ffffff"];
+
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (3 + Math.random() * 2.6) + "s";
+        piece.style.animationDelay = (Math.random() * .6) + "s";
+        piece.style.transform = "rotate(" + (Math.random() * 300) + "deg)";
+        piece.style.opacity = String(.6 + Math.random() * .35);
+        piece.style.width = (8 + Math.random() * 5) + "px";
+        piece.style.height = (12 + Math.random() * 8) + "px";
+        document.body.appendChild(piece);
+
+        setTimeout(function() {
+          if (piece && piece.parentNode) {
+            piece.parentNode.removeChild(piece);
+          }
+        }, 6500);
+      }
+    }
+
+    function preloadSavedState() {
+      const saved = readSavedKey();
+
+      if (saved.key) {
+        byId("tinyNote").textContent = "A saved ScriptNova key already exists in this browser.";
+        saveBrowserBadge("A saved key already exists in this browser.");
+      } else {
+        hideBrowserBadge();
+      }
     }
 
     async function initPage() {
+      preloadSavedState();
+
       const sessionId = getSessionIdFromUrl();
-
-      byId("sessionBox").value = sessionId;
       byId("sessionShort").textContent = shortSessionId(sessionId);
-      byId("sessionPresent").textContent = sessionId ? "Yes" : "No";
 
-      if (sessionId) {
-        byId("sessionSource").textContent = "URL query";
-        setMsg("okBox", "Payment success page loaded correctly.", true);
-        setMsg("warnBox", "", false);
-        setPendingState("Checking your Stripe purchase now...");
-
-        try {
-          await runLookup(sessionId);
-        } catch (e) {
-          byId("statusText").textContent = "Lookup failed";
-          byId("statusSub").textContent = "The page loaded, but the purchase lookup request failed.";
-          byId("deliveryState").textContent = "Could not load key";
-          byId("deliverySub").textContent = "Check the Stripe service deployment and route path.";
-          setMsg("deliveryWarnBox", "", false);
-          setMsg("errBox", e && e.message ? String(e.message) : "Could not load the purchase result.", true);
-        }
-      } else {
-        byId("sessionSource").textContent = "Not found";
-        setMsg("warnBox", "No session id was found in the URL. That means the page loaded, but Stripe did not send the expected value.", true);
-        setMsg("okBox", "", false);
-        byId("statusText").textContent = "Success page loaded";
-        byId("statusSub").textContent = "The page works, but no session_id was found in the URL.";
-        byId("deliveryState").textContent = "No session id";
-        byId("deliverySub").textContent = "A lookup cannot run without the checkout session id.";
+      if (!sessionId) {
+        byId("statusText").textContent = "No session id was found in the URL.";
+        byId("tinyNote").textContent = "This page needs a Stripe session id before it can load your purchase.";
         byId("planText").textContent = "Unavailable";
-        byId("billingText").textContent = "Unavailable";
-        byId("limitSessions").textContent = "Unavailable";
-        byId("limitDevices").textContent = "Unavailable";
-        byId("limitTime").textContent = "Unavailable";
-        byId("expiryText").textContent = "Unavailable";
+        byId("devicesText").textContent = "Unavailable";
+        byId("sessionsText").textContent = "Unavailable";
+        byId("timeText").textContent = "Unavailable";
+        byId("shareAmountText").textContent = "Unavailable";
+        byId("shareChip").textContent = "No session id";
+        byId("planChip").textContent = "No purchase loaded";
+        setMsg("warnBox", "No session id was found in the URL, so the page could not load your purchase.", true);
+        return;
+      }
+
+      try {
+        await runLookup(sessionId);
+      } catch (e) {
+        byId("statusText").textContent = "The purchase lookup request failed.";
+        byId("tinyNote").textContent = "Check the Stripe service deployment if this keeps happening.";
+        setMsg("errBox", e && e.message ? String(e.message) : "Could not load your delivered key.", true);
       }
     }
 
