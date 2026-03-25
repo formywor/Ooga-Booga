@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Stripe Checkout Test</title>
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#0b1020;
+      color:#fff;
+      padding:24px;
+    }
+    .box{
+      max-width:800px;
+      margin:0 auto;
+      background:#121a33;
+      border:1px solid #2a3b6a;
+      border-radius:16px;
+      padding:20px;
+    }
+    button, select{
+      font-size:16px;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid #35508f;
+      background:#1a2750;
+      color:#fff;
+    }
+    button{ cursor:pointer; }
+    pre{
+      margin-top:18px;
+      padding:14px;
+      background:#08101f;
+      border:1px solid #22345f;
+      border-radius:12px;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Stripe Checkout Test</h1>
+
+    <label for="plan">Plan:</label>
+    <select id="plan">
+      <option value="basic_monthly">basic_monthly</option>
+      <option value="basic_yearly">basic_yearly</option>
+      <option value="pro_monthly">pro_monthly</option>
+      <option value="pro_yearly">pro_yearly</option>
+      <option value="elite_monthly">elite_monthly</option>
+      <option value="elite_yearly">elite_yearly</option>
+      <option value="express_one_time">express_one_time</option>
+      <option value="black_express_one_time">black_express_one_time</option>
+    </select>
+
+    <button id="testBtn">Test Checkout API</button>
+
+    <pre id="out">Click the button to test...</pre>
+  </div>
+
+  <script>
+    const out = document.getElementById("out");
+    const btn = document.getElementById("testBtn");
+    const plan = document.getElementById("plan");
+
+    btn.onclick = async function () {
+      out.textContent = "Loading...";
+      try {
+        const res = await fetch("https://stripe.scriptnovaa.com/api/checkout/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            planId: plan.value,
+            site: "scriptnovaa.com",
+            source: "manual_test_page"
+          })
+        });
+
+        const text = await res.text();
+        out.textContent = "HTTP " + res.status + "\n\n" + text;
+      } catch (err) {
+        out.textContent = "Fetch failed:\n\n" + (err && err.message ? err.message : String(err));
+      }
+    };
+  </script>
+</body>
+</html>
