@@ -149,6 +149,29 @@
       box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
     }
 
+    .announcement{
+      margin-top:16px;
+      padding:16px;
+      border-radius:18px;
+      border:1px solid rgba(255,209,102,.35);
+      background:linear-gradient(180deg, rgba(255,209,102,.12), rgba(255,209,102,.06));
+      color:#fff0c7;
+      line-height:1.6;
+      box-shadow:0 10px 26px rgba(0,0,0,.18);
+    }
+
+    .announcement b{
+      color:#ffd166;
+    }
+
+    .announcementTitle{
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+
     .heroBottom{
       display:grid;
       grid-template-columns:1.4fr .9fr;
@@ -477,6 +500,17 @@
       border-color:#3b5f89;
     }
 
+    .plan.unavailable{
+      border-color:rgba(255,106,106,.28);
+      box-shadow:0 0 18px rgba(255,106,106,.05), var(--shadow);
+      opacity:.9;
+    }
+
+    .plan.unavailable .time{
+      color:#ff9d9d !important;
+      text-shadow:none !important;
+    }
+
     .plan::before{
       content:"";
       position:absolute;
@@ -489,6 +523,10 @@
 
     .plan.special::before{
       background:linear-gradient(90deg,transparent, rgba(255,209,102,.8), transparent);
+    }
+
+    .plan.unavailable::before{
+      background:linear-gradient(90deg,transparent, rgba(255,106,106,.75), transparent);
     }
 
     .plan h4{
@@ -561,6 +599,11 @@
       box-shadow:0 0 14px rgba(255,209,102,.18);
     }
 
+    .unavailable .fill{
+      background:linear-gradient(90deg,#8a3333,#c45656);
+      box-shadow:none;
+    }
+
     .fill::after{
       content:"";
       position:absolute;
@@ -581,6 +624,10 @@
       color:#c9ffe2;
       min-height:18px;
       font-weight:700;
+    }
+
+    .unlockText.unavailableText{
+      color:#ffb1b1;
     }
 
     .planTopRow{
@@ -605,6 +652,12 @@
       color:#fff2cf;
       border-color:rgba(255,209,102,.25);
       background:#221a09;
+    }
+
+    .badge.red{
+      color:#ffd6d6;
+      border-color:rgba(255,106,106,.22);
+      background:#251010;
     }
 
     .footerSorry{
@@ -884,19 +937,23 @@
     <div class="hero">
       <div class="title"><b>ScriptNova</b> — FREE Key Generator</div>
       <div class="sub">
-        Choose your FREE key tier below. Only <b>one active FREE key</b> can exist on this browser at a time.
-        Redirect progress is saved <b>only in this browser</b>, so it stays even if the page code changes later.
+        For now, all currently available FREE keys below require <b>0 redirects</b>. Complete the checklist, pick a tier, and generate it.
+        Only <b>one active FREE key</b> can exist on this browser at a time.
       </div>
 
       <div class="heroRow">
-        <span class="pill">4m FREE</span>
-        <span class="pill">15m FREE</span>
-        <span class="pill">35m FREE</span>
-        <span class="pill">1h FREE</span>
-        <span class="pill">2h FREE</span>
-        <span class="pill">3h FREE</span>
-        <span class="pill">6h FREE</span>
-        <span class="pill">10h Special</span>
+        <span class="pill">4m FREE • 0 redirects</span>
+        <span class="pill">15m FREE • 0 redirects</span>
+        <span class="pill">35m FREE • 0 redirects</span>
+        <span class="pill">1h FREE • 0 redirects</span>
+        <span class="pill">2h+ temporarily unavailable</span>
+      </div>
+
+      <div class="announcement">
+        <div class="announcementTitle">Temporary Update</div>
+        We are <b>super sorry</b>, but our ad partner got mad and kinda canceled us for now.
+        Because of that, we made all currently available FREE keys require <b>0 redirects</b> until we strike a new deal.
+        <b>All 2h+ tiers are temporarily unavailable</b> right now. Thanks for being patient with us.
       </div>
 
       <div class="gridInfo">
@@ -922,7 +979,7 @@
         <div class="heroPanel">
           <div class="summaryTitle">Overall Unlock Progress</div>
           <div class="globalMeter"><div id="globalFill" class="globalFill"></div></div>
-          <div class="summaryLine" id="globalSummary">0 redirects counted total.</div>
+          <div class="summaryLine" id="globalSummary">Available tiers now need 0 redirects.</div>
         </div>
 
         <div class="heroPanel">
@@ -965,15 +1022,15 @@
           <input id="c4" type="checkbox" />
           <div>
             <div>I understand redirect progress is stored only in my browser.</div>
-            <div class="small">No backend save is used for redirect progress.</div>
+            <div class="small">Right now redirects are not required for available tiers.</div>
           </div>
         </div>
 
         <div class="chk">
           <input id="c5" type="checkbox" />
           <div>
-            <div>I allow redirect pages to open in a new tab.</div>
-            <div class="small">If popups are blocked, allow them for better redirect counting.</div>
+            <div>I understand some tiers are temporarily unavailable.</div>
+            <div class="small">2h, 3h, 6h, and 10h Special are disabled for now.</div>
           </div>
         </div>
 
@@ -993,7 +1050,7 @@
         </div>
 
         <div class="funFact">
-          <b>Fun fact:</b> ScriptNova was the first ever company to make a browser launcher using a <b>.hta</b> file.
+          <b>Temporary note:</b> Available FREE keys are using a <b>0 redirect</b> unlock for now while we work things out with a new ad setup.
         </div>
       </div>
 
@@ -1005,7 +1062,7 @@
     <div class="smartRow">
       <div class="smartBox">
         <div class="k">Redirect Stats</div>
-        <div class="v" id="redirectStats">0 total redirects</div>
+        <div class="v" id="redirectStats">Redirects paused for available tiers</div>
         <div class="sparkWrap" id="sparkWrap"></div>
       </div>
       <div class="smartBox">
@@ -1022,19 +1079,19 @@
       <div class="plan" id="plan4m">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Quick Unlock</span>
+          <span class="badge">Instant</span>
         </div>
         <div class="time">4 Minutes</div>
-        <div class="desc">Fast starter free key.</div>
+        <div class="desc">Fast starter free key. Right now this tier needs <b>0 redirects</b>.</div>
         <div class="metaRow">
-          <span class="metaPill">2 redirects</span>
+          <span class="metaPill">0 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill4m" class="fill"></div></div>
-        <div class="stat"><span id="stat4m">0 / 2 redirects completed</span></div>
-        <div class="unlockText" id="unlock4m">Locked</div>
+        <div class="stat"><span id="stat4m">Ready after checklist</span></div>
+        <div class="unlockText" id="unlock4m">Ready after checklist</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn4mRedirect" class="btn secondary" onclick="doRedirectStep('4m')">Open Redirect</button>
+          <button id="btn4mRedirect" class="btn secondary" onclick="showNoRedirectNeeded('4m')">No Redirect Needed</button>
           <button id="btn4m" class="btn good" onclick="generateTierKey('4m')" disabled>Generate 4m Key</button>
         </div>
       </div>
@@ -1045,16 +1102,16 @@
           <span class="badge">Starter</span>
         </div>
         <div class="time">15 Minutes</div>
-        <div class="desc">A basic free key after a small unlock requirement.</div>
+        <div class="desc">A basic free key. Right now this tier needs <b>0 redirects</b>.</div>
         <div class="metaRow">
-          <span class="metaPill">10 redirects</span>
+          <span class="metaPill">0 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill15m" class="fill"></div></div>
-        <div class="stat"><span id="stat15m">0 / 10 redirects completed</span></div>
-        <div class="unlockText" id="unlock15m">Locked</div>
+        <div class="stat"><span id="stat15m">Ready after checklist</span></div>
+        <div class="unlockText" id="unlock15m">Ready after checklist</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn15mRedirect" class="btn secondary" onclick="doRedirectStep('15m')">Open Redirect</button>
+          <button id="btn15mRedirect" class="btn secondary" onclick="showNoRedirectNeeded('15m')">No Redirect Needed</button>
           <button id="btn15m" class="btn good" onclick="generateTierKey('15m')" disabled>Generate 15m Key</button>
         </div>
       </div>
@@ -1062,19 +1119,19 @@
       <div class="plan" id="plan35m">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Tier Unlock</span>
+          <span class="badge">Open</span>
         </div>
         <div class="time">35 Minutes</div>
-        <div class="desc">A longer free session after more progress.</div>
+        <div class="desc">A longer free session. Right now this tier needs <b>0 redirects</b>.</div>
         <div class="metaRow">
-          <span class="metaPill">50 redirects</span>
+          <span class="metaPill">0 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill35m" class="fill"></div></div>
-        <div class="stat"><span id="stat35m">0 / 50 redirects completed</span></div>
-        <div class="unlockText" id="unlock35m">Locked</div>
+        <div class="stat"><span id="stat35m">Ready after checklist</span></div>
+        <div class="unlockText" id="unlock35m">Ready after checklist</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn35mRedirect" class="btn secondary" onclick="doRedirectStep('35m')">Open Redirect</button>
+          <button id="btn35mRedirect" class="btn secondary" onclick="showNoRedirectNeeded('35m')">No Redirect Needed</button>
           <button id="btn35m" class="btn" onclick="generateTierKey('35m')" disabled>Generate 35m Key</button>
         </div>
       </div>
@@ -1082,100 +1139,100 @@
       <div class="plan" id="plan1h">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Requested</span>
+          <span class="badge">Open</span>
         </div>
         <div class="time">1 Hour</div>
-        <div class="desc">A stronger free key with a medium unlock amount.</div>
+        <div class="desc">A stronger free key. Right now this tier needs <b>0 redirects</b>.</div>
         <div class="metaRow">
-          <span class="metaPill">75 redirects</span>
+          <span class="metaPill">0 redirects</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill1h" class="fill"></div></div>
-        <div class="stat"><span id="stat1h">0 / 75 redirects completed</span></div>
-        <div class="unlockText" id="unlock1h">Locked</div>
+        <div class="stat"><span id="stat1h">Ready after checklist</span></div>
+        <div class="unlockText" id="unlock1h">Ready after checklist</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn1hRedirect" class="btn secondary" onclick="doRedirectStep('1h')">Open Redirect</button>
+          <button id="btn1hRedirect" class="btn secondary" onclick="showNoRedirectNeeded('1h')">No Redirect Needed</button>
           <button id="btn1h" class="btn" onclick="generateTierKey('1h')" disabled>Generate 1h Key</button>
         </div>
       </div>
 
-      <div class="plan" id="plan2h">
+      <div class="plan unavailable" id="plan2h">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Tier Unlock</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">2 Hours</div>
-        <div class="desc">Longer unlock path for a longer free key.</div>
+        <div class="desc">This tier is temporarily unavailable while we work on a new deal.</div>
         <div class="metaRow">
-          <span class="metaPill">120 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill2h" class="fill"></div></div>
-        <div class="stat"><span id="stat2h">0 / 120 redirects completed</span></div>
-        <div class="unlockText" id="unlock2h">Locked</div>
+        <div class="stat"><span id="stat2h">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock2h">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn2hRedirect" class="btn secondary" onclick="doRedirectStep('2h')">Open Redirect</button>
-          <button id="btn2h" class="btn" onclick="generateTierKey('2h')" disabled>Generate 2h Key</button>
+          <button id="btn2hRedirect" class="btn secondary" onclick="showUnavailableTier('2h')" disabled>Unavailable</button>
+          <button id="btn2h" class="btn" onclick="generateTierKey('2h')" disabled>Unavailable</button>
         </div>
       </div>
 
-      <div class="plan" id="plan3h">
+      <div class="plan unavailable" id="plan3h">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Extended</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">3 Hours</div>
-        <div class="desc">A harder unlock for users who want more time.</div>
+        <div class="desc">This tier is temporarily unavailable while we work on a new deal.</div>
         <div class="metaRow">
-          <span class="metaPill">150 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill3h" class="fill"></div></div>
-        <div class="stat"><span id="stat3h">0 / 150 redirects completed</span></div>
-        <div class="unlockText" id="unlock3h">Locked</div>
+        <div class="stat"><span id="stat3h">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock3h">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn3hRedirect" class="btn secondary" onclick="doRedirectStep('3h')">Open Redirect</button>
-          <button id="btn3h" class="btn" onclick="generateTierKey('3h')" disabled>Generate 3h Key</button>
+          <button id="btn3hRedirect" class="btn secondary" onclick="showUnavailableTier('3h')" disabled>Unavailable</button>
+          <button id="btn3h" class="btn" onclick="generateTierKey('3h')" disabled>Unavailable</button>
         </div>
       </div>
 
-      <div class="plan" id="plan6h">
+      <div class="plan unavailable" id="plan6h">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Big Unlock</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">6 Hours</div>
-        <div class="desc">High effort, much longer free access.</div>
+        <div class="desc">This tier is temporarily unavailable while we work on a new deal.</div>
         <div class="metaRow">
-          <span class="metaPill">250 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill6h" class="fill"></div></div>
-        <div class="stat"><span id="stat6h">0 / 250 redirects completed</span></div>
-        <div class="unlockText" id="unlock6h">Locked</div>
+        <div class="stat"><span id="stat6h">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock6h">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn6hRedirect" class="btn secondary" onclick="doRedirectStep('6h')">Open Redirect</button>
-          <button id="btn6h" class="btn" onclick="generateTierKey('6h')" disabled>Generate 6h Key</button>
+          <button id="btn6hRedirect" class="btn secondary" onclick="showUnavailableTier('6h')" disabled>Unavailable</button>
+          <button id="btn6h" class="btn" onclick="generateTierKey('6h')" disabled>Unavailable</button>
         </div>
       </div>
 
-      <div class="plan special" id="plan10h4s">
+      <div class="plan special unavailable" id="plan10h4s">
         <div class="planTopRow">
           <h4>Special FREE Key</h4>
-          <span class="badge gold">Special</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">10 Hours</div>
-        <div class="desc">Special free option. Shows as a bigger unlock with support for up to <b>4 sessions</b> if your backend allows it.</div>
+        <div class="desc">This special tier is temporarily unavailable while we work on a new deal.</div>
         <div class="metaRow">
-          <span class="metaPill">400 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">4 sessions</span>
         </div>
         <div class="meter"><div id="fill10h4s" class="fill"></div></div>
-        <div class="stat"><span id="stat10h4s">0 / 400 redirects completed</span></div>
-        <div class="unlockText" id="unlock10h4s">Locked</div>
+        <div class="stat"><span id="stat10h4s">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock10h4s">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn10h4sRedirect" class="btn secondary" onclick="doRedirectStep('10h4s')">Open Redirect</button>
-          <button id="btn10h4s" class="btn gold" onclick="generateTierKey('10h4s')" disabled>Generate Special Key</button>
+          <button id="btn10h4sRedirect" class="btn secondary" onclick="showUnavailableTier('10h4s')" disabled>Unavailable</button>
+          <button id="btn10h4s" class="btn gold" onclick="generateTierKey('10h4s')" disabled>Unavailable</button>
         </div>
       </div>
     </div>
@@ -1204,7 +1261,7 @@
       </div>
 
       <div id="redirectHint" class="redirectHint">
-        Redirects try to open in a <b>new tab</b>. If your browser blocks popups, allow them for this page and try again.
+        Redirects are currently paused for available tiers. Just complete the checklist and generate your key.
       </div>
     </div>
 
@@ -1220,7 +1277,7 @@
     </div>
 
     <div class="footerSorry">
-      If you experienced a free key making error, we are sorry about it and it won’t happen again.
+      We are super sorry about the ad partner issue. Available FREE keys now need 0 redirects for now, and 2h+ tiers will come back later.
     </div>
   </div>
 
@@ -1244,15 +1301,18 @@
     const CLICK_COOLDOWN_MS = 4000;
     const REDIRECT_STEP_COOLDOWN_MS = 1200;
 
+    const AVAILABLE_TIERS = ["4m","15m","35m","1h"];
+    const UNAVAILABLE_TIERS = ["2h","3h","6h","10h4s"];
+
     const TIER_CONFIG = {
-      "4m":    { label: "4 Minutes", ttl: 240, needed: 2, sessions: 1, button: "Generate 4m Key" },
-      "15m":   { label: "15 Minutes", ttl: 900, needed: 10, sessions: 1, button: "Generate 15m Key" },
-      "35m":   { label: "35 Minutes", ttl: 2100, needed: 50, sessions: 1, button: "Generate 35m Key" },
-      "1h":    { label: "1 Hour", ttl: 3600, needed: 75, sessions: 1, button: "Generate 1h Key" },
-      "2h":    { label: "2 Hours", ttl: 7200, needed: 120, sessions: 1, button: "Generate 2h Key" },
-      "3h":    { label: "3 Hours", ttl: 10800, needed: 150, sessions: 1, button: "Generate 3h Key" },
-      "6h":    { label: "6 Hours", ttl: 21600, needed: 250, sessions: 1, button: "Generate 6h Key" },
-      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 400, sessions: 4, button: "Generate Special Key" }
+      "4m":    { label: "4 Minutes", ttl: 240, needed: 0, sessions: 1, button: "Generate 4m Key", available: true },
+      "15m":   { label: "15 Minutes", ttl: 900, needed: 0, sessions: 1, button: "Generate 15m Key", available: true },
+      "35m":   { label: "35 Minutes", ttl: 2100, needed: 0, sessions: 1, button: "Generate 35m Key", available: true },
+      "1h":    { label: "1 Hour", ttl: 3600, needed: 0, sessions: 1, button: "Generate 1h Key", available: true },
+      "2h":    { label: "2 Hours", ttl: 7200, needed: 999999, sessions: 1, button: "Unavailable", available: false },
+      "3h":    { label: "3 Hours", ttl: 10800, needed: 999999, sessions: 1, button: "Unavailable", available: false },
+      "6h":    { label: "6 Hours", ttl: 21600, needed: 999999, sessions: 1, button: "Unavailable", available: false },
+      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 999999, sessions: 4, button: "Unavailable", available: false }
     };
 
     const TIER_ORDER = ["4m","15m","35m","1h","2h","3h","6h","10h4s"];
@@ -1455,9 +1515,15 @@
       return !!(s && s.exp > nowSec());
     }
 
+    function tierIsAvailable(tier){
+      return !!(TIER_CONFIG[tier] && TIER_CONFIG[tier].available);
+    }
+
     function clampProgress(tier, value){
+      const cfg = TIER_CONFIG[tier];
+      if(!cfg) return 0;
       const n = Math.max(0, parseInt(value, 10) || 0);
-      return Math.min(n, TIER_CONFIG[tier].needed);
+      return Math.min(n, cfg.needed);
     }
 
     function emptyProgressObject(){
@@ -1517,11 +1583,13 @@
     }
 
     function tierUnlocked(tier){
+      if(!tierIsAvailable(tier)) return false;
       const p = readProgress();
       return (p[tier] || 0) >= TIER_CONFIG[tier].needed;
     }
 
     function canGenerateTier(tier){
+      if(!tierIsAvailable(tier)) return false;
       if(!checklistOk()) return false;
       if(hasActiveKey()) return false;
       if(Date.now() < cooldownUntil) return false;
@@ -1529,7 +1597,8 @@
       return true;
     }
 
-    function canDoRedirect(){
+    function canDoRedirect(tier){
+      if(!tierIsAvailable(tier)) return false;
       if(!checklistOk()) return false;
       if(hasActiveKey()) return false;
       if(Date.now() < redirectCooldownUntil) return false;
@@ -1572,52 +1641,67 @@
 
     function updatePlanUi(tier, current, needed){
       const key = domKey(tier);
-      const pct = Math.max(0, Math.min(100, (current / needed) * 100));
-      byId("fill" + key).style.width = pct + "%";
-      byId("stat" + key).textContent = current + " / " + needed + " redirects completed";
-      byId("unlock" + key).textContent = current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects");
-
+      const cfg = TIER_CONFIG[tier];
       const planEl = byId("plan" + key);
+
+      if(!cfg.available){
+        byId("fill" + key).style.width = "100%";
+        byId("stat" + key).textContent = "Temporarily unavailable";
+        byId("unlock" + key).textContent = "Temporarily unavailable";
+        byId("unlock" + key).classList.add("unavailableText");
+        if(planEl) planEl.classList.add("unavailable");
+        return;
+      }
+
+      const pct = needed <= 0 ? 100 : Math.max(0, Math.min(100, (current / needed) * 100));
+      byId("fill" + key).style.width = pct + "%";
+      byId("stat" + key).textContent = needed <= 0
+        ? "Ready after checklist"
+        : (current + " / " + needed + " redirects completed");
+      byId("unlock" + key).textContent = needed <= 0
+        ? "Ready after checklist"
+        : (current >= needed ? "Unlocked" : ("Need " + (needed - current) + " more redirects"));
+
       if(planEl){
-        planEl.classList.toggle("unlocked", current >= needed);
+        planEl.classList.toggle("unlocked", current >= needed || needed === 0);
       }
     }
 
     function getBestUnlockedTier(){
-      for(let i = TIER_ORDER.length - 1; i >= 0; i--){
-        const tier = TIER_ORDER[i];
+      for(let i = AVAILABLE_TIERS.length - 1; i >= 0; i--){
+        const tier = AVAILABLE_TIERS[i];
         if(tierUnlocked(tier)) return tier;
       }
       return null;
     }
 
     function getNextTier(){
-      const p = readProgress();
-      for(const tier of TIER_ORDER){
-        if((p[tier] || 0) < TIER_CONFIG[tier].needed) return tier;
+      if(!checklistOk()) return null;
+      for(const tier of AVAILABLE_TIERS){
+        if(tierUnlocked(tier)) return tier;
       }
-      return null;
+      return AVAILABLE_TIERS[0];
     }
 
     function totalNeededAll(){
       let total = 0;
-      for(const tier of TIER_ORDER) total += TIER_CONFIG[tier].needed;
+      for(const tier of AVAILABLE_TIERS) total += TIER_CONFIG[tier].needed;
       return total;
     }
 
     function totalProgressAll(){
       const p = readProgress();
       let total = 0;
-      for(const tier of TIER_ORDER) total += Number(p[tier] || 0);
+      for(const tier of AVAILABLE_TIERS) total += Number(p[tier] || 0);
       return total;
     }
 
     function updateSummaryUi(){
       const total = totalProgressAll();
       const needed = totalNeededAll();
-      const pct = Math.max(0, Math.min(100, (total / needed) * 100));
+      const pct = needed <= 0 ? 100 : Math.max(0, Math.min(100, (total / needed) * 100));
       byId("globalFill").style.width = pct + "%";
-      byId("globalSummary").textContent = total + " redirects counted total • " + Math.round(pct) + "% of all unlock progress";
+      byId("globalSummary").textContent = "Available tiers now need 0 redirects • ready after checklist";
 
       const nextTier = getNextTier();
       if(!checklistOk()){
@@ -1626,18 +1710,16 @@
         const s = readSaved();
         byId("nextTierSummary").textContent = "You already have an active " + ((s && s.tier) || "FREE") + " key on this browser.";
       } else if(nextTier){
-        const p = readProgress();
-        const left = Math.max(0, TIER_CONFIG[nextTier].needed - (p[nextTier] || 0));
-        byId("nextTierSummary").textContent = TIER_CONFIG[nextTier].label + " is your next target • " + left + " redirects left";
+        byId("nextTierSummary").textContent = TIER_CONFIG[nextTier].label + " is ready to generate right now.";
       } else {
-        byId("nextTierSummary").textContent = "All listed tiers are fully unlocked on this browser.";
+        byId("nextTierSummary").textContent = "Pick any available tier below.";
       }
 
       const best = getBestUnlockedTier();
       byId("bestTierReached").textContent = best ? TIER_CONFIG[best].label : "None yet";
 
       const meta = readMeta();
-      byId("redirectStats").textContent = (Number(meta.totalRedirects || 0)) + " total redirects";
+      byId("redirectStats").textContent = "Redirects paused for available tiers";
       byId("lastAction").textContent = meta.lastAction || "Waiting for your first action.";
 
       renderSpark();
@@ -1660,13 +1742,9 @@
       } else {
         const bestUnlocked = getBestUnlockedTier();
         if(bestUnlocked){
-          byId("infoUnlock").textContent = TIER_CONFIG[bestUnlocked].label + " unlocked";
+          byId("infoUnlock").textContent = TIER_CONFIG[bestUnlocked].label + " ready";
         } else {
-          byId("infoUnlock").textContent =
-            p["4m"] + "/2 • " +
-            p["15m"] + "/10 • " +
-            p["35m"] + "/50 • " +
-            p["1h"] + "/75";
+          byId("infoUnlock").textContent = checklistOk() ? "Available tiers ready" : "Checklist needed";
         }
       }
 
@@ -1682,16 +1760,25 @@
         const genBtn = byId("btn" + key);
         const redirBtn = byId("btn" + key + "Redirect");
 
+        if(!tierIsAvailable(tier)){
+          genBtn.disabled = true;
+          redirBtn.disabled = true;
+          genBtn.textContent = "Unavailable";
+          redirBtn.textContent = "Unavailable";
+          continue;
+        }
+
         genBtn.disabled = !canGenerateTier(tier);
-        redirBtn.disabled = !canDoRedirect();
+        redirBtn.disabled = !canDoRedirect(tier);
 
         genBtn.textContent = active ? "Key already generated" : TIER_CONFIG[tier].button;
+        redirBtn.textContent = "No Redirect Needed";
       }
 
       const nextTier = getNextTier();
       for(const tier of TIER_ORDER){
         const plan = byId("plan" + domKey(tier));
-        if(plan){
+        if(plan && tierIsAvailable(tier)){
           plan.classList.toggle("activeTier", nextTier === tier && !hasActiveKey() && checklistOk());
         }
       }
@@ -1699,10 +1786,16 @@
 
     function incrementTierProgress(tier){
       const cfg = TIER_CONFIG[tier];
-      if(!cfg) return { current: 0, needed: 0 };
+      if(!cfg || !cfg.available) return { current: 0, needed: 0 };
 
       const p = readProgress();
       const cur = clampProgress(tier, p[tier]);
+
+      if(cfg.needed <= 0){
+        p[tier] = 0;
+        saveProgress(p);
+        return { current: 0, needed: 0 };
+      }
 
       if(cur < cfg.needed){
         p[tier] = cur + 2;
@@ -1739,61 +1832,49 @@
       }
     }
 
+    function showNoRedirectNeeded(tier){
+      const cfg = TIER_CONFIG[tier];
+      if(!cfg || !cfg.available){
+        showWarn("That tier is temporarily unavailable.");
+        return;
+      }
+
+      byId("redirectHint").classList.add("show");
+      setLastAction(cfg.label + " does not need redirects right now.");
+      showOk(cfg.label + " currently needs 0 redirects. Complete the checklist and generate it.");
+      refreshButtons();
+      updateInfoBar();
+    }
+
+    function showUnavailableTier(tier){
+      const cfg = TIER_CONFIG[tier];
+      showWarn((cfg ? cfg.label : "This tier") + " is temporarily unavailable right now.");
+      setLastAction((cfg ? cfg.label : "Tier") + " unavailable.");
+    }
+
     function doRedirectStep(tier){
       if(!TIER_CONFIG[tier]){
         showErr("Invalid tier.");
         return false;
       }
 
-      if(!checklistOk()){
-        showErr("Complete the checklist first.");
-        refreshButtons();
+      if(!tierIsAvailable(tier)){
+        showWarn(TIER_CONFIG[tier].label + " is temporarily unavailable right now.");
         return false;
       }
 
-      if(hasActiveKey()){
-        showErr("You already have a FREE key. Use it until it expires.");
-        refreshButtons();
-        return false;
-      }
-
-      if(Date.now() < redirectCooldownUntil){
-        showWarn("Please wait a moment before opening another redirect.");
-        refreshButtons();
-        return false;
-      }
-
-      const cfg = TIER_CONFIG[tier];
-      const progress = incrementTierProgress(tier);
-      redirectCooldownUntil = Date.now() + REDIRECT_STEP_COOLDOWN_MS;
-
-      markRedirectHistory();
-      setLastAction("Redirect counted for " + cfg.label + ".");
-      renderProgress();
-      byId("redirectHint").classList.add("show");
-
-      const opened = openRedirectInNewTab(REDIRECT_URL);
-
-      if(progress.current >= progress.needed){
-        showOk(cfg.label + " tier unlocked. You can generate that key now.");
-        if(!opened){
-          showWarn("Redirect counted and tier unlocked, but your browser blocked the new tab.");
-        }
-        return true;
-      }
-
-      showOk("Redirect counted for " + cfg.label + ". Progress: " + progress.current + " / " + progress.needed);
-
-      if(!opened){
-        showWarn("Redirect step counted, but the new tab was blocked. Allow popups for this page if needed.");
-      }
-
-      return true;
+      return showNoRedirectNeeded(tier);
     }
 
     async function generateTierKey(tier){
       if(!TIER_CONFIG[tier]){
         showErr("Invalid tier.");
+        return;
+      }
+
+      if(!tierIsAvailable(tier)){
+        showWarn(TIER_CONFIG[tier].label + " is temporarily unavailable right now.");
+        refreshButtons();
         return;
       }
 
@@ -2027,6 +2108,8 @@
     refreshButtons();
     updateInfoBar();
     updateCooldownInfo();
+
+    byId("redirectHint").classList.add("show");
 
     setInterval(function(){
       refreshButtons();
