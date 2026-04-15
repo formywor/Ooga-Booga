@@ -2,61 +2,108 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>ScriptNova Announcement</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ScriptNova Status</title>
+  
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: #0b0f14;
-      color: #ffffff;
+      background: #0a0a0a;
+      color: #eaeaea;
       font-family: Arial, sans-serif;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
       text-align: center;
+      overflow: hidden;
     }
 
     .container {
-      max-width: 600px;
-      padding: 20px;
+      max-width: 800px;
+      padding: 30px;
+      border: 1px solid #222;
+      border-radius: 12px;
+      background: rgba(20, 20, 20, 0.9);
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      animation: fadeIn 2s ease;
     }
 
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      color: #ff4d4d;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      position: relative;
+      animation: glitch 2s infinite;
     }
 
     p {
-      font-size: 1.2rem;
-      line-height: 1.6;
+      font-size: 1.1em;
+      line-height: 1.6em;
       color: #ccc;
     }
 
+    .highlight {
+      color: #00ffcc;
+      font-weight: bold;
+    }
+
     .footer {
-      margin-top: 30px;
-      font-size: 0.9rem;
-      color: #777;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #888;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glitch effect */
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px red, -2px -2px blue; }
+      20% { text-shadow: -2px -2px red, 2px 2px blue; }
+      40% { text-shadow: 2px -2px red, -2px 2px blue; }
+      60% { text-shadow: -2px 2px red, 2px -2px blue; }
+      80% { text-shadow: 2px 2px red, -2px -2px blue; }
+      100% { text-shadow: none; }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>ScriptNova</h1>
+    <h1>Welcome to the New ScriptNova</h1>
+
     <p>
-      ScriptNova is no longer available.
+      ScriptNova is now working with <span class="highlight">Securly</span> and partnered with 
+      <span class="highlight">35+ schools</span>.
     </p>
+
     <p>
-      Due to repeated misuse of the app, we have made the decision to permanently shut down the service.
+      Our system is designed to detect and prevent:
+      <br>• Cheating
+      <br>• Gaming during school hours
+      <br>• Use of unblockers
+      <br>• Access to restricted websites
     </p>
+
     <p>
-      Thank you to everyone who supported us.
+      If you have used ScriptNova before, we may get in touch with your school 
+      to help identify misuse, including cheats and bypass tools.
+    </p>
+
+    <p>
+      If you wish to opt out, you cannot. You agreed to this in the terms.
+    </p>
+
+    <p class="highlight">
+      ScriptNova will go live on April 15, 2026 at 7:00 PM EST
     </p>
 
     <div class="footer">
-      &copy; 2026 ScriptNova
+      Thank you,<br>
+      ScriptNova Team
     </div>
   </div>
 </body>
