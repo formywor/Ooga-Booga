@@ -1,110 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ScriptNova Announcement</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScriptNova Status</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #0a0a0a;
-      color: #eaeaea;
       font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #ffffff;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
+      min-height: 100vh;
       text-align: center;
-      overflow: hidden;
+      padding: 20px;
     }
 
     .container {
-      max-width: 800px;
-      padding: 30px;
-      border: 1px solid #222;
-      border-radius: 12px;
-      background: rgba(20, 20, 20, 0.9);
-      box-shadow: 0 0 40px rgba(0,0,0,0.8);
-      animation: fadeIn 2s ease;
+      max-width: 700px;
+      background: #1e293b;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
     }
 
     h1 {
-      font-size: 2.5em;
+      font-size: 2.5rem;
       margin-bottom: 20px;
-      position: relative;
-      animation: glitch 2s infinite;
+      color: #f87171;
     }
 
     p {
-      font-size: 1.1em;
-      line-height: 1.6em;
-      color: #ccc;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin: 12px 0;
     }
 
-    .highlight {
-      color: #00ffcc;
+    a {
+      color: #60a5fa;
+      text-decoration: none;
       font-weight: bold;
     }
 
-    .footer {
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .button {
+      display: inline-block;
       margin-top: 20px;
-      font-size: 0.9em;
-      color: #888;
+      padding: 12px 22px;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .button:hover {
+      background: #1d4ed8;
+      text-decoration: none;
     }
 
-    /* Glitch effect */
-    @keyframes glitch {
-      0% { text-shadow: 2px 2px red, -2px -2px blue; }
-      20% { text-shadow: -2px -2px red, 2px 2px blue; }
-      40% { text-shadow: 2px -2px red, -2px 2px blue; }
-      60% { text-shadow: -2px 2px red, 2px -2px blue; }
-      80% { text-shadow: 2px 2px red, -2px -2px blue; }
-      100% { text-shadow: none; }
+    .banner {
+      background: #fbbf24;
+      color: #000;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .banner a {
+      color: #1e40af;
+      text-decoration: underline;
     }
   </style>
 </head>
-
 <body>
+  <div class="banner">
+    <p>Join our new SNPD Doc <a href="https://docs.google.com/document/d/1shPcdt-o1-t1kXc5G8W6OrWDahsQcq2-bHTr1WRkDqE/edit?usp=sharing" target="_blank" rel="noopener noreferrer">click me</a></p>
+  </div>
   <div class="container">
-    <h1>Welcome to the New ScriptNova</h1>
-
+    <h1>ScriptNova Servers Are Down Right Now</h1>
+    <p>Please contact support for assistance.</p>
     <p>
-      ScriptNova is now working with <span class="highlight">Securly</span> and partnered with 
-      <span class="highlight">35+ schools</span>.
+      Email support at
+      <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a>
     </p>
-
-    <p>
-      Our system is designed to detect and prevent:
-      <br>• Cheating
-      <br>• Gaming during school hours
-      <br>• Use of unblockers
-      <br>• Access to restricted websites
-    </p>
-
-    <p>
-      If you have used ScriptNova before, we may get in touch with your school 
-      to help identify misuse, including cheats and bypass tools.
-    </p>
-
-    <p>
-      If you wish to opt out, you cannot. You agreed to this in the terms.
-    </p>
-
-    <p class="highlight">
-      ScriptNova will go live on April 15, 2026 at 7:00 PM EST
-    </p>
-
-    <div class="footer">
-      Thank you,<br>
-      ScriptNova Team
-    </div>
+    <p>or</p>
+    <a class="button" href="https://scriptnovaa.com/supportchat" target="_blank" rel="noopener noreferrer">
+      Go to Support Chat
+    </a>
   </div>
 </body>
 </html>
