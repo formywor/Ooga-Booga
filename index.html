@@ -5,41 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ScriptNova Status</title>
   <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #162033;
+      --panel-2: #1d2940;
+      --text: #f3f4f6;
+      --muted: #cbd5e1;
+      --accent: #60a5fa;
+      --accent-2: #2563eb;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(96, 165, 250, 0.12), transparent 35%),
+        linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+      color: var(--text);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      text-align: center;
       padding: 20px;
     }
 
+    .wrap {
+      width: 100%;
+      max-width: 760px;
+    }
+
+    .banner {
+      background: var(--warn);
+      color: #111827;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .banner a {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+
     .container {
-      max-width: 700px;
-      background: #1e293b;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+      background: rgba(22, 32, 51, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 36px 28px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.25);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
     }
 
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      color: #f87171;
+      margin: 8px 0 14px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.1;
+      color: var(--danger);
     }
 
     p {
-      font-size: 1.1rem;
-      line-height: 1.7;
       margin: 12px 0;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .support-box {
+      margin-top: 24px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .support-box p {
+      margin: 10px 0;
     }
 
     a {
-      color: #60a5fa;
+      color: var(--accent);
       text-decoration: none;
       font-weight: bold;
     }
@@ -50,49 +115,82 @@
 
     .button {
       display: inline-block;
-      margin-top: 20px;
+      margin-top: 14px;
       padding: 12px 22px;
-      background: #2563eb;
+      background: var(--accent-2);
       color: #fff;
-      border-radius: 10px;
+      border-radius: 12px;
       text-decoration: none;
-      transition: background 0.2s ease;
+      font-weight: bold;
+      transition: transform 0.15s ease, background 0.15s ease;
     }
 
     .button:hover {
       background: #1d4ed8;
+      transform: translateY(-1px);
       text-decoration: none;
     }
 
-    .banner {
-      background: #fbbf24;
-      color: #000;
-      padding: 10px;
-      text-align: center;
-      font-weight: bold;
+    .footer {
+      margin-top: 18px;
+      font-size: 0.92rem;
+      color: #94a3b8;
     }
 
-    .banner a {
-      color: #1e40af;
-      text-decoration: underline;
+    @media (max-width: 600px) {
+      body {
+        padding: 14px;
+      }
+
+      .container {
+        padding: 26px 18px;
+        border-radius: 18px;
+      }
+
+      .banner {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+      }
+
+      .button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="banner">
-    <p>Join our new SNPD Doc <a href="https://docs.google.com/document/d/1shPcdt-o1-t1kXc5G8W6OrWDahsQcq2-bHTr1WRkDqE/edit?usp=sharing" target="_blank" rel="noopener noreferrer">click me</a></p>
-  </div>
-  <div class="container">
-    <h1>ScriptNova Servers Are Down Right Now</h1>
-    <p>Please contact support for assistance.</p>
-    <p>
-      Email support at
-      <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a>
-    </p>
-    <p>or</p>
-    <a class="button" href="https://scriptnovaa.com/supportchat" target="_blank" rel="noopener noreferrer">
-      Go to Support Chat
-    </a>
+  <div class="wrap">
+    <div class="banner">
+      Join our new SNPD Doc
+      <a href="https://docs.google.com/document/d/1shPcdt-o1-t1kXc5G8W6OrWDahsQcq2-bHTr1WRkDqE/edit?usp=sharing" target="_blank" rel="noopener noreferrer">
+        click me
+      </a>
+    </div>
+
+    <div class="container">
+      <div class="badge">Status Update</div>
+      <h1>ScriptNova Servers Are Down Right Now</h1>
+      <p>
+        We are aware of the issue and are working on it.
+        Please check back later for updates.
+      </p>
+
+      <div class="support-box">
+        <p>Need help? Contact support at</p>
+        <p>
+          <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a>
+        </p>
+        <p>or use the support chat below.</p>
+
+        <a class="button" href="https://scriptnovaa.com/supportchat" target="_blank" rel="noopener noreferrer">
+          Go to Support Chat
+        </a>
+      </div>
+
+      <div class="footer">
+        Thank you for your patience.
+      </div>
+    </div>
   </div>
 </body>
 </html>
