@@ -660,6 +660,12 @@
       background:#251010;
     }
 
+    .badge.green{
+      color:#d6ffd6;
+      border-color:rgba(0,255,170,.22);
+      background:#102510;
+    }
+
     .footerSorry{
       text-align:center;
       margin-top:16px;
@@ -950,10 +956,8 @@
       </div>
 
       <div class="announcement">
-        <div class="announcementTitle">Temporary Update</div>
-        We are <b>super sorry</b>, but our ad partner got mad and kinda canceled us for now.
-        Because of that, we made all currently available FREE keys require <b>0 redirects</b> until we strike a new deal.
-        <b>All 2h+ tiers are temporarily unavailable</b> right now. Thanks for being patient with us.
+        <div class="announcementTitle">Important Notice</div>
+        Hello users we are sorry but free keys are going to turn off soon so please help yourself to a free 10h key that can be used many times until we close free keys
       </div>
 
       <div class="gridInfo">
@@ -1030,7 +1034,7 @@
           <input id="c5" type="checkbox" />
           <div>
             <div>I understand some tiers are temporarily unavailable.</div>
-            <div class="small">2h, 3h, 6h, and 10h Special are disabled for now.</div>
+            <div class="small">4m, 15m, 35m, 1h, 2h, 3h, and 6h are disabled for now.</div>
           </div>
         </div>
 
@@ -1076,83 +1080,83 @@
     </div>
 
     <div class="plans">
-      <div class="plan" id="plan4m">
+      <div class="plan unavailable" id="plan4m">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Instant</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">4 Minutes</div>
-        <div class="desc">Fast starter free key. Right now this tier needs <b>0 redirects</b>.</div>
+        <div class="desc">This tier is temporarily unavailable.</div>
         <div class="metaRow">
-          <span class="metaPill">0 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill4m" class="fill"></div></div>
-        <div class="stat"><span id="stat4m">Ready after checklist</span></div>
-        <div class="unlockText" id="unlock4m">Ready after checklist</div>
+        <div class="stat"><span id="stat4m">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock4m">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn4mRedirect" class="btn secondary" onclick="showNoRedirectNeeded('4m')">No Redirect Needed</button>
-          <button id="btn4m" class="btn good" onclick="generateTierKey('4m')" disabled>Generate 4m Key</button>
+          <button id="btn4mRedirect" class="btn secondary" onclick="showUnavailableTier('4m')" disabled>Unavailable</button>
+          <button id="btn4m" class="btn good" onclick="generateTierKey('4m')" disabled>Unavailable</button>
         </div>
       </div>
 
-      <div class="plan" id="plan15m">
+      <div class="plan unavailable" id="plan15m">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Starter</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">15 Minutes</div>
-        <div class="desc">A basic free key. Right now this tier needs <b>0 redirects</b>.</div>
+        <div class="desc">This tier is temporarily unavailable.</div>
         <div class="metaRow">
-          <span class="metaPill">0 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill15m" class="fill"></div></div>
-        <div class="stat"><span id="stat15m">Ready after checklist</span></div>
-        <div class="unlockText" id="unlock15m">Ready after checklist</div>
+        <div class="stat"><span id="stat15m">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock15m">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn15mRedirect" class="btn secondary" onclick="showNoRedirectNeeded('15m')">No Redirect Needed</button>
-          <button id="btn15m" class="btn good" onclick="generateTierKey('15m')" disabled>Generate 15m Key</button>
+          <button id="btn15mRedirect" class="btn secondary" onclick="showUnavailableTier('15m')" disabled>Unavailable</button>
+          <button id="btn15m" class="btn good" onclick="generateTierKey('15m')" disabled>Unavailable</button>
         </div>
       </div>
 
-      <div class="plan" id="plan35m">
+      <div class="plan unavailable" id="plan35m">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Open</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">35 Minutes</div>
-        <div class="desc">A longer free session. Right now this tier needs <b>0 redirects</b>.</div>
+        <div class="desc">This tier is temporarily unavailable.</div>
         <div class="metaRow">
-          <span class="metaPill">0 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill35m" class="fill"></div></div>
-        <div class="stat"><span id="stat35m">Ready after checklist</span></div>
-        <div class="unlockText" id="unlock35m">Ready after checklist</div>
+        <div class="stat"><span id="stat35m">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock35m">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn35mRedirect" class="btn secondary" onclick="showNoRedirectNeeded('35m')">No Redirect Needed</button>
-          <button id="btn35m" class="btn" onclick="generateTierKey('35m')" disabled>Generate 35m Key</button>
+          <button id="btn35mRedirect" class="btn secondary" onclick="showUnavailableTier('35m')" disabled>Unavailable</button>
+          <button id="btn35m" class="btn" onclick="generateTierKey('35m')" disabled>Unavailable</button>
         </div>
       </div>
 
-      <div class="plan" id="plan1h">
+      <div class="plan unavailable" id="plan1h">
         <div class="planTopRow">
           <h4>FREE Key</h4>
-          <span class="badge">Open</span>
+          <span class="badge red">Unavailable</span>
         </div>
         <div class="time">1 Hour</div>
-        <div class="desc">A stronger free key. Right now this tier needs <b>0 redirects</b>.</div>
+        <div class="desc">This tier is temporarily unavailable.</div>
         <div class="metaRow">
-          <span class="metaPill">0 redirects</span>
+          <span class="metaPill">Unavailable</span>
           <span class="metaPill">1 session</span>
         </div>
         <div class="meter"><div id="fill1h" class="fill"></div></div>
-        <div class="stat"><span id="stat1h">Ready after checklist</span></div>
-        <div class="unlockText" id="unlock1h">Ready after checklist</div>
+        <div class="stat"><span id="stat1h">Temporarily unavailable</span></div>
+        <div class="unlockText" id="unlock1h">Temporarily unavailable</div>
         <div class="row" style="margin-top:10px;">
-          <button id="btn1hRedirect" class="btn secondary" onclick="showNoRedirectNeeded('1h')">No Redirect Needed</button>
-          <button id="btn1h" class="btn" onclick="generateTierKey('1h')" disabled>Generate 1h Key</button>
+          <button id="btn1hRedirect" class="btn secondary" onclick="showUnavailableTier('1h')" disabled>Unavailable</button>
+          <button id="btn1h" class="btn" onclick="generateTierKey('1h')" disabled>Unavailable</button>
         </div>
       </div>
 
@@ -1216,23 +1220,23 @@
         </div>
       </div>
 
-      <div class="plan special unavailable" id="plan10h4s">
+      <div class="plan special" id="plan10h4s">
         <div class="planTopRow">
           <h4>Special FREE Key</h4>
-          <span class="badge red">Unavailable</span>
+          <span class="badge green">Available</span>
         </div>
         <div class="time">10 Hours</div>
-        <div class="desc">This special tier is temporarily unavailable while we work on a new deal.</div>
+        <div class="desc">Enjoy your free 10h key that can be used many times!</div>
         <div class="metaRow">
-          <span class="metaPill">Unavailable</span>
+          <span class="metaPill">Available</span>
           <span class="metaPill">4 sessions</span>
         </div>
         <div class="meter"><div id="fill10h4s" class="fill"></div></div>
-        <div class="stat"><span id="stat10h4s">Temporarily unavailable</span></div>
-        <div class="unlockText" id="unlock10h4s">Temporarily unavailable</div>
+        <div class="stat"><span id="stat10h4s">Ready to generate</span></div>
+        <div class="unlockText" id="unlock10h4s">Ready to generate</div>
         <div class="row" style="margin-top:10px;">
           <button id="btn10h4sRedirect" class="btn secondary" onclick="showUnavailableTier('10h4s')" disabled>Unavailable</button>
-          <button id="btn10h4s" class="btn gold" onclick="generateTierKey('10h4s')" disabled>Unavailable</button>
+          <button id="btn10h4s" class="btn gold" onclick="generateTierKey('10h4s')">Generate 10h Key</button>
         </div>
       </div>
     </div>
@@ -1301,18 +1305,18 @@
     const CLICK_COOLDOWN_MS = 4000;
     const REDIRECT_STEP_COOLDOWN_MS = 1200;
 
-    const AVAILABLE_TIERS = ["4m","15m","35m","1h"];
-    const UNAVAILABLE_TIERS = ["2h","3h","6h","10h4s"];
+    const AVAILABLE_TIERS = ["10h4s"];
+    const UNAVAILABLE_TIERS = ["4m","15m","35m","1h","2h","3h","6h"];
 
     const TIER_CONFIG = {
-      "4m":    { label: "4 Minutes", ttl: 240, needed: 0, sessions: 1, button: "Generate 4m Key", available: true },
-      "15m":   { label: "15 Minutes", ttl: 900, needed: 0, sessions: 1, button: "Generate 15m Key", available: true },
-      "35m":   { label: "35 Minutes", ttl: 2100, needed: 0, sessions: 1, button: "Generate 35m Key", available: true },
-      "1h":    { label: "1 Hour", ttl: 3600, needed: 0, sessions: 1, button: "Generate 1h Key", available: true },
+      "4m":    { label: "4 Minutes", ttl: 240, needed: 999999, sessions: 1, button: "Unavailable", available: false },
+      "15m":   { label: "15 Minutes", ttl: 900, needed: 999999, sessions: 1, button: "Unavailable", available: false },
+      "35m":   { label: "35 Minutes", ttl: 2100, needed: 999999, sessions: 1, button: "Unavailable", available: false },
+      "1h":    { label: "1 Hour", ttl: 3600, needed: 999999, sessions: 1, button: "Unavailable", available: false },
       "2h":    { label: "2 Hours", ttl: 7200, needed: 999999, sessions: 1, button: "Unavailable", available: false },
       "3h":    { label: "3 Hours", ttl: 10800, needed: 999999, sessions: 1, button: "Unavailable", available: false },
       "6h":    { label: "6 Hours", ttl: 21600, needed: 999999, sessions: 1, button: "Unavailable", available: false },
-      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 999999, sessions: 4, button: "Unavailable", available: false }
+      "10h4s": { label: "10 Hours Special", ttl: 36000, needed: 0, sessions: 4, button: "Generate 10h Key", available: true }
     };
 
     const TIER_ORDER = ["4m","15m","35m","1h","2h","3h","6h","10h4s"];
