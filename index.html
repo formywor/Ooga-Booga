@@ -15,6 +15,7 @@
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -63,18 +64,51 @@
       color: #94a3b8;
       font-size: 0.95rem;
     }
+
+    /* Button styling */
+    .btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 26px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 25px rgba(96,165,250,0.3);
+    }
+
+    .btn:hover {
+      background: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(96,165,250,0.4);
+    }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>ScriptNova is going private.</h1>
+
     <p>
       If you are seeing this message, you are not invited and you are permanently banned from ScriptNova.
       You may try to appeal by emailing <a href="mailto:gomegaassist@gmail.com">gomegaassist@gmail.com</a>.
     </p>
+
     <p>
       This is an informational notice only. Your access is revoked unless otherwise restored by the team.
     </p>
+
+    <!-- NEW BUTTON -->
+    <a 
+      href="https://docs.google.com/document/d/1shPcdt-o1-t1kXc5G8W6OrWDahsQcq2-bHTr1WRkDqE/edit?tab=t.6szgcla8mvpy" 
+      target="_blank" 
+      class="btn">
+      Join SNPD Doc
+    </a>
+
     <p class="note">
       Contact attempts do not guarantee service.
     </p>
