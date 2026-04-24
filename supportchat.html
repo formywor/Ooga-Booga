@@ -381,6 +381,18 @@
       display: none !important;
     }
 
+    .waiting::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60% { content: '...'; }
+      80%, 100% { content: ''; }
+    }
+
     @media (max-width: 980px) {
       .chat-shell {
         grid-template-columns: 1fr;
@@ -393,7 +405,7 @@
     <div class="hero">
       <div class="eyebrow">ScriptNova support</div>
       <h1 class="heading">Live support chat with queue and admin controls</h1>
-      <p class="subtitle">Users can start a support session with a name and HWID, then chat live..</p>
+      <p class="subtitle">Users can start a support session with a name and HWID/Client ID, then chat live with support staff.</p>
     </div>
 
     <div class="card">
@@ -404,7 +416,7 @@
         </div>
         <div class="tabs" role="tablist">
           <button id="userTab" class="tab active" type="button">User Support</button>
-          <button id="adminTab" class="tab" type="button">Admin Login</button>
+          <button id="adminTab" class="tab hidden" type="button">Admin Login</button>
         </div>
       </div>
 
@@ -419,10 +431,11 @@
                 <input id="userName" class="field" placeholder="Your name or alias" />
               </label>
               <label>
-                HWID
-                <input id="userHWID" class="field" placeholder="Hardware ID (required)" />
+                HWID or Client ID
+                <input id="userHWID" class="field" placeholder="Hardware ID or Client ID" />
               </label>
             </div>
+            <button id="unknownHWID" class="btn-secondary" type="button" style="margin-top:12px;">I don't know my HWID/Client ID</button>
             <button id="startUserSession" class="btn" type="button">Start Support Chat</button>
             <div id="userNotice" class="notice hidden"></div>
             <div class="help-block">
@@ -494,7 +507,10 @@
   </div>
 
   <script>
-    const API_BASE = 'https://api.scriptnovaa.com';
+    const API_BASE = 'http://localhost:8787';
+    if (window.location.search.includes('admin=1')) {
+      document.getElementById('adminTab').classList.remove('hidden');
+    }
     const userTab = document.getElementById('userTab');
     const adminTab = document.getElementById('adminTab');
     const userPanel = document.getElementById('userPanel');
@@ -689,8 +705,8 @@
     function updateSessionLabels(admin = false) {
       sessionIdLabel.textContent = sessionData.sessionId || '—';
       hwidLabel.textContent = sessionData.hwid || '—';
-      queueInfo.textContent = admin ? 'Select a ticket to view its conversation and commands.' : `Queue position: ${sessionData.queuePosition ?? '—'}`;
-      endSessionBtn.classList.toggle('hidden', sessionData.mode !== 'user');
+      queueInfo.textContent = admin ? 'Select a ticket to view its conversation and commands.' : (sessionData.queuePosition > 1 ? 'Waiting for admin' : `Queue position: ${sessionData.queuePosition ?? '—'}`);
+      queueInfo.classList.toggle('waiting', !admin && sessionData.queuePosition > 1);
       chatMode.textContent = admin ? 'Admin' : 'User';
     }
 
@@ -898,6 +914,10 @@
       }
     });
     endSessionBtn.addEventListener('click', endUserSession);
+    document.getElementById('unknownHWID').addEventListener('click', () => {
+      const randomId = 'unknown-' + Math.random().toString(36).substr(2, 9);
+      document.getElementById('userHWID').value = randomId;
+    });
 
     if ('localStorage' in window) {
       const savedName = localStorage.getItem('supportchat.name');
