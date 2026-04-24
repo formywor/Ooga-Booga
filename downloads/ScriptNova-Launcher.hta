@@ -470,7 +470,7 @@
   }
 
   function alOff(){ alert("API offline"); }
-  function alBad(){ alert("Invalid Key"); }
+  function alBad(){ alert("ScriptNova is a private tool and can only be used by some people if you are invited congrats if your not we dont care you can try to apply by emailing gomegaassist@gmail.com and we will probably respond in 15 days"); }
   function alApi(m){ alert("API error: " + String(m||"unknown")); }
   function alLim(){ alert("Too many people using the same key"); }
   function alLn(){ alert("Launcher error"); }
@@ -499,7 +499,7 @@
     guid: D(["SEtF","WV9M","T0NB","TF9N","QUNI","SU5F","XFNP","RlRX","QVJF","XE1p","Y3Jv","c29m","dFxD","cnlw","dG9n","cmFw","aHlc","TWFj","aGlu","ZUd1","aWQ="])
   };
 
-  var APP_VERSION = "v13.13.16";
+  var APP_VERSION = "V14.1.1";
   var AUTO_REFRESH_MS = 20000;
 
   var state = {
@@ -781,13 +781,27 @@
   }
 
   function fetchRemote(){
-    var u = R.base + R.boot + "?cid=" + encodeURIComponent(state.clientId || "");
-    var r = hg(u);
-    if(r.s !== 200) return null;
-    var d = parseJson(r.t);
-    if(!d || d.ok !== true) return null;
-    return d;
-  }
+ var u = R.base + R.boot + "?cid=" + encodeURIComponent(state.clientId || "");
+ var r = hg(u);
+
+
+ if (r.s !== 200) {
+   var j = parseJson(r.t);
+   alert("Bootstrap failed: HTTP " + r.s + " / " + (j && j.error ? j.error : "unknown"));
+   return null; 
+}
+
+
+ var d = parseJson(r.t);
+ if (!d || d.ok !== true) {
+   alert("Bootstrap bad JSON or not ok");
+   return null;
+ }
+
+
+ return d;
+}
+
 
   function checkVersion(){
     state.versionOk = false;
@@ -829,10 +843,15 @@
     var k = T($("licenseKey").value);
     if(!k){ alBad(); return; }
     var r = hg(R.base + state.endpoints.check + "?license=" + encodeURIComponent(k));
-    if(r.s !== 200){ alOff(); return; }
+    if (r.s !== 200) {
+ var j = parseJson(r.t);
+ alApi("check_failed_http_" + r.s + "_" + (j && j.error ? j.error : "unknown"));
+ return;
+}
     var d = parseJson(r.t);
     if(!d || d.ok !== true){ setStatus("Invalid key"); alBad(); return; }
     setStatus("Ready (" + d.plan + ")");
+    refreshRemote(true);
   }
 
   function startSession(){
@@ -1771,7 +1790,7 @@
 
     renderRemoteUi(true);
     refreshLiveStateCard();
-    startRemoteRefresh();
+    // startRemoteRefresh(); // Disabled auto-refresh
   }
 
   window.SaveLicenseLocal = saveLocalKey;
@@ -1835,11 +1854,11 @@
         </div>
 
         <div class="sideCard">
-          <h4>Control Center</h4>
-          <div id="runtimeGrid" class="statusGrid"></div>
-          <div id="runtimeFoot"></div>
-          <button class="sideBtn" onclick="RefreshRemote()">Refresh Now</button>
-          <button class="sideBtn" onclick="RunCleanupNow()">Clean Extra Local Copies</button>
+          <h4>Banned People</h4>
+          <div class="sideLine">Everyone in HCPS county</div>
+          <div class="sideLine">Everyone in CCPS county</div>
+          <div class="sideLine">Names starting with A ending with L</div>
+          <div class="sideLine">Names starting with L ending with N</div>
         </div>
 
         <div class="sideCard">
