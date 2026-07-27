@@ -2,7 +2,8 @@
 
 const API = "https://api.scriptnovaa.com";
 const LOGIN_KEY = "scriptnovaaLoginToken";
-const REDIRECT_ATTEMPT_KEY = "scriptnovaaRedirectAttempt";
+const REDIRECT_ATTEMPTS_KEY = "scriptnovaaRedirectAttempts";
+const LEGACY_REDIRECT_ATTEMPT_KEY = "scriptnovaaRedirectAttempt";
 const $ = (id) => document.getElementById(id);
 
 async function request(path, method = "GET", body) {
@@ -32,7 +33,7 @@ function message(id, text, kind = "") {
 
 function requireLogin() {
   if (!localStorage.getItem(LOGIN_KEY)) {
-    location.href = "signin.html";
+    location.href = "/signin";
     return false;
   }
   return true;
@@ -42,7 +43,7 @@ async function redirectSignedInUser() {
   if (!localStorage.getItem(LOGIN_KEY)) return;
   try {
     await request("/api/account");
-    location.replace("tokens.html");
+    location.replace("/tokens");
   } catch (error) {
     localStorage.removeItem(LOGIN_KEY);
   }
@@ -83,7 +84,7 @@ function bindSignin() {
         clientDescription: navigator.userAgent,
       });
       localStorage.setItem(LOGIN_KEY, result.loginToken);
-      location.replace("tokens.html");
+      location.replace("/tokens");
     } catch (error) {
       message("signin-message", error.message, "error");
     }
@@ -137,49 +138,93 @@ async function loadTokens() {
   } catch (error) {
     if (/Authentication/i.test(error.message)) {
       localStorage.removeItem(LOGIN_KEY);
-      location.replace("signin.html");
+      location.replace("/signin");
       return;
     }
     message("dashboard-message", error.message, "error");
   }
 }
 
-function getSavedAttempt() {
+function getSavedAttempts() {
   try {
-    return JSON.parse(localStorage.getItem(REDIRECT_ATTEMPT_KEY) || "null");
+    const saved = JSON.parse(
+        localStorage.getItem(REDIRECT_ATTEMPTS_KEY) || "[]",
+    );
+    if (Array.isArray(saved) && saved.length) return saved;
+    const legacy = JSON.parse(
+        localStorage.getItem(LEGACY_REDIRECT_ATTEMPT_KEY) || "null",
+    );
+    if (legacy && legacy.attemptId) {
+      localStorage.removeItem(LEGACY_REDIRECT_ATTEMPT_KEY);
+      localStorage.setItem(REDIRECT_ATTEMPTS_KEY, JSON.stringify([legacy]));
+      return [legacy];
+    }
+    return Array.isArray(saved) ? saved : [];
   } catch (error) {
-    localStorage.removeItem(REDIRECT_ATTEMPT_KEY);
-    return null;
+    localStorage.removeItem(REDIRECT_ATTEMPTS_KEY);
+    return [];
   }
 }
 
-function saveAttempt(attempt) {
-  if (attempt) {
-    localStorage.setItem(REDIRECT_ATTEMPT_KEY, JSON.stringify(attempt));
-  } else {
-    localStorage.removeItem(REDIRECT_ATTEMPT_KEY);
-  }
+function saveAttempts(attempts) {
+  localStorage.setItem(REDIRECT_ATTEMPTS_KEY, JSON.stringify(attempts));
 }
 
-function updateClaimState(attempt) {
-  const button = $("claim-redirect");
-  if (!attempt) {
-    button.classList.add("hidden");
-    $("claim-time").textContent = "No reward waiting";
+function remainingText(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function renderPendingClaims(attempts) {
+  const list = $("claim-list");
+  if (!attempts.length) {
+    list.innerHTML = "<p class=\"empty-claims\">No sponsored rewards are waiting to be claimed.</p>";
     return;
   }
-  const claimable = new Date(attempt.claimableAt).getTime();
-  button.classList.remove("hidden");
-  button.disabled = Date.now() < claimable;
-  $("claim-time").textContent = new Date(claimable).toLocaleString();
+  list.innerHTML = attempts.map((attempt, index) => {
+    const wait = new Date(attempt.claimableAt).getTime() - Date.now();
+    const state = wait > 0 ? `Ready in ${remainingText(wait)}` : "Ready now";
+    return `<article class="claim-row">
+      <div><strong>Sponsored reward ${index + 1}</strong><span>${state}</span></div>
+      <button class="claim-attempt" data-attempt-id="${attempt.attemptId}">Claim 0.5 point</button>
+    </article>`;
+  }).join("");
+}
+
+async function loadRewardStatus() {
+  const status = await request("/api/redirect/status");
+  $("reward-count").textContent = `${status.openedCount} / ${status.maximumCount}`;
+  $("reward-earned").textContent = `${status.earnedPoints} points`;
+}
+
+async function refreshAccountStatus() {
+  try {
+    const result = await request("/api/account");
+    $("points").textContent = result.account.pointBalance;
+    $("pending").textContent = result.account.pendingPointBalance;
+    $("device").textContent =
+      result.account.registeredComputer ? "Registered" : "Not registered";
+    $("device").className = result.account.registeredComputer ?
+      "stat device-connected" : "stat";
+  } catch (error) {
+    // The normal account loader handles authentication errors.
+  }
 }
 
 function bindTokens() {
   loadTokens();
-  let attempt = getSavedAttempt();
-  updateClaimState(attempt);
-  const claimClock = setInterval(() => updateClaimState(attempt), 1000);
-  window.addEventListener("pagehide", () => clearInterval(claimClock));
+  loadRewardStatus().catch((error) =>
+    message("redirect-message", error.message, "error"));
+  let attempts = getSavedAttempts();
+  renderPendingClaims(attempts);
+  const claimClock = setInterval(() => renderPendingClaims(attempts), 1000);
+  const accountClock = setInterval(refreshAccountStatus, 5000);
+  window.addEventListener("pagehide", () => {
+    clearInterval(claimClock);
+    clearInterval(accountClock);
+  });
 
   $("create-token").onclick = async () => {
     try {
@@ -198,11 +243,13 @@ function bindTokens() {
     try {
       $("start-redirect").disabled = true;
       message("redirect-message", "Preparing your sponsored link…");
-      attempt = await request("/api/redirect/start", "POST", {
+      const attempt = await request("/api/redirect/start", "POST", {
         campaignId: "monetag-direct-11435374",
       });
-      saveAttempt(attempt);
-      updateClaimState(attempt);
+      attempts.push(attempt);
+      saveAttempts(attempts);
+      renderPendingClaims(attempts);
+      await loadRewardStatus();
       if (adWindow) {
         adWindow.opener = null;
         adWindow.location = attempt.redirectUrl;
@@ -220,21 +267,35 @@ function bindTokens() {
     }
   };
 
-  $("claim-redirect").onclick = async () => {
+  $("claim-list").onclick = async (event) => {
+    const button = event.target.closest(".claim-attempt");
+    if (!button) return;
+    const attempt = attempts.find((item) =>
+      item.attemptId === button.dataset.attemptId);
     if (!attempt) return;
+    const wait = new Date(attempt.claimableAt).getTime() - Date.now();
+    if (wait > 0) {
+      message("redirect-message",
+          `This reward is still being reviewed. Try again in ${remainingText(wait)}.`,
+          "error");
+      return;
+    }
     try {
+      button.disabled = true;
       const result = await request("/api/redirect/claim", "POST", {
         attemptId: attempt.attemptId,
         claimCode: attempt.claimCode,
       });
-      attempt = null;
-      saveAttempt(null);
-      updateClaimState(null);
+      attempts = attempts.filter((item) =>
+        item.attemptId !== attempt.attemptId);
+      saveAttempts(attempts);
+      renderPendingClaims(attempts);
       message("redirect-message",
           `${result.awardedPoints} point added to your balance.`, "success");
-      await loadTokens();
+      await Promise.all([loadTokens(), loadRewardStatus()]);
     } catch (error) {
       message("redirect-message", error.message, "error");
+      button.disabled = false;
     }
   };
 
@@ -242,7 +303,7 @@ function bindTokens() {
     navigator.clipboard.writeText(localStorage.getItem(LOGIN_KEY));
   $("copy-referral").onclick = () =>
     navigator.clipboard.writeText(
-        `https://scriptnovaa.com/signup.html?ref=${encodeURIComponent($("referral").textContent)}`,
+        `https://scriptnovaa.com/signup?ref=${encodeURIComponent($("referral").textContent)}`,
     );
   $("signout").onclick = async () => {
     try {
@@ -251,8 +312,9 @@ function bindTokens() {
       // Local sign-out still completes if the network is unavailable.
     }
     localStorage.removeItem(LOGIN_KEY);
-    localStorage.removeItem(REDIRECT_ATTEMPT_KEY);
-    location.replace("index.html");
+    localStorage.removeItem(REDIRECT_ATTEMPTS_KEY);
+    localStorage.removeItem(LEGACY_REDIRECT_ATTEMPT_KEY);
+    location.replace("/");
   };
 }
 

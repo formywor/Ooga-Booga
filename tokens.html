@@ -8,8 +8,8 @@
 </head>
 <body data-page="tokens">
   <header class="site-header"><nav class="nav">
-    <a class="brand" href="index.html"><span class="brand-mark">S</span><span>ScriptNovaa</span></a>
-    <div class="nav-links"><a href="share-browser.html">Share Browser</a><a href="points-info.html">How points work</a><button id="signout">Sign out</button></div>
+    <a class="brand" href="/"><span class="brand-mark">S</span><span>ScriptNovaa</span></a>
+    <div class="nav-links"><a href="/share-browser">Share Browser</a><a href="/points-info">How points work</a><button id="signout">Sign out</button></div>
   </nav></header>
   <main class="wrap dashboard">
     <div class="dashboard-title"><div><p class="kicker">Share Browser account</p><h1>Tokens</h1></div><p>Earn points. Choose a duration. Start when you are ready.</p></div>
@@ -22,8 +22,9 @@
     <section class="panel"><h2>Create a token</h2><div class="row"><div class="grow"><label for="duration">Session duration</label><select id="duration"></select></div><button id="create-token">Create token</button></div><div id="token-message" class="message"></div></section>
     <section class="panel"><h2>Your tokens</h2><div id="token-list">Loading…</div></section>
     <section class="panel reward-panel">
-      <div><p class="kicker">Sponsored reward</p><h2>Earn through rewarded links</h2><p>Open a sponsored page, then return when the claim timer is ready. Each completed link earns 0.5 point. The limit is 44 links in a rolling 14-hour period.</p><a class="text-link" href="points-info.html">Read the complete claiming rules</a></div>
-      <div class="reward-actions"><button id="start-redirect">Open sponsored page</button><p>Claim available: <strong id="claim-time">No reward waiting</strong></p><button id="claim-redirect" class="hidden">Claim 0.5 point</button></div>
+      <div><p class="kicker">Sponsored reward</p><h2>Earn through rewarded links</h2><p>Open a sponsored page, then return when the claim timer is ready. Each completed link earns 0.5 point. The limit is 44 links in a rolling 14-hour period.</p><a class="text-link" href="/points-info">Read the complete claiming rules</a></div>
+      <div class="reward-actions"><div class="reward-meters"><p><span>Links opened</span><strong id="reward-count">— / 44</strong></p><p><span>Points claimed</span><strong id="reward-earned">—</strong></p></div><button id="start-redirect">Open sponsored page</button></div>
+      <div id="claim-list" class="claim-list"></div>
       <div id="redirect-message" class="message"></div>
     </section>
     <aside class="ad-disclosure"><span>Advertisement</span><p>Ads help fund free Share Browser tokens. This placement does not award points.</p></aside>

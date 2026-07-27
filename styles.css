@@ -26,6 +26,7 @@ button:disabled{opacity:.48;cursor:not-allowed}
 .reward-actions{padding:20px;border-radius:12px;background:var(--navy);color:#fff}
 .reward-actions p{color:#bcc5d8}
 .reward-actions button{background:var(--indigo)}
+.reward-meters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.reward-meters p{margin:0;padding:12px;border-radius:9px;background:rgba(255,255,255,.06)}.reward-meters span,.reward-meters strong{display:block}.reward-meters span{font-size:11px;text-transform:uppercase;letter-spacing:.08em}.reward-meters strong{margin-top:3px;color:#fff;font-size:20px}.claim-list{grid-column:1/-1;display:grid;gap:10px}.claim-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px;border:1px solid var(--line);border-radius:11px;background:#fff}.claim-row strong,.claim-row span{display:block}.claim-row span{color:var(--muted);font-size:13px}.claim-row button{margin:0}.empty-claims{margin:0;color:var(--muted)}.device-connected{color:var(--green)}
 .ad-disclosure{margin-top:22px;padding:14px 18px;border:1px dashed #cfd6e2;border-radius:12px;color:var(--muted);font-size:13px}
 .ad-disclosure span{color:var(--ink);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
 .ad-disclosure p{display:inline;margin-left:12px}
