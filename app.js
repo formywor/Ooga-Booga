@@ -13,13 +13,16 @@ async function request(path, method = "GET", body) {
   const response = await fetch(API + path, {
     method,
     headers,
+    cache: "no-store",
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const result = await response.json().catch(() => ({
     error: "The server returned an invalid response.",
   }));
   if (!response.ok || result.ok === false) {
-    throw new Error(result.error || "Request failed.");
+    const error = new Error(result.error || "Request failed.");
+    error.status = response.status;
+    throw error;
   }
   return result;
 }
@@ -208,14 +211,26 @@ async function refreshAccountStatus() {
       result.account.registeredComputer ? "Registered" : "Not registered";
     $("device").className = result.account.registeredComputer ?
       "stat device-connected" : "stat";
+    return result.account.registeredComputer;
   } catch (error) {
-    // The normal account loader handles authentication errors.
+    if (error.status === 401 || /Authentication/i.test(error.message)) {
+      localStorage.removeItem(LOGIN_KEY);
+      localStorage.removeItem(REDIRECT_ATTEMPTS_KEY);
+      localStorage.removeItem(LEGACY_REDIRECT_ATTEMPT_KEY);
+      location.replace("/signin");
+    }
+    return false;
   }
 }
 
 function bindTokens() {
   loadTokens();
   let attempts = [];
+  let pairingPoll = null;
+  const stopPairingPoll = () => {
+    if (pairingPoll) clearInterval(pairingPoll);
+    pairingPoll = null;
+  };
   renderPendingClaims(attempts);
   const syncRewards = async () => {
     const status = await loadRewardStatus();
@@ -231,10 +246,9 @@ function bindTokens() {
   syncRewards().catch((error) =>
     message("redirect-message", error.message, "error"));
   const claimClock = setInterval(() => renderPendingClaims(attempts), 1000);
-  const accountClock = setInterval(refreshAccountStatus, 5000);
   window.addEventListener("pagehide", () => {
     clearInterval(claimClock);
-    clearInterval(accountClock);
+    stopPairingPoll();
   });
 
   $("create-token").onclick = async () => {
@@ -314,6 +328,20 @@ function bindTokens() {
       message("pairing-message",
           "Enter this code in Share Browser. It works once and expires in 10 minutes.",
           "success");
+      stopPairingPoll();
+      const expiresAt = new Date(result.expiresAt).getTime();
+      pairingPoll = setInterval(async () => {
+        if (Date.now() >= expiresAt) {
+          stopPairingPoll();
+          return;
+        }
+        if (await refreshAccountStatus()) {
+          stopPairingPoll();
+          message("pairing-message",
+              "Connected! This computer is registered to your account.",
+              "success");
+        }
+      }, 10000);
     } catch (error) {
       message("pairing-message", error.message, "error");
     }
