@@ -7,11 +7,19 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
+var LAUNCHER_VERSION="1.1.0";
+var wmiService=null;
 var state={login:"",proof:"",registered:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,browserSeen:false,launchConfirmed:false,processGraceUntil:0,zeroProcessChecks:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
 function trim(v){return String(v||"").replace(/^\s+|\s+$/g,"")}
 function status(text,bad){$("status").innerText=text;$("status").className=bad?"status-error":"status-ok"}
-function wmi(){return GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2")}
+function wmi(){
+  if(!wmiService){
+    var locator=new ActiveXObject("WbemScripting.SWbemLocator");
+    wmiService=locator.ConnectServer(".","root\\cimv2");
+  }
+  return wmiService;
+}
 function firstWmiValue(query,propertyName){
   try{
     var items=new Enumerator(wmi().ExecQuery(query));
@@ -24,6 +32,7 @@ function api(path,body,login){
   var r=new ActiveXObject("WinHttp.WinHttpRequest.5.1");
   r.Open("POST",API_BASE+path,false);r.SetTimeouts(5000,5000,5000,8000);
   r.SetRequestHeader("Content-Type","application/json");
+  r.SetRequestHeader("X-Launcher-Version",LAUNCHER_VERSION);
   if(login)r.SetRequestHeader("Authorization","Bearer "+login);
   r.Send(JSON.stringify(body||{}));var data;
   try{data=JSON.parse(r.ResponseText)}catch(e){throw new Error("Invalid API response.")}
@@ -215,6 +224,27 @@ function waitMilliseconds(milliseconds){
   var until=new Date().getTime()+milliseconds;
   while(new Date().getTime()<until){}
 }
+function waitForBrowserStart(milliseconds){
+  var until=new Date().getTime()+milliseconds;
+  while(new Date().getTime()<until){
+    var count=browserProcessCount();
+    if(count>0)return true;
+    waitMilliseconds(250);
+  }
+  return false;
+}
+function sendDiagnostic(eventName,detail,browser){
+  if(!state.login)return;
+  try{
+    api("/api/launcher/diagnostic",{
+      event:eventName,
+      detail:String(detail||"").slice(0,500),
+      browser:String(browser||"").slice(0,20),
+      processCount:browserProcessCount(),
+      launcherVersion:LAUNCHER_VERSION
+    },state.login);
+  }catch(e){}
+}
 function showConnected(){
   var overlay=$("connected-overlay");
   var colors=["#735cff","#23ceb9","#ffd166","#ff6685","#ffffff"];
@@ -257,29 +287,25 @@ function registerDevice(){
 function launch(executable,args){
   try{
     var cleanExecutable=String(executable).replace(/"/g,"");
-    var commandLine='"'+cleanExecutable+'" '+args;
-    var processClass=wmi().Get("Win32_Process");
-    var createMethod=processClass.Methods_.Item("Create");
-    var input=createMethod.InParameters.SpawnInstance_();
-    input.CommandLine=commandLine;
-    input.CurrentDirectory=new ActiveXObject("Scripting.FileSystemObject").GetParentFolderName(cleanExecutable);
-    var output=processClass.ExecMethod_("Create",input);
-    var returnValue=Number(output.ReturnValue);
-    if(returnValue!==0)throw new Error("Windows returned launch code "+returnValue+".");
-    var processId=Number(output.ProcessId||0);
-    if(processId<=0)throw new Error("Windows did not return a browser process.");
-    return processId;
+    var shell=new ActiveXObject("WScript.Shell");
+    var commandProcessor=shell.ExpandEnvironmentStrings("%SystemRoot%")+"\\System32\\cmd.exe";
+    var command='"'+commandProcessor+'" /D /S /C ""'+cleanExecutable+'" '+args+'"';
+    var exitCode=shell.Run(command,0,true);
+    if(exitCode!==0)throw new Error("Windows returned start code "+exitCode+".");
+    return 0;
   }catch(e){
     throw new Error("Windows could not start the selected browser. "+e.message);
   }
 }
 function start(){
   var startButton=$("start");
+  var kind="";
   try{
     startButton.disabled=true;startButton.innerText="Starting...";
     if(!state.registered)connectAccount(false);
     var browserToken=trim($("browser-token").value);if(!browserToken)throw new Error("Paste a browser token.");
-    var kind=$("browser").value,exe=browserPath(kind);
+    kind=$("browser").value;
+    var exe=browserPath(kind);
     status("Validating the token and preparing "+(kind==="chrome"?"Google Chrome":"Microsoft Edge")+"...",false);
     var activation=api("/api/session/activate",{token:browserToken,browser:kind,presetId:$("preset").value,userAgentId:$("user-agent").value,deviceProof:state.proof},state.login);
     state.id=activation.sessionId;state.secret=activation.sessionSecret;state.expires=new Date(activation.expiresAt).getTime();
@@ -299,15 +325,27 @@ function start(){
     if(remainingProcesses!==0)throw new Error("Some browser processes could not be closed. Save your work, close the browser, and try again.");
     waitMilliseconds(1000);
     state.launchedProcessId=launch(exe,args);
+    if(!waitForBrowserStart(10000)){
+      throw new Error("Windows accepted the start request, but no browser process appeared.");
+    }
+    state.browserSeen=true;
+    try{
+      api("/api/session/launched",{sessionId:state.id,sessionSecret:state.secret},"");
+      state.launchConfirmed=true;
+    }catch(confirmationError){
+      throw new Error("The browser opened, but the API could not confirm the launch. "+confirmationError.message);
+    }
     $("setup").style.display="none";$("active").style.display="block";
-    state.browserSeen=false;
-    state.launchConfirmed=false;
     state.processGraceUntil=new Date().getTime()+12000;
     state.zeroProcessChecks=0;
     state.heartbeat=setInterval(heartbeat,activation.heartbeatSeconds*1000);
     state.countdown=setInterval(tick,1000);state.processCheck=setInterval(checkProcess,2500);
     tick();status("Session active. Closing the browser or launcher permanently ends this token.",false);
-  }catch(e){if(state.id)end("LAUNCH_FAILED");status("Start failed: "+e.message,true)}
+  }catch(e){
+    sendDiagnostic("START_FAILED",e.message,kind);
+    if(state.id)end("LAUNCH_FAILED");
+    status("Start failed: "+e.message,true);
+  }
   finally{startButton.disabled=false;startButton.innerText="Start Browser"}
 }
 function heartbeat(){if(state.ending||!state.id)return;try{api("/api/session/heartbeat",{sessionId:state.id,sessionSecret:state.secret},"")}catch(e){end("HEARTBEAT_FAILED");status("Validation failed. The browser was closed and the token ended.",true)}}
