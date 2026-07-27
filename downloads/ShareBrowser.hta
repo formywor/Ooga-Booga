@@ -20,7 +20,7 @@ function api(path,body,login){
   if(login)r.SetRequestHeader("Authorization","Bearer "+login);
   r.Send(JSON.stringify(body||{}));var data;
   try{data=JSON.parse(r.ResponseText)}catch(e){throw new Error("Invalid API response.")}
-  if(r.Status<200||r.Status>=300||data.ok===false)throw new Error(data.error||data.reason||"API request failed.");
+  if(r.Status<200||r.Status>=300||data.ok===false)throw new Error("API "+r.Status+": "+(data.error||data.reason||"Request failed."));
   return data;
 }
 function deviceProof(){
