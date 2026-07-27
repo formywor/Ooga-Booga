@@ -197,6 +197,7 @@ async function loadRewardStatus() {
   const status = await request("/api/redirect/status");
   $("reward-count").textContent = `${status.openedCount} / ${status.maximumCount}`;
   $("reward-earned").textContent = `${status.earnedPoints} points`;
+  return status;
 }
 
 async function refreshAccountStatus() {
@@ -215,10 +216,20 @@ async function refreshAccountStatus() {
 
 function bindTokens() {
   loadTokens();
-  loadRewardStatus().catch((error) =>
-    message("redirect-message", error.message, "error"));
   let attempts = getSavedAttempts();
   renderPendingClaims(attempts);
+  loadRewardStatus().then((status) => {
+    const openAttemptIds = new Set(
+        status.attempts
+            .filter((attempt) => attempt.status === "OPENED")
+            .map((attempt) => attempt.attemptId),
+    );
+    attempts = attempts.filter((attempt) =>
+      openAttemptIds.has(attempt.attemptId));
+    saveAttempts(attempts);
+    renderPendingClaims(attempts);
+  }).catch((error) =>
+    message("redirect-message", error.message, "error"));
   const claimClock = setInterval(() => renderPendingClaims(attempts), 1000);
   const accountClock = setInterval(refreshAccountStatus, 5000);
   window.addEventListener("pagehide", () => {
