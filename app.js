@@ -2,13 +2,33 @@
 
 const API = "https://api.scriptnovaa.com";
 const LOGIN_KEY = "scriptnovaaLoginToken";
-const REDIRECT_ATTEMPTS_KEY = "scriptnovaaRedirectAttempts";
-const LEGACY_REDIRECT_ATTEMPT_KEY = "scriptnovaaRedirectAttempt";
+const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
 const $ = (id) => document.getElementById(id);
+
+function currentLogin() {
+  const tabLogin = sessionStorage.getItem(TAB_LOGIN_KEY);
+  if (tabLogin) return tabLogin;
+  const persistentLogin = localStorage.getItem(LOGIN_KEY) || "";
+  if (persistentLogin) sessionStorage.setItem(TAB_LOGIN_KEY, persistentLogin);
+  return persistentLogin;
+}
+
+function saveLogin(loginToken) {
+  sessionStorage.setItem(TAB_LOGIN_KEY, loginToken);
+  localStorage.setItem(LOGIN_KEY, loginToken);
+}
+
+function clearLogin() {
+  const tabLogin = sessionStorage.getItem(TAB_LOGIN_KEY);
+  sessionStorage.removeItem(TAB_LOGIN_KEY);
+  if (!tabLogin || localStorage.getItem(LOGIN_KEY) === tabLogin) {
+    localStorage.removeItem(LOGIN_KEY);
+  }
+}
 
 async function request(path, method = "GET", body) {
   const headers = {"Content-Type": "application/json"};
-  const login = localStorage.getItem(LOGIN_KEY);
+  const login = currentLogin();
   if (login) headers.Authorization = `Bearer ${login}`;
   const response = await fetch(API + path, {
     method,
@@ -35,7 +55,7 @@ function message(id, text, kind = "") {
 }
 
 function requireLogin() {
-  if (!localStorage.getItem(LOGIN_KEY)) {
+  if (!currentLogin()) {
     location.href = "/signin";
     return false;
   }
@@ -43,12 +63,12 @@ function requireLogin() {
 }
 
 async function redirectSignedInUser() {
-  if (!localStorage.getItem(LOGIN_KEY)) return;
+  if (!currentLogin()) return;
   try {
     await request("/api/account");
     location.replace("/tokens");
   } catch (error) {
-    localStorage.removeItem(LOGIN_KEY);
+    clearLogin();
   }
 }
 
@@ -65,7 +85,7 @@ function bindSignup() {
         referralUsername: $("signup-ref").value,
         clientDescription: navigator.userAgent,
       });
-      localStorage.setItem(LOGIN_KEY, result.loginToken);
+      saveLogin(result.loginToken);
       message("signup-message",
           `Account created.\n\nSAVE THIS RECOVERY CODE:\n${result.recoveryCode}\n\nIt will not be shown again.`,
           "success");
@@ -86,7 +106,7 @@ function bindSignin() {
         pin: $("signin-pin").value,
         clientDescription: navigator.userAgent,
       });
-      localStorage.setItem(LOGIN_KEY, result.loginToken);
+      saveLogin(result.loginToken);
       location.replace("/tokens");
     } catch (error) {
       message("signin-message", error.message, "error");
@@ -103,7 +123,7 @@ function bindRecovery() {
         recoveryCode: $("recovery-code").value,
         newPin: $("recovery-pin").value,
       });
-      localStorage.removeItem(LOGIN_KEY);
+      clearLogin();
       message("recovery-message",
           `PIN reset.\n\nSAVE YOUR NEW RECOVERY CODE:\n${result.newRecoveryCode}\n\nSign in again with your new PIN.`,
           "success");
@@ -139,37 +159,12 @@ async function loadTokens() {
       "<p>You have not created any tokens yet.</p>";
   } catch (error) {
     if (/Authentication/i.test(error.message)) {
-      localStorage.removeItem(LOGIN_KEY);
+      clearLogin();
       location.replace("/signin");
       return;
     }
     message("dashboard-message", error.message, "error");
   }
-}
-
-function getSavedAttempts() {
-  try {
-    const saved = JSON.parse(
-        localStorage.getItem(REDIRECT_ATTEMPTS_KEY) || "[]",
-    );
-    if (Array.isArray(saved) && saved.length) return saved;
-    const legacy = JSON.parse(
-        localStorage.getItem(LEGACY_REDIRECT_ATTEMPT_KEY) || "null",
-    );
-    if (legacy && legacy.attemptId) {
-      localStorage.removeItem(LEGACY_REDIRECT_ATTEMPT_KEY);
-      localStorage.setItem(REDIRECT_ATTEMPTS_KEY, JSON.stringify([legacy]));
-      return [legacy];
-    }
-    return Array.isArray(saved) ? saved : [];
-  } catch (error) {
-    localStorage.removeItem(REDIRECT_ATTEMPTS_KEY);
-    return [];
-  }
-}
-
-function saveAttempts(attempts) {
-  localStorage.setItem(REDIRECT_ATTEMPTS_KEY, JSON.stringify(attempts));
 }
 
 function remainingText(milliseconds) {
@@ -214,9 +209,7 @@ async function refreshAccountStatus() {
     return result.account.registeredComputer;
   } catch (error) {
     if (error.status === 401 || /Authentication/i.test(error.message)) {
-      localStorage.removeItem(LOGIN_KEY);
-      localStorage.removeItem(REDIRECT_ATTEMPTS_KEY);
-      localStorage.removeItem(LEGACY_REDIRECT_ATTEMPT_KEY);
+      clearLogin();
       location.replace("/signin");
     }
     return false;
@@ -230,6 +223,41 @@ function bindTokens() {
   const stopPairingPoll = () => {
     if (pairingPoll) clearInterval(pairingPoll);
     pairingPoll = null;
+  };
+  const beginPairingPoll = (expiresAtValue) => {
+    stopPairingPoll();
+    const expiresAt = new Date(expiresAtValue).getTime();
+    pairingPoll = setInterval(async () => {
+      if (Date.now() >= expiresAt) {
+        stopPairingPoll();
+        $("pairing-result").classList.add("hidden");
+        $("create-pairing").textContent = "Generate connection code";
+        message("pairing-message",
+            "That connection code expired. Generate another code when you are ready.");
+        return;
+      }
+      if (await refreshAccountStatus()) {
+        stopPairingPoll();
+        $("pairing-result").classList.add("hidden");
+        $("create-pairing").textContent = "Generate another code";
+        message("pairing-message",
+            "Connected! This computer is registered to your account.",
+            "success");
+      }
+    }, 10000);
+  };
+  const displayPairing = (pairing, announcement) => {
+    const displayCode =
+      `${pairing.pairingCode.slice(0, 5)}-${pairing.pairingCode.slice(5)}`;
+    $("pairing-code").textContent = displayCode;
+    $("pairing-expires").textContent =
+      new Date(pairing.expiresAt).toLocaleTimeString();
+    $("pairing-result").classList.remove("hidden");
+    $("create-pairing").textContent = "Generate another code";
+    if (announcement) {
+      message("pairing-message", announcement, "success");
+    }
+    beginPairingPoll(pairing.expiresAt);
   };
   renderPendingClaims(attempts);
   const syncRewards = async () => {
@@ -245,6 +273,18 @@ function bindTokens() {
   };
   syncRewards().catch((error) =>
     message("redirect-message", error.message, "error"));
+  request("/api/device/pairing/current")
+      .then((result) => {
+        if (result.pairing) {
+          displayPairing(result.pairing,
+              "Your active connection code was restored from your account.");
+        }
+      })
+      .catch((error) => {
+        if (error.status !== 401) {
+          message("pairing-message", error.message, "error");
+        }
+      });
   const claimClock = setInterval(() => renderPendingClaims(attempts), 1000);
   window.addEventListener("pagehide", () => {
     clearInterval(claimClock);
@@ -319,29 +359,8 @@ function bindTokens() {
   $("create-pairing").onclick = async () => {
     try {
       const result = await request("/api/device/pairing/start", "POST");
-      const displayCode =
-        `${result.pairingCode.slice(0, 5)}-${result.pairingCode.slice(5)}`;
-      $("pairing-code").textContent = displayCode;
-      $("pairing-expires").textContent =
-        new Date(result.expiresAt).toLocaleTimeString();
-      $("pairing-result").classList.remove("hidden");
-      message("pairing-message",
-          "Enter this code in Share Browser. It works once and expires in 10 minutes.",
-          "success");
-      stopPairingPoll();
-      const expiresAt = new Date(result.expiresAt).getTime();
-      pairingPoll = setInterval(async () => {
-        if (Date.now() >= expiresAt) {
-          stopPairingPoll();
-          return;
-        }
-        if (await refreshAccountStatus()) {
-          stopPairingPoll();
-          message("pairing-message",
-              "Connected! This computer is registered to your account.",
-              "success");
-        }
-      }, 10000);
+      displayPairing(result,
+          "Enter this code in Share Browser. It works once and expires in 10 minutes.");
     } catch (error) {
       message("pairing-message", error.message, "error");
     }
@@ -358,9 +377,7 @@ function bindTokens() {
     } catch (error) {
       // Local sign-out still completes if the network is unavailable.
     }
-    localStorage.removeItem(LOGIN_KEY);
-    localStorage.removeItem(REDIRECT_ATTEMPTS_KEY);
-    localStorage.removeItem(LEGACY_REDIRECT_ATTEMPT_KEY);
+    clearLogin();
     location.replace("/");
   };
 }
