@@ -4,6 +4,12 @@ const API = "https://api.scriptnovaa.com";
 const LOGIN_KEY = "scriptnovaaLoginToken";
 const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
 const $ = (id) => document.getElementById(id);
+const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 function currentLogin() {
   const tabLogin = sessionStorage.getItem(TAB_LOGIN_KEY);
@@ -266,17 +272,19 @@ function bindTokens() {
       if (Date.now() >= expiresAt) {
         stopPairingPoll();
         $("pairing-result").classList.add("hidden");
-        $("create-pairing").textContent = "Generate connection code";
+        $("create-pairing").classList.add("hidden");
+        $("pairing-support").classList.remove("hidden");
         message("pairing-message",
-            "That connection code expired. Generate another code when you are ready.");
+            "That connection code expired. Submit a replacement request through Support.");
         return;
       }
       if (await refreshAccountStatus()) {
         stopPairingPoll();
         $("pairing-result").classList.add("hidden");
-        $("create-pairing").textContent = "Generate another code";
+        $("create-pairing").classList.add("hidden");
+        $("pairing-support").classList.remove("hidden");
         message("pairing-message",
-            "Connected! This computer is registered to your account.",
+            "Connected! The launcher saves this connection across updates and restarts.",
             "success");
       }
     }, 10000);
@@ -288,11 +296,63 @@ function bindTokens() {
     $("pairing-expires").textContent =
       new Date(pairing.expiresAt).toLocaleTimeString();
     $("pairing-result").classList.remove("hidden");
-    $("create-pairing").textContent = "Generate another code";
+    $("create-pairing").classList.add("hidden");
+    $("pairing-support").classList.remove("hidden");
     if (announcement) {
       message("pairing-message", announcement, "success");
     }
     beginPairingPoll(pairing.expiresAt);
+  };
+  const displayPairingState = (result) => {
+    if (result.pairing) {
+      displayPairing(result.pairing,
+          "Your original connection code was restored. It cannot be changed.");
+      return;
+    }
+    $("pairing-result").classList.add("hidden");
+    if (result.canGenerate && result.migrationAvailable) {
+      $("create-pairing").classList.remove("hidden");
+      $("create-pairing").textContent = "Generate launcher-update code";
+      $("pairing-support").classList.add("hidden");
+      message("pairing-message",
+          "Your computer was connected with an older launcher. Generate this one update code so the new launcher can remember the connection.");
+      return;
+    }
+    if (result.registeredComputer) {
+      $("create-pairing").classList.add("hidden");
+      $("pairing-support").classList.remove("hidden");
+      message("pairing-message",
+          "Your computer is connected. Share Browser will remember it after launcher updates.",
+          "success");
+      return;
+    }
+    if (result.canGenerate) {
+      $("create-pairing").classList.remove("hidden");
+      $("create-pairing").textContent =
+        result.replacementRequest?.status === "APPROVED" ?
+          "Generate approved connection code" : "Generate connection code";
+      $("pairing-support").classList.add("hidden");
+      if (result.replacementRequest?.status === "APPROVED") {
+        message("pairing-message",
+            "Your replacement request was approved. You may generate one new code.",
+            "success");
+      }
+      return;
+    }
+    $("create-pairing").classList.add("hidden");
+    $("pairing-support").classList.remove("hidden");
+    const requestStatus = result.replacementRequest?.status;
+    if (requestStatus === "PENDING") {
+      message("pairing-message",
+          "Your replacement-code request is pending review.");
+    } else if (requestStatus === "DECLINED") {
+      message("pairing-message",
+          "Your replacement-code request was declined. Read the response on Support.",
+          "error");
+    } else {
+      message("pairing-message",
+          "Connection codes cannot be changed automatically. Request another through Support.");
+    }
   };
   renderPendingClaims(attempts);
   const syncRewards = async () => {
@@ -309,12 +369,7 @@ function bindTokens() {
   syncRewards().catch((error) =>
     message("redirect-message", error.message, "error"));
   request("/api/device/pairing/current")
-      .then((result) => {
-        if (result.pairing) {
-          displayPairing(result.pairing,
-              "Your active connection code was restored from your account.");
-        }
-      })
+      .then(displayPairingState)
       .catch((error) => {
         if (error.status !== 401) {
           message("pairing-message", error.message, "error");
@@ -405,11 +460,14 @@ function bindTokens() {
 
   $("create-pairing").onclick = async () => {
     try {
+      $("create-pairing").disabled = true;
       const result = await request("/api/device/pairing/start", "POST");
       displayPairing(result,
           "Enter this code in Share Browser. It works once and expires in 10 minutes.");
     } catch (error) {
       message("pairing-message", error.message, "error");
+    } finally {
+      $("create-pairing").disabled = false;
     }
   };
   $("copy-pairing").onclick = () =>
@@ -429,8 +487,119 @@ function bindTokens() {
   };
 }
 
+function bindSupport() {
+  if (!requireLogin()) return;
+  let ticketPoll = null;
+  const categoryNames = {
+    CONNECTION_CODE_REPLACEMENT: "Connection code replacement",
+    BROWSER_PROBLEM: "Share Browser problem",
+    ACCOUNT_ACCESS: "Account access",
+    POINTS_OR_REWARDS: "Points or sponsored rewards",
+    REFERRAL_PROBLEM: "Referral problem",
+    OTHER: "Other",
+  };
+  const statusNames = {
+    PENDING: "Pending",
+    APPROVED: "Approved",
+    DECLINED: "Declined",
+    FULFILLED: "Code generated",
+  };
+
+  const renderTickets = (tickets) => {
+    if (!tickets.length) {
+      $("ticket-list").innerHTML =
+        "<p class=\"empty-claims\">You have not submitted any support tickets.</p>";
+      return;
+    }
+    $("ticket-list").innerHTML = `<div class="ticket-stack">${
+      tickets.map((ticket) => {
+        const statusValue = statusNames[ticket.status] ? ticket.status : "PENDING";
+        const response = ticket.adminResponse ?
+          `<p class="ticket-response"><strong>ScriptNovaa response:</strong><br>${escapeHtml(ticket.adminResponse)}</p>` :
+          "";
+        const approvedAction =
+          ticket.category === "CONNECTION_CODE_REPLACEMENT" &&
+          statusValue === "APPROVED" && !ticket.replacementConsumedAt ?
+            "<div class=\"ticket-approved-action\"><a class=\"button\" href=\"/tokens\">Generate approved code</a></div>" :
+            "";
+        return `<article class="ticket-card">
+          <div>
+            <span class="ticket-meta">${escapeHtml(categoryNames[ticket.category] || ticket.category)} • ${escapeHtml(new Date(ticket.createdAt).toLocaleString())}</span>
+            <h3>${escapeHtml(ticket.subject)}</h3>
+            <p>${escapeHtml(ticket.message)}</p>
+          </div>
+          <span class="ticket-status ${statusValue.toLowerCase()}">${escapeHtml(statusNames[statusValue])}</span>
+          ${response}
+          ${approvedAction}
+        </article>`;
+      }).join("")
+    }</div>`;
+  };
+
+  const loadTickets = async () => {
+    try {
+      const result = await request("/api/support/tickets");
+      renderTickets(result.tickets);
+      message("ticket-list-message", "");
+    } catch (error) {
+      if (error.status === 401 || /Authentication/i.test(error.message)) {
+        clearLogin();
+        location.replace("/signin");
+        return;
+      }
+      message("ticket-list-message", error.message, "error");
+    }
+  };
+
+  $("support-category").onchange = () => {
+    if ($("support-category").value === "CONNECTION_CODE_REPLACEMENT" &&
+        !$("support-subject").value.trim()) {
+      $("support-subject").value = "Request another connection code";
+    }
+  };
+  $("support-category").onchange();
+
+  $("support-form").onsubmit = async (event) => {
+    event.preventDefault();
+    try {
+      $("submit-ticket").disabled = true;
+      const result = await request("/api/support/tickets", "POST", {
+        category: $("support-category").value,
+        subject: $("support-subject").value,
+        message: $("support-message").value,
+      });
+      message("support-message-result",
+          `Ticket submitted. Status: ${statusNames[result.ticket.status] || result.ticket.status}.`,
+          "success");
+      $("support-form").reset();
+      $("support-category").onchange();
+      await loadTickets();
+    } catch (error) {
+      message("support-message-result", error.message, "error");
+    } finally {
+      $("submit-ticket").disabled = false;
+    }
+  };
+  $("refresh-tickets").onclick = loadTickets;
+  $("support-signout").onclick = async () => {
+    try {
+      await request("/api/logout", "POST");
+    } catch (error) {
+      // Local sign-out still completes if the network is unavailable.
+    }
+    clearLogin();
+    location.replace("/");
+  };
+  loadTickets();
+  ticketPoll = setInterval(loadTickets, 15000);
+  window.addEventListener("pagehide", () => {
+    if (ticketPoll) clearInterval(ticketPoll);
+  });
+}
+
 const page = document.body.dataset.page;
 if (page === "signup") bindSignup();
 if (page === "signin") bindSignin();
 if (page === "recovery") bindRecovery();
 if (page === "tokens") bindTokens();
+if (page === "support") bindSupport();
