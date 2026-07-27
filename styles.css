@@ -40,6 +40,7 @@ button:disabled{opacity:.48;cursor:not-allowed}
 .step-card p{margin:0;color:var(--muted)}
 .warning-panel{border-color:#efd9a8;background:#fffbf2}
 .product-actions{display:flex;flex-wrap:wrap;gap:12px}
+.pairing-panel code{max-width:360px;margin:16px 0;font-size:28px;font-weight:800;letter-spacing:.12em;text-align:center}.pairing-panel #create-pairing{margin-top:12px}
 
 @media(max-width:860px){
   .reward-panel{grid-template-columns:1fr}

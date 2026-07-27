@@ -124,7 +124,6 @@ async function loadTokens() {
     $("referral").textContent = account.referralCode;
     $("device").textContent =
       account.registeredComputer ? "Registered" : "Not registered";
-    $("launcher-token").textContent = localStorage.getItem(LOGIN_KEY);
     $("duration").innerHTML = config.tokenOptions.map((item) =>
       `<option value="${item.hours}">${item.hours} hour${item.hours === 1 ? "" : "s"} — ${item.points} points</option>`,
     ).join("");
@@ -216,19 +215,20 @@ async function refreshAccountStatus() {
 
 function bindTokens() {
   loadTokens();
-  let attempts = getSavedAttempts();
+  let attempts = [];
   renderPendingClaims(attempts);
-  loadRewardStatus().then((status) => {
-    const openAttemptIds = new Set(
-        status.attempts
-            .filter((attempt) => attempt.status === "OPENED")
-            .map((attempt) => attempt.attemptId),
-    );
-    attempts = attempts.filter((attempt) =>
-      openAttemptIds.has(attempt.attemptId));
-    saveAttempts(attempts);
+  const syncRewards = async () => {
+    const status = await loadRewardStatus();
+    attempts = status.attempts
+        .filter((attempt) => attempt.status === "OPENED")
+        .map((attempt) => ({
+          attemptId: attempt.attemptId,
+          claimableAt: new Date(attempt.claimableAt).toISOString(),
+        }));
     renderPendingClaims(attempts);
-  }).catch((error) =>
+    return status;
+  };
+  syncRewards().catch((error) =>
     message("redirect-message", error.message, "error"));
   const claimClock = setInterval(() => renderPendingClaims(attempts), 1000);
   const accountClock = setInterval(refreshAccountStatus, 5000);
@@ -257,10 +257,7 @@ function bindTokens() {
       const attempt = await request("/api/redirect/start", "POST", {
         campaignId: "monetag-direct-11435374",
       });
-      attempts.push(attempt);
-      saveAttempts(attempts);
-      renderPendingClaims(attempts);
-      await loadRewardStatus();
+      await syncRewards();
       if (adWindow) {
         adWindow.opener = null;
         adWindow.location = attempt.redirectUrl;
@@ -295,23 +292,34 @@ function bindTokens() {
       button.disabled = true;
       const result = await request("/api/redirect/claim", "POST", {
         attemptId: attempt.attemptId,
-        claimCode: attempt.claimCode,
       });
-      attempts = attempts.filter((item) =>
-        item.attemptId !== attempt.attemptId);
-      saveAttempts(attempts);
-      renderPendingClaims(attempts);
       message("redirect-message",
           `${result.awardedPoints} point added to your balance.`, "success");
-      await Promise.all([loadTokens(), loadRewardStatus()]);
+      await Promise.all([loadTokens(), syncRewards()]);
     } catch (error) {
       message("redirect-message", error.message, "error");
       button.disabled = false;
     }
   };
 
-  $("copy-login").onclick = () =>
-    navigator.clipboard.writeText(localStorage.getItem(LOGIN_KEY));
+  $("create-pairing").onclick = async () => {
+    try {
+      const result = await request("/api/device/pairing/start", "POST");
+      const displayCode =
+        `${result.pairingCode.slice(0, 5)}-${result.pairingCode.slice(5)}`;
+      $("pairing-code").textContent = displayCode;
+      $("pairing-expires").textContent =
+        new Date(result.expiresAt).toLocaleTimeString();
+      $("pairing-result").classList.remove("hidden");
+      message("pairing-message",
+          "Enter this code in Share Browser. It works once and expires in 10 minutes.",
+          "success");
+    } catch (error) {
+      message("pairing-message", error.message, "error");
+    }
+  };
+  $("copy-pairing").onclick = () =>
+    navigator.clipboard.writeText($("pairing-code").textContent);
   $("copy-referral").onclick = () =>
     navigator.clipboard.writeText(
         `https://scriptnovaa.com/signup?ref=${encodeURIComponent($("referral").textContent)}`,

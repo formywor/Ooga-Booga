@@ -73,13 +73,15 @@ function showConnected(){
   },2300);
 }
 function connectAccount(showAnimation){
-  state.login=trim($("login").value);
-  if(!state.login)throw new Error("Paste the launcher connection token from the Tokens page.");
+  var pairingCode=trim($("pairing-code").value);
+  if(!pairingCode)throw new Error("Generate a connection code on the Tokens page, then enter it here.");
   status("Connecting to ScriptNovaa...",false);
   state.proof=deviceProof();
   if(state.proof.length<20)throw new Error("Windows could not create a computer identity. Run Share Browser normally, not from a restricted folder.");
-  var result=api("/api/device/register",{deviceProof:state.proof},state.login);
+  var result=api("/api/device/pairing/complete",{pairingCode:pairingCode,deviceProof:state.proof},"");
   if(result.riskStatus==="REVIEW")throw new Error("This computer connected, but the account is being held for risk review.");
+  state.login=result.launcherToken;
+  if(!state.login)throw new Error("The API did not return a launcher session.");
   state.registered=true;
   status(result.alreadyRegistered?"Connected to your registered computer.":"Computer registered and connected.",false);
   if(showAnimation)showConnected();
@@ -95,7 +97,6 @@ function launch(executable,args){
 }
 function start(){
   try{
-    state.login=trim($("login").value);if(!state.login)throw new Error("Paste the launcher connection token from the Tokens page.");
     if(!state.registered)connectAccount(false);
     var browserToken=trim($("browser-token").value);if(!browserToken)throw new Error("Paste a browser token.");
     var kind=$("browser").value,exe=browserPath(kind);
@@ -122,7 +123,7 @@ function init(){window.resizeTo(830,710);$("register").onclick=registerDevice;$(
 window.onbeforeunload=function(){if(state.id){killSessionBrowser();try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
 </script></head>
 <body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start a timed browser session.</div>
-<div id="setup" class="panel"><label>Launcher connection token</label><input id="login" type="password" placeholder="Paste the connection token from your Tokens page"><button id="register" class="secondary">Connect this computer</button><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
+<div id="setup" class="panel"><label>One-time connection code</label><input id="pairing-code" placeholder="XXXXX-XXXXX"><button id="register" class="secondary">Connect this computer</button><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
 <div class="row"><div class="field"><label>Browser</label><select id="browser"><option value="chrome">Google Chrome</option><option value="edge">Microsoft Edge</option></select></div><div class="field"><label>Appearance</label><select id="theme"><option value="vibrant">Vibrant</option><option value="">Minimal</option></select></div></div>
 <label>Browser preset</label><select id="preset"><option value="balanced">Balanced</option><option value="privacy">Privacy</option><option value="minimal">Minimal</option></select><button id="start">Start Browser</button><p class="muted">Continuous internet is required. Closing Chrome/Edge, closing this launcher, validation failure, or timeout permanently finishes the token.</p></div>
 <div id="active" class="panel"><div class="muted">TIME REMAINING</div><div id="clock">00:00:00</div><button id="end" class="danger">End session</button></div><div id="status"></div></div>
