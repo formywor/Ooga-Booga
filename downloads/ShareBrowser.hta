@@ -7,7 +7,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
-var state={login:"",proof:"",registered:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",browserSeen:false,launchConfirmed:false,processGraceUntil:0,zeroProcessChecks:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
+var state={login:"",proof:"",registered:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,browserSeen:false,launchConfirmed:false,processGraceUntil:0,zeroProcessChecks:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
 function trim(v){return String(v||"").replace(/^\s+|\s+$/g,"")}
 function status(text,bad){$("status").innerText=text;$("status").className=bad?"status-error":"status-ok"}
@@ -175,10 +175,19 @@ function browserProcessCount(){
 function killAllSelectedBrowserProcesses(){
   if(!state.browserProcessName)return;
   var shell=new ActiveXObject("WScript.Shell");
-  for(var attempt=0;attempt<4;attempt++){
-    try{
-      shell.Run("taskkill.exe /F /T /IM "+state.browserProcessName,0,true);
-    }catch(taskKillError){}
+  var processBaseName=state.browserProcessName==="chrome.exe"?"chrome":"msedge";
+  var powerShellPath=shell.ExpandEnvironmentStrings("%SystemRoot%")+"\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+  var taskKillPath=shell.ExpandEnvironmentStrings("%SystemRoot%")+"\\System32\\taskkill.exe";
+  try{
+    var stopCommand='"'+powerShellPath+'" -NoProfile -NonInteractive -WindowStyle Hidden -Command "'+
+      "Get-Process -Name '"+processBaseName+"' -ErrorAction SilentlyContinue | "+
+      'Stop-Process -Force -ErrorAction SilentlyContinue"';
+    shell.Run(stopCommand,0,true);
+  }catch(powerShellStopError){}
+  try{
+    shell.Run('"'+taskKillPath+'" /F /T /IM '+state.browserProcessName,0,true);
+  }catch(taskKillError){}
+  for(var attempt=0;attempt<3;attempt++){
     try{
       var items=new Enumerator(wmi().ExecQuery("Select * From Win32_Process Where Name='"+state.browserProcessName+"'"));
       for(;!items.atEnd();items.moveNext()){
@@ -187,6 +196,9 @@ function killAllSelectedBrowserProcesses(){
     }catch(e2){}
     var remaining=browserProcessCount();
     if(remaining===0)return;
+    try{
+      shell.Run('"'+taskKillPath+'" /F /T /IM '+state.browserProcessName,0,true);
+    }catch(secondTaskKillError){}
   }
 }
 function removeSessionProfile(profilePath){
@@ -198,6 +210,10 @@ function removeSessionProfile(profilePath){
     var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
     if(fileSystem.FolderExists(profilePath))fileSystem.DeleteFolder(profilePath,true);
   }catch(e){}
+}
+function waitMilliseconds(milliseconds){
+  var until=new Date().getTime()+milliseconds;
+  while(new Date().getTime()<until){}
 }
 function showConnected(){
   var overlay=$("connected-overlay");
@@ -241,9 +257,18 @@ function registerDevice(){
 function launch(executable,args){
   try{
     var cleanExecutable=String(executable).replace(/"/g,"");
-    var command='"'+cleanExecutable+'" '+args;
-    var result=new ActiveXObject("WScript.Shell").Run(command,1,false);
-    if(result!==0)throw new Error("Windows returned launch code "+result+".");
+    var commandLine='"'+cleanExecutable+'" '+args;
+    var processClass=wmi().Get("Win32_Process");
+    var createMethod=processClass.Methods_.Item("Create");
+    var input=createMethod.InParameters.SpawnInstance_();
+    input.CommandLine=commandLine;
+    input.CurrentDirectory=new ActiveXObject("Scripting.FileSystemObject").GetParentFolderName(cleanExecutable);
+    var output=processClass.ExecMethod_("Create",input);
+    var returnValue=Number(output.ReturnValue);
+    if(returnValue!==0)throw new Error("Windows returned launch code "+returnValue+".");
+    var processId=Number(output.ProcessId||0);
+    if(processId<=0)throw new Error("Windows did not return a browser process.");
+    return processId;
   }catch(e){
     throw new Error("Windows could not start the selected browser. "+e.message);
   }
@@ -272,7 +297,9 @@ function start(){
     var remainingProcesses=browserProcessCount();
     if(remainingProcesses<0)throw new Error("Windows could not verify that the browser closed. Restart Share Browser and try again.");
     if(remainingProcesses!==0)throw new Error("Some browser processes could not be closed. Save your work, close the browser, and try again.");
-    launch(exe,args);$("setup").style.display="none";$("active").style.display="block";
+    waitMilliseconds(1000);
+    state.launchedProcessId=launch(exe,args);
+    $("setup").style.display="none";$("active").style.display="block";
     state.browserSeen=false;
     state.launchConfirmed=false;
     state.processGraceUntil=new Date().getTime()+12000;
@@ -317,7 +344,7 @@ function end(reason){
   var finishedProfile=state.profile;
   killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);
   if(state.id&&state.secret)try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:reason},"")}catch(e){}
-  state.id="";state.secret="";state.expires=0;state.profile="";state.browserProcessName="";state.browserSeen=false;state.launchConfirmed=false;state.processGraceUntil=0;state.zeroProcessChecks=0;$("active").style.display="none";$("setup").style.display="block";state.ending=false;
+  state.id="";state.secret="";state.expires=0;state.profile="";state.browserProcessName="";state.launchedProcessId=0;state.browserSeen=false;state.launchConfirmed=false;state.processGraceUntil=0;state.zeroProcessChecks=0;$("active").style.display="none";$("setup").style.display="block";state.ending=false;
 }
 function init(){window.resizeTo(830,800);$("register").onclick=registerDevice;$("start").onclick=start;$("end").onclick=function(){end("USER_ENDED");status("Session ended. The token cannot be reused.",false)};$("theme").onchange=function(){document.body.className=this.value};restoreConnection()}
 window.onbeforeunload=function(){if(state.id){var finishedProfile=state.profile;killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
