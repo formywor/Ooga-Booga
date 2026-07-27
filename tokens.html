@@ -1,8 +1,36 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tokens — ScriptNovaa</title><link rel="stylesheet" href="styles.css"></head>
-<body data-page="tokens"><header class="site-header"><nav class="nav"><a class="brand" href="index.html"><span class="brand-mark">S</span><span>ScriptNovaa</span></a><div class="nav-links"><a href="share-browser.html">Share Browser</a><button id="signout">Sign out</button></div></nav></header>
-<main class="wrap dashboard"><div class="dashboard-title"><div><p class="kicker">Share Browser account</p><h1>Tokens</h1></div><p>Earn points. Choose a duration. Start when you are ready.</p></div>
-<section class="dashboard-grid"><article class="dashboard-card"><span class="kicker">Available points</span><div id="points" class="stat">—</div></article><article class="dashboard-card"><span class="kicker">Pending points</span><div id="pending" class="stat">—</div></article><article class="dashboard-card"><span class="kicker">Referral name</span><div id="referral" class="stat">—</div><button id="copy-referral">Copy referral link</button></article><article class="dashboard-card"><span class="kicker">Computer</span><div id="device" class="stat">—</div></article></section>
-<section class="panel"><h2>Create a token</h2><div class="row"><div class="grow"><label for="duration">Session duration</label><select id="duration"></select></div><button id="create-token">Create token</button></div><div id="token-message" class="message"></div></section>
-<section class="panel"><h2>Your tokens</h2><div id="token-list">Loading…</div></section>
-<section class="panel"><h2>Earn through rewarded links</h2><p>Each completed link is worth 0.5 point. You may complete up to 44 in a rolling 14-hour period.</p><button id="start-redirect">Open rewarded link</button><p>Claim available: <strong id="claim-time">—</strong></p><button id="claim-redirect" class="hidden">Claim 0.5 point</button><div id="redirect-message" class="message"></div></section>
-<section class="panel"><h2>Connect the launcher</h2><p>Testing connection token:</p><code id="launcher-token"></code><button id="copy-login">Copy launcher login token</button></section><div id="dashboard-message" class="message"></div></main><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tokens — ScriptNovaa</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="tokens">
+  <header class="site-header"><nav class="nav">
+    <a class="brand" href="index.html"><span class="brand-mark">S</span><span>ScriptNovaa</span></a>
+    <div class="nav-links"><a href="share-browser.html">Share Browser</a><a href="points-info.html">How points work</a><button id="signout">Sign out</button></div>
+  </nav></header>
+  <main class="wrap dashboard">
+    <div class="dashboard-title"><div><p class="kicker">Share Browser account</p><h1>Tokens</h1></div><p>Earn points. Choose a duration. Start when you are ready.</p></div>
+    <section class="dashboard-grid">
+      <article class="dashboard-card"><span class="kicker">Available points</span><div id="points" class="stat">—</div></article>
+      <article class="dashboard-card"><span class="kicker">Pending points</span><div id="pending" class="stat">—</div></article>
+      <article class="dashboard-card"><span class="kicker">Referral name</span><div id="referral" class="stat">—</div><button id="copy-referral">Copy referral link</button></article>
+      <article class="dashboard-card"><span class="kicker">Computer</span><div id="device" class="stat">—</div></article>
+    </section>
+    <section class="panel"><h2>Create a token</h2><div class="row"><div class="grow"><label for="duration">Session duration</label><select id="duration"></select></div><button id="create-token">Create token</button></div><div id="token-message" class="message"></div></section>
+    <section class="panel"><h2>Your tokens</h2><div id="token-list">Loading…</div></section>
+    <section class="panel reward-panel">
+      <div><p class="kicker">Sponsored reward</p><h2>Earn through rewarded links</h2><p>Open a sponsored page, then return when the claim timer is ready. Each completed link earns 0.5 point. The limit is 44 links in a rolling 14-hour period.</p><a class="text-link" href="points-info.html">Read the complete claiming rules</a></div>
+      <div class="reward-actions"><button id="start-redirect">Open sponsored page</button><p>Claim available: <strong id="claim-time">No reward waiting</strong></p><button id="claim-redirect" class="hidden">Claim 0.5 point</button></div>
+      <div id="redirect-message" class="message"></div>
+    </section>
+    <aside class="ad-disclosure"><span>Advertisement</span><p>Ads help fund free Share Browser tokens. This placement does not award points.</p></aside>
+    <section class="panel"><h2>Connect the launcher</h2><p>Copy this private connection token into Share Browser:</p><code id="launcher-token"></code><button id="copy-login">Copy launcher connection token</button></section>
+    <div id="dashboard-message" class="message"></div>
+  </main>
+  <script src="app.js"></script>
+  <script>(function(s){s.dataset.zone="11435378";s.src="https://nap5k.com/tag.min.js"})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement("script")))</script>
+</body>
+</html>
