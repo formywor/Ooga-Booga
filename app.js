@@ -133,6 +133,39 @@ function bindRecovery() {
   };
 }
 
+let limitedOfferClock = null;
+
+function showLimitedOffer(config, account) {
+  const offer = $("limited-offer");
+  if (!offer) return;
+  if (limitedOfferClock) {
+    clearInterval(limitedOfferClock);
+    limitedOfferClock = null;
+  }
+  if (!config.limitedOffer?.active || account.limitedFreeTokenClaimed) {
+    offer.classList.add("hidden");
+    return;
+  }
+  const endsAt = new Date(config.limitedOffer.endsAt).getTime();
+  const update = () => {
+    const remaining = Math.max(0, endsAt - Date.now());
+    if (!remaining) {
+      offer.classList.add("hidden");
+      clearInterval(limitedOfferClock);
+      limitedOfferClock = null;
+      return;
+    }
+    const totalMinutes = Math.floor(remaining / 60000);
+    const days = Math.floor(totalMinutes / 1440);
+    const hours = Math.floor((totalMinutes % 1440) / 60);
+    const minutes = totalMinutes % 60;
+    $("limited-countdown").textContent = `${days}d ${hours}h ${minutes}m`;
+  };
+  offer.classList.remove("hidden");
+  update();
+  limitedOfferClock = setInterval(update, 60000);
+}
+
 async function loadTokens() {
   if (!requireLogin()) return;
   try {
@@ -148,13 +181,15 @@ async function loadTokens() {
     $("device").textContent =
       account.registeredComputer ? "Registered" : "Not registered";
     $("duration").innerHTML = config.tokenOptions.map((item) =>
-      `<option value="${item.hours}">${item.hours} hour${item.hours === 1 ? "" : "s"} — ${item.points} points</option>`,
+      `<option value="${item.id}">${item.label}</option>`,
     ).join("");
+    showLimitedOffer(config, account);
     $("token-list").innerHTML = tokenResult.tokens.length ?
       `<table><thead><tr><th>Token</th><th>Duration</th><th>Status</th></tr></thead><tbody>${
-        tokenResult.tokens.map((token) =>
-          `<tr><td><code>${token.displayToken || "Hidden after use"}</code></td><td>${token.durationHours}h</td><td>${token.status}</td></tr>`,
-        ).join("")
+        tokenResult.tokens.map((token) => {
+          const duration = token.durationLabel || `${token.durationHours}h`;
+          return `<tr><td><code>${token.displayToken || "Hidden after use"}</code></td><td>${duration}</td><td>${token.status}</td></tr>`;
+        }).join("")
       }</tbody></table>` :
       "<p>You have not created any tokens yet.</p>";
   } catch (error) {
@@ -289,18 +324,27 @@ function bindTokens() {
   window.addEventListener("pagehide", () => {
     clearInterval(claimClock);
     stopPairingPoll();
+    if (limitedOfferClock) clearInterval(limitedOfferClock);
   });
 
   $("create-token").onclick = async () => {
     try {
       const result = await request("/api/tokens/create", "POST", {
-        hours: Number($("duration").value),
+        optionId: $("duration").value,
       });
-      message("token-message", `Token created:\n${result.token}`, "success");
+      message("token-message",
+          `${result.durationLabel} token created:\n${result.token}`, "success");
       await loadTokens();
     } catch (error) {
       message("token-message", error.message, "error");
     }
+  };
+  $("select-limited-token").onclick = () => {
+    $("duration").value = "free-4m-2026";
+    $("token-creator").scrollIntoView({behavior: "smooth", block: "center"});
+    message("token-message",
+        "Your free four-minute token is selected. Press Create token to claim it.",
+        "success");
   };
 
   $("start-redirect").onclick = async () => {

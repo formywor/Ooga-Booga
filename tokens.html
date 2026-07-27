@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Tokens — ScriptNovaa</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260727-limited1">
 </head>
 <body data-page="tokens">
   <header class="site-header"><nav class="nav">
-    <a class="brand" href="/"><span class="brand-mark">S</span><span>ScriptNovaa</span></a>
+    <a class="brand" href="/"><span class="brand-mark"><img src="/logo.PNG" alt="ScriptNovaa logo" onerror="this.style.display='none';this.parentNode.classList.add('logo-fallback')"></span><span>ScriptNovaa</span></a>
     <div class="nav-links"><a href="/share-browser">Share Browser</a><a href="/points-info">How points work</a><button id="signout">Sign out</button></div>
   </nav></header>
   <main class="wrap dashboard">
@@ -19,7 +19,12 @@
       <article class="dashboard-card"><span class="kicker">Referral name</span><div id="referral" class="stat">—</div><button id="copy-referral">Copy referral link</button></article>
       <article class="dashboard-card"><span class="kicker">Computer</span><div id="device" class="stat">—</div></article>
     </section>
-    <section class="panel"><h2>Create a token</h2><div class="row"><div class="grow"><label for="duration">Session duration</label><select id="duration"></select></div><button id="create-token">Create token</button></div><div id="token-message" class="message"></div></section>
+    <section id="limited-offer" class="limited-offer hidden">
+      <div class="limited-glow"></div>
+      <div class="limited-copy"><span class="limited-badge">LIMITED • FREE</span><p class="kicker">A special Share Browser drop</p><h2>Four minutes. Zero points.</h2><p>Claim one complete Share Browser session free. Available once per account for a limited time.</p><div class="limited-value"><strong>4:00</strong><span>browser time<br>for 0 points</span></div></div>
+      <div class="limited-action"><span>OFFER ENDS</span><strong id="limited-countdown">Loading…</strong><small>August 27, 2026 • 11:59 PM EST</small><button id="select-limited-token">Claim free token</button></div>
+    </section>
+    <section id="token-creator" class="panel"><h2>Create a token</h2><div class="row"><div class="grow"><label for="duration">Session duration</label><select id="duration"></select></div><button id="create-token">Create token</button></div><div id="token-message" class="message"></div></section>
     <section class="panel"><h2>Your tokens</h2><div id="token-list">Loading…</div></section>
     <section class="panel reward-panel">
       <div><p class="kicker">Sponsored reward</p><h2>Earn through rewarded links</h2><p>Open a sponsored page, then return when the claim timer is ready. Each completed link earns 0.5 point. The limit is 44 links in a rolling 14-hour period.</p><a class="text-link" href="/points-info">Read the complete claiming rules</a></div>
@@ -31,7 +36,7 @@
     <section class="panel pairing-panel"><h2>Connect Share Browser</h2><p>Generate a one-time code, then enter it in the launcher within 10 minutes.</p><div id="pairing-result" class="hidden"><code id="pairing-code"></code><p>Expires: <strong id="pairing-expires"></strong></p><button id="copy-pairing">Copy connection code</button></div><button id="create-pairing">Generate connection code</button><div id="pairing-message" class="message"></div></section>
     <div id="dashboard-message" class="message"></div>
   </main>
-  <script src="app.js?v=20260727-pairing2"></script>
+  <script src="app.js?v=20260727-limited1"></script>
   <script>(function(s){s.dataset.zone="11435378";s.src="https://nap5k.com/tag.min.js"})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement("script")))</script>
 </body>
 </html>
