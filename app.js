@@ -329,6 +329,7 @@ function bindTokens() {
 
   $("create-token").onclick = async () => {
     try {
+      $("create-token").disabled = true;
       const result = await request("/api/tokens/create", "POST", {
         optionId: $("duration").value,
       });
@@ -337,6 +338,8 @@ function bindTokens() {
       await loadTokens();
     } catch (error) {
       message("token-message", error.message, "error");
+    } finally {
+      $("create-token").disabled = false;
     }
   };
   $("select-limited-token").onclick = () => {
