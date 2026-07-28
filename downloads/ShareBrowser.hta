@@ -7,9 +7,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
-var LAUNCHER_VERSION="1.1.0";
+var LAUNCHER_VERSION="1.2.0";
 var wmiService=null;
-var state={login:"",proof:"",registered:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,browserSeen:false,launchConfirmed:false,processGraceUntil:0,zeroProcessChecks:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
+var state={login:"",proof:"",registered:false,updateRequired:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,browserSeen:false,launchConfirmed:false,processGraceUntil:0,zeroProcessChecks:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
 function trim(v){return String(v||"").replace(/^\s+|\s+$/g,"")}
 function status(text,bad){$("status").innerText=text;$("status").className=bad?"status-error":"status-ok"}
@@ -39,6 +39,9 @@ function api(path,body,login){
   if(r.Status<200||r.Status>=300||data.ok===false){
     var apiError=new Error("API "+r.Status+": "+(data.error||data.reason||"Request failed."));
     apiError.apiStatus=r.Status;
+    apiError.apiCode=data.code||"";
+    apiError.updateUrl=data.updateUrl||"https://scriptnovaa.com/share-browser";
+    apiError.currentVersion=data.currentVersion||"";
     throw apiError;
   }
   return data;
@@ -69,6 +72,13 @@ function setConnectionUi(connected){
     $("pairing-code").placeholder="XXXXX-XXXXX";
     $("register").innerText="Connect this computer";
   }
+}
+function showUpdateRequired(error){
+  state.updateRequired=true;
+  $("start").disabled=true;
+  $("start").innerText="Update required";
+  var version=error&&error.currentVersion?" "+error.currentVersion:"";
+  status("A newer Share Browser version"+version+" is required.\nDownload it from scriptnovaa.com/share-browser before starting another session.",true);
 }
 function replaceOptions(selectId,items,selectedId){
   var select=$(selectId);
@@ -153,6 +163,10 @@ function restoreConnection(){
     loadLauncherConfiguration();
     status("Connected to "+result.username+". Your saved computer connection is ready.",false);
   }catch(e){
+    if(e.apiStatus===426||e.apiCode==="LAUNCHER_UPDATE_REQUIRED"){
+      showUpdateRequired(e);
+      return false;
+    }
     if(e.apiStatus===401||e.apiStatus===403){
       clearSavedConnection();
       state.login="";state.proof="";state.registered=false;
@@ -282,7 +296,13 @@ function connectAccount(showAnimation){
   return result;
 }
 function registerDevice(){
-  try{connectAccount(true)}catch(e){state.registered=false;status("Connection failed: "+e.message,true)}
+  try{connectAccount(true)}catch(e){
+    if(e.apiStatus===426||e.apiCode==="LAUNCHER_UPDATE_REQUIRED"){
+      showUpdateRequired(e);
+      return;
+    }
+    state.registered=false;status("Connection failed: "+e.message,true);
+  }
 }
 function launch(executable,args){
   try{
@@ -302,6 +322,7 @@ function start(){
   var kind="";
   try{
     startButton.disabled=true;startButton.innerText="Starting...";
+    if(state.updateRequired)throw new Error("Download the latest Share Browser version from scriptnovaa.com/share-browser.");
     if(!state.registered)connectAccount(false);
     var browserToken=trim($("browser-token").value);if(!browserToken)throw new Error("Paste a browser token.");
     kind=$("browser").value;
@@ -342,13 +363,30 @@ function start(){
     state.countdown=setInterval(tick,1000);state.processCheck=setInterval(checkProcess,2500);
     tick();status("Session active. Closing the browser or launcher permanently ends this token.",false);
   }catch(e){
+    var updateFailure=e.apiStatus===426||e.apiCode==="LAUNCHER_UPDATE_REQUIRED";
+    if(updateFailure){
+      showUpdateRequired(e);
+    }
     sendDiagnostic("START_FAILED",e.message,kind);
     if(state.id)end("LAUNCH_FAILED");
-    status("Start failed: "+e.message,true);
+    if(!updateFailure)status("Start failed: "+e.message,true);
   }
-  finally{startButton.disabled=false;startButton.innerText="Start Browser"}
+  finally{
+    startButton.disabled=state.updateRequired;
+    startButton.innerText=state.updateRequired?"Update required":"Start Browser";
+  }
 }
-function heartbeat(){if(state.ending||!state.id)return;try{api("/api/session/heartbeat",{sessionId:state.id,sessionSecret:state.secret},"")}catch(e){end("HEARTBEAT_FAILED");status("Validation failed. The browser was closed and the token ended.",true)}}
+  function heartbeat(){
+    if(state.ending||!state.id)return;
+    try{
+      api("/api/session/heartbeat",{sessionId:state.id,sessionSecret:state.secret},"");
+    }catch(e){
+      var updateFailure=e.apiStatus===426||e.apiCode==="LAUNCHER_UPDATE_REQUIRED";
+      end(updateFailure?"LAUNCHER_OUTDATED":"HEARTBEAT_FAILED");
+      if(updateFailure)showUpdateRequired(e);
+      else status("Validation failed. The browser was closed and the token ended.",true);
+    }
+  }
 function checkProcess(){
   if(state.ending||!state.id)return;
   var processCount=browserProcessCount();
@@ -387,7 +425,7 @@ function end(reason){
 function init(){window.resizeTo(830,800);$("register").onclick=registerDevice;$("start").onclick=start;$("end").onclick=function(){end("USER_ENDED");status("Session ended. The token cannot be reused.",false)};$("theme").onchange=function(){document.body.className=this.value};restoreConnection()}
 window.onbeforeunload=function(){if(state.id){var finishedProfile=state.profile;killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
 </script></head>
-<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start a timed browser session.</div>
+<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.0</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start a timed browser session.</div>
 <div id="setup" class="panel"><label>One-time connection code</label><input id="pairing-code" placeholder="XXXXX-XXXXX"><button id="register" class="secondary">Connect this computer</button><p class="muted">Once connected, this launcher remembers the computer. Replacement codes must be requested at scriptnovaa.com/support.</p><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
 <div class="row"><div class="field"><label>Browser</label><select id="browser"><option value="chrome">Google Chrome</option><option value="edge">Microsoft Edge</option></select></div><div class="field"><label>Appearance</label><select id="theme"><option value="vibrant">Vibrant</option><option value="">Minimal</option></select></div></div>
 <div class="row"><div class="field"><label>Browsing mode</label><select id="preset"><option value="balanced">Balanced</option><option value="privacy">Private</option><option value="minimal">Lightweight</option><option value="protected" selected>Protected</option></select></div><div class="field"><label>Site compatibility</label><select id="user-agent"><option value="default">Standard</option><option value="chromeOs120" selected>ScriptNovaa compatibility</option></select></div></div><div class="browser-warning"><strong>Save your browser work first.</strong> Starting a session closes every open window of the selected browser so the managed session starts cleanly. Closing the managed browser or ending the session closes every remaining process of that browser and removes the temporary profile.</div><button id="start">Start Browser</button><p class="muted">Continuous internet is required. Closing Chrome/Edge, closing this launcher, validation failure, or timeout permanently finishes the token.</p><div id="status"></div></div>

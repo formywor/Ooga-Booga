@@ -141,6 +141,12 @@ function bindRecovery() {
 
 let limitedOfferClock = null;
 
+function showDeviceWelcome(account) {
+  const welcome = $("device-welcome");
+  if (!welcome) return;
+  welcome.classList.toggle("hidden", !account.deviceSetupNoticePending);
+}
+
 function showLimitedOffer(config, account) {
   const offer = $("limited-offer");
   if (!offer) return;
@@ -186,15 +192,22 @@ async function loadTokens() {
     $("referral").textContent = account.referralCode;
     $("device").textContent =
       account.registeredComputer ? "Registered" : "Not registered";
+    $("device").className = account.registeredComputer ?
+      "stat device-connected" : "stat";
+    showDeviceWelcome(account);
     $("duration").innerHTML = config.tokenOptions.map((item) =>
       `<option value="${item.id}">${item.label}</option>`,
     ).join("");
     showLimitedOffer(config, account);
     $("token-list").innerHTML = tokenResult.tokens.length ?
-      `<table><thead><tr><th>Token</th><th>Duration</th><th>Status</th></tr></thead><tbody>${
+      `<table><thead><tr><th>Token</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead><tbody>${
         tokenResult.tokens.map((token) => {
           const duration = token.durationLabel || `${token.durationHours}h`;
-          return `<tr><td><code>${token.displayToken || "Hidden after use"}</code></td><td>${duration}</td><td>${token.status}</td></tr>`;
+          const displayToken = token.displayToken || "";
+          const action = displayToken ?
+            `<button class="copy-token light-button" data-token="${escapeHtml(displayToken)}">Copy token</button>` :
+            "";
+          return `<tr><td><code>${escapeHtml(displayToken || "Hidden after use")}</code></td><td>${escapeHtml(duration)}</td><td>${escapeHtml(token.status)}</td><td>${action}</td></tr>`;
         }).join("")
       }</tbody></table>` :
       "<p>You have not created any tokens yet.</p>";
@@ -247,7 +260,8 @@ async function refreshAccountStatus() {
       result.account.registeredComputer ? "Registered" : "Not registered";
     $("device").className = result.account.registeredComputer ?
       "stat device-connected" : "stat";
-    return result.account.registeredComputer;
+    showDeviceWelcome(result.account);
+    return result.account;
   } catch (error) {
     if (error.status === 401 || /Authentication/i.test(error.message)) {
       clearLogin();
@@ -278,7 +292,8 @@ function bindTokens() {
             "That connection code expired. Submit a replacement request through Support.");
         return;
       }
-      if (await refreshAccountStatus()) {
+      const refreshedAccount = await refreshAccountStatus();
+      if (refreshedAccount?.registeredComputer) {
         stopPairingPoll();
         $("pairing-result").classList.add("hidden");
         $("create-pairing").classList.add("hidden");
@@ -470,12 +485,29 @@ function bindTokens() {
       $("create-pairing").disabled = false;
     }
   };
-  $("copy-pairing").onclick = () =>
-    navigator.clipboard.writeText($("pairing-code").textContent);
-  $("copy-referral").onclick = () =>
-    navigator.clipboard.writeText(
+  $("copy-pairing").onclick = (event) =>
+    window.ScriptNovaaSite.copyWithFeedback(
+        event.currentTarget,
+        $("pairing-code").textContent,
+    );
+  $("copy-referral").onclick = (event) =>
+    window.ScriptNovaaSite.copyWithFeedback(
+        event.currentTarget,
         `https://scriptnovaa.com/signup?ref=${encodeURIComponent($("referral").textContent)}`,
     );
+  $("token-list").onclick = (event) => {
+    const button = event.target.closest(".copy-token");
+    if (!button) return;
+    window.ScriptNovaaSite.copyWithFeedback(button, button.dataset.token);
+  };
+  $("dismiss-device-welcome").onclick = async () => {
+    $("device-welcome").classList.add("hidden");
+    try {
+      await request("/api/account/device-welcome/acknowledge", "POST");
+    } catch (error) {
+      // The notice can safely reappear if acknowledgement could not be saved.
+    }
+  };
   $("signout").onclick = async () => {
     try {
       await request("/api/logout", "POST");

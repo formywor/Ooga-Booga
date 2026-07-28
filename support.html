@@ -3,25 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Support — ScriptNovaa</title>
-  <link rel="stylesheet" href="styles.css?v=20260727-support1">
+  <title>Account Support — ScriptNovaa</title>
+  <meta name="description" content="Create and review ScriptNovaa account and Share Browser support tickets.">
+  <meta name="robots" content="noindex,follow">
+  <link rel="canonical" href="https://scriptnovaa.com/support">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/styles.css?v=20260727-public1">
 </head>
 <body data-page="support">
   <header class="site-header"><nav class="nav">
-    <a class="brand" href="/"><span class="brand-mark"><img src="/logo.PNG" alt="ScriptNovaa logo" onerror="this.style.display='none';this.parentNode.classList.add('logo-fallback')"></span><span>ScriptNovaa</span></a>
+    <a class="brand" href="/"><span class="brand-mark"><img src="/logo-wide.png" alt="ScriptNova"></span><span>ScriptNovaa</span></a>
     <div class="nav-links"><a href="/share-browser">Share Browser</a><a href="/tokens">Tokens</a><a href="/points-info">How points work</a><button id="support-signout">Sign out</button></div>
   </nav></header>
-
   <main class="wrap support-page">
-    <section class="support-heading">
-      <div><p class="kicker">ScriptNovaa account support</p><h1>How can we help?</h1></div>
-      <p>Send one clear request and follow its status here. Connection-code replacements must be approved before another code can be generated.</p>
-    </section>
-
+    <section class="support-heading"><div><p class="kicker">ScriptNovaa account support</p><h1>How can we help?</h1></div><p>Send one clear request and follow its status here. Connection-code replacements must be approved before another code can be generated.</p></section>
     <div class="support-layout">
       <section class="panel support-form-panel">
-        <h2>Create a support ticket</h2>
-        <p class="support-note">Please do not include your PIN, recovery code, browser token, or connection code.</p>
+        <h2>Create a support ticket</h2><p class="support-note">Never include your PIN, recovery code, browser token, or connection code.</p>
         <form id="support-form">
           <label for="support-category">What do you need help with?</label>
           <select id="support-category" required>
@@ -32,37 +31,20 @@
             <option value="REFERRAL_PROBLEM">Referral problem</option>
             <option value="OTHER">Something else</option>
           </select>
-
-          <label for="support-subject">Subject</label>
-          <input id="support-subject" maxlength="80" placeholder="Short summary of the problem" required>
-
-          <label for="support-message">Explain what happened and what you need</label>
-          <textarea id="support-message" minlength="20" maxlength="2000" rows="7" placeholder="Include useful details, but never include private codes or your PIN." required></textarea>
-
+          <label for="support-subject">Subject</label><input id="support-subject" maxlength="80" placeholder="Short summary of the problem" required>
+          <label for="support-message">Explain what happened and what you need</label><textarea id="support-message" minlength="20" maxlength="2000" rows="7" placeholder="Include useful details, but never include private codes or your PIN." required></textarea>
           <button id="submit-ticket" type="submit">Submit ticket</button>
         </form>
         <div id="support-message-result" class="message"></div>
       </section>
-
-      <aside class="support-guide">
-        <p class="kicker">Connection code requests</p>
-        <h2>Why do you need another code?</h2>
-        <p>Tell the review team whether the launcher was removed, Windows was reinstalled, the saved connection stopped working, or your computer changed.</p>
-        <ol>
-          <li>Your request starts as <strong>Pending</strong>.</li>
-          <li>An administrator or developer reviews it.</li>
-          <li>If approved, return to Tokens and generate one replacement code.</li>
-        </ol>
-      </aside>
+      <aside class="support-guide"><p class="kicker">Connection code requests</p><h2>Why do you need another code?</h2><p>Tell the review team whether the launcher was removed, Windows was reinstalled, the saved connection stopped working, or your computer changed.</p><ol><li>Your request starts as <strong>Pending</strong>.</li><li>An administrator or developer reviews it.</li><li>If approved, return to Tokens and generate one replacement code.</li></ol></aside>
     </div>
-
     <section class="panel ticket-history">
       <div class="ticket-history-heading"><div><p class="kicker">Your requests</p><h2>Support ticket status</h2></div><button id="refresh-tickets" class="light-button">Refresh</button></div>
-      <div id="ticket-list"><p class="empty-claims">Loading your support tickets…</p></div>
-      <div id="ticket-list-message" class="message"></div>
+      <div id="ticket-list"><p class="empty-claims">Loading your support tickets…</p></div><div id="ticket-list-message" class="message"></div>
     </section>
   </main>
-
-  <script src="app.js?v=20260727-support1"></script>
+  <footer class="footer"><div class="wrap footer-inner"><span>© 2026 ScriptNovaa. All rights reserved.</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></div></footer>
+  <script src="/site.js?v=20260727-public1"></script><script src="/app.js?v=20260727-public1"></script>
 </body>
 </html>

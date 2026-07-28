@@ -1,0 +1,17 @@
+{
+  "name": "ScriptNovaa",
+  "short_name": "ScriptNovaa",
+  "description": "Official home of Share Browser and software by ScriptNovaa.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0c1222",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "480x480",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
