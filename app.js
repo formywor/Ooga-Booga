@@ -221,6 +221,37 @@ async function loadTokens() {
   }
 }
 
+async function detectAdBlocker() {
+  const bait = document.createElement("div");
+  bait.className = "adsbox ad-banner ad-unit sponsored-ad";
+  bait.setAttribute("aria-hidden", "true");
+  bait.style.cssText =
+    "position:absolute;left:-10000px;top:-10000px;width:1px;height:1px;";
+  document.body.appendChild(bait);
+  await new Promise((resolve) => requestAnimationFrame(() =>
+    requestAnimationFrame(resolve)));
+  const baitStyle = getComputedStyle(bait);
+  const baitBlocked =
+    bait.offsetHeight === 0 ||
+    bait.offsetWidth === 0 ||
+    baitStyle.display === "none" ||
+    baitStyle.visibility === "hidden";
+  bait.remove();
+
+  let networkBlocked = false;
+  try {
+    await fetch(`https://nap5k.com/tag.min.js?check=${Date.now()}`, {
+      mode: "no-cors",
+      cache: "no-store",
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+    });
+  } catch (error) {
+    networkBlocked = true;
+  }
+  return baitBlocked || networkBlocked;
+}
+
 function remainingText(milliseconds) {
   const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -273,6 +304,12 @@ async function refreshAccountStatus() {
 
 function bindTokens() {
   loadTokens();
+  const savedRedirectNotice =
+    sessionStorage.getItem("scriptnovaaRedirectNotice");
+  if (savedRedirectNotice) {
+    sessionStorage.removeItem("scriptnovaaRedirectNotice");
+    message("redirect-message", savedRedirectNotice, "error");
+  }
   let attempts = [];
   let pairingPoll = null;
   const stopPairingPoll = () => {
@@ -425,19 +462,30 @@ function bindTokens() {
     try {
       $("start-redirect").disabled = true;
       message("redirect-message", "Preparing your sponsored link…");
+      const adBlockDetected = await detectAdBlocker();
       const attempt = await request("/api/redirect/start", "POST", {
         campaignId: "monetag-direct-11435374",
+        adBlockDetected,
       });
       await syncRewards();
+      const redirectNotice = attempt.rewardEligible === false ?
+        (attempt.notice ||
+          "Redirect didn't count because an ad blocker was detected.") :
+        "Sponsored page opened. Return after the displayed claim time to collect 0.5 point.";
       if (adWindow) {
         adWindow.opener = null;
         adWindow.location = attempt.redirectUrl;
+        message("redirect-message", redirectNotice,
+            attempt.rewardEligible === false ? "error" : "success");
       } else {
+        if (attempt.rewardEligible === false) {
+          sessionStorage.setItem(
+              "scriptnovaaRedirectNotice",
+              redirectNotice,
+          );
+        }
         location.href = attempt.redirectUrl;
       }
-      message("redirect-message",
-          "Sponsored page opened. Return after the displayed claim time to collect 0.5 point.",
-          "success");
     } catch (error) {
       if (adWindow) adWindow.close();
       message("redirect-message", error.message, "error");
@@ -528,6 +576,7 @@ function bindSupport() {
     ACCOUNT_ACCESS: "Account access",
     POINTS_OR_REWARDS: "Points or sponsored rewards",
     REFERRAL_PROBLEM: "Referral problem",
+    DEVELOPER_PROGRAM: "ScriptNova Developer Program",
     OTHER: "Other",
   };
   const statusNames = {
@@ -590,6 +639,14 @@ function bindSupport() {
     }
   };
   $("support-category").onchange();
+  const requestedCategory =
+    new URLSearchParams(location.search).get("category");
+  if (requestedCategory === "DEVELOPER_PROGRAM") {
+    $("support-category").value = requestedCategory;
+    if (!$("support-subject").value.trim()) {
+      $("support-subject").value = "Developer Program beta application";
+    }
+  }
 
   $("support-form").onsubmit = async (event) => {
     event.preventDefault();

@@ -213,7 +213,7 @@
 
   function installRevealAnimations() {
     const elements = document.querySelectorAll(
-        ".product-card,.feature,.panel,.step-card,.legal-section",
+        ".product-card,.feature,.panel,.step-card,.legal-section,.developer-card,.revenue-card,.roadmap-line article",
     );
     elements.forEach((element) => element.classList.add("reveal-ready"));
     if (!("IntersectionObserver" in window)) {
