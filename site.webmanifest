@@ -1,7 +1,7 @@
 {
   "name": "ScriptNovaa",
   "short_name": "ScriptNovaa",
-  "description": "Official home of Share Browser and software by ScriptNovaa.",
+  "description": "Official home of ScriptNova, Share Browser, and the ScriptNova Developer Program by ScriptNovaa.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -2,6 +2,8 @@
 
 (() => {
   const COPY_RESET_DELAY = 1800;
+  const CONTINUITY_NOTICE_KEY = "scriptnovaaContinuityNoticeDismissedAt";
+  const CONTINUITY_NOTICE_DELAY = 2 * 24 * 60 * 60 * 1000;
 
   async function copyText(value) {
     if (navigator.clipboard && window.isSecureContext) {
@@ -213,7 +215,7 @@
 
   function installRevealAnimations() {
     const elements = document.querySelectorAll(
-        ".product-card,.feature,.panel,.step-card,.legal-section,.developer-card,.revenue-card,.roadmap-line article",
+    ".product-card,.feature,.panel,.step-card,.legal-section,.developer-card,.revenue-card,.roadmap-line article,.authority-main,.authority-facts,.school-grid article,.developer-requirement-list article",
     );
     elements.forEach((element) => element.classList.add("reveal-ready"));
     if (!("IntersectionObserver" in window)) {
@@ -230,7 +232,40 @@
     elements.forEach((element) => observer.observe(element));
   }
 
+  function installContinuityNotice() {
+    let dismissedAt = 0;
+    try {
+      dismissedAt = Number(localStorage.getItem(CONTINUITY_NOTICE_KEY) || 0);
+    } catch (error) {
+      // The notice remains available when browser storage is restricted.
+    }
+    if (Date.now() - dismissedAt < CONTINUITY_NOTICE_DELAY) return;
+    const notice = document.createElement("aside");
+    notice.className = "continuity-notice";
+    notice.setAttribute("role", "status");
+    notice.innerHTML = `
+      <div class="continuity-icon" aria-hidden="true">S</div>
+      <div><span class="system-badge">SYSTEM UPDATE</span>
+      <strong>Thank you for using ScriptNovaa.</strong>
+      <p>We are preparing a backup domain to help keep ScriptNovaa available if heavy traffic interrupts this domain. Keep using <b>scriptnovaa.com</b> as the official address unless we announce otherwise here.</p></div>
+      <button type="button" aria-label="Dismiss this update">&times;</button>
+    `;
+    notice.querySelector("button").addEventListener("click", () => {
+      try {
+        localStorage.setItem(CONTINUITY_NOTICE_KEY, String(Date.now()));
+      } catch (error) {
+        // Dismissal lasts for this page when storage is unavailable.
+      }
+      notice.classList.add("continuity-leaving");
+      window.setTimeout(() => notice.remove(), 220);
+    });
+    const header = document.querySelector(".site-header");
+    if (header) header.insertAdjacentElement("afterend", notice);
+    else document.body.prepend(notice);
+  }
+
   window.ScriptNovaaSite = {copyWithFeedback};
+  installContinuityNotice();
   installRevealAnimations();
-  installDailyMusic();
+  if (document.body.dataset.noMusic !== "true") installDailyMusic();
 })();

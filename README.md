@@ -12,7 +12,15 @@ repository for `scriptnovaa.com`.
 4. Do not add `node_modules`; this website is static and does not need them.
 
 The website calls `https://api.scriptnovaa.com` for accounts, points, pairing,
-tokens, rewards, and support.
+tokens, rewards, support, and the timed online demo. Deploy the updated API
+folder before publishing this website update so the demo routes are ready.
+
+## New public pages
+
+- `/scriptnova` is the official ScriptNova, ScriptNovaa, and Share Browser guide.
+- `/online-demo` is a safe 10-minute interface preview, not a proxy or IP changer.
+- `/developer-program` explains the two beta tracks and application process.
+- `/points-info` publishes the age-based sponsored-reward wait chances.
 
 ## Music
 
@@ -23,4 +31,6 @@ listed in `music/playlist.json`. Music never autoplays.
 
 After GitHub Pages publishes the files, submit
 `https://scriptnovaa.com/sitemap.xml` in Google Search Console. Search ranking
-and crawl timing are controlled by Google and cannot be guaranteed.
+and crawl timing are controlled by Google and cannot be guaranteed. Inspect the
+home page, `/scriptnova`, `/share-browser`, and `/developer-program`, then
+request indexing after the live checks succeed.
