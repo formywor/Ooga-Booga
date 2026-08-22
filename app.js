@@ -3,6 +3,7 @@
 const API = "https://api.scriptnovaa.com";
 const LOGIN_KEY = "scriptnovaaLoginToken";
 const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
+const RECOVERY_DISPLAY_KEY = "scriptnovaaPendingRecoveryCode";
 const $ = (id) => document.getElementById(id);
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -46,8 +47,16 @@ async function request(path, method = "GET", body) {
     error: "The server returned an invalid response.",
   }));
   if (!response.ok || result.ok === false) {
+    if (result.gate?.type === "RESTRICTION") {
+      location.replace(`/${String(result.gate.status || "banned").toLowerCase()}`);
+    } else if (result.gate?.type === "RECOVERY_CONFIRMATION" &&
+        location.pathname.replace(/\.html$/i, "") !== "/support") {
+      location.replace("/backup-code");
+    }
     const error = new Error(result.error || "Request failed.");
     error.status = response.status;
+    error.code = result.code || "";
+    error.gate = result.gate || null;
     throw error;
   }
   return result;
@@ -71,10 +80,16 @@ function requireLogin() {
 async function redirectSignedInUser() {
   if (!currentLogin()) return;
   try {
-    await request("/api/account");
-    location.replace("/tokens");
+    const result = await request("/api/account/gate");
+    if (result.gate?.type === "RECOVERY_CONFIRMATION") {
+      location.replace("/backup-code");
+    } else if (result.gate?.type === "RESTRICTION") {
+      location.replace(`/${String(result.gate.status || "banned").toLowerCase()}`);
+    } else {
+      location.replace("/tokens");
+    }
   } catch (error) {
-    clearLogin();
+    if (error.status === 401) clearLogin();
   }
 }
 
@@ -85,6 +100,12 @@ function bindSignup() {
   $("signup-form").onsubmit = async (event) => {
     event.preventDefault();
     try {
+      if ($("signup-pin").value !== $("signup-pin-confirm").value) {
+        throw new Error("The two PIN entries do not match.");
+      }
+      const button = event.submitter || $("signup-form").querySelector("button");
+      button.disabled = true;
+      button.textContent = "Creating your account…";
       const result = await request("/api/signup", "POST", {
         username: $("signup-user").value,
         pin: $("signup-pin").value,
@@ -92,12 +113,13 @@ function bindSignup() {
         clientDescription: navigator.userAgent,
       });
       saveLogin(result.loginToken);
-      message("signup-message",
-          `Account created.\n\nSAVE THIS RECOVERY CODE:\n${result.recoveryCode}\n\nIt will not be shown again.`,
-          "success");
-      $("continue-tokens").classList.remove("hidden");
+      sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.recoveryCode);
+      location.replace("/backup-code");
     } catch (error) {
       message("signup-message", error.message, "error");
+      const button = $("signup-form").querySelector("button");
+      button.disabled = false;
+      button.textContent = "Create account";
     }
   };
 }
@@ -113,7 +135,13 @@ function bindSignin() {
         clientDescription: navigator.userAgent,
       });
       saveLogin(result.loginToken);
-      location.replace("/tokens");
+      if (result.gate?.type === "RECOVERY_CONFIRMATION") {
+        location.replace("/backup-code");
+      } else if (result.gate?.type === "RESTRICTION") {
+        location.replace(`/${String(result.gate.status || "banned").toLowerCase()}`);
+      } else {
+        location.replace("/tokens");
+      }
     } catch (error) {
       message("signin-message", error.message, "error");
     }
@@ -128,11 +156,12 @@ function bindRecovery() {
         username: $("recovery-user").value,
         recoveryCode: $("recovery-code").value,
         newPin: $("recovery-pin").value,
+        clientDescription: navigator.userAgent,
       });
       clearLogin();
-      message("recovery-message",
-          `PIN reset.\n\nSAVE YOUR NEW RECOVERY CODE:\n${result.newRecoveryCode}\n\nSign in again with your new PIN.`,
-          "success");
+      saveLogin(result.loginToken);
+      sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.newRecoveryCode);
+      location.replace("/backup-code");
     } catch (error) {
       message("recovery-message", error.message, "error");
     }
@@ -584,6 +613,8 @@ function bindSupport() {
     APPROVED: "Approved",
     DECLINED: "Declined",
     FULFILLED: "Code generated",
+    ANSWERED: "Answered",
+    CLOSED: "Closed",
   };
 
   const renderTickets = (tickets) => {

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.scriptnovaa.com; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'">
+  <title>Save your backup code — ScriptNovaa</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css?v=20260822-account">
+</head>
+<body data-page="backup-code" class="account-gate-page">
+  <header class="site-header"><nav class="nav"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-wide.png" alt="ScriptNova"></span><span>ScriptNovaa</span></a><div class="nav-links"><a href="/support">Support</a></div></nav></header>
+  <main class="backup-shell">
+    <section class="backup-card">
+      <div class="backup-shield" aria-hidden="true">✓</div>
+      <p class="kicker">One important step</p>
+      <h1>Save your backup code.</h1>
+      <p class="backup-lead">This is the only way to recover your account if you forget your PIN. ScriptNovaa stores a protected version and cannot show this exact code again.</p>
+      <div class="backup-code-box"><span>Your private recovery code</span><code id="backup-code-value">Loading…</code></div>
+      <div class="backup-actions"><button id="copy-backup" class="light-button">Copy code</button><button id="download-backup">Download as TXT</button></div>
+      <div id="missing-backup" class="missing-backup hidden">
+        <h2>Code missing from this tab?</h2>
+        <p>Enter your PIN to invalidate the missing code and create one replacement.</p>
+        <form id="regenerate-backup-form"><label for="regenerate-pin">Current PIN</label><input id="regenerate-pin" type="password" inputmode="numeric" pattern="\d{4,8}" required><button type="submit" class="light-button">Create replacement code</button></form>
+      </div>
+      <label class="backup-confirm"><input id="saved-backup" type="checkbox"> <span>I have saved my backup code somewhere private.</span></label>
+      <button id="confirm-backup" disabled>Finish account setup</button>
+      <div id="backup-message" class="message"></div>
+      <p class="backup-warning"><strong>Never send this code to anyone.</strong> ScriptNovaa staff will not ask for it in support tickets or live chat.</p>
+    </section>
+  </main>
+  <script src="/backup-code.js?v=20260822-account"></script><script src="/account-guard.js?v=20260822-account"></script>
+</body>
+</html>

@@ -12,7 +12,7 @@ repository for `scriptnovaa.com`.
 4. Do not add `node_modules`; this website is static and does not need them.
 
 The website calls `https://api.scriptnovaa.com` for accounts, points, pairing,
-tokens, rewards, support, and the timed online demo. Deploy the updated API
+tokens, rewards, account safety, appeals, support chat, administration, and the timed online demo. Deploy the updated API
 folder before publishing this website update so the demo routes are ready.
 
 ## New public pages
@@ -21,6 +21,14 @@ folder before publishing this website update so the demo routes are ready.
 - `/online-demo` is a safe 10-minute interface preview, not a proxy or IP changer.
 - `/developer-program` explains the two beta tracks and application process.
 - `/points-info` publishes the age-based sponsored-reward wait chances.
+- `/backup-code` is the mandatory one-time recovery-code confirmation screen.
+- `/suspended`, `/banned`, and `/terminated` are private account-status and
+  appeal screens.
+- `/admin44` is a no-index operations interface. The API still requires an
+  administrator role configured in Firebase; knowing the URL grants nothing.
+
+Private account pages are intentionally excluded from `sitemap.xml` and carry
+`noindex`. Do not add `/admin44`, backup codes, or restriction pages to search.
 
 ## Music
 

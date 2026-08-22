@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.scriptnovaa.com; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'">
   <title>Recover your ScriptNovaa account</title>
   <meta name="description" content="Reset a ScriptNovaa account PIN with its recovery code.">
   <meta name="robots" content="index,follow,max-image-preview:large">
@@ -14,6 +15,6 @@
 <body data-page="recovery">
   <header class="site-header"><nav class="nav"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-wide.png" alt="ScriptNova"></span><span>ScriptNovaa</span></a><div class="nav-links"><a href="/signin">Return to sign in</a></div></nav></header>
   <main class="auth-shell"><section class="auth-panel"><p class="kicker">Account recovery</p><h1>Reset your PIN</h1><form id="recovery-form"><label for="recovery-user">Username</label><input id="recovery-user" autocomplete="username" required><label for="recovery-code">Recovery code</label><input id="recovery-code" autocomplete="off" required><label for="recovery-pin">New PIN</label><input id="recovery-pin" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{4,8}" minlength="4" maxlength="8" required><button>Reset PIN</button></form><div id="recovery-message" class="message"></div></section><aside class="auth-aside"><h2>Your code works once.</h2><p>After a successful reset, the old recovery code stops working and a replacement is generated.</p></aside></main>
-  <script src="/site.js?v=20260819-search2"></script><script src="/app.js?v=20260819-search2"></script>
+  <script src="/site.js?v=20260822-account"></script><script src="/app.js?v=20260822-account"></script><script src="/account-guard.js?v=20260822-account"></script>
 </body>
 </html>
