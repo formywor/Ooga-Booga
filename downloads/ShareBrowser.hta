@@ -7,7 +7,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
-var LAUNCHER_VERSION="1.2.0";
+var LAUNCHER_VERSION="1.2.1";
 var wmiService=null;
 var state={login:"",proof:"",registered:false,updateRequired:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,browserSeen:false,launchConfirmed:false,processGraceUntil:0,zeroProcessChecks:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
@@ -179,10 +179,74 @@ function restoreConnection(){
   return true;
 }
 function exists(path){return new ActiveXObject("Scripting.FileSystemObject").FileExists(path)}
+function addBrowserPath(paths,path){
+  path=trim(path);
+  if(!path||path.indexOf("%")!==-1)return;
+  for(var i=0;i<paths.length;i++)if(paths[i].toLowerCase()===path.toLowerCase())return;
+  paths.push(path);
+}
+function addRegistryBrowserPaths(shell,paths,executableName){
+  var keys=[
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\"+executableName+"\\",
+    "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\"+executableName+"\\",
+    "HKLM\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\"+executableName+"\\"
+  ];
+  for(var i=0;i<keys.length;i++)try{addBrowserPath(paths,shell.RegRead(keys[i]))}catch(e){}
+}
+function addRunningBrowserPaths(paths,executableName){
+  try{
+    var processes=new Enumerator(wmi().ExecQuery("Select ExecutablePath From Win32_Process Where Name='"+executableName+"'"));
+    for(;!processes.atEnd();processes.moveNext()){
+      addBrowserPath(paths,processes.item().Properties_.Item("ExecutablePath").Value);
+    }
+  }catch(e){}
+}
+function addShortcutBrowserPaths(shell,paths,folderPath,executableName){
+  try{
+    var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
+    if(!fileSystem.FolderExists(folderPath))return;
+    var files=new Enumerator(fileSystem.GetFolder(folderPath).Files);
+    for(;!files.atEnd();files.moveNext()){
+      var shortcutFile=files.item();
+      if(String(fileSystem.GetExtensionName(shortcutFile.Name)).toLowerCase()!=="lnk")continue;
+      var target=trim(shell.CreateShortcut(shortcutFile.Path).TargetPath);
+      if(String(fileSystem.GetFileName(target)).toLowerCase()===executableName.toLowerCase()){
+        addBrowserPath(paths,target);
+      }
+    }
+  }catch(e){}
+}
 function browserPath(kind){
-  var shell=new ActiveXObject("WScript.Shell"),p=[];
-  if(kind==="chrome")p=[shell.ExpandEnvironmentStrings("%ProgramFiles%")+"\\Google\\Chrome\\Application\\chrome.exe",shell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")+"\\Google\\Chrome\\Application\\chrome.exe",shell.ExpandEnvironmentStrings("%LocalAppData%")+"\\Google\\Chrome\\Application\\chrome.exe"];
-  else p=[shell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")+"\\Microsoft\\Edge\\Application\\msedge.exe",shell.ExpandEnvironmentStrings("%ProgramFiles%")+"\\Microsoft\\Edge\\Application\\msedge.exe"];
+  var shell=new ActiveXObject("WScript.Shell"),p=[],profile=shell.ExpandEnvironmentStrings("%USERPROFILE%");
+  if(kind==="chrome"){
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%ProgramW6432%")+"\\Google\\Chrome\\Application\\chrome.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%ProgramFiles%")+"\\Google\\Chrome\\Application\\chrome.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")+"\\Google\\Chrome\\Application\\chrome.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%LocalAppData%")+"\\Google\\Chrome\\Application\\chrome.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%LocalAppData%")+"\\Programs\\Google\\Chrome\\Application\\chrome.exe");
+    addBrowserPath(p,profile+"\\Applications\\Google\\Chrome\\Application\\chrome.exe");
+    addBrowserPath(p,profile+"\\Desktop\\GoogleChromePortable\\App\\Chrome-bin\\chrome.exe");
+    addBrowserPath(p,profile+"\\Downloads\\GoogleChromePortable\\App\\Chrome-bin\\chrome.exe");
+    addRegistryBrowserPaths(shell,p,"chrome.exe");
+    addRunningBrowserPaths(p,"chrome.exe");
+    addShortcutBrowserPaths(shell,p,profile+"\\Desktop","chrome.exe");
+    addShortcutBrowserPaths(shell,p,profile+"\\Downloads","chrome.exe");
+    addShortcutBrowserPaths(shell,p,shell.ExpandEnvironmentStrings("%APPDATA%")+"\\Microsoft\\Windows\\Start Menu\\Programs","chrome.exe");
+    addShortcutBrowserPaths(shell,p,shell.ExpandEnvironmentStrings("%ProgramData%")+"\\Microsoft\\Windows\\Start Menu\\Programs","chrome.exe");
+  }else{
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%ProgramW6432%")+"\\Microsoft\\Edge\\Application\\msedge.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")+"\\Microsoft\\Edge\\Application\\msedge.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%ProgramFiles%")+"\\Microsoft\\Edge\\Application\\msedge.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%LocalAppData%")+"\\Microsoft\\Edge\\Application\\msedge.exe");
+    addBrowserPath(p,shell.ExpandEnvironmentStrings("%LocalAppData%")+"\\Programs\\Microsoft\\Edge\\Application\\msedge.exe");
+    addBrowserPath(p,profile+"\\Applications\\Microsoft\\Edge\\Application\\msedge.exe");
+    addRegistryBrowserPaths(shell,p,"msedge.exe");
+    addRunningBrowserPaths(p,"msedge.exe");
+    addShortcutBrowserPaths(shell,p,profile+"\\Desktop","msedge.exe");
+    addShortcutBrowserPaths(shell,p,profile+"\\Downloads","msedge.exe");
+    addShortcutBrowserPaths(shell,p,shell.ExpandEnvironmentStrings("%APPDATA%")+"\\Microsoft\\Windows\\Start Menu\\Programs","msedge.exe");
+    addShortcutBrowserPaths(shell,p,shell.ExpandEnvironmentStrings("%ProgramData%")+"\\Microsoft\\Windows\\Start Menu\\Programs","msedge.exe");
+  }
   for(var i=0;i<p.length;i++)if(exists(p[i]))return p[i];
   throw new Error(kind==="chrome"?"Google Chrome was not found.":"Microsoft Edge was not found.");
 }
@@ -425,7 +489,7 @@ function end(reason){
 function init(){window.resizeTo(830,800);$("register").onclick=registerDevice;$("start").onclick=start;$("end").onclick=function(){end("USER_ENDED");status("Session ended. The token cannot be reused.",false)};$("theme").onchange=function(){document.body.className=this.value};restoreConnection()}
 window.onbeforeunload=function(){if(state.id){var finishedProfile=state.profile;killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
 </script></head>
-<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.0</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start a timed browser session.</div>
+<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.1</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start a timed browser session.</div>
 <div id="setup" class="panel"><label>One-time connection code</label><input id="pairing-code" placeholder="XXXXX-XXXXX"><button id="register" class="secondary">Connect this computer</button><p class="muted">Once connected, this launcher remembers the computer. Replacement codes must be requested at scriptnovaa.com/support.</p><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
 <div class="row"><div class="field"><label>Browser</label><select id="browser"><option value="chrome">Google Chrome</option><option value="edge">Microsoft Edge</option></select></div><div class="field"><label>Appearance</label><select id="theme"><option value="vibrant">Vibrant</option><option value="">Minimal</option></select></div></div>
 <div class="row"><div class="field"><label>Browsing mode</label><select id="preset"><option value="balanced">Balanced</option><option value="privacy">Private</option><option value="minimal">Lightweight</option><option value="protected" selected>Protected</option></select></div><div class="field"><label>Site compatibility</label><select id="user-agent"><option value="default">Standard</option><option value="chromeOs120" selected>ScriptNovaa compatibility</option></select></div></div><div class="browser-warning"><strong>Save your browser work first.</strong> Starting a session closes every open window of the selected browser so the managed session starts cleanly. Closing the managed browser or ending the session closes every remaining process of that browser and removes the temporary profile.</div><button id="start">Start Browser</button><p class="muted">Continuous internet is required. Closing Chrome/Edge, closing this launcher, validation failure, or timeout permanently finishes the token.</p><div id="status"></div></div>
