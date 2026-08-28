@@ -7,7 +7,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
-var LAUNCHER_VERSION="1.2.4";
+var LAUNCHER_VERSION="1.2.5";
 var wmiService=null;
 var state={login:"",proof:"",registered:false,updateRequired:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,launchMethod:"",browserSeen:false,launchConfirmed:false,processGraceUntil:0,manualEndAllowedAt:0,zeroProcessChecks:0,heartbeatFailures:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
@@ -311,6 +311,24 @@ function waitForBrowserStart(milliseconds){
   }
   return false;
 }
+function browserStaysRunning(milliseconds){
+  var until=new Date().getTime()+milliseconds;
+  var nextHeartbeat=new Date().getTime()+8000;
+  while(new Date().getTime()<until){
+    if(browserProcessCount()<=0)return false;
+    if(state.id&&new Date().getTime()>=nextHeartbeat){
+      try{api("/api/session/heartbeat",{sessionId:state.id,sessionSecret:state.secret},"")}catch(e){}
+      nextHeartbeat=new Date().getTime()+8000;
+    }
+    waitMilliseconds(250);
+  }
+  return browserProcessCount()>0;
+}
+function buildLaunchArguments(options,userAgent){
+  var args='--user-data-dir="'+state.profile+'" --new-window '+options.join(" ");
+  if(userAgent)args+=' --user-agent="'+String(userAgent).replace(/"/g,"")+'"';
+  return args+" https://scriptnovaa.com/";
+}
 function sendDiagnostic(eventName,detail,browser){
   if(!state.login)return;
   try{
@@ -410,9 +428,7 @@ function start(){
     if(!startupOptions||typeof startupOptions.join!=="function"){
       throw new Error("The API did not return a usable browser configuration. Deploy the matching API version and try again.");
     }
-    var args='--user-data-dir="'+state.profile+'" --new-window '+startupOptions.join(" ");
-    if(activation.launch.userAgent)args+=' --user-agent="'+String(activation.launch.userAgent).replace(/"/g,"")+'"';
-    args+=" https://scriptnovaa.com/";
+    var args=buildLaunchArguments(startupOptions,activation.launch.userAgent);
     status("Closing every open "+(kind==="chrome"?"Google Chrome":"Microsoft Edge")+" window before launch...",false);
     killAllSelectedBrowserProcesses();
     var remainingProcesses=browserProcessCount();
@@ -426,6 +442,24 @@ function start(){
       if(!waitForBrowserStart(9000)){
         throw new Error("Windows accepted two start requests, but no browser process appeared.");
       }
+    }
+    status("Checking that the browser remains stable before confirming the token...",false);
+    if(!browserStaysRunning(30000)){
+      sendDiagnostic("BROWSER_EARLY_EXIT","The selected configuration exited during startup verification.",kind);
+      var fallbackOptions=activation.launch.fallbackStartupOptions;
+      if(!fallbackOptions||typeof fallbackOptions.join!=="function"){
+        throw new Error("The browser closed during startup and no compatibility configuration was available.");
+      }
+      status("The browser closed during startup. Retrying with compatibility settings...",false);
+      killAllSelectedBrowserProcesses();
+      removeSessionProfile(state.profile);
+      waitMilliseconds(1000);
+      var fallbackArgs=buildLaunchArguments(fallbackOptions,activation.launch.fallbackUserAgent||"");
+      state.launchedProcessId=launch(exe,fallbackArgs);
+      if(!waitForBrowserStart(9000)||!browserStaysRunning(15000)){
+        throw new Error("The browser also closed while using compatibility settings.");
+      }
+      sendDiagnostic("BROWSER_COMPATIBILITY_FALLBACK","Compatibility settings kept the browser running. Launch method: "+(state.launchMethod||"unknown"),kind);
     }
     state.browserSeen=true;
     try{
@@ -528,7 +562,7 @@ function end(reason){
 function init(){window.resizeTo(830,800);$("register").onclick=registerDevice;$("start").onclick=start;$("end").onclick=function(){if(new Date().getTime()<state.manualEndAllowedAt){status("Share Browser is still completing startup. Please wait a moment before ending the session.",false);return}end("USER_ENDED");status("Session ended. The token cannot be reused.",false)};$("theme").onchange=function(){document.body.className=this.value};restoreConnection()}
 window.onbeforeunload=function(){if(state.id){var finishedProfile=state.profile;killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
 </script></head>
-<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.4</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start a timed browser session.</div>
+<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.5</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start your timed browser session.</div>
 <div id="setup" class="panel"><label>One-time connection code</label><input id="pairing-code" placeholder="XXXXX-XXXXX"><button id="register" class="secondary">Connect this computer</button><p class="muted">Once connected, this launcher remembers the computer. Replacement codes must be requested at scriptnovaa.com/support.</p><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
 <div class="row"><div class="field"><label>Browser</label><select id="browser"><option value="chrome">Google Chrome</option><option value="edge">Microsoft Edge</option></select></div><div class="field"><label>Appearance</label><select id="theme"><option value="vibrant">Vibrant</option><option value="">Minimal</option></select></div></div>
 <div class="row"><div class="field"><label>Browsing mode</label><select id="preset"><option value="balanced">Balanced</option><option value="privacy">Private</option><option value="minimal">Lightweight</option><option value="protected" selected>Protected</option></select></div><div class="field"><label>Site compatibility</label><select id="user-agent"><option value="default">Standard</option><option value="chromeOs120" selected>ScriptNovaa compatibility</option></select></div></div><div class="browser-warning"><strong>Save your browser work first.</strong> Starting a session closes every open window of the selected browser so the managed session starts cleanly. Closing the managed browser or ending the session closes every remaining process of that browser and removes the temporary profile.</div><button id="start">Start Browser</button><p class="muted">Continuous internet is required. Closing Chrome/Edge, closing this launcher, validation failure, or timeout permanently finishes the token.</p><div id="status"></div></div>
