@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.scriptnovaa.com; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"><title>ScriptNovaa Operations</title><meta name="robots" content="noindex,nofollow,noarchive"><link rel="icon" href="/favicon.png" type="image/png"><link rel="stylesheet" href="/styles.css?v=20260822-account"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.scriptnovaa.com; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"><title>ScriptNovaa Operations</title><meta name="robots" content="noindex,nofollow,noarchive"><link rel="icon" href="/favicon.png" type="image/png"><link rel="stylesheet" href="/styles.css?v=20260828-support"></head>
 <body data-page="admin" class="admin-body">
   <header class="admin-header"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-wide.png" alt="ScriptNova"></span><span>ScriptNovaa</span></a><div><span id="admin-identity">Restricted operations portal</span><button id="admin-signout" class="light-button hidden">Sign out</button></div></header>
   <main class="admin-shell">
     <section id="admin-login-panel" class="admin-login-card"><p class="kicker">Authorized staff only</p><h1>Operations sign in</h1><p>Use your normal ScriptNovaa username and PIN. The API separately verifies your administrator role in Firebase.</p><form id="admin-login-form"><label for="admin-username">Username</label><input id="admin-username" autocomplete="username" required><label for="admin-pin">PIN</label><input id="admin-pin" type="password" inputmode="numeric" pattern="\d{4,8}" autocomplete="current-password" required><button>Continue securely</button></form><div id="admin-login-message" class="message"></div></section>
     <section id="admin-dashboard" class="hidden">
       <div class="admin-hero"><div><p class="kicker">ScriptNovaa Operations</p><h1>Support and account safety.</h1></div><button id="admin-refresh" class="light-button">Refresh queues</button></div>
-      <nav class="admin-tabs" aria-label="Admin tools"><button data-admin-tab="accounts" class="active">Accounts</button><button data-admin-tab="tickets">Tickets <span id="ticket-count">0</span></button><button data-admin-tab="chats">Live chat <span id="chat-count">0</span></button><button data-admin-tab="appeals">Appeals <span id="appeal-count">0</span></button></nav>
+      <nav class="admin-tabs" aria-label="Admin tools"><button data-admin-tab="accounts" class="active">Accounts</button><button data-admin-tab="tickets">Tickets <span id="ticket-count">0</span></button><button data-admin-tab="chats">Representative queue <span id="chat-count">0</span></button><button data-admin-tab="appeals">Appeals <span id="appeal-count">0</span></button><button data-admin-tab="old">Old <span id="old-count">0</span></button></nav>
       <section id="admin-tab-accounts" class="admin-tab">
         <div class="admin-grid"><article class="admin-panel"><h2>Find an account</h2><form id="account-search-form"><label for="account-search-username">Exact username</label><div class="admin-inline"><input id="account-search-username" required><button>Search</button></div></form><div id="account-search-message" class="message"></div></article><article class="admin-panel admin-safety-note"><strong>Private operations data</strong><p>Network prefixes and account details are for safety review only. Do not copy them into public tickets or live chat.</p></article></div>
         <div id="admin-account-detail" class="hidden">
@@ -17,10 +17,11 @@
         </div>
       </section>
       <section id="admin-tab-tickets" class="admin-tab hidden"><div class="admin-queue-heading"><div><p class="kicker">Trackable requests</p><h2>Support tickets</h2></div></div><div id="admin-ticket-list" class="admin-queue"></div></section>
-      <section id="admin-tab-chats" class="admin-tab hidden"><div class="admin-queue-heading"><div><p class="kicker">Best-effort channel</p><h2>Live support chats</h2></div></div><div id="admin-chat-list" class="admin-queue"></div></section>
+      <section id="admin-tab-chats" class="admin-tab hidden"><div class="admin-queue-heading"><div><p class="kicker">Human help requested</p><h2>Representative queue</h2></div></div><div id="admin-chat-list" class="admin-queue"></div></section>
       <section id="admin-tab-appeals" class="admin-tab hidden"><div class="admin-queue-heading"><div><p class="kicker">Account review</p><h2>Appeals</h2></div></div><div id="admin-appeal-list" class="admin-queue"></div></section>
+      <section id="admin-tab-old" class="admin-tab hidden"><div class="admin-queue-heading"><div><p class="kicker">Completed records</p><h2>Old chats, tickets and appeals</h2></div></div><div id="admin-old-list" class="admin-queue"></div></section>
       <div id="admin-global-message" class="message"></div>
     </section>
   </main>
-  <script src="/admin.js?v=20260822-account"></script><script src="/account-guard.js?v=20260822-account"></script>
+  <script src="/admin.js?v=20260828-support"></script><script src="/account-guard.js?v=20260828-support"></script>
 </body></html>

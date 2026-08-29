@@ -10,7 +10,7 @@
   <link rel="canonical" href="https://scriptnovaa.com/support">
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="/styles.css?v=20260819-search2">
+  <link rel="stylesheet" href="/styles.css?v=20260828-support">
 </head>
 <body data-page="support">
   <header class="site-header"><nav class="nav">
@@ -46,16 +46,23 @@
       <div id="ticket-list"><p class="empty-claims">Loading your support tickets…</p></div><div id="ticket-list-message" class="message"></div>
     </section>
     <section id="live-chat-panel" class="panel live-chat-panel">
-      <div class="ticket-history-heading"><div><p class="kicker">Best-effort live help</p><h2>Chat with ScriptNovaa Support</h2></div><span class="chat-availability">Response not guaranteed</span></div>
-      <div class="support-chat-warning"><strong>Use a ticket for anything important.</strong><p>Live chat may not receive a response and cannot restore lost points, issue point refunds, or override reward decisions. Never share your PIN, recovery code, browser token, or connection code.</p></div>
+      <div class="ticket-history-heading"><div><p class="kicker">Instant guided help</p><h2>Chat with the ScriptNovaa Assistant</h2></div><span class="chat-availability assistant-ready">Assistant ready</span></div>
+      <p class="assistant-intro">The assistant can understand common questions and check limited, sanitized account and launcher information. It cannot change your account. Ask to be transferred to a representative at any time.</p>
+      <div class="support-chat-warning"><strong>Keep private codes private.</strong><p>Never share your PIN, recovery code, browser token, or connection code. A representative is not guaranteed to respond immediately. Lost-point recovery and point refunds cannot be handled through chat.</p></div>
       <div id="chat-start">
-        <form id="chat-start-form"><label for="chat-first-message">What do you need help with?</label><textarea id="chat-first-message" minlength="20" maxlength="800" rows="4" required></textarea><label class="chat-policy-check"><input id="chat-policy" type="checkbox" required> I understand that live chat is not guaranteed and cannot handle lost-point recovery or point refunds.</label><button id="start-chat-button">Start live chat</button></form>
+        <form id="chat-start-form"><label for="chat-first-message">What do you need help with?</label><textarea id="chat-first-message" minlength="20" maxlength="800" rows="4" placeholder="Tell us what you clicked, what you expected, and the exact message you saw." required></textarea><label class="chat-policy-check"><input id="chat-policy" type="checkbox" required> I understand that the assistant is automated, representatives are not always available, and I must not share private codes.</label><button id="start-chat-button">Ask the assistant</button></form>
       </div>
-      <div id="chat-conversation" class="hidden"><div class="chat-status-row"><span class="live-dot"></span><strong id="chat-state">Waiting for an available agent</strong></div><div id="chat-messages" class="chat-messages"></div><form id="chat-reply-form"><label for="chat-reply">Reply</label><div class="chat-reply-row"><input id="chat-reply" maxlength="800" autocomplete="off" required><button id="send-chat-message">Send</button></div></form></div>
+      <div id="chat-conversation" class="hidden">
+        <div class="chat-toolbar"><div class="chat-status-row"><span class="live-dot"></span><strong id="chat-state">Assistant ready</strong></div><label class="speech-toggle"><input id="chat-read-aloud" type="checkbox"> Read replies aloud</label></div>
+        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+        <form id="chat-reply-form"><label for="chat-reply">Reply</label><div class="chat-reply-row"><input id="chat-reply" maxlength="800" autocomplete="off" required><button id="send-chat-message">Send</button></div></form>
+        <div class="chat-actions"><button id="transfer-chat" class="light-button">Transfer to a representative</button><button id="close-chat" class="text-button">End this chat</button></div>
+      </div>
       <div id="chat-message-result" class="message"></div>
+      <section class="past-chat-section"><button id="toggle-past-chats" class="history-toggle" aria-expanded="false">Past chats <span id="past-chat-count">0</span></button><div id="past-chat-list" class="past-chat-list hidden"></div></section>
     </section>
   </main>
   <footer class="footer"><div class="wrap footer-inner"><span>© 2026 ScriptNovaa. All rights reserved.</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></div></footer>
-  <script src="/site.js?v=20260822-account"></script><script src="/app.js?v=20260822-account"></script><script src="/support-chat.js?v=20260822-account"></script><script src="/account-guard.js?v=20260822-account"></script>
+  <script src="/site.js?v=20260828-support"></script><script src="/app.js?v=20260828-support"></script><script src="/support-chat.js?v=20260828-support"></script><script src="/account-guard.js?v=20260828-support"></script>
 </body>
 </html>

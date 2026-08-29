@@ -15,6 +15,10 @@ The website calls `https://api.scriptnovaa.com` for accounts, points, pairing,
 tokens, rewards, account safety, appeals, support chat, administration, and the timed online demo. Deploy the updated API
 folder before publishing this website update so the demo routes are ready.
 
+Support chat includes the free ScriptNovaa Assistant, representative transfer,
+past-chat history, and optional read-aloud through the visitor's system voice.
+No Google or paid AI API is loaded by the website.
+
 ## New public pages
 
 - `/scriptnova` is the official ScriptNova, ScriptNovaa, and Share Browser guide.

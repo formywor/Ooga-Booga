@@ -97,16 +97,43 @@
     $("admin-ticket-list").innerHTML = tickets.length ? tickets.map((ticket) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(ticket.category)} · ${escapeHtml(ticket.username || "")}</span><h3>${escapeHtml(ticket.subject)}</h3></div><strong>${escapeHtml(ticket.status)}</strong></header><p>${escapeHtml(ticket.message)}</p><form class="admin-ticket-response" data-id="${escapeHtml(ticket.ticketId)}" data-category="${escapeHtml(ticket.category)}"><textarea maxlength="2000" required placeholder="Response to the user">${escapeHtml(ticket.adminResponse || "")}</textarea><select>${ticket.category === "CONNECTION_CODE_REPLACEMENT" ? "<option>PENDING</option><option>APPROVED</option><option>DECLINED</option>" : "<option>PENDING</option><option>ANSWERED</option><option>CLOSED</option>"}</select><button>Save response</button></form></article>`).join("") : `<p class="admin-empty">No support tickets.</p>`;
   };
   const renderChats = (chats) => {
-    $("chat-count").textContent = chats.filter((item) => item.status !== "CLOSED").length;
+    $("chat-count").textContent = chats.length;
     $("admin-chat-list").innerHTML = chats.length ? chats.map((chat) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(chat.username)} · ${escapeHtml(date(chat.updatedAt))}</span><h3>Live support chat</h3></div><strong>${escapeHtml(chat.status)}</strong></header><div class="admin-chat-thread">${chat.messages.map((item) => `<p class="${escapeHtml(item.sender.toLowerCase())}"><b>${escapeHtml(item.senderName || item.sender)}</b><br>${escapeHtml(item.message)}</p>`).join("")}</div><form class="admin-chat-response" data-id="${escapeHtml(chat.chatId)}"><input maxlength="800" placeholder="Reply as support" required><button>Send</button><button type="button" class="light-button close-admin-chat">Close chat</button></form></article>`).join("") : `<p class="admin-empty">No live chats.</p>`;
   };
   const renderAppeals = (appeals) => {
-    $("appeal-count").textContent = appeals.filter((item) => item.status === "PENDING").length;
+    $("appeal-count").textContent = appeals.length;
     $("admin-appeal-list").innerHTML = appeals.length ? appeals.map((appeal) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(appeal.username)} · ${escapeHtml(appeal.restrictionStatus)}</span><h3>${escapeHtml(appeal.subject)}</h3></div><strong>${escapeHtml(appeal.status)}</strong></header><p>${escapeHtml(appeal.message)}</p>${appeal.status === "PENDING" ? `<form class="admin-appeal-response" data-id="${escapeHtml(appeal.appealId)}"><textarea maxlength="2000" minlength="10" placeholder="Decision explanation" required></textarea><select><option value="DENIED">Deny appeal</option><option value="APPROVED">Approve appeal</option></select><label><input type="checkbox" class="restore-account"> Restore account access when approved</label><button>Submit decision</button></form>` : `<p class="admin-decision"><b>Decision:</b> ${escapeHtml(appeal.adminResponse)}</p>`}</article>`).join("") : `<p class="admin-empty">No appeals.</p>`;
+  };
+  const renderOld = (tickets, chats, appeals) => {
+    const records = [
+      ...tickets.map((item) => ({type: "Ticket", status: item.status,
+        title: item.subject, username: item.username, detail: item.adminResponse || item.message,
+        updatedAt: item.updatedAt})),
+      ...chats.map((item) => ({type: "Chat", status: item.status,
+        title: item.messages[0]?.message || "Support conversation", username: item.username,
+        detail: item.messages[item.messages.length - 1]?.message || "Chat closed.",
+        updatedAt: item.updatedAt})),
+      ...appeals.map((item) => ({type: "Appeal", status: item.status,
+        title: item.subject, username: item.username, detail: item.adminResponse || item.message,
+        updatedAt: item.updatedAt})),
+    ].sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
+    $("old-count").textContent = records.length;
+    $("admin-old-list").innerHTML = records.length ? records.map((record) =>
+      `<article class="admin-queue-card old-record"><header><div><span>${escapeHtml(record.type)} · ${escapeHtml(record.username || "")} · ${escapeHtml(date(record.updatedAt))}</span><h3>${escapeHtml(record.title)}</h3></div><strong>${escapeHtml(record.status)}</strong></header><p>${escapeHtml(record.detail)}</p></article>`).join("") :
+      `<p class="admin-empty">No completed support records.</p>`;
   };
   async function refreshQueues() {
     const [tickets, chats, appeals] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals")]);
-    renderTickets(tickets.tickets); renderChats(chats.chats); renderAppeals(appeals.appeals);
+    const activeTickets = tickets.tickets.filter((item) => ["PENDING", "APPROVED"].includes(item.status));
+    const activeChats = chats.chats.filter((item) => ["WAITING", "ACTIVE"].includes(item.status));
+    const activeAppeals = appeals.appeals.filter((item) => item.status === "PENDING");
+    const oldTickets = tickets.tickets.filter((item) => !["PENDING", "APPROVED"].includes(item.status));
+    const oldChats = chats.chats.filter((item) => item.status === "CLOSED");
+    const oldAppeals = appeals.appeals.filter((item) => item.status !== "PENDING");
+    renderTickets(activeTickets);
+    renderChats(activeChats);
+    renderAppeals(activeAppeals);
+    renderOld(oldTickets, oldChats, oldAppeals);
   }
   $("admin-ticket-list").onclick = async (event) => { const form = event.target.closest(".admin-ticket-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/support/tickets/${encodeURIComponent(form.dataset.id)}/respond`, "POST", {response: form.querySelector("textarea").value, status: form.querySelector("select").value}); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-chat-list").onclick = async (event) => { const form = event.target.closest(".admin-chat-response"); if (!form) return; event.preventDefault(); try { if (event.target.classList.contains("close-admin-chat")) await request(`/api/admin/support/chats/${encodeURIComponent(form.dataset.id)}/status`, "POST", {status: "CLOSED"}); else if (event.target.tagName === "BUTTON") await request(`/api/admin/support/chats/${encodeURIComponent(form.dataset.id)}/messages`, "POST", {message: form.querySelector("input").value}); else return; await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };

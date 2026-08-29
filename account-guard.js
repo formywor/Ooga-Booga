@@ -31,7 +31,7 @@
     }
     if (gate.type === "RESTRICTION") {
       const destination = `/${String(gate.status || "BANNED").toLowerCase()}`;
-      if (path !== destination) location.replace(destination);
+      if (path !== destination && path !== "/support") location.replace(destination);
       return;
     }
     if (gate.type === "CLEAR" && (path === "/backup-code" || restrictionPages.has(path))) {
