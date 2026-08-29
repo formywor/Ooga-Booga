@@ -17,7 +17,9 @@ folder before publishing this website update so the demo routes are ready.
 
 Support chat includes the free ScriptNovaa Assistant, representative transfer,
 past-chat history, and optional read-aloud through the visitor's system voice.
-No Google or paid AI API is loaded by the website.
+No Google or paid AI API is loaded by the website. Resolved-chat learning
+suggestions must be reviewed under Operations → Learning before they become
+reusable assistant guidance.
 
 ## New public pages
 

@@ -104,7 +104,14 @@
     $("appeal-count").textContent = appeals.length;
     $("admin-appeal-list").innerHTML = appeals.length ? appeals.map((appeal) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(appeal.username)} · ${escapeHtml(appeal.restrictionStatus)}</span><h3>${escapeHtml(appeal.subject)}</h3></div><strong>${escapeHtml(appeal.status)}</strong></header><p>${escapeHtml(appeal.message)}</p>${appeal.status === "PENDING" ? `<form class="admin-appeal-response" data-id="${escapeHtml(appeal.appealId)}"><textarea maxlength="2000" minlength="10" placeholder="Decision explanation" required></textarea><select><option value="DENIED">Deny appeal</option><option value="APPROVED">Approve appeal</option></select><label><input type="checkbox" class="restore-account"> Restore account access when approved</label><button>Submit decision</button></form>` : `<p class="admin-decision"><b>Decision:</b> ${escapeHtml(appeal.adminResponse)}</p>`}</article>`).join("") : `<p class="admin-empty">No appeals.</p>`;
   };
-  const renderOld = (tickets, chats, appeals) => {
+  const renderLearning = (candidates) => {
+    $("learning-count").textContent = candidates.length;
+    const canReview = administrator?.role === "ADMIN";
+    $("admin-learning-list").innerHTML = candidates.length ? candidates.map((candidate) =>
+      `<article class="admin-queue-card learning-card"><header><div><span>Resolved chat · ${escapeHtml(date(candidate.createdAt))}</span><h3>Suggested support guidance</h3></div><strong>${escapeHtml(candidate.status)}</strong></header><p><b>User question</b><br>${escapeHtml(candidate.question)}</p>${canReview ? `<form class="admin-learning-response" data-id="${escapeHtml(candidate.candidateId)}"><label>Reusable answer</label><textarea maxlength="800" minlength="10" required>${escapeHtml(candidate.suggestedAnswer || "")}</textarea><label>Matching keywords, separated by commas</label><input maxlength="300" required value="${escapeHtml((candidate.suggestedKeywords || []).join(", "))}"><select><option value="APPROVED">Approve guidance</option><option value="REJECTED">Reject suggestion</option></select><button>Save review</button></form>` : `<p class="admin-decision">Only a full administrator can approve assistant guidance.</p>`}</article>`).join("") :
+      `<p class="admin-empty">No learning suggestions are waiting for review.</p>`;
+  };
+  const renderOld = (tickets, chats, appeals, learning) => {
     const records = [
       ...tickets.map((item) => ({type: "Ticket", status: item.status,
         title: item.subject, username: item.username, detail: item.adminResponse || item.message,
@@ -116,6 +123,10 @@
       ...appeals.map((item) => ({type: "Appeal", status: item.status,
         title: item.subject, username: item.username, detail: item.adminResponse || item.message,
         updatedAt: item.updatedAt})),
+      ...learning.map((item) => ({type: "Assistant learning", status: item.status,
+        title: item.question || "Support guidance", username: "Operations",
+        detail: item.reviewedAnswer || item.suggestedAnswer || "Suggestion reviewed.",
+        updatedAt: item.updatedAt})),
     ].sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
     $("old-count").textContent = records.length;
     $("admin-old-list").innerHTML = records.length ? records.map((record) =>
@@ -123,21 +134,25 @@
       `<p class="admin-empty">No completed support records.</p>`;
   };
   async function refreshQueues() {
-    const [tickets, chats, appeals] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals")]);
+    const [tickets, chats, appeals, learning] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals"), request("/api/admin/support/learning")]);
     const activeTickets = tickets.tickets.filter((item) => ["PENDING", "APPROVED"].includes(item.status));
     const activeChats = chats.chats.filter((item) => ["WAITING", "ACTIVE"].includes(item.status));
     const activeAppeals = appeals.appeals.filter((item) => item.status === "PENDING");
     const oldTickets = tickets.tickets.filter((item) => !["PENDING", "APPROVED"].includes(item.status));
     const oldChats = chats.chats.filter((item) => item.status === "CLOSED");
     const oldAppeals = appeals.appeals.filter((item) => item.status !== "PENDING");
+    const pendingLearning = learning.candidates.filter((item) => item.status === "PENDING");
+    const oldLearning = learning.candidates.filter((item) => item.status !== "PENDING");
     renderTickets(activeTickets);
     renderChats(activeChats);
     renderAppeals(activeAppeals);
-    renderOld(oldTickets, oldChats, oldAppeals);
+    renderLearning(pendingLearning);
+    renderOld(oldTickets, oldChats, oldAppeals, oldLearning);
   }
   $("admin-ticket-list").onclick = async (event) => { const form = event.target.closest(".admin-ticket-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/support/tickets/${encodeURIComponent(form.dataset.id)}/respond`, "POST", {response: form.querySelector("textarea").value, status: form.querySelector("select").value}); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-chat-list").onclick = async (event) => { const form = event.target.closest(".admin-chat-response"); if (!form) return; event.preventDefault(); try { if (event.target.classList.contains("close-admin-chat")) await request(`/api/admin/support/chats/${encodeURIComponent(form.dataset.id)}/status`, "POST", {status: "CLOSED"}); else if (event.target.tagName === "BUTTON") await request(`/api/admin/support/chats/${encodeURIComponent(form.dataset.id)}/messages`, "POST", {message: form.querySelector("input").value}); else return; await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-appeal-list").onclick = async (event) => { const form = event.target.closest(".admin-appeal-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/appeals/${encodeURIComponent(form.dataset.id)}/review`, "POST", {response: form.querySelector("textarea").value, status: form.querySelector("select").value, restoreAccount: form.querySelector(".restore-account").checked}); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
+  $("admin-learning-list").onclick = async (event) => { const form = event.target.closest(".admin-learning-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/support/learning/${encodeURIComponent(form.dataset.id)}/review`, "POST", {answer: form.querySelector("textarea").value, keywords: form.querySelector("input").value.split(","), status: form.querySelector("select").value}); flash("admin-global-message", "Assistant guidance reviewed and audited.", "success"); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-refresh").onclick = () => refreshQueues().catch((error) => flash("admin-global-message", error.message, "error"));
   verify();
 })();
