@@ -1,10 +1,10 @@
 # ScriptNovaa website
 
-## Project Z — 0.1.1 beta
+## Project Z — 0.1.2 beta
 
 New download page: `/project-z`. The complete Windows download is
-`downloads/ProjectZ-0.1.1.zip`; do not upload only its HTA file. Project Z's
-native companion requires WebView2 Runtime and .NET Framework 4.8.
+`downloads/ProjectZ-0.1.2.zip`. The package contains a standalone HTA and its
+README; Project Z no longer requires a companion executable.
 
 The Tokens page now selects Share Browser or Project Z. The same point balance,
 registered computer and overall two-unused-token limit apply. Existing accounts
