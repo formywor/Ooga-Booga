@@ -7,9 +7,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
-var LAUNCHER_VERSION="1.2.6";
+var LAUNCHER_VERSION="1.2.7";
 var wmiService=null;
-var state={login:"",proof:"",registered:false,updateRequired:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,launchMethod:"",browserSeen:false,launchConfirmed:false,processGraceUntil:0,manualEndAllowedAt:0,zeroProcessChecks:0,heartbeatFailures:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
+var state={login:"",proof:"",registered:false,connecting:false,updateRequired:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,launchMethod:"",browserSeen:false,launchConfirmed:false,processGraceUntil:0,manualEndAllowedAt:0,zeroProcessChecks:0,heartbeatFailures:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
 function trim(v){return String(v||"").replace(/^\s+|\s+$/g,"")}
 function status(text,bad){$("status").innerText=text;$("status").className=bad?"status-error":"status-ok"}
@@ -394,13 +394,19 @@ function connectAccount(showAnimation){
   return result;
 }
 function registerDevice(){
+  if(state.connecting)return;
+  state.connecting=true;
+  $("register").disabled=true;
   try{connectAccount(true)}catch(e){
     if(e.apiStatus===426||e.apiCode==="LAUNCHER_UPDATE_REQUIRED"){
       showUpdateRequired(e);
+      state.connecting=false;
       return;
     }
     state.registered=false;status("Connection failed: "+e.message,true);
   }
+  state.connecting=false;
+  if(!state.registered)$("register").disabled=false;
 }
 function launch(executable,args){
   var cleanExecutable=String(executable).replace(/"/g,"");
@@ -578,7 +584,7 @@ function end(reason){
 function init(){window.resizeTo(830,800);$("register").onclick=registerDevice;$("start").onclick=start;$("end").onclick=function(){if(new Date().getTime()<state.manualEndAllowedAt){status("Share Browser is still completing startup. Please wait a moment before ending the session.",false);return}end("USER_ENDED");status("Session ended. The token cannot be reused.",false)};$("theme").onchange=function(){document.body.className=this.value};restoreConnection()}
 window.onbeforeunload=function(){if(state.id){var finishedProfile=state.profile;killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
 </script></head>
-<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.6</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start your timed browser session.</div>
+<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.7</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start your timed browser session.</div>
 <div id="setup" class="panel"><label>One-time connection code</label><input id="pairing-code" placeholder="XXXXX-XXXXX"><button id="register" class="secondary">Connect this computer</button><p class="muted">Once connected, this launcher remembers the computer. Replacement codes must be requested at scriptnovaa.com/support.</p><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
 <div class="row"><div class="field"><label>Browser</label><select id="browser"><option value="chrome">Google Chrome</option><option value="edge">Microsoft Edge</option></select></div><div class="field"><label>Appearance</label><select id="theme"><option value="vibrant">Vibrant</option><option value="">Minimal</option></select></div></div>
 <div class="row"><div class="field"><label>Browsing mode</label><select id="preset"><option value="balanced">Balanced</option><option value="privacy">Private</option><option value="minimal">Lightweight</option><option value="protected" selected>Protected</option></select></div><div class="field"><label>Site compatibility</label><select id="user-agent"><option value="default">Standard</option><option value="chromeOs120" selected>ScriptNovaa compatibility</option></select></div></div><div class="browser-warning"><strong>Save your browser work first.</strong> Starting a session closes every open window of the selected browser so the managed session starts cleanly. Closing the managed browser or ending the session closes every remaining process of that browser and removes the temporary profile.</div><button id="start">Start Browser</button><p class="muted">Continuous internet is required. Closing Chrome/Edge, closing this launcher, validation failure, or timeout permanently finishes the token.</p><div id="status"></div></div>
