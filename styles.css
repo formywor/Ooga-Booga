@@ -114,3 +114,7 @@ button:disabled{opacity:.48;cursor:not-allowed}
 .admin-learning-response{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.admin-learning-response label,.admin-learning-response textarea,.admin-learning-response input{grid-column:1/-1}.admin-learning-response button{margin:0}.learning-card>p{white-space:pre-wrap}
 @media(max-width:650px){.chat-toolbar{align-items:flex-start;flex-direction:column}.chat-actions{align-items:stretch;flex-direction:column}.chat-actions button{width:100%}}
 @media(prefers-reduced-motion:reduce){.signup-motion .auth-panel,.signup-motion .auth-aside,.backup-card{animation:none!important}}
+
+/* Project Z extends the product page, leaving the shared site theme unchanged. */
+.z-banner{align-items:stretch}.z-details{align-self:center;max-width:350px;padding:30px;border:1px solid rgba(255,255,255,.2);border-radius:18px;background:rgba(255,255,255,.06)}.z-details h2{font-size:30px;line-height:1.2;letter-spacing:-.03em}.z-details p{font-size:15px;line-height:1.6}.z-details .system-badge{font-size:12px}.z-banner .product-copy{min-width:0}#product-notice{color:var(--muted)}
+@media(max-width:760px){.z-details{max-width:none;width:100%}.z-banner{flex-direction:column}.z-details h2{font-size:26px}}

@@ -1,5 +1,21 @@
 # ScriptNovaa website
 
+## Project Z — 0.1.0 beta
+
+New download page: `/project-z`. The complete Windows download is
+`downloads/ProjectZ-0.1.0.zip`; do not upload only its HTA file. Project Z's
+native companion requires WebView2 Runtime and .NET Framework 4.8.
+
+The Tokens page now selects Share Browser or Project Z. The same point balance,
+registered computer and overall two-unused-token limit apply. Existing accounts
+and Share tokens are not migrated or renamed. Z provides Google, DuckDuckGo and
+Bing search inside its own window, with Standard and Privacy local profiles.
+There is **no VPN/proxy/FAST service** in this free release.
+
+Deploy the updated API first, then upload this entire website folder (including
+the ZIP) to Pages. No Sites hosting migration is needed. `/project-z` is included
+in the sitemap. The main source for the companion is in `outputs/project-z`.
+
 Upload the contents of this folder to the root of the GitHub Pages website
 repository for `scriptnovaa.com`.
 

@@ -169,6 +169,20 @@ function bindRecovery() {
 }
 
 let limitedOfferClock = null;
+let tokenConfiguration = null;
+function renderTokenOptions() {
+  if (!tokenConfiguration) return;
+  const isZ = $("token-product")?.value === "z";
+  const options = isZ ? tokenConfiguration.projectZ?.tokenOptions || [] : tokenConfiguration.tokenOptions;
+  const previous = $("duration").value;
+  $("duration").innerHTML = options.map((item) =>
+    `<option value="${escapeHtml(item.id)}">${escapeHtml(item.label)}</option>`).join("");
+  if (options.some((item) => item.id === previous)) $("duration").value = previous;
+  $("create-token").disabled = options.length === 0;
+  if ($("product-notice")) $("product-notice").textContent = isZ ?
+    "Z tokens work only in Project Z on your connected computer. Direct internet; no VPN or FAST surcharge. Two unused tokens maximum across both products." :
+    "Share tokens work only in Share Browser. Two unused tokens maximum across both products.";
+}
 
 function showDeviceWelcome(account) {
   const welcome = $("device-welcome");
@@ -224,14 +238,13 @@ async function loadTokens() {
     $("device").className = account.registeredComputer ?
       "stat device-connected" : "stat";
     showDeviceWelcome(account);
-    $("duration").innerHTML = config.tokenOptions.map((item) =>
-      `<option value="${item.id}">${item.label}</option>`,
-    ).join("");
+    tokenConfiguration = config;
+    renderTokenOptions();
     showLimitedOffer(config, account);
     $("token-list").innerHTML = tokenResult.tokens.length ?
       `<table><thead><tr><th>Token</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead><tbody>${
         tokenResult.tokens.map((token) => {
-          const duration = token.durationLabel || `${token.durationHours}h`;
+          const duration = (token.product === "z" ? "Project Z · " : "Share · ") + (token.durationLabel || `${token.durationHours}h`);
           const displayToken = token.displayToken || "";
           const action = displayToken ?
             `<button class="copy-token light-button" data-token="${escapeHtml(displayToken)}">Copy token</button>` :
@@ -332,6 +345,10 @@ async function refreshAccountStatus() {
 }
 
 function bindTokens() {
+  if ($("token-product")) {
+    $("token-product").value = new URLSearchParams(location.search).get("product") === "z" ? "z" : "share";
+    $("token-product").onchange = renderTokenOptions;
+  }
   loadTokens();
   const savedRedirectNotice =
     sessionStorage.getItem("scriptnovaaRedirectNotice");
@@ -468,9 +485,10 @@ function bindTokens() {
       $("create-token").disabled = true;
       const result = await request("/api/tokens/create", "POST", {
         optionId: $("duration").value,
+        product: $("token-product")?.value || "share",
       });
       message("token-message",
-          `${result.durationLabel} token created:\n${result.token}`, "success");
+          `${result.product === "z" ? "Project Z" : "Share Browser"} · ${result.durationLabel} token created:\n${result.token}`, "success");
       await loadTokens();
     } catch (error) {
       message("token-message", error.message, "error");
@@ -479,6 +497,8 @@ function bindTokens() {
     }
   };
   $("select-limited-token").onclick = () => {
+    if ($("token-product")) $("token-product").value = "share";
+    renderTokenOptions();
     $("duration").value = "free-4m-2026";
     $("token-creator").scrollIntoView({behavior: "smooth", block: "center"});
     message("token-message",
