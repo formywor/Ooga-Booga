@@ -1,9 +1,9 @@
 # ScriptNovaa website
 
-## Project Z — 0.1.2 beta
+## Project Z — 0.1.3 beta
 
 New download page: `/project-z`. The complete Windows download is
-`downloads/ProjectZ-0.1.2.zip`. The package contains a standalone HTA and its
+`downloads/ProjectZ-0.1.3.zip`. The package contains a standalone HTA and its
 README; Project Z no longer requires a companion executable.
 
 The Tokens page now selects Share Browser or Project Z. The same point balance,
