@@ -6,10 +6,10 @@ New download page: `/project-z`. The complete Windows download is
 `downloads/ProjectZ-0.1.5.zip`. The package contains a standalone HTA and its
 README; Project Z no longer requires a companion executable.
 
-## Project Z Modern — 0.1.0 experiment
+## Project Z Modern — 0.1.1 experiment
 
 `project-z-modern.html` provides a separate download at
-`downloads/ProjectZModern-0.1.0.zip`. Its package contains only
+`downloads/ProjectZModern-0.1.1.zip`. Its package contains only
 `ProjectZModern.hta` and a README. It does not replace Project Z 0.1.5 and does
 not bundle a custom executable. The HTA controls an isolated installation of
 Microsoft Edge already present on Windows so modern JavaScript, WebGL, media,
