@@ -6,6 +6,15 @@ New download page: `/project-z`. The complete Windows download is
 `downloads/ProjectZ-0.1.5.zip`. The package contains a standalone HTA and its
 README; Project Z no longer requires a companion executable.
 
+## Project Z Modern — 0.1.0 experiment
+
+`project-z-modern.html` provides a separate download at
+`downloads/ProjectZModern-0.1.0.zip`. Its package contains only
+`ProjectZModern.hta` and a README. It does not replace Project Z 0.1.5 and does
+not bundle a custom executable. The HTA controls an isolated installation of
+Microsoft Edge already present on Windows so modern JavaScript, WebGL, media,
+and embeds can work with the same registered computer and Z tokens.
+
 The Tokens page now selects Share Browser or Project Z. The same point balance,
 registered computer and overall two-unused-token limit apply. Existing accounts
 and Share tokens are not migrated or renamed. Z provides Google, DuckDuckGo and
