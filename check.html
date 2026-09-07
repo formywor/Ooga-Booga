@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI Writing and Invisible Text Checker — ScriptNovaa</title>
+  <meta name="description" content="Check writing for AI-like patterns, invisible Unicode text, zero-width characters, direction overrides, possible encoded watermarks, repetition, and unusual formatting.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://scriptnovaa.com/check">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/styles.css?v=20260906-check">
+  <meta property="og:title" content="ScriptNovaa Writing Check">
+  <meta property="og:description" content="Inspect writing patterns and reveal invisible Unicode characters with several transparent analysis signals.">
+  <meta property="og:url" content="https://scriptnovaa.com/check">
+  <meta property="og:type" content="website">
+</head>
+<body class="check-body">
+  <header class="site-header"><nav class="nav">
+    <a class="brand" href="/" aria-label="ScriptNovaa home"><span class="brand-mark"><img src="/logo-wide.png" alt="ScriptNova"></span><span>ScriptNovaa</span></a>
+    <div class="nav-links"><a href="/share-browser">Share Browser</a><a href="/project-z">Project Z</a><a href="/check" aria-current="page">Writing check</a><a href="/support">Support</a><a class="nav-action" href="/signin">Sign in</a></div>
+  </nav></header>
+  <main class="wrap check-page">
+    <section class="check-hero">
+      <div><p class="kicker">ScriptNovaa tools</p><h1>Look beneath the writing.</h1><p>Compare several writing-pattern signals and reveal characters that are normally invisible. The result explains what it noticed instead of pretending to know the author with certainty.</p></div>
+      <aside><span>4 SIGNAL GROUPS</span><strong>Style<br>Repetition<br>Unicode<br>Gemini</strong></aside>
+    </section>
+    <section class="check-workspace">
+      <form id="check-form" class="check-editor">
+        <div class="check-editor-head"><div><p class="kicker">Text inspector</p><h2>Paste writing to examine</h2></div><span id="character-count">0 / 12,000</span></div>
+        <textarea id="check-text" minlength="30" maxlength="12000" rows="16" placeholder="Paste an essay, message, article, or other writing here…" required></textarea>
+        <label class="check-consent"><input id="use-gemini" type="checkbox" checked><span><strong>Include Gemini’s opinion</strong><small>The text will be sent to Google Gemini for this check. Turn this off for ScriptNovaa-only pattern analysis.</small></span></label>
+        <div class="check-actions"><button id="analyze-button" type="submit">Analyze writing</button><button id="paste-button" class="light-button" type="button">Paste</button><button id="clear-button" class="light-button" type="button">Clear</button></div>
+        <div id="check-message" class="message" aria-live="polite"></div>
+      </form>
+      <section id="check-results" class="check-results hidden" aria-live="polite">
+        <div class="check-result-head"><div id="score-ring" class="score-ring"><span id="score-value">—</span><small>pattern score</small></div><div><p class="kicker">Combined estimate</p><h2 id="verdict">Waiting for text</h2><p id="confidence"></p></div></div>
+        <div class="check-disclaimer"><strong>Not proof of authorship</strong><p id="disclaimer"></p></div>
+        <div class="check-signal-grid">
+          <article><span>STYLE</span><strong id="style-score">—</strong><p id="style-summary"></p></article>
+          <article><span>TEXT SIZE</span><strong id="word-count">—</strong><p id="text-stats"></p></article>
+          <article><span>INVISIBLE TEXT</span><strong id="invisible-count">—</strong><p id="invisible-summary"></p></article>
+          <article><span>GEMINI</span><strong id="gemini-score">—</strong><p id="gemini-status"></p></article>
+        </div>
+        <article class="check-detail"><h3>Why it reached this result</h3><ul id="reason-list"></ul></article>
+        <article id="invisible-detail" class="check-detail hidden"><h3>Invisible and unusual characters</h3><p id="watermark-warning"></p><div id="character-list" class="character-list"></div></article>
+        <article class="check-detail"><h3>Privacy for this check</h3><p id="privacy-result"></p></article>
+      </section>
+    </section>
+    <section class="panel check-explainer"><h2>What this tool can—and cannot—tell you.</h2><div class="feature-grid">
+      <article class="feature"><span class="number">01 / PATTERNS</span><h3>AI-like writing signals</h3><p>Sentence uniformity, repeated phrases, vocabulary repetition, formulaic transitions, and Gemini’s separate assessment are compared.</p></article>
+      <article class="feature"><span class="number">02 / HIDDEN DATA</span><h3>Invisible character scan</h3><p>Zero-width characters, bidirectional controls, Unicode tags, private-use characters, soft hyphens, and other unusual controls are reported with positions.</p></article>
+      <article class="feature"><span class="number">03 / LIMITS</span><h3>No false certainty</h3><p>Human writing can look automated and edited AI writing can look human. Short samples are especially unreliable. Never punish someone using this score alone.</p></article>
+    </div><p class="check-footnote">This page examines pasted text. It cannot inspect hidden layers, revision history, document metadata, images, or watermarks in an original Word or PDF file.</p></section>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><span>© 2026 ScriptNovaa. Built to explain signals, not make accusations.</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/support">Support</a></span></div></footer>
+  <script src="/site.js?v=20260819-search2"></script>
+  <script src="/check.js?v=20260906-1"></script>
+</body>
+</html>
