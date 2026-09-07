@@ -23,13 +23,13 @@
   <main class="wrap check-page">
     <section class="check-hero">
       <div><p class="kicker">ScriptNovaa tools</p><h1>Look beneath the writing.</h1><p>Compare several writing-pattern signals and reveal characters that are normally invisible. The result explains what it noticed instead of pretending to know the author with certainty.</p></div>
-      <aside><span>4 SIGNAL GROUPS</span><strong>Style<br>Repetition<br>Unicode<br>Gemini</strong></aside>
+      <aside><span>MULTI-CHECKER ANALYSIS</span><strong>Local signals<br>Sapling · GPTZero<br>Copyleaks · HF<br>Gemini</strong></aside>
     </section>
     <section class="check-workspace">
       <form id="check-form" class="check-editor">
         <div class="check-editor-head"><div><p class="kicker">Text inspector</p><h2>Paste writing to examine</h2></div><span id="character-count">0 / 12,000</span></div>
         <textarea id="check-text" minlength="30" maxlength="12000" rows="16" placeholder="Paste an essay, message, article, or other writing here…" required></textarea>
-        <label class="check-consent"><input id="use-gemini" type="checkbox" checked><span><strong>Include Gemini’s opinion</strong><small>The text will be sent to Google Gemini for this check. Turn this off for ScriptNovaa-only pattern analysis.</small></span></label>
+        <label class="check-consent"><input id="use-gemini" type="checkbox" checked><span><strong>Include available online AI checkers</strong><small>The text may be sent to configured providers such as Sapling, GPTZero, and Google Gemini. Turn this off for ScriptNovaa-only analysis.</small></span></label>
         <div class="check-actions"><button id="analyze-button" type="submit">Analyze writing</button><button id="paste-button" class="light-button" type="button">Paste</button><button id="clear-button" class="light-button" type="button">Clear</button></div>
         <div id="check-message" class="message" aria-live="polite"></div>
       </form>
@@ -40,21 +40,24 @@
           <article><span>STYLE</span><strong id="style-score">—</strong><p id="style-summary"></p></article>
           <article><span>TEXT SIZE</span><strong id="word-count">—</strong><p id="text-stats"></p></article>
           <article><span>INVISIBLE TEXT</span><strong id="invisible-count">—</strong><p id="invisible-summary"></p></article>
-          <article><span>GEMINI</span><strong id="gemini-score">—</strong><p id="gemini-status"></p></article>
+          <article><span>ONLINE CHECKERS</span><strong id="gemini-score">—</strong><p id="gemini-status"></p></article>
         </div>
         <article class="check-detail"><h3>Why it reached this result</h3><ul id="reason-list"></ul></article>
+        <article class="check-detail"><h3>Checker responses</h3><div id="provider-list" class="provider-list"></div></article>
+        <article class="check-detail"><h3>AI-like passages to review</h3><p>Stronger color means the local pattern check found more signals. A highlight is not proof that AI wrote the sentence.</p><div id="highlighted-text" class="highlighted-text"></div></article>
         <article id="invisible-detail" class="check-detail hidden"><h3>Invisible and unusual characters</h3><p id="watermark-warning"></p><div id="character-list" class="character-list"></div></article>
         <article class="check-detail"><h3>Privacy for this check</h3><p id="privacy-result"></p></article>
+        <article class="check-detail improve-card"><h3>Make the writing clearer</h3><p>Use the writing assistant to reduce repetition, add natural flow, and improve specificity while preserving the meaning. It does not promise to bypass detectors.</p><button id="improve-button" type="button">Improve clarity</button><div id="improve-message" class="message" aria-live="polite"></div><div id="improve-result" class="hidden"><textarea id="revised-text" rows="12" readonly></textarea><div class="check-actions"><button id="copy-revision" type="button">Copy revision</button></div><ul id="change-list"></ul></div></article>
       </section>
     </section>
     <section class="panel check-explainer"><h2>What this tool can—and cannot—tell you.</h2><div class="feature-grid">
-      <article class="feature"><span class="number">01 / PATTERNS</span><h3>AI-like writing signals</h3><p>Sentence uniformity, repeated phrases, vocabulary repetition, formulaic transitions, and Gemini’s separate assessment are compared.</p></article>
+      <article class="feature"><span class="number">01 / PATTERNS</span><h3>AI-like writing signals</h3><p>Sentence uniformity, repeated phrases, vocabulary repetition, formulaic transitions, and results from available online detectors are compared.</p></article>
       <article class="feature"><span class="number">02 / HIDDEN DATA</span><h3>Invisible character scan</h3><p>Zero-width characters, bidirectional controls, Unicode tags, private-use characters, soft hyphens, and other unusual controls are reported with positions.</p></article>
       <article class="feature"><span class="number">03 / LIMITS</span><h3>No false certainty</h3><p>Human writing can look automated and edited AI writing can look human. Short samples are especially unreliable. Never punish someone using this score alone.</p></article>
     </div><p class="check-footnote">This page examines pasted text. It cannot inspect hidden layers, revision history, document metadata, images, or watermarks in an original Word or PDF file.</p></section>
   </main>
   <footer class="footer"><div class="wrap footer-inner"><span>© 2026 ScriptNovaa. Built to explain signals, not make accusations.</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/support">Support</a></span></div></footer>
   <script src="/site.js?v=20260819-search2"></script>
-  <script src="/check.js?v=20260906-1"></script>
+  <script src="/check.js?v=20260906-3"></script>
 </body>
 </html>
