@@ -95,6 +95,7 @@ async function redirectSignedInUser() {
 
 function bindSignup() {
   redirectSignedInUser();
+  const signupStartedAt = Date.now();
   const referral = new URLSearchParams(location.search).get("ref");
   if (referral) $("signup-ref").value = referral;
   $("signup-form").onsubmit = async (event) => {
@@ -111,6 +112,8 @@ function bindSignup() {
         pin: $("signup-pin").value,
         referralUsername: $("signup-ref").value,
         clientDescription: navigator.userAgent,
+        website: $("signup-website")?.value || "",
+        signupStartedAt,
       });
       saveLogin(result.loginToken);
       sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.recoveryCode);
@@ -135,6 +138,7 @@ function bindSignin() {
         clientDescription: navigator.userAgent,
       });
       saveLogin(result.loginToken);
+      if (result.securityWarning) sessionStorage.setItem("scriptnovaaSecurityWarning", result.securityWarning);
       if (result.gate?.type === "RECOVERY_CONFIRMATION") {
         location.replace("/backup-code");
       } else if (result.gate?.type === "RESTRICTION") {

@@ -292,7 +292,7 @@
   function installPrivacyShield(profile) {
     if (!profile || profile.privacyMode === false) return;
     const sensitivePages = new Set([
-      "/account", "/settings", "/chat", "/tokens", "/support",
+      "/account", "/settings", "/chat", "/tokens", "/support", "/notifications",
     ]);
     const cleanPath = window.location.pathname.replace(/\.html$/, "");
     if (!sensitivePages.has(cleanPath)) return;
@@ -320,6 +320,8 @@
     };
     window.addEventListener("blur", () => show(false));
     window.addEventListener("focus", hide);
+    window.addEventListener("beforeprint", () => show(false));
+    window.addEventListener("afterprint", hide);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) show(false);
       else hide();
@@ -329,6 +331,12 @@
       hide();
     });
     window.ScriptNovaaPrivacy = {hideScreen: () => show(true)};
+    let lastInteraction = Date.now();
+    ["pointerdown", "keydown", "touchstart", "mousemove"].forEach((eventName) =>
+      window.addEventListener(eventName, () => { lastInteraction = Date.now(); }, {passive: true}));
+    window.setInterval(() => {
+      if (!shield.classList.contains("active") && Date.now() - lastInteraction > 3 * 60 * 1000) show(false);
+    }, 15000);
 
     const warningKey = "scriptnovaaPrivacyWarningSeen";
     let alreadySeen = false;
@@ -366,11 +374,14 @@
         <span>?</span><i class="profile-unread hidden">0</i>
       </button>
       <div class="profile-menu" hidden>
-        <header><span class="profile-menu-avatar">?</span><div><strong>My account</strong><small>Loading…</small></div></header>
+        <header><span class="profile-menu-avatar">S</span><div><strong>My Account</strong><small>Signed in</small></div></header>
         <a href="/account"><b>My Account</b><small>Profile, badges and quick links</small></a>
         <a href="/settings"><b>Settings</b><small>Display and privacy controls</small></a>
         <a href="/chat"><b>Chat</b><span class="menu-new">NEW</span><small>Public chat and private messages</small></a>
+        <a href="/notifications"><b>Notifications</b><span class="profile-notification-count"></span><small>Security and chat updates</small></a>
         <a href="/features"><b>Features</b><small>Explore ScriptNovaa</small></a>
+        <a href="/status"><b>Status</b><small>Check ScriptNovaa services</small></a>
+        <a href="/safety"><b>Safety</b><small>Chat rules and reporting</small></a>
         <a href="/support"><b>Support</b><small>Tickets and live help</small></a>
         <a href="/terms"><b>Terms of Use</b><small>Community and product rules</small></a>
         <button class="profile-hide-screen" type="button"><b>Hide my screen</b><small>Turn on the Privacy Mode shield</small></button>
@@ -409,13 +420,24 @@
         <a href="/terms"><b>Terms of Use</b></a>`;
       return;
     }
+    const securityWarning = sessionStorage.getItem("scriptnovaaSecurityWarning");
+    if (securityWarning) {
+      sessionStorage.removeItem("scriptnovaaSecurityWarning");
+      const notice = document.createElement("aside"); notice.className = "security-login-toast";
+      notice.innerHTML = `<span class="system-badge">SECURITY</span><strong></strong><a href="/account">Review activity</a><button type="button" aria-label="Dismiss">×</button>`;
+      notice.querySelector("strong").textContent = securityWarning;
+      notice.querySelector("button").onclick = () => notice.remove(); document.body.appendChild(notice);
+    }
     accountRequest("/api/community/summary").then((result) => {
       const profile = result.profile;
-      const initial = String(profile.displayName || profile.username || "S").charAt(0).toUpperCase();
+      const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦"};
+      const initial = avatarSymbols[profile.avatarId] || String(profile.displayName || profile.username || "S").charAt(0).toUpperCase();
       button.querySelector("span").textContent = initial;
       shell.querySelector(".profile-menu-avatar").textContent = initial;
       shell.querySelector(".profile-menu header strong").textContent = profile.displayName;
       shell.querySelector(".profile-menu header small").textContent = `@${profile.username}`;
+      const notificationCount = Number(result.notificationCount || 0);
+      shell.querySelector(".profile-notification-count").textContent = notificationCount ? String(notificationCount) : "";
       shell.dataset.accent = profile.accent;
       const unread = shell.querySelector(".profile-unread");
       if (result.unreadCount > 0) {
@@ -423,9 +445,16 @@
         unread.classList.remove("hidden");
       }
       installPrivacyShield(profile);
+    }).catch(() => accountRequest("/api/account").then((result) => {
+      const username = result.account?.username || "My Account";
+      const initial = String(username).charAt(0).toUpperCase();
+      button.querySelector("span").textContent = initial;
+      shell.querySelector(".profile-menu-avatar").textContent = initial;
+      shell.querySelector(".profile-menu header strong").textContent = username;
+      shell.querySelector(".profile-menu header small").textContent = "Community profile temporarily unavailable";
     }).catch(() => {
       shell.querySelector(".profile-menu header small").textContent = "Sign in again if needed";
-    });
+    }));
   }
 
   window.ScriptNovaaSite = {copyWithFeedback, accountRequest};

@@ -3,7 +3,11 @@
 (() => {
   if (!requireLogin()) return;
   const state = {profile: null, mode: "public", threadId: "", other: null,
-    poll: null, loading: false, lastTypingAt: 0};
+    poll: null, presencePoll: null, loading: false, lastTypingAt: 0, lastActivityAt: Date.now()};
+  const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦"};
+  const avatar = (id, name) => avatarSymbols[id] || String(name || "S").charAt(0).toUpperCase();
+  const draftKey = () => `scriptnovaaChatDraft:${state.mode}:${state.threadId || "public"}`;
+  function connection(ok) { const node = $("connection-state"); node.textContent = ok ? "Connected" : "Connection lost"; node.classList.toggle("lost", !ok); }
   const badges = (items) => (items || []).map((badge) =>
     `<span class="community-badge badge-${escapeHtml(String(badge).toLowerCase())}">${escapeHtml(badge)}</span>`).join("");
   const time = (value) => new Date(Number(value || 0)).toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
@@ -11,8 +15,8 @@
   function renderPublic(messages) {
     $("community-messages").innerHTML = messages.length ? messages.map((item) => `
       <article class="community-message-row${item.accountId === state.profile.accountId ? " mine" : ""}">
-        <div class="community-message-avatar">${escapeHtml(item.displayName.charAt(0).toUpperCase())}</div>
-        <div><header><strong>${escapeHtml(item.displayName)}</strong><span>@${escapeHtml(item.username)}</span>${badges(item.badges)}<time>${escapeHtml(time(item.createdAt))}</time></header><p>${escapeHtml(item.text).replace(/\n/g, "<br>")}</p></div>
+        <div class="community-message-avatar">${escapeHtml(avatar(item.avatarId, item.displayName))}</div>
+        <div><header><strong>${escapeHtml(item.displayName)} <em class="presence ${escapeHtml(String(item.presence || "OFFLINE").toLowerCase())}"></em></strong><span>@${escapeHtml(item.username)}</span>${badges(item.badges)}<time>${escapeHtml(time(item.createdAt))}</time></header><p>${item.deleted ? "<i>Message deleted</i>" : escapeHtml(item.text).replace(/\n/g, "<br>")}${item.editedAt ? " <small>(edited)</small>" : ""}</p>${item.deleted ? "" : `<div class="message-actions">${item.accountId === state.profile.accountId ? `<button data-action="edit" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="report" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Report</button><button data-action="mute" data-user="${escapeHtml(item.username)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.username)}">Block</button>`}</div>`}</div>
       </article>`).join("") : `<p class="community-empty">It is quiet here. Start the conversation.</p>`;
   }
 
@@ -20,7 +24,7 @@
     $("community-messages").innerHTML = messages.length ? messages.map((item) => {
       const mine = item.senderAccountId === state.profile.accountId;
       const read = mine && Object.keys(item.readBy || {}).some((accountId) => accountId !== item.senderAccountId);
-      return `<article class="private-message ${mine ? "mine" : "theirs"}"><div><header><strong>${escapeHtml(item.senderDisplayName || item.senderUsername)}</strong>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header><p>${escapeHtml(item.text).replace(/\n/g, "<br>")}</p>${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
+      return `<article class="private-message ${mine ? "mine" : "theirs"}"><div><header><strong>${escapeHtml(item.senderDisplayName || item.senderUsername)}</strong>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header><p>${item.deleted ? "<i>Message deleted</i>" : escapeHtml(item.text).replace(/\n/g, "<br>")}${item.editedAt ? " <small>(edited)</small>" : ""}</p>${item.deleted ? "" : `<div class="message-actions"><button data-action="report" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Report</button>${mine ? `<button data-action="edit" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="mute" data-user="${escapeHtml(item.senderUsername)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.senderUsername)}">Block</button>`}</div>`}${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
     }).join("") : `<p class="community-empty">Start a private conversation with ${escapeHtml(state.other?.displayName || "this user")}.</p>`;
   }
 
@@ -31,7 +35,9 @@
       const result = await request("/api/community/public");
       renderPublic(result.messages);
       $("community-typing").textContent = result.typingLabel || "";
-    } catch (error) { message("community-message", error.message, "error"); }
+      if (state.mode === "public") $("channel-description").textContent = result.slowModeSeconds ? `Messages disappear after 48 hours · ${result.slowModeSeconds}s slow mode` : "Messages disappear automatically after 48 hours.";
+      connection(true);
+    } catch (error) { connection(false); message("community-message", error.message, "error"); }
     finally { state.loading = false; }
   }
 
@@ -44,7 +50,8 @@
       $("community-typing").textContent = result.typingLabel || "";
       await request(`/api/community/private/${encodeURIComponent(state.threadId)}/read`, "POST", {});
       loadThreads();
-    } catch (error) { message("community-message", error.message, "error"); }
+      connection(true);
+    } catch (error) { connection(false); message("community-message", error.message, "error"); }
     finally { state.loading = false; }
   }
 
@@ -53,11 +60,19 @@
       const result = await request("/api/community/private");
       $("dm-list").innerHTML = result.threads.length ? result.threads.map((thread) => `
         <button type="button" data-thread="${escapeHtml(thread.threadId)}" data-name="${escapeHtml(thread.other.displayName)}" data-user="${escapeHtml(thread.other.username)}" class="dm-person${thread.threadId === state.threadId ? " active" : ""}">
-          <span>${escapeHtml(thread.other.displayName.charAt(0).toUpperCase())}</span><div><b>${escapeHtml(thread.other.displayName)}</b><small>${escapeHtml(thread.preview || `@${thread.other.username}`)}</small></div>${thread.unread ? "<i></i>" : ""}
+          <span>${escapeHtml(avatar(thread.other.avatarId, thread.other.displayName))}</span><div><b>${escapeHtml(thread.other.displayName)} <em class="presence ${escapeHtml(String(thread.other.presence?.state || "OFFLINE").toLowerCase())}"></em></b><small>${escapeHtml(thread.preview || `@${thread.other.username}`)}</small></div>${thread.unread ? "<i></i>" : ""}
         </button>`).join("") : `<p class="community-empty-small">No private messages yet.</p>`;
       document.querySelectorAll("[data-thread]").forEach((button) => button.addEventListener("click", () => {
         openThread(button.dataset.thread, {displayName: button.dataset.name, username: button.dataset.user});
       }));
+      const unread = result.threads.find((thread) => thread.unread);
+      if (unread && state.profile?.browserNotifications && "Notification" in window && Notification.permission === "granted") {
+        const key = `scriptnovaaNotified:${unread.threadId}:${unread.preview}`;
+        if (!sessionStorage.getItem(key)) {
+          sessionStorage.setItem(key, "1");
+          new Notification(`Message from ${unread.other.displayName}`, {body: unread.preview || "Open ScriptNovaa Chat to read it."});
+        }
+      }
     } catch (error) { message("community-message", error.message, "error"); }
   }
 
@@ -72,6 +87,7 @@
     $("channel-symbol").textContent = "#"; $("channel-title").textContent = "public";
     $("channel-description").textContent = "Messages disappear automatically after 48 hours.";
     $("community-text").placeholder = "Message #public";
+    $("community-text").value = localStorage.getItem(draftKey()) || "";
     loadThreads(); loadPublic(); startPolling();
   }
 
@@ -81,6 +97,7 @@
     $("channel-symbol").textContent = "@"; $("channel-title").textContent = other.displayName;
     $("channel-description").textContent = `Private conversation with @${other.username} · administrators can review messages`;
     $("community-text").placeholder = `Message ${other.displayName}`;
+    $("community-text").value = localStorage.getItem(draftKey()) || "";
     loadThreads(); loadPrivate(); startPolling();
   }
 
@@ -98,14 +115,20 @@
     try {
       const summary = await request("/api/community/summary");
       state.profile = summary.profile;
+      $("community-text").value = localStorage.getItem(draftKey()) || "";
+      await request("/api/community/presence", "POST", {state: "ONLINE"});
       await Promise.all([loadThreads(), loadPublic()]);
       startPolling();
+      state.presencePoll = setInterval(async () => {
+        try { const idle = Date.now() - state.lastActivityAt > 60000; await request("/api/community/presence", "POST", {state: document.hidden || idle ? "IDLE" : "ONLINE"}); connection(true); }
+        catch (_) { connection(false); }
+      }, 30000);
     } catch (error) { message("community-message", error.message, "error"); }
   }
 
   $("open-public").addEventListener("click", openPublic);
   $("community-refresh").addEventListener("click", () => state.mode === "public" ? loadPublic() : loadPrivate());
-  $("community-text").addEventListener("input", sendTyping);
+  $("community-text").addEventListener("input", () => { state.lastActivityAt = Date.now(); localStorage.setItem(draftKey(), $("community-text").value); sendTyping(); });
   $("community-compose").addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = $("community-text").value.trim();
@@ -115,10 +138,35 @@
       if (state.mode === "public") await request("/api/community/public/messages", "POST", {text});
       else await request(`/api/community/private/${encodeURIComponent(state.threadId)}/messages`, "POST", {text});
       $("community-text").value = "";
+      localStorage.removeItem(draftKey());
       state.mode === "public" ? await loadPublic() : await loadPrivate();
       $("community-messages").scrollTop = $("community-messages").scrollHeight;
     } catch (error) { message("community-message", error.message, "error"); }
     finally { $("community-compose").querySelector("button").disabled = false; }
+  });
+
+  $("community-messages").addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-action]"); if (!button) return;
+    try {
+      const action = button.dataset.action;
+      if (["block", "mute"].includes(action)) {
+        if (!confirm(`${action === "block" ? "Block" : "Mute"} @${button.dataset.user}?`)) return;
+        await request(`/api/community/relationships/${encodeURIComponent(button.dataset.user)}`, "POST", {action: action.toUpperCase()});
+      } else if (action === "report") {
+        const reason = prompt("Briefly explain the safety concern:"); if (!reason) return;
+        await request("/api/community/messages/report", "POST", {scope: button.dataset.scope, threadId: state.threadId, messageId: button.dataset.message, reason});
+        message("community-message", "Message reported to ScriptNovaa Safety.", "success"); return;
+      } else if (action === "edit") {
+        const text = prompt("Edit your message (within two minutes):", button.dataset.text || ""); if (!text) return;
+        const path = button.dataset.scope === "PRIVATE" ? `/api/community/private/${encodeURIComponent(state.threadId)}/messages/${encodeURIComponent(button.dataset.message)}` : `/api/community/public/messages/${encodeURIComponent(button.dataset.message)}`;
+        await request(path, "PATCH", {text});
+      } else if (action === "delete") {
+        if (!confirm("Delete this message?")) return;
+        const path = button.dataset.scope === "PRIVATE" ? `/api/community/private/${encodeURIComponent(state.threadId)}/messages/${encodeURIComponent(button.dataset.message)}` : `/api/community/public/messages/${encodeURIComponent(button.dataset.message)}`;
+        await request(path, "DELETE");
+      }
+      state.mode === "public" ? await loadPublic() : await loadPrivate();
+    } catch (error) { message("community-message", error.message, "error"); }
   });
 
   const dialog = $("new-dm-dialog");
@@ -130,7 +178,7 @@
       const query = $("dm-search").value.trim();
       const result = await request(`/api/community/users?query=${encodeURIComponent(query)}`);
       $("dm-search-results").innerHTML = result.users.length ? result.users.map((user) => `
-        <button type="button" data-start-user="${escapeHtml(user.username)}"><span>${escapeHtml(user.displayName.charAt(0).toUpperCase())}</span><div><b>${escapeHtml(user.displayName)}</b><small>@${escapeHtml(user.username)} ${escapeHtml((user.badges || []).join(" · "))}</small></div></button>`).join("") : "<p>No users found.</p>";
+          <button type="button" data-start-user="${escapeHtml(user.username)}"><span>${escapeHtml(avatar(user.avatarId, user.displayName))}</span><div><b>${escapeHtml(user.displayName)} <em class="presence ${escapeHtml(String(user.presence?.state || "OFFLINE").toLowerCase())}"></em></b><small>@${escapeHtml(user.username)} ${escapeHtml((user.badges || []).join(" · "))}</small></div></button>`).join("") : "<p>No users found.</p>";
       document.querySelectorAll("[data-start-user]").forEach((button) => button.addEventListener("click", async () => {
         try {
           const started = await request("/api/community/private/start", "POST", {username: button.dataset.startUser});
@@ -139,6 +187,7 @@
       }));
     } catch (error) { $("dm-search-results").textContent = error.message; }
   });
-  window.addEventListener("pagehide", () => { if (state.poll) clearInterval(state.poll); });
+  ["pointerdown", "keydown", "mousemove"].forEach((name) => window.addEventListener(name, () => { state.lastActivityAt = Date.now(); }, {passive: true}));
+  window.addEventListener("pagehide", () => { if (state.poll) clearInterval(state.poll); if (state.presencePoll) clearInterval(state.presencePoll); request("/api/community/presence", "POST", {state: "OFFLINE"}).catch(() => {}); });
   initialize();
 })();

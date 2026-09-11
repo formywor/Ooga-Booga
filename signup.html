@@ -17,6 +17,7 @@
   <main class="auth-shell">
     <section class="auth-panel signup-panel"><div class="signup-step">1 <span>Account details</span></div><p class="kicker">ScriptNovaa account</p><h1>Create account</h1><p class="signup-intro">Your account connects referrals, points, support, and Share Browser tokens in one place.</p>
       <form id="signup-form">
+        <div class="robot-trap" aria-hidden="true"><label for="signup-website">Leave this field empty</label><input id="signup-website" tabindex="-1" autocomplete="off"></div>
         <label for="signup-user">Choose your username</label><input id="signup-user" autocomplete="username" pattern="[a-z0-9_]{3,20}" minlength="3" maxlength="20" spellcheck="false" required><p class="field-help">3–20 lowercase letters, numbers, or underscores. This becomes your own public referral name.</p>
         <label for="signup-pin">PIN — 4 to 8 digits</label><input id="signup-pin" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{4,8}" minlength="4" maxlength="8" required><p class="field-help">Avoid repeated digits, number sequences, birthdays, and common PINs.</p>
         <label for="signup-pin-confirm">Confirm your PIN</label><input id="signup-pin-confirm" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{4,8}" minlength="4" maxlength="8" required>
@@ -31,6 +32,6 @@
       <div class="notice"><strong>Next: save your backup code.</strong><br>After signup you will move to a protected backup-code screen. You must save and confirm the code before using the rest of the site.</div>
     </aside>
   </main>
-  <script src="/site.js?v=20260822-account"></script><script src="/app.js?v=20260822-account"></script><script src="/account-guard.js?v=20260822-account"></script>
+  <script src="/site.js?v=20260911-security"></script><script src="/app.js?v=20260911-security"></script><script src="/account-guard.js?v=20260911-security"></script>
 </body>
 </html>
