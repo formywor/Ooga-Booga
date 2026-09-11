@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.scriptnovaa.com; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'">
+  <title>Settings — ScriptNovaa</title><meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/favicon.png" type="image/png"><link rel="stylesheet" href="/styles.css?v=20260911-community">
+</head>
+<body data-page="settings" class="account-hub-body">
+  <header class="site-header"><nav class="nav"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-wide.png" alt="ScriptNova"></span><span>ScriptNovaa</span></a><div class="nav-links"><a href="/account">My Account</a><a href="/chat">Chat</a><a href="/support">Support</a></div></nav></header>
+  <main class="wrap settings-page">
+    <div class="settings-heading"><p class="kicker">Your space</p><h1>Settings</h1><p>Make your public profile feel like yours and choose how sensitive pages behave when you switch away.</p></div>
+    <form id="profile-settings-form" class="settings-grid">
+      <section class="settings-card"><p class="kicker">Profile</p><h2>How people see you</h2><label for="settings-display-name">Display name</label><input id="settings-display-name" minlength="2" maxlength="32" required><small>Your username stays permanent. Your display name can change.</small><label for="settings-bio">Short bio</label><textarea id="settings-bio" maxlength="160" rows="4" placeholder="A little about you"></textarea><div class="field-count"><span id="bio-count">0</span>/160</div><label for="settings-accent">Profile color</label><select id="settings-accent"><option value="violet">Violet</option><option value="mint">Mint</option><option value="blue">Blue</option><option value="rose">Rose</option><option value="amber">Amber</option></select></section>
+      <section class="settings-card privacy-settings-card"><p class="kicker">On by default</p><h2>Privacy Mode</h2><label class="setting-switch"><input id="settings-privacy" type="checkbox" checked><span><b>Hide sensitive pages when inactive</b><small>When this tab loses focus, ScriptNovaa covers account, token, support and chat content with a blackout screen.</small></span></label><div class="privacy-reality"><strong>What it can and cannot do</strong><p>Privacy Mode can hide the webpage when it becomes inactive. A website cannot detect every viewer or prevent browser extensions, screenshots, cameras, screen-recording tools, or operating-system capture.</p></div><button id="test-privacy" class="secondary" type="button">Test privacy shield</button></section>
+      <section class="settings-actions"><button id="save-profile" type="submit">Save changes</button><div id="settings-message" class="message"></div></section>
+    </form>
+    <section class="settings-card signout-card"><div><p class="kicker">Account session</p><h2>Sign out</h2><p>This removes the saved sign-in from this browser. It does not delete your account.</p></div><button id="settings-signout" class="danger" type="button">Sign out of ScriptNovaa</button></section>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><span>© 2026 ScriptNovaa.</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></div></footer>
+  <script src="/site.js?v=20260911-community"></script><script src="/app.js?v=20260911-community"></script><script src="/account-pages.js?v=20260911-community"></script><script src="/account-guard.js?v=20260911-community"></script>
+</body></html>

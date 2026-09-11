@@ -264,7 +264,172 @@
     else document.body.prepend(notice);
   }
 
-  window.ScriptNovaaSite = {copyWithFeedback};
+  function storedLoginToken() {
+    try {
+      return sessionStorage.getItem("scriptnovaaTabLoginToken") ||
+        localStorage.getItem("scriptnovaaLoginToken") || "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  async function accountRequest(path, options = {}) {
+    const token = storedLoginToken();
+    if (!token) throw new Error("SIGNED_OUT");
+    const response = await fetch(`https://api.scriptnovaa.com${path}`, {
+      ...options,
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        ...(options.headers || {}),
+      },
+    });
+    if (!response.ok) throw new Error("ACCOUNT_UNAVAILABLE");
+    return response.json();
+  }
+
+  function installPrivacyShield(profile) {
+    if (!profile || profile.privacyMode === false) return;
+    const sensitivePages = new Set([
+      "/account", "/settings", "/chat", "/tokens", "/support",
+    ]);
+    const cleanPath = window.location.pathname.replace(/\.html$/, "");
+    if (!sensitivePages.has(cleanPath)) return;
+
+    const shield = document.createElement("div");
+    shield.className = "privacy-shield";
+    shield.setAttribute("aria-hidden", "true");
+    shield.innerHTML = `
+      <div class="privacy-shield-mark">S</div>
+      <strong>Privacy Mode</strong>
+      <p>Sensitive content is hidden while this page is inactive.</p>
+      <button type="button">Show my screen</button>
+    `;
+    document.body.appendChild(shield);
+    let manuallyHidden = false;
+    const show = (manual = false) => {
+      manuallyHidden = manual || manuallyHidden;
+      shield.classList.add("active");
+      shield.setAttribute("aria-hidden", "false");
+    };
+    const hide = () => {
+      if (manuallyHidden) return;
+      shield.classList.remove("active");
+      shield.setAttribute("aria-hidden", "true");
+    };
+    window.addEventListener("blur", () => show(false));
+    window.addEventListener("focus", hide);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) show(false);
+      else hide();
+    });
+    shield.querySelector("button").addEventListener("click", () => {
+      manuallyHidden = false;
+      hide();
+    });
+    window.ScriptNovaaPrivacy = {hideScreen: () => show(true)};
+
+    const warningKey = "scriptnovaaPrivacyWarningSeen";
+    let alreadySeen = false;
+    try { alreadySeen = sessionStorage.getItem(warningKey) === "true"; } catch (error) {}
+    if (!alreadySeen) {
+      const warning = document.createElement("aside");
+      warning.className = "privacy-watch-notice";
+      warning.setAttribute("role", "status");
+      warning.innerHTML = `
+        <span class="privacy-watch-icon">●</span>
+        <div><span class="system-badge">PRIVACY MODE</span>
+        <strong></strong>
+        <p>This screen may still be visible to screen-sharing, recording software, or browser extensions. Privacy Mode hides it when the page is inactive, but websites cannot block operating-system capture.</p></div>
+        <a href="/settings">Settings</a>
+        <button type="button" aria-label="Dismiss privacy notice">&times;</button>
+      `;
+      warning.querySelector("strong").textContent =
+        `${profile.displayName || profile.username}, this page may be watched.`;
+      warning.querySelector("button").addEventListener("click", () => {
+        try { sessionStorage.setItem(warningKey, "true"); } catch (error) {}
+        warning.classList.add("continuity-leaving");
+        window.setTimeout(() => warning.remove(), 220);
+      });
+      document.body.appendChild(warning);
+    }
+  }
+
+  function installProfileMenu() {
+    const nav = document.querySelector(".site-header .nav");
+    if (!nav || nav.querySelector(".profile-menu-shell")) return;
+    const shell = document.createElement("div");
+    shell.className = "profile-menu-shell";
+    shell.innerHTML = `
+      <button class="profile-menu-button" type="button" aria-label="Open account menu" aria-expanded="false">
+        <span>?</span><i class="profile-unread hidden">0</i>
+      </button>
+      <div class="profile-menu" hidden>
+        <header><span class="profile-menu-avatar">?</span><div><strong>My account</strong><small>Loading…</small></div></header>
+        <a href="/account"><b>My Account</b><small>Profile, badges and quick links</small></a>
+        <a href="/settings"><b>Settings</b><small>Display and privacy controls</small></a>
+        <a href="/chat"><b>Chat</b><span class="menu-new">NEW</span><small>Public chat and private messages</small></a>
+        <a href="/features"><b>Features</b><small>Explore ScriptNovaa</small></a>
+        <a href="/support"><b>Support</b><small>Tickets and live help</small></a>
+        <a href="/terms"><b>Terms of Use</b><small>Community and product rules</small></a>
+        <button class="profile-hide-screen" type="button"><b>Hide my screen</b><small>Turn on the Privacy Mode shield</small></button>
+      </div>
+    `;
+    nav.appendChild(shell);
+    const button = shell.querySelector(".profile-menu-button");
+    const menu = shell.querySelector(".profile-menu");
+    const toggle = () => {
+      const willOpen = menu.hidden;
+      menu.hidden = !willOpen;
+      button.setAttribute("aria-expanded", String(willOpen));
+    };
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggle();
+    });
+    document.addEventListener("click", (event) => {
+      if (!shell.contains(event.target)) {
+        menu.hidden = true;
+        button.setAttribute("aria-expanded", "false");
+      }
+    });
+    shell.querySelector(".profile-hide-screen").addEventListener("click", () => {
+      menu.hidden = true;
+      if (window.ScriptNovaaPrivacy) window.ScriptNovaaPrivacy.hideScreen();
+    });
+
+    const token = storedLoginToken();
+    if (!token) {
+      shell.classList.add("signed-out-profile");
+      button.querySelector("span").textContent = "S";
+      menu.innerHTML = `<a href="/signin"><b>Sign in</b><small>Open your ScriptNovaa account</small></a>
+        <a href="/signup"><b>Create account</b><small>Join ScriptNovaa</small></a>
+        <a href="/features"><b>Features</b><small>See what is available</small></a>
+        <a href="/terms"><b>Terms of Use</b></a>`;
+      return;
+    }
+    accountRequest("/api/community/summary").then((result) => {
+      const profile = result.profile;
+      const initial = String(profile.displayName || profile.username || "S").charAt(0).toUpperCase();
+      button.querySelector("span").textContent = initial;
+      shell.querySelector(".profile-menu-avatar").textContent = initial;
+      shell.querySelector(".profile-menu header strong").textContent = profile.displayName;
+      shell.querySelector(".profile-menu header small").textContent = `@${profile.username}`;
+      shell.dataset.accent = profile.accent;
+      const unread = shell.querySelector(".profile-unread");
+      if (result.unreadCount > 0) {
+        unread.textContent = result.unreadCount > 9 ? "9+" : String(result.unreadCount);
+        unread.classList.remove("hidden");
+      }
+      installPrivacyShield(profile);
+    }).catch(() => {
+      shell.querySelector(".profile-menu header small").textContent = "Sign in again if needed";
+    });
+  }
+
+  window.ScriptNovaaSite = {copyWithFeedback, accountRequest};
+  installProfileMenu();
   installContinuityNotice();
   installRevealAnimations();
   if (document.body.dataset.noMusic !== "true") installDailyMusic();

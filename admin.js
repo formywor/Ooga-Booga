@@ -104,6 +104,11 @@
     $("appeal-count").textContent = appeals.length;
     $("admin-appeal-list").innerHTML = appeals.length ? appeals.map((appeal) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(appeal.username)} · ${escapeHtml(appeal.restrictionStatus)}</span><h3>${escapeHtml(appeal.subject)}</h3></div><strong>${escapeHtml(appeal.status)}</strong></header><p>${escapeHtml(appeal.message)}</p>${appeal.status === "PENDING" ? `<form class="admin-appeal-response" data-id="${escapeHtml(appeal.appealId)}"><textarea maxlength="2000" minlength="10" placeholder="Decision explanation" required></textarea><select><option value="DENIED">Deny appeal</option><option value="APPROVED">Approve appeal</option></select><label><input type="checkbox" class="restore-account"> Restore account access when approved</label><button>Submit decision</button></form>` : `<p class="admin-decision"><b>Decision:</b> ${escapeHtml(appeal.adminResponse)}</p>`}</article>`).join("") : `<p class="admin-empty">No appeals.</p>`;
   };
+  const renderCommunity = (threads) => {
+    $("community-review-count").textContent = threads.length;
+    $("admin-community-list").innerHTML = threads.length ? threads.map((thread) =>
+      `<article class="admin-queue-card"><header><div><span>${escapeHtml(date(thread.updatedAt))}</span><h3>${escapeHtml((thread.participants || []).map((person) => `@${person.username}`).join(" ↔ ") || "Private conversation")}</h3></div><strong>PRIVATE</strong></header><p>${escapeHtml(thread.lastMessagePreview || "No messages yet.")}</p><button class="review-community-thread" data-thread-id="${escapeHtml(thread.threadId)}">Review messages</button><div class="admin-community-thread" data-thread-output="${escapeHtml(thread.threadId)}"></div></article>`).join("") : `<p class="admin-empty">No private conversations.</p>`;
+  };
   const renderLearning = (candidates) => {
     $("learning-count").textContent = candidates.length;
     const canReview = administrator?.role === "ADMIN";
@@ -134,7 +139,7 @@
       `<p class="admin-empty">No completed support records.</p>`;
   };
   async function refreshQueues() {
-    const [tickets, chats, appeals, learning] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals"), request("/api/admin/support/learning")]);
+    const [tickets, chats, appeals, learning, community] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals"), request("/api/admin/support/learning"), request("/api/admin/community/private")]);
     const activeTickets = tickets.tickets.filter((item) => ["PENDING", "APPROVED"].includes(item.status));
     const activeChats = chats.chats.filter((item) => ["WAITING", "ACTIVE"].includes(item.status));
     const activeAppeals = appeals.appeals.filter((item) => item.status === "PENDING");
@@ -147,12 +152,14 @@
     renderChats(activeChats);
     renderAppeals(activeAppeals);
     renderLearning(pendingLearning);
+    renderCommunity(community.threads);
     renderOld(oldTickets, oldChats, oldAppeals, oldLearning);
   }
   $("admin-ticket-list").onclick = async (event) => { const form = event.target.closest(".admin-ticket-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/support/tickets/${encodeURIComponent(form.dataset.id)}/respond`, "POST", {response: form.querySelector("textarea").value, status: form.querySelector("select").value}); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-chat-list").onclick = async (event) => { const form = event.target.closest(".admin-chat-response"); if (!form) return; event.preventDefault(); try { if (event.target.classList.contains("close-admin-chat")) await request(`/api/admin/support/chats/${encodeURIComponent(form.dataset.id)}/status`, "POST", {status: "CLOSED"}); else if (event.target.tagName === "BUTTON") await request(`/api/admin/support/chats/${encodeURIComponent(form.dataset.id)}/messages`, "POST", {message: form.querySelector("input").value}); else return; await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-appeal-list").onclick = async (event) => { const form = event.target.closest(".admin-appeal-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/appeals/${encodeURIComponent(form.dataset.id)}/review`, "POST", {response: form.querySelector("textarea").value, status: form.querySelector("select").value, restoreAccount: form.querySelector(".restore-account").checked}); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-learning-list").onclick = async (event) => { const form = event.target.closest(".admin-learning-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/support/learning/${encodeURIComponent(form.dataset.id)}/review`, "POST", {answer: form.querySelector("textarea").value, keywords: form.querySelector("input").value.split(","), status: form.querySelector("select").value}); flash("admin-global-message", "Assistant guidance reviewed and audited.", "success"); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
+  $("admin-community-list").onclick = async (event) => { const button = event.target.closest(".review-community-thread"); if (!button) return; try { button.disabled = true; const result = await request(`/api/admin/community/private/${encodeURIComponent(button.dataset.threadId)}/messages`); const output = document.querySelector(`[data-thread-output="${CSS.escape(button.dataset.threadId)}"]`); output.innerHTML = result.messages.length ? `<div class="admin-chat-thread">${result.messages.map((item) => `<p><b>${escapeHtml(item.senderDisplayName || item.senderUsername || "User")}</b><br>${escapeHtml(item.text)}<br><small>${escapeHtml(date(item.createdAt))}</small></p>`).join("")}</div>` : "<p>No messages in this conversation.</p>"; } catch (error) { flash("admin-global-message", error.message, "error"); } finally { button.disabled = false; } };
   $("admin-refresh").onclick = () => refreshQueues().catch((error) => flash("admin-global-message", error.message, "error"));
   verify();
 })();
