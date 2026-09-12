@@ -1,5 +1,9 @@
 # ScriptNovaa website
 
+## Signup and reward security — September 12, 2026
+
+This website release solves the API-issued signup challenge before account creation and preserves the secret proof for each new sponsored reward in the current browser tab. Publish it only after the matching API release or signup and new reward claims will not work.
+
 ## Profiles and Beta — September 12, 2026
 
 Chat names and avatars now open a safe community profile card. Beta members receive an account section, custom profile status, exclusive colors, custom pictures, and a direct Beta feedback link. The chat layout now fixes avatar overflow and keeps messages below the retention notice. Publish this folder together with the matching API update.

@@ -96,6 +96,17 @@ async function redirectSignedInUser() {
 function bindSignup() {
   redirectSignedInUser();
   const signupStartedAt = Date.now();
+  let signupChallengePromise = request("/api/signup/challenge", "POST", {});
+  const solveSignupChallenge = async (challenge) => {
+    if (!window.crypto?.subtle || typeof TextEncoder === "undefined") throw new Error("Your browser cannot complete the account safety check. Update your browser and try again.");
+    const prefix = "0".repeat(Number(challenge.difficulty || 3)); const encoder = new TextEncoder();
+    for (let solution = 0; solution <= 9999999; solution += 1) {
+      const digest = await crypto.subtle.digest("SHA-256", encoder.encode(`${challenge.nonce}:${solution}`));
+      const hex = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      if (hex.startsWith(prefix)) return String(solution);
+    }
+    throw new Error("Account safety verification failed. Reload the page and try again.");
+  };
   const referral = new URLSearchParams(location.search).get("ref");
   if (referral) $("signup-ref").value = referral;
   $("signup-form").onsubmit = async (event) => {
@@ -106,6 +117,13 @@ function bindSignup() {
       }
       const button = event.submitter || $("signup-form").querySelector("button");
       button.disabled = true;
+      button.textContent = "Completing safety check…";
+      let challenge = await signupChallengePromise;
+      if (new Date(challenge.expiresAt).getTime() < Date.now() + 5000) {
+        signupChallengePromise = request("/api/signup/challenge", "POST", {});
+        challenge = await signupChallengePromise;
+      }
+      const challengeSolution = await solveSignupChallenge(challenge);
       button.textContent = "Creating your account…";
       const result = await request("/api/signup", "POST", {
         username: $("signup-user").value,
@@ -114,11 +132,15 @@ function bindSignup() {
         clientDescription: navigator.userAgent,
         website: $("signup-website")?.value || "",
         signupStartedAt,
+        challengeId: challenge.challengeId,
+        challengeBucket: challenge.challengeBucket,
+        challengeSolution,
       });
       saveLogin(result.loginToken);
       sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.recoveryCode);
       location.replace("/backup-code");
     } catch (error) {
+      if (["SIGNUP_CHALLENGE_REQUIRED", "SIGNUP_CHALLENGE_INVALID"].includes(error.code)) signupChallengePromise = request("/api/signup/challenge", "POST", {});
       message("signup-message", error.message, "error");
       const button = $("signup-form").querySelector("button");
       button.disabled = false;
@@ -464,6 +486,7 @@ function bindTokens() {
         .map((attempt) => ({
           attemptId: attempt.attemptId,
           claimableAt: new Date(attempt.claimableAt).toISOString(),
+          claimCode: sessionStorage.getItem(`scriptnovaaRewardProof:${attempt.attemptId}`) || "",
         }));
     renderPendingClaims(attempts);
     return status;
@@ -520,6 +543,7 @@ function bindTokens() {
         campaignId: "monetag-direct-11435374",
         adBlockDetected,
       });
+      if (attempt.claimCode) sessionStorage.setItem(`scriptnovaaRewardProof:${attempt.attemptId}`, attempt.claimCode);
       await syncRewards();
       const redirectNotice = attempt.rewardEligible === false ?
         (attempt.notice ||
@@ -564,7 +588,9 @@ function bindTokens() {
       button.disabled = true;
       const result = await request("/api/redirect/claim", "POST", {
         attemptId: attempt.attemptId,
+        claimCode: attempt.claimCode,
       });
+      sessionStorage.removeItem(`scriptnovaaRewardProof:${attempt.attemptId}`);
       message("redirect-message",
           `${result.awardedPoints} point added to your balance.`, "success");
       await Promise.all([loadTokens(), syncRewards()]);
