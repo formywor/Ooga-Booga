@@ -629,6 +629,7 @@ function bindSupport() {
     ACCOUNT_ACCESS: "Account access",
     POINTS_OR_REWARDS: "Points or sponsored rewards",
     REFERRAL_PROBLEM: "Referral problem",
+    CHAT_APPEAL: "Chat ban appeal",
     DEVELOPER_PROGRAM: "ScriptNova Developer Program",
     OTHER: "Other",
   };
@@ -639,6 +640,7 @@ function bindSupport() {
     FULFILLED: "Code generated",
     ANSWERED: "Answered",
     CLOSED: "Closed",
+    DENIED: "Denied",
   };
 
   const renderTickets = (tickets) => {
@@ -692,14 +694,19 @@ function bindSupport() {
         !$("support-subject").value.trim()) {
       $("support-subject").value = "Request another connection code";
     }
+    if ($("support-category").value === "CHAT_APPEAL" &&
+        !$("support-subject").value.trim()) {
+      $("support-subject").value = "Appeal my chat restriction";
+    }
   };
   $("support-category").onchange();
   const requestedCategory =
     new URLSearchParams(location.search).get("category");
-  if (requestedCategory === "DEVELOPER_PROGRAM") {
+  if (["DEVELOPER_PROGRAM", "CHAT_APPEAL"].includes(requestedCategory)) {
     $("support-category").value = requestedCategory;
     if (!$("support-subject").value.trim()) {
-      $("support-subject").value = "Developer Program beta application";
+      $("support-subject").value = requestedCategory === "CHAT_APPEAL" ?
+        "Appeal my chat restriction" : "Developer Program beta application";
     }
   }
 

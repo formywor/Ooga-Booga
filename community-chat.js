@@ -22,12 +22,19 @@
     else box.scrollTop += box.scrollHeight - oldHeight;
   }
 
-  function applyChatPause(until) {
+  function applyChatPause(until, profile = state.profile) {
     const expires = Number(until || 0); if (expires <= Date.now()) return false;
     const textarea = $("community-text"); const button = $("community-compose").querySelector("button");
     textarea.disabled = true; button.disabled = true;
     textarea.placeholder = `Chat paused until ${new Date(expires).toLocaleString()}`;
     message("community-message", `Chat is paused until ${new Date(expires).toLocaleString()}.`, "error");
+    const panel = $("chat-ban-panel"); panel.classList.remove("hidden");
+    $("chat-ban-detail").textContent = `${profile?.chatBanReason || "A chat safety restriction is active."} Access is paused until ${new Date(expires).toLocaleString()}.`;
+    const buy = $("buy-chat-unban"); const canPay = profile?.paidChatUnbanAllowed === true;
+    const affordable = profile?.paidChatUnbanAffordable === true;
+    buy.classList.toggle("hidden", !canPay); buy.disabled = canPay && !affordable;
+    buy.textContent = affordable ? `Restore for ${Number(profile?.chatUnbanFee || 8)} points` : `Need ${Number(profile?.chatUnbanFee || 8)} points to restore`;
+    $("chat-ban-title").textContent = canPay ? "Restore access now or submit an appeal." : "This restriction requires an administrator review.";
     return true;
   }
 
@@ -134,7 +141,7 @@
     try {
       const summary = await request("/api/community/summary");
       state.profile = summary.profile;
-      applyChatPause(state.profile.chatBannedUntil);
+      applyChatPause(state.profile.chatBannedUntil, state.profile);
       $("community-text").value = localStorage.getItem(draftKey()) || "";
       await request("/api/community/presence", "POST", {state: "ONLINE"});
       await Promise.all([loadThreads(), loadPublic()]);
@@ -148,6 +155,16 @@
 
   $("open-public").addEventListener("click", openPublic);
   $("community-refresh").addEventListener("click", () => state.mode === "public" ? loadPublic() : loadPrivate());
+  $("buy-chat-unban").addEventListener("click", async () => {
+    const fee = Number(state.profile?.chatUnbanFee || 8);
+    if (!confirm(`Use ${fee} points to restore chat access? This does not erase moderation records.`)) return;
+    try {
+      $("buy-chat-unban").disabled = true;
+      const result = await request("/api/community/unban-purchase", "POST", {});
+      message("chat-unban-message", `Chat access restored. Your balance is ${result.pointBalance} points.`, "success");
+      setTimeout(() => location.reload(), 900);
+    } catch (error) { message("chat-unban-message", error.message, "error"); $("buy-chat-unban").disabled = false; }
+  });
   $("community-text").addEventListener("input", () => { state.lastActivityAt = Date.now(); localStorage.setItem(draftKey(), $("community-text").value); sendTyping(); });
   $("community-text").addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
