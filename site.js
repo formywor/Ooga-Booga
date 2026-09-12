@@ -318,13 +318,14 @@
       shield.classList.remove("active");
       shield.setAttribute("aria-hidden", "true");
     };
-    window.addEventListener("blur", () => show(false));
-    window.addEventListener("focus", hide);
-    window.addEventListener("beforeprint", () => show(false));
-    window.addEventListener("afterprint", hide);
+    let possibleViewingSignal = "";
+    window.addEventListener("blur", () => { possibleViewingSignal = "This tab lost focus"; show(false); });
+    window.addEventListener("focus", () => { hide(); showPossibleViewingNotice(possibleViewingSignal); possibleViewingSignal = ""; });
+    window.addEventListener("beforeprint", () => { possibleViewingSignal = "A print or capture-style browser event occurred"; show(false); });
+    window.addEventListener("afterprint", () => { hide(); showPossibleViewingNotice(possibleViewingSignal); possibleViewingSignal = ""; });
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) show(false);
-      else hide();
+      if (document.hidden) { possibleViewingSignal = "This page became hidden"; show(false); }
+      else { hide(); showPossibleViewingNotice(possibleViewingSignal); possibleViewingSignal = ""; }
     });
     shield.querySelector("button").addEventListener("click", () => {
       manuallyHidden = false;
@@ -338,25 +339,25 @@
       if (!shield.classList.contains("active") && Date.now() - lastInteraction > 3 * 60 * 1000) show(false);
     }, 15000);
 
-    const warningKey = "scriptnovaaPrivacyWarningSeen";
-    let alreadySeen = false;
-    try { alreadySeen = sessionStorage.getItem(warningKey) === "true"; } catch (error) {}
-    if (!alreadySeen) {
+    function showPossibleViewingNotice(signal) {
+      if (!signal || document.querySelector(".privacy-watch-notice")) return;
+      const warningKey = "scriptnovaaPrivacyWarningDismissedV2";
+      try { if (localStorage.getItem(warningKey) === "true") return; } catch (error) {}
       const warning = document.createElement("aside");
       warning.className = "privacy-watch-notice";
       warning.setAttribute("role", "status");
       warning.innerHTML = `
         <span class="privacy-watch-icon">●</span>
-        <div><span class="system-badge">PRIVACY MODE</span>
+        <div><span class="system-badge">PRIVACY MODE · POSSIBLE VIEWING</span>
         <strong></strong>
-        <p>This screen may still be visible to screen-sharing, recording software, or browser extensions. Privacy Mode hides it when the page is inactive, but websites cannot block operating-system capture.</p></div>
+        <p>${signal}. ScriptNovaa cannot detect screen recording with certainty. This is a cautious warning based only on a browser-visible signal.</p></div>
         <a href="/settings">Settings</a>
         <button type="button" aria-label="Dismiss privacy notice">&times;</button>
       `;
       warning.querySelector("strong").textContent =
-        `${profile.displayName || profile.username}, this page may be watched.`;
+        `${profile.displayName || profile.username}, we think this page may have been viewed while inactive.`;
       warning.querySelector("button").addEventListener("click", () => {
-        try { sessionStorage.setItem(warningKey, "true"); } catch (error) {}
+        try { localStorage.setItem(warningKey, "true"); } catch (error) {}
         warning.classList.add("continuity-leaving");
         window.setTimeout(() => warning.remove(), 220);
       });

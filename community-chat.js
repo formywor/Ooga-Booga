@@ -2,6 +2,7 @@
 
 (() => {
   if (!requireLogin()) return;
+  const chatFixes = document.createElement("link"); chatFixes.rel = "stylesheet"; chatFixes.href = "/chat-fixes.css?v=20260912"; document.head.appendChild(chatFixes);
   const state = {profile: null, mode: "public", threadId: "", other: null,
     poll: null, presencePoll: null, loading: false, lastTypingAt: 0, lastActivityAt: Date.now()};
   const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦"};
@@ -12,20 +13,38 @@
     `<span class="community-badge badge-${escapeHtml(String(badge).toLowerCase())}">${escapeHtml(badge)}</span>`).join("");
   const time = (value) => new Date(Number(value || 0)).toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
 
+  function replaceMessages(html) {
+    const box = $("community-messages");
+    const distanceFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
+    const oldHeight = box.scrollHeight;
+    box.innerHTML = html;
+    if (distanceFromBottom < 100 || oldHeight <= box.clientHeight) box.scrollTop = box.scrollHeight;
+    else box.scrollTop += box.scrollHeight - oldHeight;
+  }
+
+  function applyChatPause(until) {
+    const expires = Number(until || 0); if (expires <= Date.now()) return false;
+    const textarea = $("community-text"); const button = $("community-compose").querySelector("button");
+    textarea.disabled = true; button.disabled = true;
+    textarea.placeholder = `Chat paused until ${new Date(expires).toLocaleString()}`;
+    message("community-message", `Chat is paused until ${new Date(expires).toLocaleString()}.`, "error");
+    return true;
+  }
+
   function renderPublic(messages) {
-    $("community-messages").innerHTML = messages.length ? messages.map((item) => `
+    replaceMessages(messages.length ? messages.map((item) => `
       <article class="community-message-row${item.accountId === state.profile.accountId ? " mine" : ""}">
         <div class="community-message-avatar">${escapeHtml(avatar(item.avatarId, item.displayName))}</div>
         <div><header><strong>${escapeHtml(item.displayName)} <em class="presence ${escapeHtml(String(item.presence || "OFFLINE").toLowerCase())}"></em></strong><span>@${escapeHtml(item.username)}</span>${badges(item.badges)}<time>${escapeHtml(time(item.createdAt))}</time></header><p>${item.deleted ? "<i>Message deleted</i>" : escapeHtml(item.text).replace(/\n/g, "<br>")}${item.editedAt ? " <small>(edited)</small>" : ""}</p>${item.deleted ? "" : `<div class="message-actions">${item.accountId === state.profile.accountId ? `<button data-action="edit" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="report" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Report</button><button data-action="mute" data-user="${escapeHtml(item.username)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.username)}">Block</button>`}</div>`}</div>
-      </article>`).join("") : `<p class="community-empty">It is quiet here. Start the conversation.</p>`;
+      </article>`).join("") : `<p class="community-empty">It is quiet here. Start the conversation.</p>`);
   }
 
   function renderPrivate(messages) {
-    $("community-messages").innerHTML = messages.length ? messages.map((item) => {
+    replaceMessages(messages.length ? messages.map((item) => {
       const mine = item.senderAccountId === state.profile.accountId;
       const read = mine && Object.keys(item.readBy || {}).some((accountId) => accountId !== item.senderAccountId);
       return `<article class="private-message ${mine ? "mine" : "theirs"}"><div><header><strong>${escapeHtml(item.senderDisplayName || item.senderUsername)}</strong>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header><p>${item.deleted ? "<i>Message deleted</i>" : escapeHtml(item.text).replace(/\n/g, "<br>")}${item.editedAt ? " <small>(edited)</small>" : ""}</p>${item.deleted ? "" : `<div class="message-actions"><button data-action="report" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Report</button>${mine ? `<button data-action="edit" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="mute" data-user="${escapeHtml(item.senderUsername)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.senderUsername)}">Block</button>`}</div>`}${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
-    }).join("") : `<p class="community-empty">Start a private conversation with ${escapeHtml(state.other?.displayName || "this user")}.</p>`;
+    }).join("") : `<p class="community-empty">Start a private conversation with ${escapeHtml(state.other?.displayName || "this user")}.</p>`);
   }
 
   async function loadPublic() {
@@ -115,6 +134,7 @@
     try {
       const summary = await request("/api/community/summary");
       state.profile = summary.profile;
+      applyChatPause(state.profile.chatBannedUntil);
       $("community-text").value = localStorage.getItem(draftKey()) || "";
       await request("/api/community/presence", "POST", {state: "ONLINE"});
       await Promise.all([loadThreads(), loadPublic()]);
@@ -129,6 +149,13 @@
   $("open-public").addEventListener("click", openPublic);
   $("community-refresh").addEventListener("click", () => state.mode === "public" ? loadPublic() : loadPrivate());
   $("community-text").addEventListener("input", () => { state.lastActivityAt = Date.now(); localStorage.setItem(draftKey(), $("community-text").value); sendTyping(); });
+  $("community-text").addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    const form = $("community-compose");
+    if (typeof form.requestSubmit === "function") form.requestSubmit();
+    else form.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));
+  });
   $("community-compose").addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = $("community-text").value.trim();
@@ -138,11 +165,17 @@
       if (state.mode === "public") await request("/api/community/public/messages", "POST", {text});
       else await request(`/api/community/private/${encodeURIComponent(state.threadId)}/messages`, "POST", {text});
       $("community-text").value = "";
+      $("community-text").focus();
       localStorage.removeItem(draftKey());
       state.mode === "public" ? await loadPublic() : await loadPrivate();
       $("community-messages").scrollTop = $("community-messages").scrollHeight;
-    } catch (error) { message("community-message", error.message, "error"); }
-    finally { $("community-compose").querySelector("button").disabled = false; }
+    } catch (error) {
+      message("community-message", error.message, "error");
+      if (error.code === "CHAT_BANNED") {
+        const match = String(error.message).match(/until\s+([^.]*(?:\.\d+)?Z)/i);
+        applyChatPause(match ? Date.parse(match[1]) : Date.now() + 2 * 86400000);
+      }
+    } finally { if (!$("community-text").disabled) $("community-compose").querySelector("button").disabled = false; }
   });
 
   $("community-messages").addEventListener("click", async (event) => {

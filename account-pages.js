@@ -1,6 +1,7 @@
 "use strict";
 (() => {
   if (!requireLogin()) return;
+  const enhancementStyle = document.createElement("link"); enhancementStyle.rel = "stylesheet"; enhancementStyle.href = "/status-enhancements.css?v=20260911"; document.head.appendChild(enhancementStyle);
   const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦"};
   const badges = (items) => (items || []).map((badge) => `<span class="community-badge badge-${escapeHtml(badge.toLowerCase())}">${escapeHtml(badge)}</span>`).join("");
   const when = (value) => value ? new Date(Number(value)).toLocaleString() : "Unknown";
@@ -47,14 +48,19 @@
   }
 
   async function loadSettings() {
+    const avatarSelect = $("settings-avatar");
+    let avatarPreview = $("settings-avatar-preview");
+    if (avatarSelect && !avatarPreview) { avatarPreview = document.createElement("div"); avatarPreview.id = "settings-avatar-preview"; avatarPreview.className = "avatar-preview"; avatarSelect.parentNode.insertBefore(avatarPreview, avatarSelect); }
+    const updateAvatarPreview = () => { if (!avatarPreview) return; avatarPreview.textContent = avatarSymbols[avatarSelect.value] || "S"; avatarPreview.dataset.accent = $("settings-accent").value; };
     try {
       const result = await request("/api/profile/me"); const p = result.profile;
       $("settings-display-name").value = p.displayName; $("settings-bio").value = p.bio || ""; $("settings-accent").value = p.accent;
       $("settings-avatar").value = p.avatarId || "nova"; $("settings-privacy").checked = p.privacyMode !== false;
       $("settings-dms").checked = p.allowDirectMessages !== false; $("settings-last-active").checked = p.showLastActive === true;
-      $("settings-notifications").checked = p.browserNotifications === true; $("bio-count").textContent = $("settings-bio").value.length;
+      $("settings-notifications").checked = p.browserNotifications === true; $("bio-count").textContent = $("settings-bio").value.length; updateAvatarPreview();
     } catch (error) { message("settings-message", error.message, "error"); }
     $("settings-bio").oninput = () => { $("bio-count").textContent = $("settings-bio").value.length; };
+    avatarSelect.onchange = updateAvatarPreview; $("settings-accent").onchange = updateAvatarPreview;
     $("profile-settings-form").onsubmit = async (event) => { event.preventDefault(); try {
       $("save-profile").disabled = true; await request("/api/profile/me", "PATCH", {displayName: $("settings-display-name").value,
         bio: $("settings-bio").value, accent: $("settings-accent").value, avatarId: $("settings-avatar").value,
