@@ -71,6 +71,7 @@
     $("account-chat-status").textContent = account.chatBannedUntil && account.chatBannedUntil > Date.now() ?
       `Banned until ${date(account.chatBannedUntil)} · ${account.chatBanSource || "AUTOMATIC"} · ${account.chatWarningCount} warning(s)${account.chatBanReason ? ` · ${account.chatBanReason}` : ""}` :
       `Chat active · ${account.chatWarningCount} warning(s)`;
+    $("account-beta-status").textContent = `Direct Beta: ${account.betaProgramStatus || "NONE"} · Developer: ${account.developerProgramStatus || "NONE"}`;
     $("admin-network-history").innerHTML = account.networkHistory.length ? `<div class="admin-table">${account.networkHistory.map((item) => `<div><code>${escapeHtml(item.networkPrefix)}</code><span>${escapeHtml(item.client)}</span><small>${escapeHtml(date(item.lastUsedAt))}${item.revoked ? " · revoked" : ""}</small></div>`).join("")}</div>` : "<p>No network history recorded yet.</p>";
     $("admin-point-history").innerHTML = account.recentPointTransactions.length ? `<div class="admin-table">${account.recentPointTransactions.map((item) => `<div><strong>${item.amount > 0 ? "+" : ""}${escapeHtml(item.amount)}</strong><span>${escapeHtml(item.type)}</span><small>${escapeHtml(item.reason || date(item.createdAt))}</small></div>`).join("")}</div>` : "<p>No point history recorded.</p>";
   };
@@ -100,6 +101,12 @@
       $("account-chat-reason").value = ""; flash("admin-account-message", "Chat access updated and audited.", "success"); await renderAccount({accountId: activeAccountId}); }
     catch (error) { flash("admin-account-message", error.message, "error"); }
   };
+  $("account-beta-form").onsubmit = async (event) => { event.preventDefault(); if (!activeAccountId) return;
+    try { await request(`/api/admin/accounts/${encodeURIComponent(activeAccountId)}/beta`, "POST", {
+      action: $("account-beta-action").value, reason: $("account-beta-reason").value});
+      $("account-beta-reason").value = ""; flash("admin-account-message", "Beta access updated and audited.", "success"); await renderAccount({accountId: activeAccountId}); }
+    catch (error) { flash("admin-account-message", error.message, "error"); }
+  };
 
   const renderTickets = (tickets) => {
     $("ticket-count").textContent = tickets.filter((item) => item.status === "PENDING").length;
@@ -122,6 +129,10 @@
     const open = reports.filter((report) => report.status === "OPEN");
     $("community-review-count").textContent = open.length;
     $("admin-community-reports").innerHTML = open.length ? open.map((report) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(report.scope)} · ${escapeHtml(date(report.createdAt))}</span><h3>Reported message</h3></div><strong>OPEN</strong></header><p>${escapeHtml(report.reason)}</p><small>Message ${escapeHtml(report.messageId)} · account ${escapeHtml(report.reportedAccountId || "unknown")}</small><form class="admin-remove-message" data-scope="${escapeHtml(report.scope)}" data-thread="${escapeHtml(report.threadId || "")}" data-message="${escapeHtml(report.messageId)}"><textarea maxlength="300" placeholder="Required moderation reason" required></textarea><button>Remove message</button></form></article>`).join("") : "<p class=\"admin-empty\">No open message reports.</p>";
+  };
+  const renderAnnouncements = (items) => {
+    $("announcement-count").textContent = items.length;
+    $("admin-announcement-list").innerHTML = items.length ? items.map((item) => `<article class="admin-queue-card"><header><div><span>${escapeHtml(item.audience)} · ${escapeHtml(date(item.createdAt))}</span><h3>${escapeHtml(item.title)}</h3></div><strong>${escapeHtml(item.recipientCount)} sent</strong></header><p>${escapeHtml(item.message)}</p><small>Sent by ${escapeHtml(item.createdByName || "Administrator")}</small></article>`).join("") : "<p class=\"admin-empty\">No announcements sent yet.</p>";
   };
   const renderLearning = (candidates) => {
     $("learning-count").textContent = candidates.length;
@@ -153,7 +164,7 @@
       `<p class="admin-empty">No completed support records.</p>`;
   };
   async function refreshQueues() {
-    const [tickets, chats, appeals, learning, community, reports] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals"), request("/api/admin/support/learning"), request("/api/admin/community/private"), request("/api/admin/community/reports")]);
+    const [tickets, chats, appeals, learning, community, reports, announcements] = await Promise.all([request("/api/admin/support/tickets"), request("/api/admin/support/chats"), request("/api/admin/appeals"), request("/api/admin/support/learning"), request("/api/admin/community/private"), request("/api/admin/community/reports"), request("/api/admin/announcements")]);
     const activeTickets = tickets.tickets.filter((item) => item.status === "PENDING" ||
       (item.category === "CONNECTION_CODE_REPLACEMENT" && item.status === "APPROVED"));
     const activeChats = chats.chats.filter((item) => ["WAITING", "ACTIVE"].includes(item.status));
@@ -169,6 +180,7 @@
     renderLearning(pendingLearning);
     renderCommunity(community.threads);
     renderCommunityReports(reports.reports);
+    renderAnnouncements(announcements.announcements);
     renderOld(oldTickets, oldChats, oldAppeals, oldLearning);
   }
   $("admin-ticket-list").onclick = async (event) => { const form = event.target.closest(".admin-ticket-response"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request(`/api/admin/support/tickets/${encodeURIComponent(form.dataset.id)}/respond`, "POST", {response: form.querySelector("textarea").value, status: form.querySelector("select").value}); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
@@ -183,6 +195,13 @@
       action: $("community-chat-action").value, durationHours: 48, reason: $("community-chat-action-reason").value});
     event.currentTarget.reset(); flash("admin-global-message", "Chat access updated and audited.", "success");
   } catch (error) { flash("admin-global-message", error.message, "error"); } };
+  $("announcement-form").onsubmit = async (event) => { event.preventDefault();
+    if (!confirm("Send this announcement to the selected audience now?")) return;
+    try { const result = await request("/api/admin/announcements", "POST", {audience: $("announcement-audience").value,
+      usernames: $("announcement-users").value.split(/[\s,]+/), title: $("announcement-title").value, message: $("announcement-message").value});
+      event.currentTarget.reset(); flash("announcement-message-result", `Announcement sent to ${result.recipientCount} account(s).`, "success"); await refreshQueues();
+    } catch (error) { flash("announcement-message-result", error.message, "error"); }
+  };
   $("admin-community-reports").onclick = async (event) => { const form = event.target.closest(".admin-remove-message"); if (!form || event.target.tagName !== "BUTTON") return; event.preventDefault(); try { await request("/api/admin/community/remove", "POST", {scope: form.dataset.scope, threadId: form.dataset.thread, messageId: form.dataset.message, reason: form.querySelector("textarea").value}); flash("admin-global-message", "Message removed with an audited reason.", "success"); await refreshQueues(); } catch (error) { flash("admin-global-message", error.message, "error"); } };
   $("admin-refresh").onclick = () => refreshQueues().catch((error) => flash("admin-global-message", error.message, "error"));
   verify();

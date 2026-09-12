@@ -20,7 +20,7 @@
         const summary = await request("/api/community/summary"); const profile = summary.profile;
         $("account-display-name").textContent = profile.displayName;
         $("account-username").textContent = `@${profile.username}${profile.bio ? ` · ${profile.bio}` : ""}`;
-        $("account-avatar").textContent = avatarSymbols[profile.avatarId] || profile.displayName.charAt(0).toUpperCase();
+        $("account-avatar").innerHTML = profile.avatarImage ? `<img src="${escapeHtml(profile.avatarImage)}" alt="">` : escapeHtml(avatarSymbols[profile.avatarId] || profile.displayName.charAt(0).toUpperCase());
         $("account-avatar").dataset.accent = profile.accent;
         $("account-badges").innerHTML = badges(profile.badges) || "<span class=\"community-badge\">MEMBER</span>";
         $("account-created").textContent = profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "Member";
@@ -48,24 +48,41 @@
   }
 
   async function loadSettings() {
+    let customAvatar = "";
     const avatarSelect = $("settings-avatar");
     let avatarPreview = $("settings-avatar-preview");
     if (avatarSelect && !avatarPreview) { avatarPreview = document.createElement("div"); avatarPreview.id = "settings-avatar-preview"; avatarPreview.className = "avatar-preview"; avatarSelect.parentNode.insertBefore(avatarPreview, avatarSelect); }
-    const updateAvatarPreview = () => { if (!avatarPreview) return; avatarPreview.textContent = avatarSymbols[avatarSelect.value] || "S"; avatarPreview.dataset.accent = $("settings-accent").value; };
+    const updateAvatarPreview = () => { if (!avatarPreview) return; avatarPreview.innerHTML = customAvatar ? `<img src="${escapeHtml(customAvatar)}" alt="Custom profile preview">` : escapeHtml(avatarSymbols[avatarSelect.value] || "S"); avatarPreview.dataset.accent = $("settings-accent").value; };
+    const resizeAvatar = (file) => new Promise((resolve, reject) => {
+      if (!file || file.size > 5 * 1024 * 1024) return reject(new Error("Choose an image smaller than 5 MB."));
+      const reader = new FileReader(); reader.onerror = () => reject(new Error("That image could not be read."));
+      reader.onload = () => { const image = new Image(); image.onerror = () => reject(new Error("Choose a valid PNG, JPEG, or WebP image."));
+        image.onload = () => { const canvas = document.createElement("canvas"); canvas.width = 128; canvas.height = 128;
+          const side = Math.min(image.width, image.height); const x = (image.width - side) / 2; const y = (image.height - side) / 2;
+          canvas.getContext("2d").drawImage(image, x, y, side, side, 0, 0, 128, 128);
+          resolve(canvas.toDataURL("image/webp", 0.78)); };
+        image.src = reader.result; };
+      reader.readAsDataURL(file);
+    });
     try {
       const result = await request("/api/profile/me"); const p = result.profile;
       $("settings-display-name").value = p.displayName; $("settings-bio").value = p.bio || ""; $("settings-accent").value = p.accent;
       $("settings-avatar").value = p.avatarId || "nova"; $("settings-privacy").checked = p.privacyMode !== false;
       $("settings-dms").checked = p.allowDirectMessages !== false; $("settings-last-active").checked = p.showLastActive === true;
-      $("settings-notifications").checked = p.browserNotifications === true; $("bio-count").textContent = $("settings-bio").value.length; updateAvatarPreview();
+      $("settings-notifications").checked = p.browserNotifications === true; $("settings-auto-translate").checked = p.autoTranslateChat !== false;
+      $("settings-chat-language").value = p.chatLanguage || "AUTO"; customAvatar = p.avatarImage || "";
+      $("beta-avatar-settings").classList.toggle("hidden", !p.betaAccess); $("bio-count").textContent = $("settings-bio").value.length; updateAvatarPreview();
     } catch (error) { message("settings-message", error.message, "error"); }
     $("settings-bio").oninput = () => { $("bio-count").textContent = $("settings-bio").value.length; };
     avatarSelect.onchange = updateAvatarPreview; $("settings-accent").onchange = updateAvatarPreview;
+    $("settings-avatar-file").onchange = async () => { try { customAvatar = await resizeAvatar($("settings-avatar-file").files[0]); updateAvatarPreview(); message("settings-message", "Picture prepared. Save changes to publish it.", "success"); } catch (error) { message("settings-message", error.message, "error"); } };
+    $("remove-custom-avatar").onclick = () => { customAvatar = ""; $("settings-avatar-file").value = ""; updateAvatarPreview(); };
     $("profile-settings-form").onsubmit = async (event) => { event.preventDefault(); try {
       $("save-profile").disabled = true; await request("/api/profile/me", "PATCH", {displayName: $("settings-display-name").value,
-        bio: $("settings-bio").value, accent: $("settings-accent").value, avatarId: $("settings-avatar").value,
+        bio: $("settings-bio").value, accent: $("settings-accent").value, avatarId: $("settings-avatar").value, avatarImage: customAvatar,
         privacyMode: $("settings-privacy").checked, allowDirectMessages: $("settings-dms").checked,
-        showLastActive: $("settings-last-active").checked, browserNotifications: $("settings-notifications").checked});
+        showLastActive: $("settings-last-active").checked, browserNotifications: $("settings-notifications").checked,
+        autoTranslateChat: $("settings-auto-translate").checked, chatLanguage: $("settings-chat-language").value});
       message("settings-message", "Your settings were saved.", "success");
     } catch (error) { message("settings-message", error.message, "error"); } finally { $("save-profile").disabled = false; } };
     $("test-privacy").onclick = () => window.ScriptNovaaPrivacy?.hideScreen();

@@ -1,5 +1,7 @@
 "use strict";
 
+(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260912"; document.head.appendChild(link); })();
+
 (() => {
   const COPY_RESET_DELAY = 1800;
   const CONTINUITY_NOTICE_KEY = "scriptnovaaContinuityNoticeDismissedAt";
@@ -433,8 +435,9 @@
       const profile = result.profile;
       const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦"};
       const initial = avatarSymbols[profile.avatarId] || String(profile.displayName || profile.username || "S").charAt(0).toUpperCase();
-      button.querySelector("span").textContent = initial;
-      shell.querySelector(".profile-menu-avatar").textContent = initial;
+      const picture = profile.avatarImage ? `<img src="${String(profile.avatarImage).replace(/"/g, "&quot;")}" alt="">` : initial;
+      button.querySelector("span").innerHTML = picture;
+      shell.querySelector(".profile-menu-avatar").innerHTML = picture;
       shell.querySelector(".profile-menu header strong").textContent = profile.displayName;
       shell.querySelector(".profile-menu header small").textContent = `@${profile.username}`;
       const notificationCount = Number(result.notificationCount || 0);

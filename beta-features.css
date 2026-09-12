@@ -1,0 +1,13 @@
+.badge-beta{border-color:#8b5cf6!important;background:linear-gradient(135deg,#6d28d9,#ec4899)!important;color:#fff!important;box-shadow:0 0 14px rgba(139,92,246,.35);animation:beta-glow 2.4s ease-in-out infinite}
+.community-badges{display:flex;flex-wrap:wrap;gap:5px}
+.community-message-row,.private-message{animation:chat-arrive .22s ease-out}
+.community-message-avatar img,.dm-person img,.dm-search-results img,.account-avatar img,.avatar-preview img,.profile-menu-avatar img,.profile-menu-button img{width:100%;height:100%;border-radius:inherit;object-fit:cover}
+.show-original{margin-left:8px!important;padding:2px 6px!important;border:0!important;background:transparent!important;color:#625bd4!important;font-size:9px!important;text-decoration:underline}
+.beta-avatar-settings{margin-top:18px;padding:16px;border:1px solid #b6a5f5;border-radius:14px;background:linear-gradient(135deg,#f7f4ff,#fff3fa)}
+.beta-avatar-settings h3{margin:9px 0 4px}.beta-avatar-settings p{color:var(--muted);font-size:13px}.beta-avatar-settings button{margin-top:8px}
+.beta-access-section{padding-top:70px;padding-bottom:70px}
+.notification-card:not(.read){animation:notice-arrive .32s ease-out}
+@keyframes beta-glow{50%{box-shadow:0 0 23px rgba(236,72,153,.55);transform:translateY(-1px)}}
+@keyframes chat-arrive{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes notice-arrive{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.badge-beta,.community-message-row,.private-message,.notification-card:not(.read){animation:none}}
