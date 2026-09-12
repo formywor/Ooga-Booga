@@ -70,11 +70,38 @@
     return true;
   }
 
+  function membership(createdAt) {
+    const days = Math.max(0, Math.floor((Date.now() - Number(createdAt || Date.now())) / 86400000));
+    if (days < 1) return "Joined today";
+    if (days < 30) return `Member for ${days} day${days === 1 ? "" : "s"}`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `Member for about ${months} month${months === 1 ? "" : "s"}`;
+    const years = Math.floor(months / 12); return `Member for about ${years} year${years === 1 ? "" : "s"}`;
+  }
+
+  async function openProfile(username) {
+    const dialog = $("community-profile-dialog"); const content = $("community-profile-content");
+    content.innerHTML = "<p>Loading profile…</p>";
+    if (!dialog.open) { if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", ""); }
+    try {
+      const result = await request(`/api/profiles/${encodeURIComponent(username)}`); const p = result.profile;
+      const relation = p.relationship || {}; const beta = (p.badges || []).includes("BETA");
+      content.innerHTML = `<section class="profile-card" data-accent="${escapeHtml(p.accent || "violet")}">
+        <div class="profile-card-head"><div class="profile-card-avatar">${avatarMarkup(p.avatarImage, p.avatarId, p.displayName)}</div><div><p class="kicker">Community profile</p><h2>${escapeHtml(p.displayName)}</h2><p>@${escapeHtml(p.username)} · <span class="presence ${escapeHtml(String(p.presence?.state || "OFFLINE").toLowerCase())}"></span> ${escapeHtml(String(p.presence?.state || "OFFLINE").toLowerCase())}</p></div></div>
+        <div class="community-badges">${badges(p.badges) || "<span class=\"community-badge\">MEMBER</span>"}</div>
+        ${p.bio ? `<p class="profile-card-bio">${escapeHtml(p.bio)}</p>` : ""}
+        <dl class="profile-facts"><div><dt>Member</dt><dd>${escapeHtml(membership(p.createdAt))}</dd></div><div><dt>Account</dt><dd>${p.accountStatus === "RESTRICTED" ? "Restricted" : "Active"}</dd></div><div><dt>Chat access</dt><dd>${p.chatStatus === "PAUSED" ? "Paused" : "Active"}</dd></div><div><dt>Your controls</dt><dd>${relation.blocked ? "Blocked" : relation.muted ? "Muted" : "None"}</dd></div></dl>
+        ${beta ? `<div class="profile-beta-note"><span class="community-badge badge-beta">BETA</span><b>Testing what comes next</b><p>${escapeHtml(p.betaStatus || "This member has early access to selected ScriptNovaa features.")}</p></div>` : ""}
+        <div class="profile-card-actions">${p.isSelf ? `<a class="button-link" href="/account">Open My Account</a>` : `<button type="button" data-profile-action="message" data-user="${escapeHtml(p.username)}">Message</button><button type="button" class="secondary" data-profile-action="${relation.muted ? "UNMUTE" : "MUTE"}" data-user="${escapeHtml(p.username)}">${relation.muted ? "Unmute" : "Mute"}</button><button type="button" class="secondary" data-profile-action="${relation.blocked ? "UNBLOCK" : "BLOCK"}" data-user="${escapeHtml(p.username)}">${relation.blocked ? "Unblock" : "Block"}</button>`}<button type="button" class="secondary" data-profile-action="referral" data-referral="${escapeHtml(p.referralUrl)}">Copy referral link</button></div>
+        <p class="profile-safety-note">Block and mute status shown here is private to your account. ScriptNovaa does not publish moderation reasons.</p></section>`;
+    } catch (error) { content.innerHTML = `<p class="message error">${escapeHtml(error.message)}</p>`; }
+  }
+
   function renderPublic(messages) {
     replaceMessages(messages.length ? messages.map((item) => `
       <article class="community-message-row${item.accountId === state.profile.accountId ? " mine" : ""}">
-        <div class="community-message-avatar">${avatarMarkup(item.avatarImage, item.avatarId, item.displayName)}</div>
-        <div><header><strong>${escapeHtml(item.displayName)} <em class="presence ${escapeHtml(String(item.presence || "OFFLINE").toLowerCase())}"></em></strong><span>@${escapeHtml(item.username)}</span>${badges(item.badges)}<time>${escapeHtml(time(item.createdAt))}</time></header>${item.deleted ? "<p><i>Message deleted</i></p>" : messageText(`public:${item.messageId}`, item.text, item.editedAt ? " <small>(edited)</small>" : "")}${item.deleted ? "" : `<div class="message-actions">${item.accountId === state.profile.accountId ? `<button data-action="edit" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="report" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Report</button><button data-action="mute" data-user="${escapeHtml(item.username)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.username)}">Block</button>`}</div>`}</div>
+        <button type="button" class="community-message-avatar profile-open" data-profile-user="${escapeHtml(item.username)}" aria-label="Open ${escapeHtml(item.displayName)} profile">${avatarMarkup(item.avatarImage, item.avatarId, item.displayName)}</button>
+        <div><header><button type="button" class="profile-name" data-profile-user="${escapeHtml(item.username)}">${escapeHtml(item.displayName)} <em class="presence ${escapeHtml(String(item.presence || "OFFLINE").toLowerCase())}"></em></button><span>@${escapeHtml(item.username)}</span>${badges(item.badges)}<time>${escapeHtml(time(item.createdAt))}</time></header>${item.deleted ? "<p><i>Message deleted</i></p>" : messageText(`public:${item.messageId}`, item.text, item.editedAt ? " <small>(edited)</small>" : "")}${item.deleted ? "" : `<div class="message-actions">${item.accountId === state.profile.accountId ? `<button data-action="edit" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="report" data-scope="PUBLIC" data-message="${escapeHtml(item.messageId)}">Report</button><button data-action="mute" data-user="${escapeHtml(item.username)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.username)}">Block</button>`}</div>`}</div>
       </article>`).join("") : `<p class="community-empty">It is quiet here. Start the conversation.</p>`); translateVisible();
   }
 
@@ -82,7 +109,7 @@
     replaceMessages(messages.length ? messages.map((item) => {
       const mine = item.senderAccountId === state.profile.accountId;
       const read = mine && Object.keys(item.readBy || {}).some((accountId) => accountId !== item.senderAccountId);
-      return `<article class="private-message ${mine ? "mine" : "theirs"}"><div class="community-message-avatar">${avatarMarkup(item.senderAvatarImage, item.senderAvatarId, item.senderDisplayName)}</div><div><header><strong>${escapeHtml(item.senderDisplayName || item.senderUsername)}</strong>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header>${item.deleted ? "<p><i>Message deleted</i></p>" : messageText(`private:${state.threadId}:${item.messageId}`, item.text, item.editedAt ? " <small>(edited)</small>" : "")}${item.deleted ? "" : `<div class="message-actions"><button data-action="report" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Report</button>${mine ? `<button data-action="edit" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="mute" data-user="${escapeHtml(item.senderUsername)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.senderUsername)}">Block</button>`}</div>`}${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
+      return `<article class="private-message ${mine ? "mine" : "theirs"}"><button type="button" class="community-message-avatar profile-open" data-profile-user="${escapeHtml(item.senderUsername)}">${avatarMarkup(item.senderAvatarImage, item.senderAvatarId, item.senderDisplayName)}</button><div><header><button type="button" class="profile-name" data-profile-user="${escapeHtml(item.senderUsername)}">${escapeHtml(item.senderDisplayName || item.senderUsername)}</button>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header>${item.deleted ? "<p><i>Message deleted</i></p>" : messageText(`private:${state.threadId}:${item.messageId}`, item.text, item.editedAt ? " <small>(edited)</small>" : "")}${item.deleted ? "" : `<div class="message-actions"><button data-action="report" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Report</button>${mine ? `<button data-action="edit" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="mute" data-user="${escapeHtml(item.senderUsername)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.senderUsername)}">Block</button>`}</div>`}${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
     }).join("") : `<p class="community-empty">Start a private conversation with ${escapeHtml(state.other?.displayName || "this user")}.</p>`); translateVisible();
   }
 
@@ -232,6 +259,8 @@
   });
 
   $("community-messages").addEventListener("click", async (event) => {
+    const profileButton = event.target.closest("[data-profile-user]");
+    if (profileButton) { openProfile(profileButton.dataset.profileUser); return; }
     const button = event.target.closest("[data-action]"); if (!button) return;
     try {
       const action = button.dataset.action;
@@ -261,6 +290,17 @@
   });
 
   const dialog = $("new-dm-dialog");
+  const profileDialog = $("community-profile-dialog");
+  $("community-profile-content").addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-profile-action]"); if (!button) return;
+    try {
+      const action = button.dataset.profileAction;
+      if (action === "referral") { await navigator.clipboard.writeText(button.dataset.referral); button.textContent = "Copied"; return; }
+      if (action === "message") { const started = await request("/api/community/private/start", "POST", {username: button.dataset.user}); profileDialog.close(); openThread(started.threadId, started.other); return; }
+      await request(`/api/community/relationships/${encodeURIComponent(button.dataset.user)}`, "POST", {action});
+      await openProfile(button.dataset.user);
+    } catch (error) { message("community-message", error.message, "error"); }
+  });
   $("new-dm-button").addEventListener("click", () => {
     if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", "");
   });

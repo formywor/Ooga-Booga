@@ -1,6 +1,6 @@
 "use strict";
 
-(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260912"; document.head.appendChild(link); })();
+(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260912-profile"; document.head.appendChild(link); })();
 
 (() => {
   const COPY_RESET_DELAY = 1800;

@@ -631,6 +631,7 @@ function bindSupport() {
     REFERRAL_PROBLEM: "Referral problem",
     CHAT_APPEAL: "Chat ban appeal",
     DEVELOPER_PROGRAM: "ScriptNova Developer Program",
+    BETA_FEEDBACK: "Beta feature feedback",
     OTHER: "Other",
   };
   const statusNames = {
@@ -702,11 +703,12 @@ function bindSupport() {
   $("support-category").onchange();
   const requestedCategory =
     new URLSearchParams(location.search).get("category");
-  if (["DEVELOPER_PROGRAM", "CHAT_APPEAL"].includes(requestedCategory)) {
+  if (["DEVELOPER_PROGRAM", "CHAT_APPEAL", "BETA_FEEDBACK"].includes(requestedCategory)) {
     $("support-category").value = requestedCategory;
     if (!$("support-subject").value.trim()) {
       $("support-subject").value = requestedCategory === "CHAT_APPEAL" ?
-        "Appeal my chat restriction" : "Developer Program beta application";
+        "Appeal my chat restriction" : requestedCategory === "BETA_FEEDBACK" ?
+          "Beta feature feedback" : "Developer Program beta application";
     }
   }
 

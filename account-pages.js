@@ -25,6 +25,8 @@
         $("account-badges").innerHTML = badges(profile.badges) || "<span class=\"community-badge\">MEMBER</span>";
         $("account-created").textContent = profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "Member";
         $("account-unread").textContent = String(summary.unreadCount || 0);
+        $("account-beta-panel").classList.toggle("hidden", !profile.betaAccess);
+        if (profile.betaAccess && profile.betaStatus) $("account-beta-status").textContent = profile.betaStatus;
       } catch (ignored) {
         $("account-created").textContent = "Member"; $("account-unread").textContent = "—";
         message("account-page-message", "Your account loaded. Community details are temporarily unavailable.");
@@ -66,11 +68,15 @@
     });
     try {
       const result = await request("/api/profile/me"); const p = result.profile;
+      if (p.betaAccess) [["cosmic", "Cosmic (Beta)"], ["electric", "Electric (Beta)"]].forEach(([value, label]) => {
+        if (![...$("settings-accent").options].some((option) => option.value === value)) $("settings-accent").add(new Option(label, value));
+      });
       $("settings-display-name").value = p.displayName; $("settings-bio").value = p.bio || ""; $("settings-accent").value = p.accent;
       $("settings-avatar").value = p.avatarId || "nova"; $("settings-privacy").checked = p.privacyMode !== false;
       $("settings-dms").checked = p.allowDirectMessages !== false; $("settings-last-active").checked = p.showLastActive === true;
       $("settings-notifications").checked = p.browserNotifications === true; $("settings-auto-translate").checked = p.autoTranslateChat !== false;
       $("settings-chat-language").value = p.chatLanguage || "AUTO"; customAvatar = p.avatarImage || "";
+      $("settings-beta-status").value = p.betaStatus || "";
       $("beta-avatar-settings").classList.toggle("hidden", !p.betaAccess); $("bio-count").textContent = $("settings-bio").value.length; updateAvatarPreview();
     } catch (error) { message("settings-message", error.message, "error"); }
     $("settings-bio").oninput = () => { $("bio-count").textContent = $("settings-bio").value.length; };
@@ -80,6 +86,7 @@
     $("profile-settings-form").onsubmit = async (event) => { event.preventDefault(); try {
       $("save-profile").disabled = true; await request("/api/profile/me", "PATCH", {displayName: $("settings-display-name").value,
         bio: $("settings-bio").value, accent: $("settings-accent").value, avatarId: $("settings-avatar").value, avatarImage: customAvatar,
+        betaStatus: $("settings-beta-status").value,
         privacyMode: $("settings-privacy").checked, allowDirectMessages: $("settings-dms").checked,
         showLastActive: $("settings-last-active").checked, browserNotifications: $("settings-notifications").checked,
         autoTranslateChat: $("settings-auto-translate").checked, chatLanguage: $("settings-chat-language").value});

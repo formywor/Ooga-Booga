@@ -1,5 +1,9 @@
 # ScriptNovaa website
 
+## Profiles and Beta — September 12, 2026
+
+Chat names and avatars now open a safe community profile card. Beta members receive an account section, custom profile status, exclusive colors, custom pictures, and a direct Beta feedback link. The chat layout now fixes avatar overflow and keeps messages below the retention notice. Publish this folder together with the matching API update.
+
 ## Project Z — 0.1.5 beta
 
 New download page: `/project-z`. The complete Windows download is
