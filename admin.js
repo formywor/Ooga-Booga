@@ -8,9 +8,11 @@
   const $ = (id) => document.getElementById(id);
   let activeAccountId = "";
   let administrator = null;
-  const token = () => sessionStorage.getItem(TAB_LOGIN_KEY) || (Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "");
-  const saveToken = (value) => { sessionStorage.setItem(TAB_LOGIN_KEY, value); };
+  sessionStorage.removeItem(TAB_LOGIN_KEY);
+  const token = () => Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "";
+  const saveToken = (value) => { localStorage.setItem(LOGIN_KEY, value); localStorage.setItem(LOGIN_EXPIRY_KEY, String(Date.now() + 24 * 60 * 60 * 1000)); };
   const clearToken = () => { sessionStorage.removeItem(TAB_LOGIN_KEY); localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); };
+  window.addEventListener("storage", (event) => { if (event.key === LOGIN_KEY || event.key === LOGIN_EXPIRY_KEY) location.reload(); });
   const escapeHtml = (value) => String(value ?? "").replace(/&/g, "&amp;")
       .replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");

@@ -6,7 +6,7 @@
   const state = {profile: null, mode: "public", threadId: "", other: null,
     poll: null, presencePoll: null, loading: false, lastTypingAt: 0, lastActivityAt: Date.now(),
     translationCache: new Map(), translationSource: new Map(), translationPending: new Set(), translationUnavailable: false};
-  const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦", prism: "◇", comet: "☄", signal: "⌁"};
+  const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦", prism: "◇", comet: "☄", signal: "⌁", crown: "♛", ghost: "◌", crystal: "⬡"};
   const avatar = (id, name) => avatarSymbols[id] || String(name || "S").charAt(0).toUpperCase();
   const avatarMarkup = (image, id, name) => image ? `<img src="${escapeHtml(image)}" alt="">` : escapeHtml(avatar(id, name));
   const draftKey = () => `scriptnovaaChatDraft:${state.mode}:${state.threadId || "public"}`;
@@ -20,8 +20,21 @@
     const distanceFromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
     const oldHeight = box.scrollHeight;
     box.innerHTML = html;
+    applyMessageFilter();
     if (distanceFromBottom < 100 || oldHeight <= box.clientHeight) box.scrollTop = box.scrollHeight;
     else box.scrollTop += box.scrollHeight - oldHeight;
+  }
+
+  function applyMessageFilter() {
+    const query = String($("chat-search")?.value || "").trim().toLowerCase();
+    document.querySelectorAll("#community-messages .community-message-row, #community-messages .private-message").forEach((row) => {
+      row.classList.toggle("message-filtered", Boolean(query) && !row.textContent.toLowerCase().includes(query));
+    });
+  }
+
+  function updateCharacterCount() {
+    const count = $("chat-character-count");
+    if (count) count.textContent = String($("community-text").value.length);
   }
 
   function translationTarget() {
@@ -86,7 +99,7 @@
     try {
       const result = await request(`/api/profiles/${encodeURIComponent(username)}`); const p = result.profile;
       const relation = p.relationship || {}; const beta = (p.badges || []).includes("BETA");
-      content.innerHTML = `<section class="profile-card tier-${escapeHtml(p.pointTier || "standard")} frame-${escapeHtml(p.betaFrame || "none")}" data-accent="${escapeHtml(p.accent || "violet")}">
+      content.innerHTML = `<section class="profile-card tier-${escapeHtml(p.pointTier || "standard")} frame-${escapeHtml(p.betaFrame || "none")} layout-${escapeHtml(p.betaLayout || "classic")} font-${escapeHtml(p.betaFont || "default")} effect-${escapeHtml(p.betaEffect || "none")}" data-accent="${escapeHtml(p.accent || "violet")}">
         <div class="profile-card-head"><div class="profile-card-avatar">${avatarMarkup(p.avatarImage, p.avatarId, p.displayName)}</div><div><p class="kicker">Community profile</p><h2>${escapeHtml(p.displayName)}</h2><p>@${escapeHtml(p.username)} · <span class="presence ${escapeHtml(String(p.presence?.state || "OFFLINE").toLowerCase())}"></span> ${escapeHtml(String(p.presence?.state || "OFFLINE").toLowerCase())}</p></div></div>
         <div class="community-badges">${badges(p.badges) || "<span class=\"community-badge\">MEMBER</span>"}</div>
         ${p.bio ? `<p class="profile-card-bio">${escapeHtml(p.bio)}</p>` : ""}
@@ -172,7 +185,7 @@
     $("channel-symbol").textContent = "#"; $("channel-title").textContent = "public";
     $("channel-description").textContent = "Messages disappear automatically after 48 hours.";
     $("community-text").placeholder = "Message #public";
-    $("community-text").value = localStorage.getItem(draftKey()) || "";
+    $("community-text").value = localStorage.getItem(draftKey()) || ""; updateCharacterCount();
     loadThreads(); loadPublic(); startPolling();
   }
 
@@ -182,7 +195,7 @@
     $("channel-symbol").textContent = "@"; $("channel-title").textContent = other.displayName;
     $("channel-description").textContent = `Private conversation with @${other.username} · administrators can review messages`;
     $("community-text").placeholder = `Message ${other.displayName}`;
-    $("community-text").value = localStorage.getItem(draftKey()) || "";
+    $("community-text").value = localStorage.getItem(draftKey()) || ""; updateCharacterCount();
     loadThreads(); loadPrivate(); startPolling();
   }
 
@@ -202,7 +215,7 @@
       state.profile = summary.profile;
       $("admin-command-guide").classList.toggle("hidden", !(state.profile.badges || []).includes("ADMIN"));
       applyChatPause(state.profile.chatBannedUntil, state.profile);
-      $("community-text").value = localStorage.getItem(draftKey()) || "";
+      $("community-text").value = localStorage.getItem(draftKey()) || ""; updateCharacterCount();
       await request("/api/community/presence", "POST", {state: "ONLINE"});
       await Promise.all([loadThreads(), loadPublic()]);
       startPolling();
@@ -225,7 +238,7 @@
       setTimeout(() => location.reload(), 900);
     } catch (error) { message("chat-unban-message", error.message, "error"); $("buy-chat-unban").disabled = false; }
   });
-  $("community-text").addEventListener("input", () => { state.lastActivityAt = Date.now(); localStorage.setItem(draftKey(), $("community-text").value); sendTyping(); });
+  $("community-text").addEventListener("input", () => { state.lastActivityAt = Date.now(); localStorage.setItem(draftKey(), $("community-text").value); updateCharacterCount(); sendTyping(); });
   $("community-text").addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
     event.preventDefault();
@@ -245,6 +258,7 @@
       } else if (state.mode === "public") await request("/api/community/public/messages", "POST", {text});
       else await request(`/api/community/private/${encodeURIComponent(state.threadId)}/messages`, "POST", {text});
       $("community-text").value = "";
+      updateCharacterCount();
       $("community-text").focus();
       localStorage.removeItem(draftKey());
       state.mode === "public" ? await loadPublic() : await loadPrivate();
@@ -304,6 +318,16 @@
   $("new-dm-button").addEventListener("click", () => {
     if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", "");
   });
+  $("chat-search").addEventListener("input", applyMessageFilter);
+  $("jump-latest").addEventListener("click", () => {
+    $("chat-search").value = ""; applyMessageFilter();
+    $("community-messages").scrollTop = $("community-messages").scrollHeight;
+  });
+  document.querySelectorAll("[data-quick-text]").forEach((button) => button.addEventListener("click", () => {
+    const input = $("community-text"); const addition = button.dataset.quickText || "";
+    input.value = `${input.value}${input.value && !/\s$/.test(input.value) ? " " : ""}${addition}`.slice(0, Number(input.maxLength || 1000));
+    input.dispatchEvent(new Event("input", {bubbles: true})); input.focus();
+  }));
   $("dm-search-button").addEventListener("click", async () => {
     try {
       const query = $("dm-search").value.trim();
@@ -320,5 +344,6 @@
   });
   ["pointerdown", "keydown", "mousemove"].forEach((name) => window.addEventListener(name, () => { state.lastActivityAt = Date.now(); }, {passive: true}));
   window.addEventListener("pagehide", () => { if (state.poll) clearInterval(state.poll); if (state.presencePoll) clearInterval(state.presencePoll); request("/api/community/presence", "POST", {state: "OFFLINE"}).catch(() => {}); });
+  updateCharacterCount();
   initialize();
 })();

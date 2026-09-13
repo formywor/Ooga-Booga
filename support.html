@@ -35,8 +35,10 @@
             <option value="BETA_FEEDBACK">Beta feature feedback</option>
             <option value="OTHER">Something else</option>
           </select>
+          <div id="support-category-guide" class="support-category-guide" role="note">Choose the closest category so your request reaches the right review queue.</div>
           <label for="support-subject">Subject</label><input id="support-subject" maxlength="80" placeholder="Short summary of the problem" required>
           <label for="support-message">Explain what happened and what you need</label><textarea id="support-message" minlength="20" maxlength="2000" rows="7" placeholder="Include useful details, but never include private codes or your PIN." required></textarea>
+          <div class="support-compose-meta"><span>Include what you clicked, what happened, and when it happened.</span><b><span id="support-character-count">0</span>/2000</b></div>
           <button id="submit-ticket" type="submit">Submit ticket</button>
         </form>
         <div id="support-message-result" class="message"></div>
@@ -45,6 +47,7 @@
     </div>
     <section class="panel ticket-history">
       <div class="ticket-history-heading"><div><p class="kicker">Your requests</p><h2>Support ticket status</h2></div><button id="refresh-tickets" class="light-button">Refresh</button></div>
+      <div class="ticket-status-guide"><span><b>Pending</b> Waiting for review</span><span><b>Answered</b> A response is ready</span><span><b>Closed</b> Review is complete</span></div>
       <div id="ticket-list"><p class="empty-claims">Loading your support tickets…</p></div><div id="ticket-list-message" class="message"></div>
     </section>
     <section id="live-chat-panel" class="panel live-chat-panel">
@@ -65,6 +68,6 @@
     </section>
   </main>
   <footer class="footer"><div class="wrap footer-inner"><span>© 2026 ScriptNovaa. All rights reserved.</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></div></footer>
-  <script src="/site.js?v=20260912-privacy"></script><script src="/app.js?v=20260912-chat-moderation"></script><script src="/support-chat.js?v=20260912-support"></script><script src="/account-guard.js?v=20260912-support"></script>
+  <script src="/site.js?v=20260913-social"></script><script src="/app.js?v=20260913-social"></script><script src="/support-chat.js?v=20260913-social"></script><script src="/account-guard.js?v=20260913-social"></script>
 </body>
 </html>

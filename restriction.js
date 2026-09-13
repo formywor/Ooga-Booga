@@ -6,9 +6,11 @@
   const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
   const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
   const $ = (id) => document.getElementById(id);
+  window.addEventListener("storage", (event) => { if (event.key === LOGIN_KEY || event.key === LOGIN_EXPIRY_KEY) location.reload(); });
   const remembered = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "";
   if (!remembered) { localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); }
-  const token = sessionStorage.getItem(TAB_LOGIN_KEY) || remembered;
+  sessionStorage.removeItem(TAB_LOGIN_KEY);
+  const token = remembered;
   if (!token) {
     location.replace("/signin");
     return;
@@ -82,6 +84,7 @@
     try { await request("/api/logout", "POST"); } catch (error) {}
     sessionStorage.removeItem(TAB_LOGIN_KEY);
     localStorage.removeItem(LOGIN_KEY);
+    localStorage.removeItem(LOGIN_EXPIRY_KEY);
     location.replace("/");
   };
   load().catch((error) => setMessage(error.message, "error"));

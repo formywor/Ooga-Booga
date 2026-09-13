@@ -1,6 +1,6 @@
 "use strict";
 
-(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260913-beta"; document.head.appendChild(link); })();
+(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260913-social"; document.head.appendChild(link); })();
 
 (() => {
   if (window.top !== window.self) {
@@ -274,8 +274,7 @@
 
   function storedLoginToken() {
     try {
-      const tabToken = sessionStorage.getItem("scriptnovaaTabLoginToken");
-      if (tabToken) return tabToken;
+      sessionStorage.removeItem("scriptnovaaTabLoginToken");
       const expiresAt = Number(localStorage.getItem("scriptnovaaLoginExpiresAt") || 0);
       if (expiresAt <= Date.now()) {
         localStorage.removeItem("scriptnovaaLoginToken");
@@ -448,7 +447,7 @@
     }
     accountRequest("/api/community/summary").then((result) => {
       const profile = result.profile;
-      const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦"};
+      const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦", prism: "◇", comet: "☄", signal: "⌁", crown: "♛", ghost: "◌", crystal: "⬡"};
       const initial = avatarSymbols[profile.avatarId] || String(profile.displayName || profile.username || "S").charAt(0).toUpperCase();
       const picture = profile.avatarImage ? `<img src="${String(profile.avatarImage).replace(/"/g, "&quot;")}" alt="">` : initial;
       button.querySelector("span").innerHTML = picture;

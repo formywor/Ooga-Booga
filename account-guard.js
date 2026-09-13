@@ -8,8 +8,8 @@
   const remembered = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ?
     localStorage.getItem(LOGIN_KEY) || "" : "";
   if (!remembered) { localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); }
-  const token = sessionStorage.getItem(TAB_LOGIN_KEY) ||
-    remembered;
+  sessionStorage.removeItem(TAB_LOGIN_KEY);
+  const token = remembered;
   if (!token) return;
 
   const path = location.pathname.replace(/\.html$/i, "").replace(/\/$/, "") || "/";
@@ -22,7 +22,7 @@
   }).then(async (response) => {
     if (response.status === 401) {
       sessionStorage.removeItem(TAB_LOGIN_KEY);
-      if (localStorage.getItem(LOGIN_KEY) === token) localStorage.removeItem(LOGIN_KEY);
+      localStorage.removeItem(LOGIN_KEY);
       localStorage.removeItem(LOGIN_EXPIRY_KEY);
       return null;
     }

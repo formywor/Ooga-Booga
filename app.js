@@ -14,8 +14,6 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/'/g, "&#039;");
 
 function currentLogin() {
-  const tabLogin = sessionStorage.getItem(TAB_LOGIN_KEY);
-  if (tabLogin) return tabLogin;
   const persistentLogin = localStorage.getItem(LOGIN_KEY) || "";
   const expiresAt = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0);
   if (!persistentLogin || expiresAt <= Date.now()) {
@@ -23,30 +21,26 @@ function currentLogin() {
     localStorage.removeItem(LOGIN_EXPIRY_KEY);
     return "";
   }
-  sessionStorage.setItem(TAB_LOGIN_KEY, persistentLogin);
+  sessionStorage.removeItem(TAB_LOGIN_KEY);
   return persistentLogin;
 }
 
 function saveLogin(loginToken, remember = false) {
-  sessionStorage.setItem(TAB_LOGIN_KEY, loginToken);
-  if (remember) {
-    localStorage.setItem(LOGIN_KEY, loginToken);
-    localStorage.setItem(LOGIN_EXPIRY_KEY,
-        String(Date.now() + 30 * 24 * 60 * 60 * 1000));
-  } else {
-    localStorage.removeItem(LOGIN_KEY);
-    localStorage.removeItem(LOGIN_EXPIRY_KEY);
-  }
+  sessionStorage.removeItem(TAB_LOGIN_KEY);
+  localStorage.setItem(LOGIN_KEY, loginToken);
+  localStorage.setItem(LOGIN_EXPIRY_KEY,
+      String(Date.now() + (remember ? 30 : 1) * 24 * 60 * 60 * 1000));
 }
 
 function clearLogin() {
-  const tabLogin = sessionStorage.getItem(TAB_LOGIN_KEY);
   sessionStorage.removeItem(TAB_LOGIN_KEY);
-  if (!tabLogin || localStorage.getItem(LOGIN_KEY) === tabLogin) {
-    localStorage.removeItem(LOGIN_KEY);
-  }
+  localStorage.removeItem(LOGIN_KEY);
   localStorage.removeItem(LOGIN_EXPIRY_KEY);
 }
+
+window.addEventListener("storage", (event) => {
+  if (event.key === LOGIN_KEY || event.key === LOGIN_EXPIRY_KEY) location.reload();
+});
 
 async function request(path, method = "GET", body) {
   const headers = {"Content-Type": "application/json"};
@@ -673,6 +667,17 @@ function bindSupport() {
     CLOSED: "Closed",
     DENIED: "Denied",
   };
+  const categoryGuidance = {
+    CONNECTION_CODE_REPLACEMENT: "Explain why the saved computer connection no longer works and whether Windows or the computer changed.",
+    BROWSER_PROBLEM: "Include Chrome or Edge, the selected mode, the launcher version, the exact message, and the approximate time.",
+    ACCOUNT_ACCESS: "Explain the sign-in or recovery step that failed. Never include the PIN or recovery code itself.",
+    POINTS_OR_REWARDS: "Include the reward or referral action, approximate time, expected balance, and the message shown.",
+    REFERRAL_PROBLEM: "Include both public usernames, which referral link was used, and which required step was completed.",
+    CHAT_APPEAL: "Explain what happened, why the restriction should be reviewed, and what will change if access is restored.",
+    DEVELOPER_PROGRAM: "Describe what you want to build, your audience, relevant experience, and how you will follow ScriptNovaa rules.",
+    BETA_FEEDBACK: "Name the Beta feature, describe the result, and explain what would make it better.",
+    OTHER: "Give a short timeline and include exact on-screen wording where possible.",
+  };
 
   const renderTickets = (tickets) => {
     if (!tickets.length) {
@@ -693,7 +698,7 @@ function bindSupport() {
             "";
         return `<article class="ticket-card">
           <div>
-            <span class="ticket-meta">${escapeHtml(categoryNames[ticket.category] || ticket.category)} • ${escapeHtml(new Date(ticket.createdAt).toLocaleString())}</span>
+            <span class="ticket-meta">${escapeHtml(categoryNames[ticket.category] || ticket.category)} • ${escapeHtml(new Date(ticket.createdAt).toLocaleString())} • Ref ${escapeHtml(String(ticket.ticketId || "UNKNOWN").slice(-8).toUpperCase())}</span>
             <h3>${escapeHtml(ticket.subject)}</h3>
             <p>${escapeHtml(ticket.message)}</p>
           </div>
@@ -721,6 +726,7 @@ function bindSupport() {
   };
 
   $("support-category").onchange = () => {
+    $("support-category-guide").textContent = categoryGuidance[$("support-category").value] || categoryGuidance.OTHER;
     if ($("support-category").value === "CONNECTION_CODE_REPLACEMENT" &&
         !$("support-subject").value.trim()) {
       $("support-subject").value = "Request another connection code";
@@ -740,7 +746,11 @@ function bindSupport() {
         "Appeal my chat restriction" : requestedCategory === "BETA_FEEDBACK" ?
           "Beta feature feedback" : "Developer Program beta application";
     }
+    $("support-category").onchange();
   }
+  $("support-message").addEventListener("input", () => {
+    $("support-character-count").textContent = String($("support-message").value.length);
+  });
 
   $("support-form").onsubmit = async (event) => {
     event.preventDefault();
@@ -755,6 +765,7 @@ function bindSupport() {
           `Ticket submitted. Status: ${statusNames[result.ticket.status] || result.ticket.status}.`,
           "success");
       $("support-form").reset();
+      $("support-character-count").textContent = "0";
       $("support-category").onchange();
       await loadTickets();
     } catch (error) {

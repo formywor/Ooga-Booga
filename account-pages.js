@@ -2,7 +2,7 @@
 (() => {
   if (!requireLogin()) return;
   const enhancementStyle = document.createElement("link"); enhancementStyle.rel = "stylesheet"; enhancementStyle.href = "/status-enhancements.css?v=20260911"; document.head.appendChild(enhancementStyle);
-  const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦", prism: "◇", comet: "☄", signal: "⌁"};
+  const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦", prism: "◇", comet: "☄", signal: "⌁", crown: "♛", ghost: "◌", crystal: "⬡"};
   const badges = (items) => (items || []).map((badge) => `<span class="community-badge badge-${escapeHtml(badge.toLowerCase())}">${escapeHtml(badge)}</span>`).join("");
   const when = (value) => value ? new Date(Number(value)).toLocaleString() : "Unknown";
   const pin = (promptText) => window.prompt(promptText || "Enter your current PIN to continue:") || "";
@@ -55,7 +55,7 @@
     const avatarSelect = $("settings-avatar");
     let avatarPreview = $("settings-avatar-preview");
     if (avatarSelect && !avatarPreview) { avatarPreview = document.createElement("div"); avatarPreview.id = "settings-avatar-preview"; avatarPreview.className = "avatar-preview"; avatarSelect.parentNode.insertBefore(avatarPreview, avatarSelect); }
-    const updateAvatarPreview = () => { if (!avatarPreview) return; avatarPreview.innerHTML = customAvatar ? `<img src="${escapeHtml(customAvatar)}" alt="Custom profile preview">` : escapeHtml(avatarSymbols[avatarSelect.value] || "S"); avatarPreview.dataset.accent = $("settings-accent").value; };
+    const updateAvatarPreview = () => { if (!avatarPreview) return; avatarPreview.innerHTML = customAvatar ? `<img src="${escapeHtml(customAvatar)}" alt="Custom profile preview">` : escapeHtml(avatarSymbols[avatarSelect.value] || "S"); avatarPreview.dataset.accent = $("settings-accent").value; avatarPreview.className = `avatar-preview frame-${$("settings-beta-frame")?.value || "none"}`; };
     const resizeAvatar = (file) => new Promise((resolve, reject) => {
       if (!file || file.size > 5 * 1024 * 1024) return reject(new Error("Choose an image smaller than 5 MB."));
       const reader = new FileReader(); reader.onerror = () => reject(new Error("That image could not be read."));
@@ -69,10 +69,10 @@
     });
     try {
       const result = await request("/api/profile/me"); const p = result.profile;
-      if (p.betaAccess) [["cosmic", "Cosmic (Beta)"], ["electric", "Electric (Beta)"]].forEach(([value, label]) => {
+      if (p.betaAccess) [["cosmic", "Cosmic (Beta)"], ["electric", "Electric (Beta)"], ["inferno", "Inferno (Beta)"], ["ocean", "Deep Ocean (Beta)"], ["midnight", "Midnight (Beta)"]].forEach(([value, label]) => {
         if (![...$("settings-accent").options].some((option) => option.value === value)) $("settings-accent").add(new Option(label, value));
       });
-      if (p.betaAccess) [["prism", "Prism (Beta)"], ["comet", "Comet (Beta)"], ["signal", "Signal (Beta)"]].forEach(([value, label]) => {
+      if (p.betaAccess) [["prism", "Prism (Beta)"], ["comet", "Comet (Beta)"], ["signal", "Signal (Beta)"], ["crown", "Crown (Beta)"], ["ghost", "Ghost (Beta)"], ["crystal", "Crystal (Beta)"]].forEach(([value, label]) => {
         if (![...$("settings-avatar").options].some((option) => option.value === value)) $("settings-avatar").add(new Option(label, value));
       });
       $("settings-display-name").value = p.displayName; $("settings-bio").value = p.bio || ""; $("settings-accent").value = p.accent;
@@ -82,16 +82,21 @@
       $("settings-chat-language").value = p.chatLanguage || "AUTO"; customAvatar = p.avatarImage || "";
       $("settings-beta-status").value = p.betaStatus || "";
       $("settings-beta-frame").value = p.betaFrame || "none";
+      $("settings-beta-layout").value = p.betaLayout || "classic";
+      $("settings-beta-font").value = p.betaFont || "default";
+      $("settings-beta-effect").value = p.betaEffect || "none";
       $("beta-avatar-settings").classList.toggle("hidden", !p.betaAccess); $("bio-count").textContent = $("settings-bio").value.length; updateAvatarPreview();
     } catch (error) { message("settings-message", error.message, "error"); }
     $("settings-bio").oninput = () => { $("bio-count").textContent = $("settings-bio").value.length; };
-    avatarSelect.onchange = updateAvatarPreview; $("settings-accent").onchange = updateAvatarPreview;
+    avatarSelect.onchange = updateAvatarPreview; $("settings-accent").onchange = updateAvatarPreview; $("settings-beta-frame").onchange = updateAvatarPreview;
     $("settings-avatar-file").onchange = async () => { try { customAvatar = await resizeAvatar($("settings-avatar-file").files[0]); updateAvatarPreview(); message("settings-message", "Picture prepared. Save changes to publish it.", "success"); } catch (error) { message("settings-message", error.message, "error"); } };
     $("remove-custom-avatar").onclick = () => { customAvatar = ""; $("settings-avatar-file").value = ""; updateAvatarPreview(); };
     $("profile-settings-form").onsubmit = async (event) => { event.preventDefault(); try {
       $("save-profile").disabled = true; await request("/api/profile/me", "PATCH", {displayName: $("settings-display-name").value,
         bio: $("settings-bio").value, accent: $("settings-accent").value, avatarId: $("settings-avatar").value, avatarImage: customAvatar,
         betaStatus: $("settings-beta-status").value, betaFrame: $("settings-beta-frame").value,
+        betaLayout: $("settings-beta-layout").value, betaFont: $("settings-beta-font").value,
+        betaEffect: $("settings-beta-effect").value,
         privacyMode: $("settings-privacy").checked, allowDirectMessages: $("settings-dms").checked,
         showLastActive: $("settings-last-active").checked, browserNotifications: $("settings-notifications").checked,
         autoTranslateChat: $("settings-auto-translate").checked, chatLanguage: $("settings-chat-language").value});
