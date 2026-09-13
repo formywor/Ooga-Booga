@@ -94,6 +94,27 @@
     } catch (error) { message("settings-message", error.message, "error"); } finally { $("save-profile").disabled = false; } };
     $("test-privacy").onclick = () => window.ScriptNovaaPrivacy?.hideScreen();
     $("settings-signout").onclick = async () => { try { await request("/api/logout", "POST"); } catch (_) {} clearLogin(); location.replace("/"); };
+    $("change-pin-form").onsubmit = async (event) => {
+      event.preventDefault();
+      const currentPin = $("current-pin").value;
+      const newPin = $("new-pin").value;
+      if (newPin !== $("confirm-new-pin").value) {
+        message("pin-change-message", "The two new PIN entries do not match.", "error");
+        return;
+      }
+      const button = event.submitter || $("change-pin-form").querySelector("button");
+      try {
+        button.disabled = true;
+        await request("/api/account/security/pin/change", "POST", {currentPin, newPin});
+        $("change-pin-form").reset();
+        sessionStorage.removeItem("scriptnovaaPinUpgradePromptShown");
+        message("pin-change-message", "PIN changed. Your other website sessions were signed out.", "success");
+      } catch (error) {
+        message("pin-change-message", error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
+    };
     const loadRelationships = async () => { try { const result = await request("/api/community/relationships"); $("relationship-list").innerHTML = result.relationships.length ? result.relationships.map((item) => `<div class="security-row"><div><b>${escapeHtml(item.profile?.displayName || "User")}</b><small>@${escapeHtml(item.profile?.username || "unknown")} · ${escapeHtml(item.kind)}</small></div><button type="button" class="secondary undo-relationship" data-user="${escapeHtml(item.profile?.username || "")}" data-action="${item.kind === "BLOCKED" ? "UNBLOCK" : "UNMUTE"}">${item.kind === "BLOCKED" ? "Unblock" : "Unmute"}</button></div>`).join("") : "<p>You have not blocked or muted anyone.</p>"; document.querySelectorAll(".undo-relationship").forEach((button) => button.onclick = async () => { try { await request(`/api/community/relationships/${encodeURIComponent(button.dataset.user)}`, "POST", {action: button.dataset.action}); await loadRelationships(); } catch (error) { message("settings-message", error.message, "error"); } }); } catch (error) { $("relationship-list").textContent = error.message; } };
     loadRelationships();
   }

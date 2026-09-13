@@ -3,6 +3,7 @@
 const API = "https://api.scriptnovaa.com";
 const LOGIN_KEY = "scriptnovaaLoginToken";
 const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
+const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
 const RECOVERY_DISPLAY_KEY = "scriptnovaaPendingRecoveryCode";
 const $ = (id) => document.getElementById(id);
 const escapeHtml = (value) => String(value ?? "")
@@ -16,13 +17,26 @@ function currentLogin() {
   const tabLogin = sessionStorage.getItem(TAB_LOGIN_KEY);
   if (tabLogin) return tabLogin;
   const persistentLogin = localStorage.getItem(LOGIN_KEY) || "";
-  if (persistentLogin) sessionStorage.setItem(TAB_LOGIN_KEY, persistentLogin);
+  const expiresAt = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0);
+  if (!persistentLogin || expiresAt <= Date.now()) {
+    localStorage.removeItem(LOGIN_KEY);
+    localStorage.removeItem(LOGIN_EXPIRY_KEY);
+    return "";
+  }
+  sessionStorage.setItem(TAB_LOGIN_KEY, persistentLogin);
   return persistentLogin;
 }
 
-function saveLogin(loginToken) {
+function saveLogin(loginToken, remember = false) {
   sessionStorage.setItem(TAB_LOGIN_KEY, loginToken);
-  localStorage.setItem(LOGIN_KEY, loginToken);
+  if (remember) {
+    localStorage.setItem(LOGIN_KEY, loginToken);
+    localStorage.setItem(LOGIN_EXPIRY_KEY,
+        String(Date.now() + 30 * 24 * 60 * 60 * 1000));
+  } else {
+    localStorage.removeItem(LOGIN_KEY);
+    localStorage.removeItem(LOGIN_EXPIRY_KEY);
+  }
 }
 
 function clearLogin() {
@@ -31,6 +45,7 @@ function clearLogin() {
   if (!tabLogin || localStorage.getItem(LOGIN_KEY) === tabLogin) {
     localStorage.removeItem(LOGIN_KEY);
   }
+  localStorage.removeItem(LOGIN_EXPIRY_KEY);
 }
 
 async function request(path, method = "GET", body) {
@@ -136,7 +151,7 @@ function bindSignup() {
         challengeBucket: challenge.challengeBucket,
         challengeSolution,
       });
-      saveLogin(result.loginToken);
+      saveLogin(result.loginToken, false);
       sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.recoveryCode);
       location.replace("/backup-code");
     } catch (error) {
@@ -159,7 +174,7 @@ function bindSignin() {
         pin: $("signin-pin").value,
         clientDescription: navigator.userAgent,
       });
-      saveLogin(result.loginToken);
+      saveLogin(result.loginToken, Boolean($("signin-remember")?.checked));
       if (result.securityWarning) sessionStorage.setItem("scriptnovaaSecurityWarning", result.securityWarning);
       if (result.gate?.type === "RECOVERY_CONFIRMATION") {
         location.replace("/backup-code");
@@ -185,7 +200,7 @@ function bindRecovery() {
         clientDescription: navigator.userAgent,
       });
       clearLogin();
-      saveLogin(result.loginToken);
+      saveLogin(result.loginToken, false);
       sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.newRecoveryCode);
       location.replace("/backup-code");
     } catch (error) {
@@ -306,18 +321,7 @@ async function detectAdBlocker() {
     baitStyle.visibility === "hidden";
   bait.remove();
 
-  let networkBlocked = false;
-  try {
-    await fetch(`https://nap5k.com/tag.min.js?check=${Date.now()}`, {
-      mode: "no-cors",
-      cache: "no-store",
-      credentials: "omit",
-      referrerPolicy: "no-referrer",
-    });
-  } catch (error) {
-    networkBlocked = true;
-  }
-  return baitBlocked || networkBlocked;
+  return baitBlocked;
 }
 
 function remainingText(milliseconds) {

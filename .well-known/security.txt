@@ -1,0 +1,5 @@
+Contact: https://scriptnovaa.com/support
+Expires: 2027-09-13T00:00:00Z
+Canonical: https://scriptnovaa.com/.well-known/security.txt
+Policy: https://scriptnovaa.com/security
+Preferred-Languages: en

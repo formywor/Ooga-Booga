@@ -10,9 +10,12 @@ function setCheckMessage(text, kind = "") {
 }
 
 function verdictLabel(value) {
-  return {MORE_AI_LIKE: "More AI-like patterns", MORE_HUMAN_LIKE: "More human-like patterns",
+  return {
+    MORE_AI_LIKE: "More AI-like patterns",
+    MORE_HUMAN_LIKE: "More human-like patterns",
     MIXED_OR_UNCERTAIN: "Mixed or uncertain",
-    NOT_ENOUGH_TEXT: "Not enough text for a useful estimate"}[value] || "Mixed or uncertain";
+    NOT_ENOUGH_TEXT: "Not enough text for a useful estimate",
+  }[value] || "Mixed or uncertain";
 }
 
 function appendReason(list, text) {
@@ -75,14 +78,16 @@ function renderHighlights(signals) {
 }
 
 function renderResult(analysis) {
-  byId("check-results").classList.remove("hidden");
+  const results = byId("check-results");
+  results.classList.remove("hidden");
   byId("score-value").textContent = analysis.verdict === "NOT_ENOUGH_TEXT" ? "?" : String(analysis.score);
   byId("score-ring").style.setProperty("--score", `${analysis.score * 3.6}deg`);
   byId("verdict").textContent = verdictLabel(analysis.verdict);
   byId("confidence").textContent = `${analysis.confidence.toLowerCase()} confidence · ${analysis.style.wordCount} words examined`;
   byId("disclaimer").textContent = analysis.disclaimer;
   byId("style-score").textContent = `${analysis.style.score} / 100`;
-  byId("style-summary").textContent = analysis.style.findings.length ? analysis.style.findings[0] : "No strong style pattern stood out.";
+  byId("style-summary").textContent = analysis.style.findings.length ?
+    analysis.style.findings[0] : "No strong style pattern stood out.";
   byId("word-count").textContent = String(analysis.style.wordCount);
   byId("text-stats").textContent = `${analysis.style.sentenceCount} sentences · ${analysis.style.averageSentenceWords} average words per sentence`;
   const online = analysis.online || {availableCount: analysis.gemini.available ? 1 : 0,
@@ -96,6 +101,7 @@ function renderResult(analysis) {
   renderProviders(online);
   renderHighlights(analysis.style.sentenceSignals);
   renderInvisible(analysis.invisible);
+
   const reasons = byId("reason-list");
   reasons.replaceChildren();
   analysis.style.findings.forEach((reason) => appendReason(reasons, reason));
@@ -109,7 +115,7 @@ function renderResult(analysis) {
     appendReason(reasons, provider.uncertainty);
   });
   if (!reasons.children.length) appendReason(reasons, "The available signals are weak or balanced.");
-  byId("check-results").scrollIntoView({behavior: "smooth", block: "start"});
+  results.scrollIntoView({behavior: "smooth", block: "start"});
 }
 
 byId("check-text").addEventListener("input", () => {
@@ -183,7 +189,9 @@ byId("check-form").addEventListener("submit", async (event) => {
     button.textContent = "Analyzing…";
     setCheckMessage("Running the writing and invisible-character checks…");
     const response = await fetch(`${CHECK_API}/api/writing/check`, {
-      method: "POST", headers: {"Content-Type": "application/json"}, cache: "no-store",
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      cache: "no-store",
       body: JSON.stringify({text: byId("check-text").value, useOnline: byId("use-gemini").checked}),
     });
     const result = await response.json().catch(() => ({error: "The server returned an unreadable response."}));

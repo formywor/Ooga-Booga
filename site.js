@@ -3,6 +3,12 @@
 (() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260912-profile"; document.head.appendChild(link); })();
 
 (() => {
+  if (window.top !== window.self) {
+    try { window.top.location = window.self.location.href; } catch (error) {
+      document.documentElement.innerHTML = "<head><title>ScriptNovaa</title></head><body><p>This ScriptNovaa page cannot be displayed inside another website.</p></body>";
+    }
+    return;
+  }
   const COPY_RESET_DELAY = 1800;
   const CONTINUITY_NOTICE_KEY = "scriptnovaaContinuityNoticeDismissedAt";
   const CONTINUITY_NOTICE_DELAY = 2 * 24 * 60 * 60 * 1000;
@@ -268,8 +274,15 @@
 
   function storedLoginToken() {
     try {
-      return sessionStorage.getItem("scriptnovaaTabLoginToken") ||
-        localStorage.getItem("scriptnovaaLoginToken") || "";
+      const tabToken = sessionStorage.getItem("scriptnovaaTabLoginToken");
+      if (tabToken) return tabToken;
+      const expiresAt = Number(localStorage.getItem("scriptnovaaLoginExpiresAt") || 0);
+      if (expiresAt <= Date.now()) {
+        localStorage.removeItem("scriptnovaaLoginToken");
+        localStorage.removeItem("scriptnovaaLoginExpiresAt");
+        return "";
+      }
+      return localStorage.getItem("scriptnovaaLoginToken") || "";
     } catch (error) {
       return "";
     }
@@ -461,7 +474,44 @@
     }));
   }
 
+  function installMobileNavigation() {
+    document.querySelectorAll(".site-header .nav").forEach((nav) => {
+      const links = nav.querySelector(":scope > .nav-links");
+      if (!links || nav.querySelector(".mobile-nav-toggle")) return;
+      nav.classList.add("nav-enhanced");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "mobile-nav-toggle";
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-label", "Open navigation");
+      button.innerHTML = "<span></span><span></span><span></span>";
+      nav.insertBefore(button, links);
+      const close = () => {
+        nav.classList.remove("mobile-open");
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-label", "Open navigation");
+      };
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const open = !nav.classList.contains("mobile-open");
+        nav.classList.toggle("mobile-open", open);
+        button.setAttribute("aria-expanded", String(open));
+        button.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+      });
+      links.addEventListener("click", (event) => {
+        if (event.target.closest("a")) close();
+      });
+      document.addEventListener("click", (event) => {
+        if (!nav.contains(event.target)) close();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") close();
+      });
+    });
+  }
+
   window.ScriptNovaaSite = {copyWithFeedback, accountRequest};
+  installMobileNavigation();
   installProfileMenu();
   installContinuityNotice();
   installRevealAnimations();

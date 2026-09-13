@@ -7,7 +7,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;font:15px "Segoe UI",A
 "use strict";
 var API_BASE="https://api.scriptnovaa.com";
 var REGISTRY_BASE="HKCU\\Software\\ScriptNovaa\\ShareBrowser\\";
-var LAUNCHER_VERSION="1.2.7";
+var LAUNCHER_VERSION="1.2.8";
 var wmiService=null;
 var state={login:"",proof:"",registered:false,connecting:false,updateRequired:false,id:"",secret:"",expires:0,profile:"",browserProcessName:"",launchedProcessId:0,launchMethod:"",browserSeen:false,launchConfirmed:false,processGraceUntil:0,manualEndAllowedAt:0,zeroProcessChecks:0,heartbeatFailures:0,heartbeat:null,countdown:null,processCheck:null,ending:false};
 function $(id){return document.getElementById(id)}
@@ -52,14 +52,72 @@ function registryRead(name){
 function registryWrite(name,value){
   new ActiveXObject("WScript.Shell").RegWrite(REGISTRY_BASE+name,String(value),"REG_SZ");
 }
+function registryDeleteAt(base,name){
+  try{new ActiveXObject("WScript.Shell").RegDelete(base+name)}catch(e){}
+}
+function protectedRegistryWriteAt(product,name,value){
+  var shell=new ActiveXObject("WScript.Shell");
+  var registryBase="HKCU\\Software\\ScriptNovaa\\"+product+"\\";
+  var powershellBase="HKCU:\\Software\\ScriptNovaa\\"+product;
+  var pendingName="Pending"+name+"-"+new Date().getTime()+"-"+Math.floor(Math.random()*100000);
+  shell.RegWrite(registryBase+pendingName,String(value),"REG_SZ");
+  try{
+    var script="Add-Type -AssemblyName System.Security;"+
+      "$p='"+psSingle(powershellBase)+"';"+
+      "$v=(Get-ItemProperty -LiteralPath $p -Name '"+pendingName+"').'"+pendingName+"';"+
+      "$b=[Text.Encoding]::UTF8.GetBytes([string]$v);"+
+      "$e=[Security.Cryptography.ProtectedData]::Protect($b,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser);"+
+      "Set-ItemProperty -LiteralPath $p -Name '"+name+"Protected' -Value ([Convert]::ToBase64String($e));"+
+      "Remove-ItemProperty -LiteralPath $p -Name '"+pendingName+"' -ErrorAction SilentlyContinue";
+    if(shell.Run("powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -Command \""+script+"\"",0,true)!==0){
+      throw new Error("Windows could not protect the saved connection.");
+    }
+  }finally{
+    registryDeleteAt(registryBase,pendingName);
+  }
+}
+function protectedRegistryReadAt(product,name){
+  var shell=new ActiveXObject("WScript.Shell");
+  var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
+  var registryBase="HKCU\\Software\\ScriptNovaa\\"+product+"\\";
+  var powershellBase="HKCU:\\Software\\ScriptNovaa\\"+product;
+  var temporaryFile=shell.ExpandEnvironmentStrings("%TEMP%")+"\\ScriptNovaa-secret-"+new Date().getTime()+"-"+Math.floor(Math.random()*100000)+".tmp";
+  try{
+    var encrypted=String(shell.RegRead(registryBase+name+"Protected")||"");
+    if(encrypted){
+      var script="Add-Type -AssemblyName System.Security;"+
+        "$p='"+psSingle(powershellBase)+"';"+
+        "$e=(Get-ItemProperty -LiteralPath $p -Name '"+name+"Protected').'"+name+"Protected';"+
+        "$b=[Convert]::FromBase64String([string]$e);"+
+        "$d=[Security.Cryptography.ProtectedData]::Unprotect($b,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser);"+
+        "[IO.File]::WriteAllText('"+psSingle(temporaryFile)+"',[Text.Encoding]::UTF8.GetString($d))";
+      if(shell.Run("powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -Command \""+script+"\"",0,true)===0&&fileSystem.FileExists(temporaryFile)){
+        var stream=fileSystem.OpenTextFile(temporaryFile,1,false);var value=stream.ReadAll();stream.Close();
+        fileSystem.DeleteFile(temporaryFile,true);return String(value||"");
+      }
+    }
+  }catch(e){
+    try{if(fileSystem.FileExists(temporaryFile))fileSystem.DeleteFile(temporaryFile,true)}catch(cleanupError){}
+  }
+  var legacy="";
+  try{legacy=String(shell.RegRead(registryBase+name)||"")}catch(ignore){}
+  if(legacy){
+    try{protectedRegistryWriteAt(product,name,legacy);registryDeleteAt(registryBase,name)}catch(migrationError){return ""}
+  }
+  return legacy;
+}
 function clearSavedConnection(){
   var shell=new ActiveXObject("WScript.Shell");
   try{shell.RegDelete(REGISTRY_BASE+"LauncherToken")}catch(e){}
   try{shell.RegDelete(REGISTRY_BASE+"DeviceProof")}catch(e2){}
+  try{shell.RegDelete(REGISTRY_BASE+"LauncherTokenProtected")}catch(e3){}
+  try{shell.RegDelete(REGISTRY_BASE+"DeviceProofProtected")}catch(e4){}
 }
 function saveConnection(){
-  registryWrite("LauncherToken",state.login);
-  registryWrite("DeviceProof",state.proof);
+  protectedRegistryWriteAt("ShareBrowser","LauncherToken",state.login);
+  protectedRegistryWriteAt("ShareBrowser","DeviceProof",state.proof);
+  registryDeleteAt(REGISTRY_BASE,"LauncherToken");
+  registryDeleteAt(REGISTRY_BASE,"DeviceProof");
 }
 function setConnectionUi(connected){
   $("pairing-code").disabled=connected;
@@ -148,12 +206,11 @@ function deviceProof(){
   return [uuid,bios,machineGuid,computerName].join("|");
 }
 function restoreConnection(){
-  var savedLogin=registryRead("LauncherToken");
-  var savedProof=registryRead("DeviceProof");
+  var savedLogin=protectedRegistryReadAt("ShareBrowser","LauncherToken");
+  var savedProof=protectedRegistryReadAt("ShareBrowser","DeviceProof");
   if(!savedLogin||savedProof.length<20){
-    var sharedShell=new ActiveXObject("WScript.Shell");
-    try{savedLogin=String(sharedShell.RegRead("HKCU\\Software\\ScriptNovaa\\ProjectZ\\LauncherToken")||"")}catch(importLoginError){}
-    try{savedProof=String(sharedShell.RegRead("HKCU\\Software\\ScriptNovaa\\ProjectZ\\DeviceProof")||"")}catch(importProofError){}
+    savedLogin=protectedRegistryReadAt("ProjectZ","LauncherToken");
+    savedProof=protectedRegistryReadAt("ProjectZ","DeviceProof");
   }
   if(!savedLogin||savedProof.length<20){
     setConnectionUi(false);
@@ -584,7 +641,7 @@ function end(reason){
 function init(){window.resizeTo(830,800);$("register").onclick=registerDevice;$("start").onclick=start;$("end").onclick=function(){if(new Date().getTime()<state.manualEndAllowedAt){status("Share Browser is still completing startup. Please wait a moment before ending the session.",false);return}end("USER_ENDED");status("Session ended. The token cannot be reused.",false)};$("theme").onchange=function(){document.body.className=this.value};restoreConnection()}
 window.onbeforeunload=function(){if(state.id){var finishedProfile=state.profile;killAllSelectedBrowserProcesses();removeSessionProfile(finishedProfile);try{api("/api/session/end",{sessionId:state.id,sessionSecret:state.secret,reason:"LAUNCHER_CLOSED"},"")}catch(e){}}};
 </script></head>
-<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.7</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start your timed browser session.</div>
+<body class="vibrant" onload="init()"><div class="shell"><div class="eyebrow">SCRIPTNOVAA PRESENTS &bull; VERSION 1.2.8</div><h1>Share Browser</h1><div class="muted">Paste a token, choose your settings, and start your timed browser session.</div>
 <div id="setup" class="panel"><label>One-time connection code</label><input id="pairing-code" placeholder="XXXXX-XXXXX"><button id="register" class="secondary">Connect this computer</button><p class="muted">Once connected, this launcher remembers the computer. Replacement codes must be requested at scriptnovaa.com/support.</p><label>Share Browser token</label><input id="browser-token" placeholder="SHARE-XXXX-XXXX-XXXX">
 <div class="row"><div class="field"><label>Browser</label><select id="browser"><option value="chrome">Google Chrome</option><option value="edge">Microsoft Edge</option></select></div><div class="field"><label>Appearance</label><select id="theme"><option value="vibrant">Vibrant</option><option value="">Minimal</option></select></div></div>
 <div class="row"><div class="field"><label>Browsing mode</label><select id="preset"><option value="balanced">Balanced</option><option value="privacy">Private</option><option value="minimal">Lightweight</option><option value="protected" selected>Protected</option></select></div><div class="field"><label>Site compatibility</label><select id="user-agent"><option value="default">Standard</option><option value="chromeOs120" selected>ScriptNovaa compatibility</option></select></div></div><div class="browser-warning"><strong>Save your browser work first.</strong> Starting a session closes every open window of the selected browser so the managed session starts cleanly. Closing the managed browser or ending the session closes every remaining process of that browser and removes the temporary profile.</div><button id="start">Start Browser</button><p class="muted">Continuous internet is required. Closing Chrome/Edge, closing this launcher, validation failure, or timeout permanently finishes the token.</p><div id="status"></div></div>

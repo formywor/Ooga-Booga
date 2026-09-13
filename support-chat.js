@@ -4,9 +4,12 @@
   const API = "https://api.scriptnovaa.com";
   const LOGIN_KEY = "scriptnovaaLoginToken";
   const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
+  const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
   const SPEECH_KEY = "scriptnovaaSupportReadAloud";
   const $ = (id) => document.getElementById(id);
-  const token = sessionStorage.getItem(TAB_LOGIN_KEY) || localStorage.getItem(LOGIN_KEY) || "";
+  const remembered = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "";
+  if (!remembered) { localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); }
+  const token = sessionStorage.getItem(TAB_LOGIN_KEY) || remembered;
   if (!token || !$("live-chat-panel")) return;
 
   let activeChat = null;

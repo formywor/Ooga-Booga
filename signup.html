@@ -19,8 +19,8 @@
       <form id="signup-form">
         <div class="robot-trap" aria-hidden="true"><label for="signup-website">Leave this field empty</label><input id="signup-website" tabindex="-1" autocomplete="off"></div>
         <label for="signup-user">Choose your username</label><input id="signup-user" autocomplete="username" pattern="[a-z0-9_]{3,20}" minlength="3" maxlength="20" spellcheck="false" required><p class="field-help">3–20 lowercase letters, numbers, or underscores. This becomes your own public referral name.</p>
-        <label for="signup-pin">PIN — 4 to 8 digits</label><input id="signup-pin" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{4,8}" minlength="4" maxlength="8" required><p class="field-help">Avoid repeated digits, number sequences, birthdays, and common PINs.</p>
-        <label for="signup-pin-confirm">Confirm your PIN</label><input id="signup-pin-confirm" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{4,8}" minlength="4" maxlength="8" required>
+        <label for="signup-pin">PIN — 7 to 14 digits</label><input id="signup-pin" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{7,14}" minlength="7" maxlength="14" required><p class="field-help">Avoid repeated digits, number sequences, birthdays, and common PINs.</p>
+        <label for="signup-pin-confirm">Confirm your PIN</label><input id="signup-pin-confirm" type="password" inputmode="numeric" autocomplete="new-password" pattern="\d{7,14}" minlength="7" maxlength="14" required>
         <div class="referral-explainer"><span>Optional</span><div><label for="signup-ref">Were you invited? Enter that person’s username</label><p>This is <strong>not</strong> where you choose your referral name. Your referral name will be the username you choose above. Enter an existing user’s name here only if they referred you, so both accounts can receive rewards after the safety checks pass.</p></div></div><input id="signup-ref" maxlength="20" autocomplete="off" placeholder="Example: friend_username">
         <button>Create account</button>
       </form>

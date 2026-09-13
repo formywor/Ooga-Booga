@@ -4,12 +4,13 @@
   const API = "https://api.scriptnovaa.com";
   const LOGIN_KEY = "scriptnovaaLoginToken";
   const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
+  const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
   const $ = (id) => document.getElementById(id);
   let activeAccountId = "";
   let administrator = null;
-  const token = () => sessionStorage.getItem(TAB_LOGIN_KEY) || localStorage.getItem(LOGIN_KEY) || "";
+  const token = () => sessionStorage.getItem(TAB_LOGIN_KEY) || (Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "");
   const saveToken = (value) => { sessionStorage.setItem(TAB_LOGIN_KEY, value); };
-  const clearToken = () => { sessionStorage.removeItem(TAB_LOGIN_KEY); localStorage.removeItem(LOGIN_KEY); };
+  const clearToken = () => { sessionStorage.removeItem(TAB_LOGIN_KEY); localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); };
   const escapeHtml = (value) => String(value ?? "").replace(/&/g, "&amp;")
       .replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");

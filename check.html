@@ -25,6 +25,7 @@
       <div><p class="kicker">ScriptNovaa tools</p><h1>Look beneath the writing.</h1><p>Compare several writing-pattern signals and reveal characters that are normally invisible. The result explains what it noticed instead of pretending to know the author with certainty.</p></div>
       <aside><span>MULTI-CHECKER ANALYSIS</span><strong>Local signals<br>Sapling · GPTZero<br>Copyleaks · HF<br>Gemini</strong></aside>
     </section>
+
     <section class="check-workspace">
       <form id="check-form" class="check-editor">
         <div class="check-editor-head"><div><p class="kicker">Text inspector</p><h2>Paste writing to examine</h2></div><span id="character-count">0 / 12,000</span></div>
@@ -33,6 +34,7 @@
         <div class="check-actions"><button id="analyze-button" type="submit">Analyze writing</button><button id="paste-button" class="light-button" type="button">Paste</button><button id="clear-button" class="light-button" type="button">Clear</button></div>
         <div id="check-message" class="message" aria-live="polite"></div>
       </form>
+
       <section id="check-results" class="check-results hidden" aria-live="polite">
         <div class="check-result-head"><div id="score-ring" class="score-ring"><span id="score-value">—</span><small>pattern score</small></div><div><p class="kicker">Combined estimate</p><h2 id="verdict">Waiting for text</h2><p id="confidence"></p></div></div>
         <div class="check-disclaimer"><strong>Not proof of authorship</strong><p id="disclaimer"></p></div>
@@ -50,6 +52,7 @@
         <article class="check-detail improve-card"><h3>Make the writing clearer</h3><p>Use the writing assistant to reduce repetition, add natural flow, and improve specificity while preserving the meaning. It does not promise to bypass detectors.</p><button id="improve-button" type="button">Improve clarity</button><div id="improve-message" class="message" aria-live="polite"></div><div id="improve-result" class="hidden"><textarea id="revised-text" rows="12" readonly></textarea><div class="check-actions"><button id="copy-revision" type="button">Copy revision</button></div><ul id="change-list"></ul></div></article>
       </section>
     </section>
+
     <section class="panel check-explainer"><h2>What this tool can—and cannot—tell you.</h2><div class="feature-grid">
       <article class="feature"><span class="number">01 / PATTERNS</span><h3>AI-like writing signals</h3><p>Sentence uniformity, repeated phrases, vocabulary repetition, formulaic transitions, and results from available online detectors are compared.</p></article>
       <article class="feature"><span class="number">02 / HIDDEN DATA</span><h3>Invisible character scan</h3><p>Zero-width characters, bidirectional controls, Unicode tags, private-use characters, soft hyphens, and other unusual controls are reported with positions.</p></article>
