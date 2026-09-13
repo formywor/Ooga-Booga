@@ -1,6 +1,6 @@
 "use strict";
 
-(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260913-social"; document.head.appendChild(link); })();
+(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260913-notifications"; document.head.appendChild(link); })();
 
 (() => {
   if (window.top !== window.self) {
@@ -456,6 +456,17 @@
       shell.querySelector(".profile-menu header small").textContent = `@${profile.username}`;
       const notificationCount = Number(result.notificationCount || 0);
       shell.querySelector(".profile-notification-count").textContent = notificationCount ? String(notificationCount) : "";
+      if (notificationCount && profile.browserNotifications && "Notification" in window && Notification.permission === "granted") {
+        accountRequest("/api/notifications").then((response) => {
+          const latest = (response.notifications || []).find((item) => !item.readAt);
+          if (!latest) return;
+          const shownKey = `scriptnovaaShownNotification:${profile.accountId}`;
+          if (localStorage.getItem(shownKey) === latest.notificationId) return;
+          const popup = new Notification(latest.title || "ScriptNovaa update", {body: latest.message || "Open ScriptNovaa to review this update.", icon: "/favicon.png", tag: `scriptnovaa-${latest.notificationId}`});
+          popup.onclick = () => { window.focus(); location.href = "/notifications"; };
+          localStorage.setItem(shownKey, latest.notificationId);
+        }).catch(() => {});
+      }
       shell.dataset.accent = profile.accent;
       const unread = shell.querySelector(".profile-unread");
       if (result.unreadCount > 0) {

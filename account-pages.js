@@ -79,16 +79,31 @@
       $("settings-avatar").value = p.avatarId || "nova"; $("settings-privacy").checked = p.privacyMode !== false;
       $("settings-dms").checked = p.allowDirectMessages !== false; $("settings-last-active").checked = p.showLastActive === true;
       $("settings-notifications").checked = p.browserNotifications === true; $("settings-auto-translate").checked = p.autoTranslateChat !== false;
+      $("settings-notification-mode").value = p.notificationMode || "ALL";
+      const notificationCategories = p.notificationCategories || {};
+      $("notify-security").checked = notificationCategories.security !== false;
+      $("notify-chat-safety").checked = notificationCategories.chatSafety !== false;
+      $("notify-private-messages").checked = notificationCategories.privateMessages !== false;
+      $("notify-support").checked = notificationCategories.support !== false;
+      $("notify-announcements").checked = notificationCategories.announcements !== false;
+      $("notify-beta").checked = notificationCategories.beta !== false;
+      $("notify-rewards").checked = notificationCategories.rewards !== false;
       $("settings-chat-language").value = p.chatLanguage || "AUTO"; customAvatar = p.avatarImage || "";
       $("settings-beta-status").value = p.betaStatus || "";
       $("settings-beta-frame").value = p.betaFrame || "none";
       $("settings-beta-layout").value = p.betaLayout || "classic";
       $("settings-beta-font").value = p.betaFont || "default";
       $("settings-beta-effect").value = p.betaEffect || "none";
+      $("settings-profile-song-title").value = p.profileSongTitle || "";
+      $("settings-profile-song-url").value = p.profileSongUrl || "";
+      $("settings-profile-song-autoplay").checked = p.profileSongAutoplay === true;
+      $("settings-profile-song-loop").checked = p.profileSongLoop === true;
       $("beta-avatar-settings").classList.toggle("hidden", !p.betaAccess); $("bio-count").textContent = $("settings-bio").value.length; updateAvatarPreview();
     } catch (error) { message("settings-message", error.message, "error"); }
     $("settings-bio").oninput = () => { $("bio-count").textContent = $("settings-bio").value.length; };
     avatarSelect.onchange = updateAvatarPreview; $("settings-accent").onchange = updateAvatarPreview; $("settings-beta-frame").onchange = updateAvatarPreview;
+    const updateNotificationChoices = () => { $("notification-category-settings").classList.toggle("active", $("settings-notification-mode").value === "CUSTOM"); };
+    $("settings-notification-mode").onchange = updateNotificationChoices; updateNotificationChoices();
     $("settings-avatar-file").onchange = async () => { try { customAvatar = await resizeAvatar($("settings-avatar-file").files[0]); updateAvatarPreview(); message("settings-message", "Picture prepared. Save changes to publish it.", "success"); } catch (error) { message("settings-message", error.message, "error"); } };
     $("remove-custom-avatar").onclick = () => { customAvatar = ""; $("settings-avatar-file").value = ""; updateAvatarPreview(); };
     $("profile-settings-form").onsubmit = async (event) => { event.preventDefault(); try {
@@ -96,9 +111,17 @@
         bio: $("settings-bio").value, accent: $("settings-accent").value, avatarId: $("settings-avatar").value, avatarImage: customAvatar,
         betaStatus: $("settings-beta-status").value, betaFrame: $("settings-beta-frame").value,
         betaLayout: $("settings-beta-layout").value, betaFont: $("settings-beta-font").value,
-        betaEffect: $("settings-beta-effect").value,
+        betaEffect: $("settings-beta-effect").value, profileSongTitle: $("settings-profile-song-title").value,
+        profileSongUrl: $("settings-profile-song-url").value, profileSongAutoplay: $("settings-profile-song-autoplay").checked,
+        profileSongLoop: $("settings-profile-song-loop").checked,
         privacyMode: $("settings-privacy").checked, allowDirectMessages: $("settings-dms").checked,
         showLastActive: $("settings-last-active").checked, browserNotifications: $("settings-notifications").checked,
+        notificationMode: $("settings-notification-mode").value, notificationCategories: {
+          security: $("notify-security").checked, chatSafety: $("notify-chat-safety").checked,
+          privateMessages: $("notify-private-messages").checked, support: $("notify-support").checked,
+          announcements: $("notify-announcements").checked, beta: $("notify-beta").checked,
+          rewards: $("notify-rewards").checked,
+        },
         autoTranslateChat: $("settings-auto-translate").checked, chatLanguage: $("settings-chat-language").value});
       message("settings-message", "Your settings were saved.", "success");
     } catch (error) { message("settings-message", error.message, "error"); } finally { $("save-profile").disabled = false; } };

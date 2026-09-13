@@ -105,8 +105,12 @@
         ${p.bio ? `<p class="profile-card-bio">${escapeHtml(p.bio)}</p>` : ""}
         <dl class="profile-facts"><div class="profile-point-total"><dt>Available points</dt><dd>${Number(p.pointBalance || 0).toLocaleString()}</dd></div><div><dt>Recognition</dt><dd>${escapeHtml(p.pointTierLabel || "MEMBER")}</dd></div><div><dt>Member</dt><dd>${escapeHtml(membership(p.createdAt))}</dd></div><div><dt>Account</dt><dd>${p.accountStatus === "RESTRICTED" ? "Restricted" : "Active"}</dd></div><div><dt>Chat access</dt><dd>${p.chatStatus === "PAUSED" ? "Paused" : "Active"}</dd></div><div><dt>Your controls</dt><dd>${relation.blocked ? "Blocked" : relation.muted ? "Muted" : "None"}</dd></div></dl>
         ${beta ? `<div class="profile-beta-note"><span class="community-badge badge-beta">BETA</span><b>Testing what comes next</b><p>${escapeHtml(p.betaStatus || "This member has early access to selected ScriptNovaa features.")}</p></div>` : ""}
+        ${beta && p.profileSongUrl ? `<div class="profile-song-card"><div><span>PROFILE SOUNDTRACK</span><b>${escapeHtml(p.profileSongTitle || "Beta profile song")}</b></div><audio id="profile-song" controls controlslist="nodownload" preload="none"${p.profileSongLoop ? " loop" : ""} src="${escapeHtml(p.profileSongUrl)}"></audio><small id="profile-song-status">Pressing play loads music from this member's chosen host, which may receive your IP address.</small></div>` : ""}
         <div class="profile-card-actions">${p.isSelf ? `<a class="button-link" href="/account">Open My Account</a>` : `<button type="button" data-profile-action="message" data-user="${escapeHtml(p.username)}">Message</button><button type="button" class="secondary" data-profile-action="${relation.muted ? "UNMUTE" : "MUTE"}" data-user="${escapeHtml(p.username)}">${relation.muted ? "Unmute" : "Mute"}</button><button type="button" class="secondary" data-profile-action="${relation.blocked ? "UNBLOCK" : "BLOCK"}" data-user="${escapeHtml(p.username)}">${relation.blocked ? "Unblock" : "Block"}</button>`}<button type="button" class="secondary" data-profile-action="referral" data-referral="${escapeHtml(p.referralUrl)}">Copy referral link</button></div>
         <p class="profile-safety-note">Block and mute status shown here is private to your account. ScriptNovaa does not publish moderation reasons.</p></section>`;
+      const song = $("profile-song");
+      if (song && p.profileSongAutoplay) song.play().then(() => { $("profile-song-status").textContent = "Now playing this member's Beta profile song."; })
+          .catch(() => { $("profile-song-status").textContent = "Your browser blocked automatic playback. Press play to listen."; });
     } catch (error) { content.innerHTML = `<p class="message error">${escapeHtml(error.message)}</p>`; }
   }
 
@@ -305,6 +309,7 @@
 
   const dialog = $("new-dm-dialog");
   const profileDialog = $("community-profile-dialog");
+  profileDialog.addEventListener("close", () => { const song = $("profile-song"); if (song) { song.pause(); song.currentTime = 0; } });
   $("community-profile-content").addEventListener("click", async (event) => {
     const button = event.target.closest("[data-profile-action]"); if (!button) return;
     try {
