@@ -1,6 +1,6 @@
 "use strict";
 
-(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260912-profile"; document.head.appendChild(link); })();
+(() => { const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/beta-features.css?v=20260913-beta"; document.head.appendChild(link); })();
 
 (() => {
   if (window.top !== window.self) {
@@ -396,6 +396,7 @@
         <a href="/chat"><b>Chat</b><span class="menu-new">NEW</span><small>Public chat and private messages</small></a>
         <a href="/notifications"><b>Notifications</b><span class="profile-notification-count"></span><small>Security and chat updates</small></a>
         <a href="/features"><b>Features</b><small>Explore ScriptNovaa</small></a>
+        <a href="/beta"><b>Beta</b><span class="menu-new">BETA</span><small>Early access and profile rewards</small></a>
         <a href="/status"><b>Status</b><small>Check ScriptNovaa services</small></a>
         <a href="/safety"><b>Safety</b><small>Chat rules and reporting</small></a>
         <a href="/support"><b>Support</b><small>Tickets and live help</small></a>
@@ -433,6 +434,7 @@
       menu.innerHTML = `<a href="/signin"><b>Sign in</b><small>Open your ScriptNovaa account</small></a>
         <a href="/signup"><b>Create account</b><small>Join ScriptNovaa</small></a>
         <a href="/features"><b>Features</b><small>See what is available</small></a>
+        <a href="/beta"><b>Beta</b><small>See early-access benefits</small></a>
         <a href="/terms"><b>Terms of Use</b></a>`;
       return;
     }
