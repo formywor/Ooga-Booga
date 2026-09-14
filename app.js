@@ -538,7 +538,7 @@ function bindTokens() {
       message("redirect-message", "Preparing your sponsored link…");
       const adBlockDetected = await detectAdBlocker();
       const attempt = await request("/api/redirect/start", "POST", {
-        campaignId: "monetag-direct-11435374",
+        campaignId: "monetag-direct-11795557",
         adBlockDetected,
       });
       if (attempt.claimCode) sessionStorage.setItem(`scriptnovaaRewardProof:${attempt.attemptId}`, attempt.claimCode);
