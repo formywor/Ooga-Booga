@@ -5,7 +5,8 @@
   const chatFixes = document.createElement("link"); chatFixes.rel = "stylesheet"; chatFixes.href = "/chat-fixes.css?v=20260912"; document.head.appendChild(chatFixes);
   const state = {profile: null, mode: "public", threadId: "", other: null,
     poll: null, presencePoll: null, loading: false, lastTypingAt: 0, lastActivityAt: Date.now(),
-    translationCache: new Map(), translationSource: new Map(), translationPending: new Set(), translationUnavailable: false};
+    translationCache: new Map(), translationSource: new Map(), translationPending: new Set(), translationUnavailable: false,
+    privateUnlockExpiresAt: 0, privateUnlockMode: "", pendingPrivateThread: null};
   const avatarSymbols = {nova: "S", orbit: "◉", pixel: "◆", bolt: "ϟ", wave: "≋", game: "✦", prism: "◇", comet: "☄", signal: "⌁", crown: "♛", ghost: "◌", crystal: "⬡"};
   const avatar = (id, name) => avatarSymbols[id] || String(name || "S").charAt(0).toUpperCase();
   const avatarMarkup = (image, id, name) => image ? `<img src="${escapeHtml(image)}" alt="">` : escapeHtml(avatar(id, name));
@@ -62,7 +63,8 @@
     } catch (_) {} finally { keys.forEach((key) => state.translationPending.delete(key)); }
   }
 
-  function messageText(key, original, suffix = "") {
+  function messageText(key, original, suffix = "", coded = false) {
+    if (coded) return `<p class="scriptnova-coded"><span class="message-text">${escapeHtml(original).replace(/\n/g, "<br>")}</span>${suffix}<br><span class="encrypted-chip">ScriptNova Language</span></p>`;
     state.translationSource.set(key, original); const translated = state.translationCache.get(key); const shown = translated || original;
     return `<p class="translatable" data-translation-key="${escapeHtml(key)}" data-showing="${translated ? "translated" : "original"}"><span class="message-text">${escapeHtml(shown).replace(/\n/g, "<br>")}</span>${suffix}<button type="button" class="show-original${translated ? "" : " hidden"}" data-action="translation">${translated ? "See original" : "See original"}</button></p>`;
   }
@@ -126,7 +128,7 @@
     replaceMessages(messages.length ? messages.map((item) => {
       const mine = item.senderAccountId === state.profile.accountId;
       const read = mine && Object.keys(item.readBy || {}).some((accountId) => accountId !== item.senderAccountId);
-      return `<article class="private-message tier-${escapeHtml(item.senderPointTier || "standard")} frame-${escapeHtml(item.senderBetaFrame || "none")} ${mine ? "mine" : "theirs"}"><button type="button" class="community-message-avatar profile-open" data-profile-user="${escapeHtml(item.senderUsername)}">${avatarMarkup(item.senderAvatarImage, item.senderAvatarId, item.senderDisplayName)}</button><div><header><button type="button" class="profile-name" data-profile-user="${escapeHtml(item.senderUsername)}">${escapeHtml(item.senderDisplayName || item.senderUsername)}</button>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header>${item.deleted ? "<p><i>Message deleted</i></p>" : messageText(`private:${state.threadId}:${item.messageId}`, item.text, item.editedAt ? " <small>(edited)</small>" : "")}${item.deleted ? "" : `<div class="message-actions"><button data-action="report" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Report</button>${mine ? `<button data-action="edit" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Delete</button>` : `<button data-action="mute" data-user="${escapeHtml(item.senderUsername)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.senderUsername)}">Block</button>`}</div>`}${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
+      return `<article class="private-message tier-${escapeHtml(item.senderPointTier || "standard")} frame-${escapeHtml(item.senderBetaFrame || "none")} ${mine ? "mine" : "theirs"}"><button type="button" class="community-message-avatar profile-open" data-profile-user="${escapeHtml(item.senderUsername)}">${avatarMarkup(item.senderAvatarImage, item.senderAvatarId, item.senderDisplayName)}</button><div><header><button type="button" class="profile-name" data-profile-user="${escapeHtml(item.senderUsername)}">${escapeHtml(item.senderDisplayName || item.senderUsername)}</button>${badges(item.senderBadges)}<time>${escapeHtml(time(item.createdAt))}</time></header>${item.deleted ? "<p><i>Message deleted</i></p>" : messageText(`private:${state.threadId}:${item.messageId}`, item.text, item.editedAt ? " <small>(edited)</small>" : "", item.scriptNovaLanguage === true)}${item.deleted ? "" : `<div class="message-actions"><button data-action="report" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Report</button>${mine && item.scriptNovaLanguage !== true ? `<button data-action="edit" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}" data-text="${escapeHtml(item.text)}">Edit</button><button data-action="delete" data-scope="PRIVATE" data-message="${escapeHtml(item.messageId)}">Delete</button>` : mine ? "" : `<button data-action="mute" data-user="${escapeHtml(item.senderUsername)}">Mute</button><button data-action="block" data-user="${escapeHtml(item.senderUsername)}">Block</button>`}</div>`}${mine ? `<small class="read-receipt">${read ? "READ" : "SENT"}</small>` : ""}</div></article>`;
     }).join("") : `<p class="community-empty">Start a private conversation with ${escapeHtml(state.other?.displayName || "this user")}.</p>`); translateVisible();
   }
 
@@ -148,12 +150,17 @@
     state.loading = true;
     try {
       const result = await request(`/api/community/private/${encodeURIComponent(state.threadId)}/messages`);
+      state.privateUnlockExpiresAt = Number(result.unlockExpiresAt || 0); state.privateUnlockMode = result.unlockMode || "";
+      if (Number(state.profile?.chatBannedUntil || 0) <= Date.now()) {
+        $("community-text").disabled = result.unlockMode !== "FULL";
+        $("community-compose").querySelector("button").disabled = result.unlockMode !== "FULL";
+      }
       renderPrivate(result.messages);
       $("community-typing").textContent = result.typingLabel || "";
       await request(`/api/community/private/${encodeURIComponent(state.threadId)}/read`, "POST", {});
       loadThreads();
       connection(true);
-    } catch (error) { connection(false); message("community-message", error.message, "error"); }
+    } catch (error) { connection(false); if (error.code === "PRIVATE_CHAT_LOCKED") showPrivateLock(); else message("community-message", error.message, "error"); }
     finally { state.loading = false; }
   }
 
@@ -189,18 +196,33 @@
     $("channel-symbol").textContent = "#"; $("channel-title").textContent = "public";
     $("channel-description").textContent = "Messages disappear automatically after 48 hours.";
     $("community-text").placeholder = "Message #public";
+    if (Number(state.profile?.chatBannedUntil || 0) <= Date.now()) { $("community-text").disabled = false; $("community-compose").querySelector("button").disabled = false; }
     $("community-text").value = localStorage.getItem(draftKey()) || ""; updateCharacterCount();
     loadThreads(); loadPublic(); startPolling();
+  }
+
+  function showPrivateLock() {
+    state.privateUnlockExpiresAt = 0; state.privateUnlockMode = "";
+    replaceMessages(`<div class="private-locked"><span class="lock-mark">◆</span><h2>Private messages are locked</h2><p>Enter your PIN to unencrypt this conversation for 15 minutes.</p><button id="open-private-unlock" type="button">Unlock private messages</button></div>`);
+    $("community-text").disabled = true; $("community-compose").querySelector("button").disabled = true;
+    $("open-private-unlock")?.addEventListener("click", openPrivateUnlockDialog);
+  }
+
+  function openPrivateUnlockDialog() {
+    const dialog = $("private-unlock-dialog"); $("private-unlock-pin").value = ""; message("private-unlock-message", "");
+    if (!dialog.open) { if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", ""); }
+    setTimeout(() => $("private-unlock-pin").focus(), 30);
   }
 
   function openThread(threadId, other) {
     state.mode = "private"; state.threadId = threadId; state.other = other;
     $("open-public").classList.remove("active");
     $("channel-symbol").textContent = "@"; $("channel-title").textContent = other.displayName;
-    $("channel-description").textContent = `Private conversation with @${other.username} · administrators can review messages`;
+    $("channel-description").textContent = `Encrypted at rest · private conversation with @${other.username} · authorized administrators can review`;
     $("community-text").placeholder = `Message ${other.displayName}`;
     $("community-text").value = localStorage.getItem(draftKey()) || ""; updateCharacterCount();
-    loadThreads(); loadPrivate(); startPolling();
+    loadThreads(); startPolling();
+    if (state.privateUnlockExpiresAt > Date.now()) loadPrivate(); else { showPrivateLock(); openPrivateUnlockDialog(); }
   }
 
   async function sendTyping() {
@@ -309,6 +331,21 @@
 
   const dialog = $("new-dm-dialog");
   const profileDialog = $("community-profile-dialog");
+  const unlockDialog = $("private-unlock-dialog");
+  $("private-unlock-close").addEventListener("click", () => unlockDialog.close());
+  $("private-unlock-form").addEventListener("submit", async (event) => {
+    event.preventDefault(); const button = $("private-unlock-button");
+    try {
+      button.disabled = true; button.textContent = "Unencrypting…";
+      const result = await request("/api/community/private/unlock", "POST", {pin: $("private-unlock-pin").value});
+      state.privateUnlockExpiresAt = Number(result.expiresAt || 0); state.privateUnlockMode = result.mode || "";
+      unlockDialog.close();
+      replaceMessages(`<div class="private-locked"><div class="crypto-orbit"><i></i><i></i><i></i></div><h2>Unencrypting…</h2><p>Opening your protected conversation.</p></div>`);
+      await loadPrivate();
+      if (result.mode === "DECOY") message("community-message", "ScriptNova Language privacy view is active. Translation tools are unavailable for two days.", "success");
+    } catch (error) { message("private-unlock-message", error.message, "error"); }
+    finally { button.disabled = false; button.textContent = "Unencrypt messages"; }
+  });
   profileDialog.addEventListener("close", () => { const song = $("profile-song"); if (song) { song.pause(); song.currentTime = 0; } });
   $("community-profile-content").addEventListener("click", async (event) => {
     const button = event.target.closest("[data-profile-action]"); if (!button) return;
@@ -349,6 +386,7 @@
   });
   ["pointerdown", "keydown", "mousemove"].forEach((name) => window.addEventListener(name, () => { state.lastActivityAt = Date.now(); }, {passive: true}));
   window.addEventListener("pagehide", () => { if (state.poll) clearInterval(state.poll); if (state.presencePoll) clearInterval(state.presencePoll); request("/api/community/presence", "POST", {state: "OFFLINE"}).catch(() => {}); });
+  setTimeout(() => $("chat-crypto-intro")?.classList.add("done"), 850);
   updateCharacterCount();
   initialize();
 })();

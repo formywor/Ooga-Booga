@@ -89,6 +89,7 @@
       $("notify-beta").checked = notificationCategories.beta !== false;
       $("notify-rewards").checked = notificationCategories.rewards !== false;
       $("settings-chat-language").value = p.chatLanguage || "AUTO"; customAvatar = p.avatarImage || "";
+      $("delete-pin-status").innerHTML = `<b>Status:</b> ${p.deletePinEnabled ? "Enabled" : "Not set"}`;
       $("settings-beta-status").value = p.betaStatus || "";
       $("settings-beta-frame").value = p.betaFrame || "none";
       $("settings-beta-layout").value = p.betaLayout || "classic";
@@ -147,6 +148,27 @@
       } finally {
         button.disabled = false;
       }
+    };
+    $("delete-pin-form").onsubmit = async (event) => {
+      event.preventDefault(); const deletePin = $("delete-pin-new").value;
+      if (deletePin !== $("delete-pin-confirm").value) { message("delete-pin-message", "The two Delete PIN entries do not match.", "error"); return; }
+      const button = event.submitter || $("delete-pin-form").querySelector("button");
+      try {
+        button.disabled = true;
+        await request("/api/account/security/delete-pin", "POST", {action: "SET", currentPin: $("delete-pin-current").value, deletePin});
+        $("delete-pin-form").reset(); $("delete-pin-status").innerHTML = "<b>Status:</b> Enabled";
+        message("delete-pin-message", "Delete PIN saved. Keep it separate from your account PIN.", "success");
+      } catch (error) { message("delete-pin-message", error.message, "error"); } finally { button.disabled = false; }
+    };
+    $("remove-delete-pin").onclick = async () => {
+      const currentPin = $("delete-pin-current").value;
+      if (!currentPin) { message("delete-pin-message", "Enter your current account PIN first.", "error"); return; }
+      try {
+        $("remove-delete-pin").disabled = true;
+        await request("/api/account/security/delete-pin", "POST", {action: "REMOVE", currentPin});
+        $("delete-pin-form").reset(); $("delete-pin-status").innerHTML = "<b>Status:</b> Not set";
+        message("delete-pin-message", "Delete PIN removed.", "success");
+      } catch (error) { message("delete-pin-message", error.message, "error"); } finally { $("remove-delete-pin").disabled = false; }
     };
     const loadRelationships = async () => { try { const result = await request("/api/community/relationships"); $("relationship-list").innerHTML = result.relationships.length ? result.relationships.map((item) => `<div class="security-row"><div><b>${escapeHtml(item.profile?.displayName || "User")}</b><small>@${escapeHtml(item.profile?.username || "unknown")} · ${escapeHtml(item.kind)}</small></div><button type="button" class="secondary undo-relationship" data-user="${escapeHtml(item.profile?.username || "")}" data-action="${item.kind === "BLOCKED" ? "UNBLOCK" : "UNMUTE"}">${item.kind === "BLOCKED" ? "Unblock" : "Unmute"}</button></div>`).join("") : "<p>You have not blocked or muted anyone.</p>"; document.querySelectorAll(".undo-relationship").forEach((button) => button.onclick = async () => { try { await request(`/api/community/relationships/${encodeURIComponent(button.dataset.user)}`, "POST", {action: button.dataset.action}); await loadRelationships(); } catch (error) { message("settings-message", error.message, "error"); } }); } catch (error) { $("relationship-list").textContent = error.message; } };
     loadRelationships();
