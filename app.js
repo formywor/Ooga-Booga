@@ -390,6 +390,15 @@ function bindTokens() {
   }
   let attempts = [];
   let pairingPoll = null;
+  const showBetaPairingQuota = (quota) => {
+    const panel = $("beta-pairing-quota");
+    if (!panel) return;
+    if (!quota) { panel.classList.add("hidden"); return; }
+    panel.classList.remove("hidden");
+    panel.textContent = `BETA CONNECTION BENEFIT · ${quota.available}/4 replacement codes available` +
+      (quota.nextRechargeAt ? ` · next used slot returns ${new Date(quota.nextRechargeAt).toLocaleString()}` :
+        " · each used code returns after 28 days");
+  };
   const stopPairingPoll = () => {
     if (pairingPoll) clearInterval(pairingPoll);
     pairingPoll = null;
@@ -407,8 +416,11 @@ function bindTokens() {
             "That connection code expired. Submit a replacement request through Support.");
         return;
       }
-      const refreshedAccount = await refreshAccountStatus();
-      if (refreshedAccount?.registeredComputer) {
+      const [refreshedAccount, refreshedPairing] = await Promise.all([
+        refreshAccountStatus(), request("/api/device/pairing/current"),
+      ]);
+      showBetaPairingQuota(refreshedPairing.betaReplacement);
+      if (refreshedAccount?.registeredComputer && !refreshedPairing.pairing) {
         stopPairingPoll();
         $("pairing-result").classList.add("hidden");
         $("create-pairing").classList.add("hidden");
@@ -434,6 +446,7 @@ function bindTokens() {
     beginPairingPoll(pairing.expiresAt);
   };
   const displayPairingState = (result) => {
+    showBetaPairingQuota(result.betaReplacement);
     if (result.pairing) {
       displayPairing(result.pairing,
           "Your original connection code was restored. It cannot be changed.");
@@ -446,6 +459,15 @@ function bindTokens() {
       $("pairing-support").classList.add("hidden");
       message("pairing-message",
           "Your computer was connected with an older launcher. Generate this one update code so the new launcher can remember the connection.");
+      return;
+    }
+    if (result.betaReplacementAvailable && result.canGenerate) {
+      $("create-pairing").classList.remove("hidden");
+      $("create-pairing").textContent = "Generate Beta replacement code";
+      $("pairing-support").classList.add("hidden");
+      message("pairing-message",
+          "Beta members may successfully use four replacement codes. Each used slot returns 28 days later.",
+          "success");
       return;
     }
     if (result.registeredComputer) {
@@ -610,8 +632,9 @@ function bindTokens() {
     try {
       $("create-pairing").disabled = true;
       const result = await request("/api/device/pairing/start", "POST");
+      showBetaPairingQuota(result.betaQuota);
       displayPairing(result,
-          "Enter this code in Share Browser. It works once and expires in 10 minutes.");
+          "Enter this code in a ScriptNovaa browser. It works once and expires in 10 minutes.");
     } catch (error) {
       message("pairing-message", error.message, "error");
     } finally {

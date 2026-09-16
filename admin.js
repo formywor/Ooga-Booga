@@ -75,6 +75,8 @@
       `Banned until ${date(account.chatBannedUntil)} · ${account.chatBanSource || "AUTOMATIC"} · ${account.chatWarningCount} warning(s)${account.chatBanReason ? ` · ${account.chatBanReason}` : ""}` :
       `Chat active · ${account.chatWarningCount} warning(s)`;
     $("account-beta-status").textContent = `Direct Beta: ${account.betaProgramStatus || "NONE"} · Developer: ${account.developerProgramStatus || "NONE"}`;
+    const quota = account.betaConnectionCodes || {available: 4, nextRechargeAt: null};
+    $("account-device-status").textContent = `${account.registeredComputer ? "Computer connected" : "No connected computer"} · Beta replacements ${quota.available}/4 available${quota.nextRechargeAt ? ` · next recharge ${date(quota.nextRechargeAt)}` : ""}`;
     $("admin-network-history").innerHTML = account.networkHistory.length ? `<div class="admin-table">${account.networkHistory.map((item) => `<div><code>${escapeHtml(item.networkPrefix)}</code><span>${escapeHtml(item.client)}</span><small>${escapeHtml(date(item.lastUsedAt))}${item.revoked ? " · revoked" : ""}</small></div>`).join("")}</div>` : "<p>No network history recorded yet.</p>";
     $("admin-point-history").innerHTML = account.recentPointTransactions.length ? `<div class="admin-table">${account.recentPointTransactions.map((item) => `<div><strong>${item.amount > 0 ? "+" : ""}${escapeHtml(item.amount)}</strong><span>${escapeHtml(item.type)}</span><small>${escapeHtml(item.reason || date(item.createdAt))}</small></div>`).join("")}</div>` : "<p>No point history recorded.</p>";
   };
@@ -109,6 +111,20 @@
       action: $("account-beta-action").value, reason: $("account-beta-reason").value});
       $("account-beta-reason").value = ""; flash("admin-account-message", "Beta access updated and audited.", "success"); await renderAccount({accountId: activeAccountId}); }
     catch (error) { flash("admin-account-message", error.message, "error"); }
+  };
+  $("account-device-form").onsubmit = async (event) => { event.preventDefault(); if (!activeAccountId) return;
+    const action = $("account-device-action").value;
+    try {
+      const result = await request(`/api/admin/accounts/${encodeURIComponent(activeAccountId)}/device/${action === "CODE" ? "code" : "remove"}`, "POST", {reason: $("account-device-reason").value});
+      $("account-device-reason").value = "";
+      if (action === "CODE") {
+        const displayCode = `${result.pairingCode.slice(0, 5)}-${result.pairingCode.slice(5)}`;
+        flash("account-device-result", `Connection code: ${displayCode} · expires ${date(result.expiresAt)}`, "success");
+      } else {
+        flash("account-device-result", "The connected computer and its launcher sessions were revoked.", "success");
+      }
+      await renderAccount({accountId: activeAccountId});
+    } catch (error) { flash("account-device-result", error.message, "error"); }
   };
 
   const renderTickets = (tickets) => {
