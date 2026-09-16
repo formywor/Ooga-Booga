@@ -207,16 +207,23 @@ let limitedOfferClock = null;
 let tokenConfiguration = null;
 function renderTokenOptions() {
   if (!tokenConfiguration) return;
-  const isZ = $("token-product")?.value === "z";
-  const options = isZ ? tokenConfiguration.projectZ?.tokenOptions || [] : tokenConfiguration.tokenOptions;
+  const product = $("token-product")?.value || "share";
+  const options = product === "z" ? tokenConfiguration.projectZ?.tokenOptions || [] :
+    product === "galaxy" ? tokenConfiguration.galaxy?.tokenOptions || [] : tokenConfiguration.tokenOptions;
   const previous = $("duration").value;
   $("duration").innerHTML = options.map((item) =>
     `<option value="${escapeHtml(item.id)}">${escapeHtml(item.label)}</option>`).join("");
   if (options.some((item) => item.id === previous)) $("duration").value = previous;
   $("create-token").disabled = options.length === 0;
-  if ($("product-notice")) $("product-notice").textContent = isZ ?
-    "Z tokens work only in Project Z on your connected computer. Direct internet; no VPN or FAST surcharge. Two unused tokens maximum across both products." :
-    "Share tokens work only in Share Browser. Two unused tokens maximum across both products.";
+  if ($("product-notice")) $("product-notice").textContent = product === "z" ?
+    "Z tokens work only in Project Z. Direct connection; no VPN or FAST surcharge." :
+    product === "galaxy" ?
+      "Galaxy tokens power Snova Search, the sponsored demonstration, and managed Chrome or Edge. Multi-use options can reopen on this connected computer until their time expires." :
+      "Share tokens work only in Share Browser. Maximum two unused tokens across all products.";
+}
+
+function tokenProductName(product) {
+  return product === "z" ? "Project Z" : product === "galaxy" ? "Galaxy" : "Share";
 }
 
 function showDeviceWelcome(account) {
@@ -279,7 +286,7 @@ async function loadTokens() {
     $("token-list").innerHTML = tokenResult.tokens.length ?
       `<table><thead><tr><th>Token</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead><tbody>${
         tokenResult.tokens.map((token) => {
-          const duration = (token.product === "z" ? "Project Z · " : "Share · ") + (token.durationLabel || `${token.durationHours}h`);
+          const duration = `${tokenProductName(token.product)} · ${token.accessMode === "multi" ? "Multi-use · " : ""}${token.durationLabel || `${token.durationHours}h`}`;
           const displayToken = token.displayToken || "";
           const action = displayToken ?
             `<button class="copy-token light-button" data-token="${escapeHtml(displayToken)}">Copy token</button>` :
@@ -370,7 +377,8 @@ async function refreshAccountStatus() {
 
 function bindTokens() {
   if ($("token-product")) {
-    $("token-product").value = new URLSearchParams(location.search).get("product") === "z" ? "z" : "share";
+    const requestedProduct = new URLSearchParams(location.search).get("product");
+    $("token-product").value = ["z", "galaxy"].includes(requestedProduct) ? requestedProduct : "share";
     $("token-product").onchange = renderTokenOptions;
   }
   loadTokens();
@@ -513,7 +521,7 @@ function bindTokens() {
         product: $("token-product")?.value || "share",
       });
       message("token-message",
-          `${result.product === "z" ? "Project Z" : "Share Browser"} · ${result.durationLabel} token created:\n${result.token}`, "success");
+          `${result.product === "z" ? "Project Z" : result.product === "galaxy" ? "Galaxy Browser" : "Share Browser"} · ${result.durationLabel} token created:\n${result.token}`, "success");
       await loadTokens();
     } catch (error) {
       message("token-message", error.message, "error");
