@@ -77,6 +77,7 @@
     $("account-beta-status").textContent = `Direct Beta: ${account.betaProgramStatus || "NONE"} · Developer: ${account.developerProgramStatus || "NONE"}`;
     const quota = account.betaConnectionCodes || {available: 4, nextRechargeAt: null};
     $("account-device-status").textContent = `${account.registeredComputer ? "Computer connected" : "No connected computer"} · Beta replacements ${quota.available}/4 available${quota.nextRechargeAt ? ` · next recharge ${date(quota.nextRechargeAt)}` : ""}`;
+    let select = $("account-device-target"); if (!select) {select = document.createElement("select"); select.id = "account-device-target"; select.setAttribute("aria-label", "Computer to remove"); $("account-device-form").prepend(select);} select.innerHTML = (account.connectedDeviceIds || []).map((id, i) => `<option value="${escapeHtml(id)}">Computer ${i + 1} — ${escapeHtml(id)}</option>`).join("");
     $("admin-network-history").innerHTML = account.networkHistory.length ? `<div class="admin-table">${account.networkHistory.map((item) => `<div><code>${escapeHtml(item.networkPrefix)}</code><span>${escapeHtml(item.client)}</span><small>${escapeHtml(date(item.lastUsedAt))}${item.revoked ? " · revoked" : ""}</small></div>`).join("")}</div>` : "<p>No network history recorded yet.</p>";
     $("admin-point-history").innerHTML = account.recentPointTransactions.length ? `<div class="admin-table">${account.recentPointTransactions.map((item) => `<div><strong>${item.amount > 0 ? "+" : ""}${escapeHtml(item.amount)}</strong><span>${escapeHtml(item.type)}</span><small>${escapeHtml(item.reason || date(item.createdAt))}</small></div>`).join("")}</div>` : "<p>No point history recorded.</p>";
   };
@@ -115,7 +116,7 @@
   $("account-device-form").onsubmit = async (event) => { event.preventDefault(); if (!activeAccountId) return;
     const action = $("account-device-action").value;
     try {
-      const result = await request(`/api/admin/accounts/${encodeURIComponent(activeAccountId)}/device/${action === "CODE" ? "code" : "remove"}`, "POST", {reason: $("account-device-reason").value});
+      const result = await request(`/api/admin/accounts/${encodeURIComponent(activeAccountId)}/device/${action === "CODE" ? "code" : "remove"}`, "POST", {reason: $("account-device-reason").value, deviceId: $("account-device-target").value});
       $("account-device-reason").value = "";
       if (action === "CODE") {
         const displayCode = `${result.pairingCode.slice(0, 5)}-${result.pairingCode.slice(5)}`;
