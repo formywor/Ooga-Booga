@@ -21,9 +21,11 @@
     cache: "no-store",
   }).then(async (response) => {
     if (response.status === 401) {
+      if (localStorage.getItem(LOGIN_KEY) !== token) return null;
       sessionStorage.removeItem(TAB_LOGIN_KEY);
       localStorage.removeItem(LOGIN_KEY);
       localStorage.removeItem(LOGIN_EXPIRY_KEY);
+      window.dispatchEvent(new Event("scriptnovaa-auth-changed"));
       return null;
     }
     return response.json();

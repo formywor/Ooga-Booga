@@ -299,6 +299,11 @@
         ...(options.headers || {}),
       },
     });
+    if (response.status === 401 && storedLoginToken() === token) {
+      localStorage.removeItem("scriptnovaaLoginToken");
+      localStorage.removeItem("scriptnovaaLoginExpiresAt");
+      window.dispatchEvent(new Event("scriptnovaa-auth-changed"));
+    }
     if (!response.ok) throw new Error("ACCOUNT_UNAVAILABLE");
     return response.json();
   }
@@ -389,7 +394,7 @@
         <span>?</span><i class="profile-unread hidden">0</i>
       </button>
       <div class="profile-menu" hidden>
-        <header><span class="profile-menu-avatar">S</span><div><strong>My Account</strong><small>Signed in</small></div></header>
+        <header><span class="profile-menu-avatar">S</span><div><strong>My Account</strong><small>Checking account…</small></div></header>
         <a href="/account"><b>My Account</b><small>Profile, badges and quick links</small></a>
         <a href="/settings"><b>Settings</b><small>Display and privacy controls</small></a>
         <a href="/chat"><b>Chat</b><span class="menu-new">NEW</span><small>Public chat and private messages</small></a>
@@ -414,6 +419,13 @@
     button.addEventListener("click", (event) => {
       event.stopPropagation();
       toggle();
+    });
+    shell.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        menu.hidden = true;
+        button.setAttribute("aria-expanded", "false");
+        button.focus();
+      }
     });
     document.addEventListener("click", (event) => {
       if (!shell.contains(event.target)) {
@@ -482,7 +494,7 @@
       shell.querySelector(".profile-menu header strong").textContent = username;
       shell.querySelector(".profile-menu header small").textContent = "Community profile temporarily unavailable";
     }).catch(() => {
-      shell.querySelector(".profile-menu header small").textContent = "Sign in again if needed";
+      shell.querySelector(".profile-menu header small").textContent = "Account check unavailable. Try again shortly.";
     }));
   }
 
@@ -522,7 +534,37 @@
     });
   }
 
+  // Keep navigation consistent on every page, including pages restored from history.
+  function syncAccountLinks() {
+    const signedIn = Boolean(storedLoginToken());
+    document.querySelectorAll('a[href="/signin"], a[href="/signup"], a[data-account-link]').forEach((link) => {
+      if (link.closest(".profile-menu") || !link.closest(".site-header, .hero, .hero-actions")) return;
+      if (!link.dataset.accountLink) {
+        link.dataset.accountLink = link.getAttribute("href");
+        link.dataset.accountLabel = link.textContent;
+      }
+      link.setAttribute("href", signedIn ? (link.dataset.accountLink === "/signin" ? "/account" : "/tokens") : link.dataset.accountLink);
+      link.textContent = signedIn ? (link.dataset.accountLink === "/signin" ? "My Account" : "My tokens") : link.dataset.accountLabel;
+    });
+  }
+  let navigationToken = storedLoginToken();
+  function checkAccountChange() {
+    const nextToken = storedLoginToken();
+    if (nextToken !== navigationToken) {
+      // Reload account-bound content as well, never keep the previous user's data visible.
+      location.reload();
+      return;
+    }
+    syncAccountLinks();
+  }
+  window.addEventListener("storage", (event) => {
+    if (!event.key || event.key === "scriptnovaaLoginToken" || event.key === "scriptnovaaLoginExpiresAt") checkAccountChange();
+  });
+  window.addEventListener("pageshow", checkAccountChange);
+  window.addEventListener("scriptnovaa-auth-changed", checkAccountChange);
+  window.setInterval(checkAccountChange, 30000);
   window.ScriptNovaaSite = {copyWithFeedback, accountRequest};
+  syncAccountLinks();
   installMobileNavigation();
   installProfileMenu();
   installContinuityNotice();
