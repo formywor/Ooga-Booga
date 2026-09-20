@@ -1,4 +1,6 @@
-# Personal sites — proposed hosting architecture (not deployed)
+# Personal sites — hosting architecture (not deployed)
+
+September 19: the developer portal, application reviews, address reservation, custom DNS verification, and a separate fixed-template hosting gateway are implemented. See `hosting-gateway/README.md` in the repository for deployment. DNS and HTTPS provisioning remain manual. Independent hosting and arbitrary third-party uploads are not part of this release.
 
 Users may choose a ScriptNovaa subdomain or their own domain. This is separate from the existing GitHub Pages website and Galaxy's local demonstration.
 

@@ -400,6 +400,7 @@
         <a href="/chat"><b>Chat</b><span class="menu-new">NEW</span><small>Public chat and private messages</small></a>
         <a href="/notifications"><b>Notifications</b><span class="profile-notification-count"></span><small>Security and chat updates</small></a>
         <a href="/features"><b>Features</b><small>Explore ScriptNovaa</small></a>
+        <a href="/developerportal"><b>Developer portal</b><small>Applications and managed hosting</small></a>
         <a href="/beta"><b>Beta</b><span class="menu-new">BETA</span><small>Early access and profile rewards</small></a>
         <a href="/status"><b>Status</b><small>Check ScriptNovaa services</small></a>
         <a href="/safety"><b>Safety</b><small>Chat rules and reporting</small></a>
