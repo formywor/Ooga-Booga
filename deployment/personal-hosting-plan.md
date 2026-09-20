@@ -11,7 +11,7 @@ Users may choose a ScriptNovaa subdomain or their own domain. This is separate f
 
 ## Address and security requirements
 
-1. Reserve unique DNS-safe slugs in the database. `iii_dev` could request `iii-dev`, but collisions must be checked, not silently merged. Reserve `www`, `api`, `admin`, `mail`, and other system names.
+1. Reserve unique DNS-safe slugs in the database. `example` could request `example`, but collisions must be checked, not silently merged. Reserve `www`, `api`, `admin`, `mail`, and other system names.
 2. Use a separate multi-tenant hosting service with wildcard TLS and domain routing. Do not point wildcard DNS at GitHub Pages. Existing root website and API routes must remain unchanged.
 3. Verify custom-domain ownership before activation. Issue HTTPS certificates and safely release domain mappings when a site is removed.
 4. Keep arbitrary uploaded HTML/scripts isolated from the main account origin. Use host-only authentication cookies (never domain-wide cookies), explicit allowed origins, no shared credentials, and a separate untrusted-content domain if user scripts are supported.

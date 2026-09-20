@@ -9,10 +9,9 @@
   let activeAccountId = "";
   let administrator = null;
   sessionStorage.removeItem(TAB_LOGIN_KEY);
-  const token = () => Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "";
-  const saveToken = (value) => { localStorage.setItem(LOGIN_KEY, value); localStorage.setItem(LOGIN_EXPIRY_KEY, String(Date.now() + 24 * 60 * 60 * 1000)); };
-  const clearToken = () => { sessionStorage.removeItem(TAB_LOGIN_KEY); localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); };
-  window.addEventListener("storage", (event) => { if (event.key === LOGIN_KEY || event.key === LOGIN_EXPIRY_KEY) location.reload(); });
+  const token = () => window.ScriptNovaaAuth.token();
+  const saveToken = value => window.ScriptNovaaAuth.save(value);
+  const clearToken = expected => window.ScriptNovaaAuth.clear(expected);
   const escapeHtml = (value) => String(value ?? "").replace(/&/g, "&amp;")
       .replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
@@ -37,19 +36,22 @@
     $("admin-identity").textContent = `${administrator.displayName} · ${administrator.role}`;
   };
   const verify = async () => {
-    if (!token()) return;
+    const originalToken=token();
+    if (!originalToken) return;
     try { revealDashboard(await request("/api/admin/me")); await refreshQueues(); }
-    catch (error) { if (error.status === 401) clearToken(); flash("admin-login-message", error.message, "error"); }
+    catch (error) { if (error.status === 401) clearToken(originalToken); flash("admin-login-message", error.message, "error"); }
   };
   $("admin-login-form").onsubmit = async (event) => {
     event.preventDefault();
+    let attemptedToken = token();
     try {
       const login = await request("/api/login", "POST", {username: $("admin-username").value,
         pin: $("admin-pin").value, clientDescription: navigator.userAgent});
       saveToken(login.loginToken);
+      attemptedToken = login.loginToken;
       revealDashboard(await request("/api/admin/me"));
       await refreshQueues();
-    } catch (error) { clearToken(); flash("admin-login-message", error.message, "error"); }
+    } catch (error) { if(error.status === 401) clearToken(attemptedToken); flash("admin-login-message", error.message, "error"); }
   };
   $("admin-signout").onclick = async () => { try { await request("/api/logout", "POST"); } catch (error) {} clearToken(); location.reload(); };
   document.querySelectorAll("[data-admin-tab]").forEach((button) => button.onclick = () => {

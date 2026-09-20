@@ -273,18 +273,7 @@
   }
 
   function storedLoginToken() {
-    try {
-      sessionStorage.removeItem("scriptnovaaTabLoginToken");
-      const expiresAt = Number(localStorage.getItem("scriptnovaaLoginExpiresAt") || 0);
-      if (expiresAt <= Date.now()) {
-        localStorage.removeItem("scriptnovaaLoginToken");
-        localStorage.removeItem("scriptnovaaLoginExpiresAt");
-        return "";
-      }
-      return localStorage.getItem("scriptnovaaLoginToken") || "";
-    } catch (error) {
-      return "";
-    }
+    return window.ScriptNovaaAuth.token();
   }
 
   async function accountRequest(path, options = {}) {
@@ -300,8 +289,7 @@
       },
     });
     if (response.status === 401 && storedLoginToken() === token) {
-      localStorage.removeItem("scriptnovaaLoginToken");
-      localStorage.removeItem("scriptnovaaLoginExpiresAt");
+      window.ScriptNovaaAuth.clear(token);
       window.dispatchEvent(new Event("scriptnovaa-auth-changed"));
     }
     if (!response.ok) throw new Error("ACCOUNT_UNAVAILABLE");
@@ -558,9 +546,6 @@
     }
     syncAccountLinks();
   }
-  window.addEventListener("storage", (event) => {
-    if (!event.key || event.key === "scriptnovaaLoginToken" || event.key === "scriptnovaaLoginExpiresAt") checkAccountChange();
-  });
   window.addEventListener("pageshow", checkAccountChange);
   window.addEventListener("scriptnovaa-auth-changed", checkAccountChange);
   window.setInterval(checkAccountChange, 30000);

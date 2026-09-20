@@ -5,9 +5,8 @@
   const LOGIN_KEY = "scriptnovaaLoginToken";
   const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
   const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
-  const remembered = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ?
-    localStorage.getItem(LOGIN_KEY) || "" : "";
-  if (!remembered) { localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); }
+  const remembered = window.ScriptNovaaAuth.token();
+  
   sessionStorage.removeItem(TAB_LOGIN_KEY);
   const token = remembered;
   if (!token) return;
@@ -21,10 +20,9 @@
     cache: "no-store",
   }).then(async (response) => {
     if (response.status === 401) {
-      if (localStorage.getItem(LOGIN_KEY) !== token) return null;
+      if (window.ScriptNovaaAuth.token() !== token) return null;
       sessionStorage.removeItem(TAB_LOGIN_KEY);
-      localStorage.removeItem(LOGIN_KEY);
-      localStorage.removeItem(LOGIN_EXPIRY_KEY);
+      window.ScriptNovaaAuth.clear(token);
       window.dispatchEvent(new Event("scriptnovaa-auth-changed"));
       return null;
     }

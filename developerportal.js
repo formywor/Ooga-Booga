@@ -6,7 +6,7 @@
   async function action(button, fn) {button.disabled = true; try {await fn();} catch (error) {status(error.message);} finally {button.disabled = false;}}
   // Preserve useful API validation messages without ever rendering user HTML.
   async function send(path, body) {
-    const token = localStorage.getItem("scriptnovaaLoginToken");
+    const token = window.ScriptNovaaAuth.token();
     const response = await fetch(`https://api.scriptnovaa.com${path}`, {method:"POST", headers:{"Content-Type":"application/json", Authorization:`Bearer ${token || ""}`}, body:JSON.stringify(body), cache:"no-store"});
     const result = await response.json(); if (!response.ok) throw new Error(result.error || "Request failed."); return result;
   }

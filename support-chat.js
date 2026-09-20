@@ -7,8 +7,8 @@
   const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
   const SPEECH_KEY = "scriptnovaaSupportReadAloud";
   const $ = (id) => document.getElementById(id);
-  const remembered = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "";
-  if (!remembered) { localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); }
+  const remembered = window.ScriptNovaaAuth.token();
+  
   sessionStorage.removeItem(TAB_LOGIN_KEY);
   const token = remembered;
   if (!token || !$("live-chat-panel")) return;

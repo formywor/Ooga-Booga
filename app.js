@@ -14,33 +14,17 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/'/g, "&#039;");
 
 function currentLogin() {
-  const persistentLogin = localStorage.getItem(LOGIN_KEY) || "";
-  const expiresAt = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0);
-  if (!persistentLogin || expiresAt <= Date.now()) {
-    localStorage.removeItem(LOGIN_KEY);
-    localStorage.removeItem(LOGIN_EXPIRY_KEY);
-    return "";
-  }
-  sessionStorage.removeItem(TAB_LOGIN_KEY);
-  return persistentLogin;
+  return window.ScriptNovaaAuth.token();
 }
 
 function saveLogin(loginToken, remember = false) {
-  sessionStorage.removeItem(TAB_LOGIN_KEY);
-  localStorage.setItem(LOGIN_KEY, loginToken);
-  localStorage.setItem(LOGIN_EXPIRY_KEY,
-      String(Date.now() + (remember ? 30 : 1) * 24 * 60 * 60 * 1000));
+  window.ScriptNovaaAuth.save(loginToken, remember);
 }
 
-function clearLogin() {
-  sessionStorage.removeItem(TAB_LOGIN_KEY);
-  localStorage.removeItem(LOGIN_KEY);
-  localStorage.removeItem(LOGIN_EXPIRY_KEY);
+function clearLogin(expected) {
+  window.ScriptNovaaAuth.clear(expected);
 }
 
-window.addEventListener("storage", (event) => {
-  if (event.key === LOGIN_KEY || event.key === LOGIN_EXPIRY_KEY) location.reload();
-});
 
 async function request(path, method = "GET", body) {
   const headers = {"Content-Type": "application/json"};
@@ -64,6 +48,7 @@ async function request(path, method = "GET", body) {
     }
     const error = new Error(result.error || "Request failed.");
     error.status = response.status;
+    error.loginToken = login;
     error.code = result.code || "";
     error.gate = result.gate || null;
     throw error;
@@ -87,9 +72,11 @@ function requireLogin() {
 }
 
 async function redirectSignedInUser() {
-  if (!currentLogin()) return;
+  const originalLogin = currentLogin();
+  if (!originalLogin) return;
   try {
     const result = await request("/api/account/gate");
+    if (currentLogin() !== originalLogin) return;
     if (result.gate?.type === "RECOVERY_CONFIRMATION") {
       location.replace("/backup-code");
     } else if (result.gate?.type === "RESTRICTION") {
@@ -98,7 +85,7 @@ async function redirectSignedInUser() {
       location.replace("/tokens");
     }
   } catch (error) {
-    if (error.status === 401) clearLogin();
+    if (error.status === 401) clearLogin(originalLogin);
   }
 }
 
@@ -297,7 +284,7 @@ async function loadTokens() {
       "<p>You have not created any tokens yet.</p>";
   } catch (error) {
     if (/Authentication/i.test(error.message)) {
-      clearLogin();
+      clearLogin(error.loginToken);
       location.replace("/signin");
       return;
     }
@@ -368,7 +355,7 @@ async function refreshAccountStatus() {
     return result.account;
   } catch (error) {
     if (error.status === 401 || /Authentication/i.test(error.message)) {
-      clearLogin();
+      clearLogin(error.loginToken);
       location.replace("/signin");
     }
     return false;
@@ -748,7 +735,7 @@ function bindSupport() {
       message("ticket-list-message", "");
     } catch (error) {
       if (error.status === 401 || /Authentication/i.test(error.message)) {
-        clearLogin();
+        clearLogin(error.loginToken);
         location.replace("/signin");
         return;
       }

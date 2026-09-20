@@ -7,9 +7,8 @@
   const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
   const RECOVERY_DISPLAY_KEY = "scriptnovaaPendingRecoveryCode";
   const $ = (id) => document.getElementById(id);
-  window.addEventListener("storage", (event) => { if (event.key === LOGIN_KEY || event.key === LOGIN_EXPIRY_KEY) location.reload(); });
-  const remembered = Number(localStorage.getItem(LOGIN_EXPIRY_KEY) || 0) > Date.now() ? localStorage.getItem(LOGIN_KEY) || "" : "";
-  if (!remembered) { localStorage.removeItem(LOGIN_KEY); localStorage.removeItem(LOGIN_EXPIRY_KEY); }
+  const remembered = window.ScriptNovaaAuth.token();
+  
   sessionStorage.removeItem(TAB_LOGIN_KEY);
   const token = remembered;
   if (!token) {
