@@ -13,7 +13,7 @@
   async function load() {
     const data = await api("/api/developer/portal");
     el("portal-account").hidden = false;
-    status(data.hostingEnabled ? "Your portal is ready. Sites still require individual approval." : "Applications are open. Managed hosting is awaiting infrastructure setup.");
+    status(data.hostingEnabled ? "Hosting is available. Check your site's status below; custom domains also need DNS, HTTPS and administrator activation." : "Applications are open. Managed hosting is awaiting infrastructure setup.");
     el("program-list").replaceChildren();
     for (const item of Object.values(data.requests)) {const row = text(el("program-list"), "article", ""); row.className="portal-record"; text(row,"strong",`${item.type} · ${item.status}`); text(row,"p",item.reason || "Awaiting administrator review.");}
     if (!Object.keys(data.requests).length) text(el("program-list"),"p","No applications yet.");
@@ -21,6 +21,15 @@
     el("verify-domain").hidden = !data.site?.customDomain;
     if (data.site) {text(el("hosting-site"),"h3",`${data.site.slug}.scriptnovaa.com · ${data.site.status}`); if(data.site.reviewReason) text(el("hosting-site"),"p",data.site.reviewReason); for(const record of data.site.dns) text(el("hosting-site"),"code",`${record.type} ${record.name}\n${record.value}`); if(data.site.customDomain) text(el("hosting-site"),"p", data.site.domainVerifiedAt ? "DNS verified. Hosting and HTTPS approval are separate." : "DNS not verified yet."); el("launch-slug").value=data.site.slug;}
     el("program-admin").hidden = !data.administrator;
+    if (data.site?.customDomain) {
+      const help = text(el("hosting-site"), "section", "");
+      text(help, "h4", "How to enter these records in Namecheap");
+      text(help, "p", "The names above are full DNS names, not necessarily the Host text to paste. Namecheap adds the domain you are managing automatically. Remove that domain and its preceding dot from each Host; use @ when nothing remains. Keep the entire Value unchanged.");
+      text(help, "p", "Example: while managing example.com, play.example.com uses CNAME Host play, and _scriptnovaa.play.example.com uses TXT Host _scriptnovaa.play. For example.com itself, the TXT Host is _scriptnovaa.");
+      text(help, "p", "Recommended: use a subdomain such as play.example.com to keep your existing website and email unchanged. Do not add a CNAME beside A or AAAA records at the same name. Root-domain routing needs provider-specific setup; our current automated check expects a visible CNAME and cannot verify flattened ALIAS records.");
+      text(help, "h4", "DNS is only the first step");
+      text(help, "p", "1. Save the two records at your authoritative DNS provider and check them here. 2. ScriptNovaa staff must attach your exact hostname to the hosting service and provision HTTPS. 3. An administrator activates the reservation. 4. Start Galaxy and use Open timed site. Adding DNS alone does not upload your old website or activate hosting.");
+    }
     if(data.administrator) await reviews();
   }
   async function reviews() {
