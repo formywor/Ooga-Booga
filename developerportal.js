@@ -3,6 +3,7 @@
   const el = id => document.getElementById(id), api = window.ScriptNovaaSite.accountRequest;
   const status = text => {el("portal-status").textContent = text;};
   function text(parent, tag, value) {const node = document.createElement(tag); node.textContent = value; parent.append(node); return node;}
+  function copyField(parent,label,value){text(parent,"p",label);text(parent,"code",value);const button=text(parent,"button",`Copy ${label}`);button.type="button";button.onclick=async()=>{try{await navigator.clipboard.writeText(value);button.textContent="Copied!";setTimeout(()=>{button.textContent=`Copy ${label}`;},2000);}catch{status("Copy was blocked by your browser. Select the text above and copy it manually.");}};}
   async function action(button, fn) {button.disabled = true; try {await fn();} catch (error) {status(error.message);} finally {button.disabled = false;}}
   // Preserve useful API validation messages without ever rendering user HTML.
   async function send(path, body) {
@@ -19,16 +20,18 @@
     if (!Object.keys(data.requests).length) text(el("program-list"),"p","No applications yet.");
     el("hosting-form").hidden = Boolean(data.site); el("hosting-site").replaceChildren();
     el("verify-domain").hidden = !data.site?.customDomain;
-    if (data.site) {text(el("hosting-site"),"h3",`${data.site.slug}.scriptnovaa.com · ${data.site.status}`); if(data.site.reviewReason) text(el("hosting-site"),"p",data.site.reviewReason); for(const record of data.site.dns) text(el("hosting-site"),"code",`${record.type} ${record.name}\n${record.value}`); if(data.site.customDomain) text(el("hosting-site"),"p", data.site.domainVerifiedAt ? "DNS verified. Hosting and HTTPS approval are separate." : "DNS not verified yet."); el("launch-slug").value=data.site.slug;}
+    if (data.site) {text(el("hosting-site"),"h3",`${data.site.customDomain || data.site.slug+".scriptnovaa.com"} · ${data.site.status}`); if(data.site.reviewReason) text(el("hosting-site"),"p",data.site.reviewReason); if(data.site.customDomain) text(el("hosting-site"),"p", data.site.domainVerifiedAt ? "DNS check passed. Staff must still verify routing and HTTPS before activation." : "DNS not verified yet.");}
     el("program-admin").hidden = !data.administrator;
     if (data.site?.customDomain) {
       const help = text(el("hosting-site"), "section", "");
-      text(help, "h4", "How to enter these records in Namecheap");
-      text(help, "p", "The names above are full DNS names, not necessarily the Host text to paste. Namecheap adds the domain you are managing automatically. Remove that domain and its preceding dot from each Host; use @ when nothing remains. Keep the entire Value unchanged.");
-      text(help, "p", "Example: while managing example.com, play.example.com uses CNAME Host play, and _scriptnovaa.play.example.com uses TXT Host _scriptnovaa.play. For example.com itself, the TXT Host is _scriptnovaa.");
-      text(help, "p", "Recommended: use a subdomain such as play.example.com to keep your existing website and email unchanged. Do not add a CNAME beside A or AAAA records at the same name. Root-domain routing needs provider-specific setup; our current automated check expects a visible CNAME and cannot verify flattened ALIAS records.");
+      text(help, "h4", "1. Open your domain's DNS settings");
+      text(help, "p", "Use the company that currently manages your nameservers—not necessarily where you bought the domain. Look for DNS records, Manage DNS or DNS zone. Do not change nameservers or unrelated website/email records.");
+      text(help, "p", "Providers label fields differently: Host / Name, and Value / Content / Target. Some append your zone name automatically; others require the full DNS name. Use the matching name below, not both. TTL can stay Automatic or the provider's default.");
+      for(const record of data.site.dns){const card=text(help,"article","");card.className="portal-record";text(card,"h4",`Add a ${record.type} record`);text(card,"p",`Click Add record, choose ${record.type}, then copy the fields below. Save the record.`);copyField(card,"full DNS name",record.name);if(record.host)copyField(card,"relative Host / Name",record.host);else text(card,"p","If your provider appends the zone, remove that zone and its preceding dot from the full DNS name; use @ for the zone itself. Example: _scriptnovaa.play.example.com becomes _scriptnovaa.play inside example.com.");copyField(card,record.type==="TXT"?"TXT value / Content":"CNAME target",record.value);}
+      if(data.site.domainKind==="ROOT")text(help,"p","Root domain: add only the TXT ownership record for now. Contact Support for the hosting provider's exact A/AAAA or ALIAS routing records after the hostname is attached. Do not create a root CNAME or replace existing website records blindly. Ownership verification alone does not finish root-domain setup.");
+      else text(help,"p","The CNAME must not coexist with A/AAAA records at the same host. If your DNS provider offers proxying, choose DNS-only for this verification. Leave other hostnames and email records alone.");
       text(help, "h4", "DNS is only the first step");
-      text(help, "p", "1. Save the two records at your authoritative DNS provider and check them here. 2. ScriptNovaa staff must attach your exact hostname to the hosting service and provision HTTPS. 3. An administrator activates the reservation. 4. Start Galaxy and use Open timed site. Adding DNS alone does not upload your old website or activate hosting.");
+      text(help, "p", "2. Save your records, then click Check my DNS records. Updates may take time to appear. 3. Staff attach your hostname, check routing and provision HTTPS. 4. An administrator activates hosting. Adding DNS does not upload your old website or list it as a sponsor; sponsor content needs a separate review.");
     }
     if(data.administrator) await reviews();
   }
@@ -51,10 +54,12 @@
     }
   }
   el("program-form").onsubmit=e=>{e.preventDefault();action(e.currentTarget.querySelector("button"),async()=>{await send("/api/developer/requests",{type:el("program-type").value,message:el("program-message").value});el("program-message").value="";await load();});};
-  el("hosting-form").onsubmit=e=>{e.preventDefault();action(e.currentTarget.querySelector("button"),async()=>{await send("/api/developer/site",{slug:el("hosting-slug").value,customDomain:el("hosting-domain").value});await load();});};
+  function domainChoice(){const own=el("hosting-type").value!=="SCRIPTNOVAA";el("custom-domain-fields").hidden=!own;el("hosting-domain").required=own;el("hosting-zone").required=own;el("personal-address-label").textContent=own?"Internal project name (not an extra domain)":"Your ScriptNovaa address";el("scriptnovaa-suffix").hidden=own;}
+  el("hosting-type").onchange=domainChoice;domainChoice();
+  el("hosting-form").onsubmit=e=>{e.preventDefault();action(e.currentTarget.querySelector("button"),async()=>{const own=el("hosting-type").value!=="SCRIPTNOVAA";await send("/api/developer/site",{slug:el("hosting-slug").value,customDomain:own?el("hosting-domain").value:"",domainKind:el("hosting-type").value,dnsZone:own?el("hosting-zone").value:""});await load();});};
   el("verify-domain").onclick=()=>action(el("verify-domain"),async()=>{await send("/api/developer/domain/verify",{});await load();});
   el("review-refresh").onclick=()=>action(el("review-refresh"),reviews);
-  el("hosting-launch").onsubmit=e=>{e.preventDefault();action(e.currentTarget.querySelector("button"),async()=>{const result=await send("/api/hosting/launch",{slug:el("launch-slug").value});el("hosting-link").replaceChildren();const link=text(el("hosting-link"),"a","Open your timed site (keep this private)");link.href=result.url;link.target="_blank";link.rel="noopener noreferrer";});};
-  const target=new URLSearchParams(location.search).get("site");if(target)el("launch-slug").value=target;
+
+
   load().catch(error=>{status(error.message === "SIGNED_OUT" ? "Sign in to apply and manage your space." : "The portal could not load. Check your connection and that the updated API is deployed.");el("portal-signin").hidden=false;});
 })();

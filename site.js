@@ -550,6 +550,29 @@
   window.addEventListener("scriptnovaa-auth-changed", checkAccountChange);
   window.setInterval(checkAccountChange, 30000);
   window.ScriptNovaaSite = {copyWithFeedback, accountRequest};
+  // A sandboxed sponsor embed must not display account controls from its parent.
+  if (window.top === window.self) {
+    let websiteNotice, websiteNoticeBusy = false;
+    async function refreshWebsiteNotice() {
+      if (websiteNoticeBusy || document.hidden) return;
+      if (!storedLoginToken()) {websiteNotice?.remove(); websiteNotice=null; return;}
+      websiteNoticeBusy=true;
+      try {
+        const {session}=await accountRequest("/api/website/session");
+        websiteNotice?.remove(); websiteNotice=null;
+        if(session){
+          websiteNotice=document.createElement("aside");websiteNotice.className="panel";websiteNotice.setAttribute("aria-label","Active website session");
+          const label=document.createElement("p");label.textContent=`You have an active session: ${session.sponsor.name}.`;
+          const visit=document.createElement("a");visit.href="/sponsors";visit.textContent="Visit your site";
+          const end=document.createElement("button");end.type="button";end.textContent="End session";end.style.marginLeft="16px";
+          end.onclick=async()=>{end.disabled=true;try{await accountRequest("/api/website/session/end",{method:"POST",body:JSON.stringify({sessionId:session.id})});websiteNotice?.remove();websiteNotice=null;}catch{end.disabled=false;label.textContent="Could not end the website session. Please try again.";}};
+          websiteNotice.append(label,visit,end);(document.querySelector("main")||document.body).prepend(websiteNotice);
+        }
+      } catch {websiteNotice?.remove();websiteNotice=null;} finally {websiteNoticeBusy=false;}
+    }
+    refreshWebsiteNotice();setInterval(refreshWebsiteNotice,60000);
+    document.addEventListener("visibilitychange",refreshWebsiteNotice);
+  }
   syncAccountLinks();
   installMobileNavigation();
   installProfileMenu();

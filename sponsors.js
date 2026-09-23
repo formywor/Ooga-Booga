@@ -1,0 +1,16 @@
+"use strict";
+(() => {
+  const el=id=>document.getElementById(id);let current=null,shown="",busy=false,revision=0,refreshing=false;
+  async function api(path,body){const token=window.ScriptNovaaAuth.token();if(!token)throw new Error("Sign in to start or view your website session.");const r=await fetch("https://api.scriptnovaa.com"+path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:body?JSON.stringify(body):undefined,cache:"no-store"});const data=await r.json();if(!r.ok)throw new Error(data.error||"Request failed.");return data;}
+  function clear(){current=null;shown="";el("sponsor-view").replaceChildren();el("sponsor-end").hidden=el("sponsor-external").hidden=true;}
+  function show(session){if(!session){clear();return;}current=session;el("sponsor-end").hidden=false;el("sponsor-status").textContent="You have an active website session. No timer is running.";el("sponsor-external").hidden=false;el("sponsor-external").href=session.sponsor.url;
+    const key=session.id+session.sponsor.url+session.sponsor.mode;if(shown===key)return;shown=key;el("sponsor-view").replaceChildren();
+    if(session.sponsor.mode==="embed"){const frame=document.createElement("iframe");frame.title=session.sponsor.name;frame.referrerPolicy="no-referrer";frame.setAttribute("sandbox","allow-scripts allow-forms allow-popups");frame.style.cssText="width:100%;height:70vh;border:1px solid #ccd3e0;margin-top:20px;border-radius:12px";frame.src=session.sponsor.url;el("sponsor-view").append(frame);}
+  }
+  async function run(fn){if(busy)return;busy=true;revision++;el("sponsor-start").disabled=true;try{await fn();}catch(e){el("sponsor-status").textContent=e.message;}finally{busy=false;el("sponsor-start").disabled=false;}}
+  el("sponsor-start").onclick=()=>run(async()=>show((await api("/api/website/session/start",{sponsorId:el("sponsor-choice").value})).session));
+  el("sponsor-end").onclick=()=>run(async()=>{if(current)await api("/api/website/session/end",{sessionId:current.id});clear();el("sponsor-status").textContent="Website session ended.";});
+  async function refresh(){if(busy||refreshing||document.hidden)return;refreshing=true;const expected=revision;try{const data=await api("/api/website/session");if(expected===revision)show(data.session);}catch(e){if(expected===revision){clear();el("sponsor-status").textContent=e.message;}}finally{refreshing=false;}}
+  fetch("https://api.scriptnovaa.com/api/sponsors",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("Sponsor list unavailable.");return r.json();}).then(data=>{const chosen=new URLSearchParams(location.search).get("sponsor");for(const s of data.sponsors){const o=document.createElement("option");o.value=s.id;o.textContent=s.name;el("sponsor-choice").append(o);}if(data.sponsors.some(s=>s.id===chosen))el("sponsor-choice").value=chosen;el("sponsor-choice").onchange=()=>{el("sponsor-description").textContent=data.sponsors.find(s=>s.id===el("sponsor-choice").value)?.description||"";};el("sponsor-choice").onchange();el("sponsor-status").textContent="Choose a sponsor, then start your session.";refresh();}).catch(e=>{el("sponsor-status").textContent=e.message;el("sponsor-start").disabled=true;});
+  setInterval(refresh,30000);document.addEventListener("visibilitychange",refresh);
+})();
