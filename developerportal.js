@@ -20,7 +20,20 @@
     if (!Object.keys(data.requests).length) text(el("program-list"),"p","No applications yet.");
     el("hosting-form").hidden = Boolean(data.site); el("hosting-site").replaceChildren();
     el("verify-domain").hidden = !data.site?.customDomain;
-    if (data.site) {text(el("hosting-site"),"h3",`${data.site.customDomain || data.site.slug+".scriptnovaa.com"} · ${data.site.status}`); if(data.site.reviewReason) text(el("hosting-site"),"p",data.site.reviewReason); if(data.site.customDomain) text(el("hosting-site"),"p", data.site.domainVerifiedAt ? "DNS check passed. Staff must still verify routing and HTTPS before activation." : "DNS not verified yet.");}
+    if (data.site) {
+      text(el("hosting-site"),"h3",`${data.site.customDomain || data.site.slug+".scriptnovaa.com"} · ${data.site.status}`);
+      if(data.site.reviewReason) text(el("hosting-site"),"p",data.site.reviewReason);
+      if(data.site.customDomain) {
+        const verified=Boolean(data.site.domainVerifiedAt);
+        const awaitingReview=["PENDING","APPROVED"].includes(data.site.status);
+        const message=!verified ? "DNS not verified yet. Add the records below, then click Check my DNS records."
+          : awaitingReview ? "Your domain is waiting for approval from an administrator. It has passed the DNS check. Estimated review time: around 15 minutes to 2 days; this is not guaranteed. Staff will check hosting, routing and HTTPS before activation."
+          : data.site.status === "ACTIVE" ? "Your domain has passed the DNS check and is approved for hosting."
+          : "Your domain previously passed the DNS check, but hosting is not active. See the administrator's decision above or contact Support.";
+        const notice=text(el("hosting-site"),"p",message);notice.setAttribute("role","status");
+        text(el("hosting-site"),"p","HTTPS is required for managed website sessions to protect session access. A DNS check confirms domain ownership, not that hosting or its certificate is ready.");
+      }
+    }
     el("program-admin").hidden = !data.administrator;
     if (data.site?.customDomain) {
       const help = text(el("hosting-site"), "section", "");
