@@ -3,8 +3,26 @@
   const el = id => document.getElementById(id), api = window.ScriptNovaaSite.accountRequest;
   const status = text => {el("portal-status").textContent = text;};
   function text(parent, tag, value) {const node = document.createElement(tag); node.textContent = value; parent.append(node); return node;}
-  function copyField(parent,label,value){text(parent,"p",label);text(parent,"code",value);const button=text(parent,"button",`Copy ${label}`);button.type="button";button.onclick=async()=>{try{await navigator.clipboard.writeText(value);button.textContent="Copied!";setTimeout(()=>{button.textContent=`Copy ${label}`;},2000);}catch{status("Copy was blocked by your browser. Select the text above and copy it manually.");}};}
-  async function action(button, fn) {button.disabled = true; try {await fn();} catch (error) {status(error.message);} finally {button.disabled = false;}}
+  function localStatus(button, message) {
+    let notice=button.nextElementSibling;
+    if(!notice?.classList.contains("action-status")){notice=document.createElement("p");notice.className="action-status";notice.setAttribute("role","status");notice.setAttribute("aria-live","polite");button.after(notice);}
+    notice.textContent=message;
+    return notice;
+  }
+  function copyField(parent,label,value){text(parent,"p",label);text(parent,"code",value);const button=text(parent,"button",`Copy ${label}`);button.type="button";button.onclick=async()=>{try{await navigator.clipboard.writeText(value);localStatus(button,"Copied to clipboard.");button.textContent="Copied!";setTimeout(()=>{button.textContent=`Copy ${label}`;},2000);}catch{localStatus(button,"Copy was blocked by your browser. Select the text above and copy it manually.");}};}
+  async function action(button, fn) {
+    if(button.disabled)return;
+    const form=button.closest("form"), fallback=button.closest(".portal-record")?.parentElement;
+    const notice=localStatus(button,"Please wait…");button.disabled=true;
+    try {notice.textContent=await fn() || "Done. Your information is up to date.";}
+    catch(error){notice.textContent=error.message;}
+    finally {
+      button.disabled=false;
+      // Keep feedback visible if a successful action hides its form or refreshes its row.
+      if(form?.hidden)form.after(notice);
+      else if(!notice.isConnected && fallback?.isConnected)fallback.prepend(notice);
+    }
+  }
   // Preserve useful API validation messages without ever rendering user HTML.
   async function send(path, body) {
     const token = window.ScriptNovaaAuth.token();
@@ -47,6 +65,7 @@
       text(help, "p", "2. Save your records, then click Check my DNS records. Updates may take time to appear. 3. Staff attach your hostname, check routing and provision HTTPS. 4. An administrator activates hosting. Adding DNS does not upload your old website or list it as a sponsor; sponsor content needs a separate review.");
     }
     if(data.administrator) await reviews();
+    return data;
   }
   async function reviews() {
     const data = await api("/api/admin/program-requests");
@@ -70,7 +89,7 @@
   function domainChoice(){const own=el("hosting-type").value!=="SCRIPTNOVAA";el("custom-domain-fields").hidden=!own;el("hosting-domain").required=own;el("hosting-zone").required=own;el("personal-address-label").textContent=own?"Internal project name (not an extra domain)":"Your ScriptNovaa address";el("scriptnovaa-suffix").hidden=own;}
   el("hosting-type").onchange=domainChoice;domainChoice();
   el("hosting-form").onsubmit=e=>{e.preventDefault();action(e.currentTarget.querySelector("button"),async()=>{const own=el("hosting-type").value!=="SCRIPTNOVAA";await send("/api/developer/site",{slug:el("hosting-slug").value,customDomain:own?el("hosting-domain").value:"",domainKind:el("hosting-type").value,dnsZone:own?el("hosting-zone").value:""});await load();});};
-  el("verify-domain").onclick=()=>action(el("verify-domain"),async()=>{await send("/api/developer/domain/verify",{});await load();});
+  el("verify-domain").onclick=()=>action(el("verify-domain"),async()=>{await send("/api/developer/domain/verify",{});const data=await load();return ["PENDING","APPROVED"].includes(data.site?.status) ? "DNS check passed. Your domain is waiting for approval from an administrator. Estimated review time: around 15 minutes to 2 days; this is not guaranteed." : data.site?.status === "ACTIVE" ? "DNS check passed. Your domain is approved for hosting." : "DNS check passed. Hosting is not active; see the administrator decision or contact Support.";});
   el("review-refresh").onclick=()=>action(el("review-refresh"),reviews);
 
 
