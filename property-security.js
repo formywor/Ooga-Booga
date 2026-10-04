@@ -35,7 +35,7 @@ function render(){
     for(const i of [response,g,n,...Object.values(inputs)])i.onchange=change;
     const buttons=document.createElement("div");buttons.className="row";
     const pair=document.createElement("button");pair.textContent="Pair phone";pair.onclick=async()=>{try{const j=await request("/pair",{cameraId:cfg.id});const payload=btoa(unescape(encodeURIComponent(JSON.stringify({id:cfg.id,name:cfg.name,location:cfg.location,token:j.token,iceServers:j.iceServers}))));$("pairPanel").hidden=false;$("pairLink").value=location.origin+"/camerainput#"+payload;}catch(e){error(e);}};
-    const connect=document.createElement("button");connect.textContent="Connect / reconnect";connect.onclick=()=>connectCamera(c).catch(error);
+    const connect=document.createElement("button");connect.textContent="Connect / reconnect";connect.onclick=async()=>{if(c.connecting)return;c.connecting=true;connect.disabled=true;connect.textContent="Connecting…";try{await connectCamera(c);}catch(e){error(e);}finally{c.connecting=false;connect.disabled=false;connect.textContent="Connect / reconnect";}};
     const rec=document.createElement("button");rec.textContent="Record test clip";rec.onclick=()=>record(c).catch(error);
     const remove=document.createElement("button");remove.textContent="Remove";remove.onclick=()=>{disarm();configs=configs.filter(v=>v.id!==cfg.id);save();render();};buttons.append(pair,connect,rec,remove);card.append(buttons);$("cameras").append(card);$("cameraSelect").add(new Option(cfg.name+" · "+cfg.location,cfg.id));
   }
