@@ -44,7 +44,8 @@ window.ScriptNovaaRemote = (() => {
   byId('remote-fullscreen').onclick=()=>{if(document.fullscreenElement===panel)document.exitFullscreen().catch(e=>report(e.message));else panel.requestFullscreen().catch(()=>report('Full screen is unavailable in this browser. The large remote view still works.'));};
   byId('remote-close').onclick=()=>{keyboard.checked=false;panel.hidden=true;if(document.fullscreenElement===panel)document.exitFullscreen().catch(()=>{});};
   byId('remote-stop').onclick=stop;
-  byId('remote-zoom').onchange=e=>byId('remote-stage').classList.toggle('actual-size',e.target.value==='actual');
+  const savedZoom=localStorage.getItem('scriptnovaaFamilyZoom')==='actual'?'actual':'fit';byId('remote-zoom').value=savedZoom;byId('remote-stage').classList.toggle('actual-size',savedZoom==='actual');
+  byId('remote-zoom').onchange=e=>{localStorage.setItem('scriptnovaaFamilyZoom',e.target.value);byId('remote-stage').classList.toggle('actual-size',e.target.value==='actual');};
   byId('remote-type').onclick=()=>{const value=byId('remote-text').value;if(!/^[\x20-\x7e]{0,300}$/.test(value))return report('Typing currently supports up to 300 English/ASCII characters.');send({type:'text',text:value});byId('remote-text').value='';};
   panel.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>send({type:'key',key:b.dataset.key}));
   panel.querySelectorAll('[data-scroll]').forEach(b=>b.onclick=()=>send({type:'scroll',amount:Number(b.dataset.scroll)}));
