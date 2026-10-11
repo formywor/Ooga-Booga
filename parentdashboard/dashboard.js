@@ -47,7 +47,7 @@ function text(tag,value,cls){const n=document.createElement(tag);n.textContent=v
 
 function button(label,fn,cls='secondary'){const n=text('button',label,cls);n.onclick=()=>action(async()=>{n.disabled=true;try{await fn();await refresh();}finally{n.disabled=false;}});return n;}
 
-async function refresh(){if(!grant||refreshing)return;refreshing=true;try{const state=await api('state');remote.update(state.devices);if(!settingsDirty&&!savingSettings)$('automatic').checked=state.settings.automaticReview===true;const fragment=document.createDocumentFragment();
+async function refresh(preserve=false){if(!grant||refreshing)return;refreshing=true;try{const state=await api('state');remote.update(state.devices);if(preserve&&(['INPUT','BUTTON','SELECT','TEXTAREA'].includes(document.activeElement.tagName)||document.querySelector('#devices details[open]')))return;if(!settingsDirty&&!savingSettings)$('automatic').checked=state.settings.automaticReview===true;const fragment=document.createDocumentFragment();
 
 for(const d of state.devices){const card=text('section','','card'),title=text('div','','device-title');title.append(text('h3',d.name),text('span',Date.now()/1000-d.lastSeen<20?'Connected':'Offline',Date.now()/1000-d.lastSeen<20?'badge':'badge offline'));card.append(title,text('p','Screen: '+(d.status.screen||'Not reported')+'\nAudio: '+(d.status.audio||'Not reported')+'\nCaptions: '+(d.status.captions||'No completed English captions received')+'\nExtension: '+(d.status.extension?'Connected':'Not connected')+(d.status.error?'\n'+d.status.error:'')+'\nApp: '+(d.version||'Unknown')+'\nUpdates: '+(d.status.updates||'Update status not reported — install 0.3.0'),'details'));
 
@@ -70,5 +70,5 @@ fragment.append(card);}if(!state.devices.length)fragment.append(text('p','No com
 
 // Do not rebuild inputs during typing. Active remote sessions refresh more often.
 
-setInterval(()=>{if(grant&&(remote.active||!['INPUT','BUTTON','SELECT','TEXTAREA'].includes(document.activeElement.tagName)&&!document.querySelector('#devices details[open]')))action(refresh);},2000);
+setInterval(()=>{if(grant&&(remote.active||!['INPUT','BUTTON','SELECT','TEXTAREA'].includes(document.activeElement.tagName)&&!document.querySelector('#devices details[open]')))action(()=>refresh(true));},2000);
 
