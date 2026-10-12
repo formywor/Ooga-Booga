@@ -27,8 +27,9 @@ $('signin').onclick=()=>action(()=>unlock(true));$('unlock').onclick=()=>action(
 
 $('logout').onclick=()=>action(async()=>{try{await remote.stop();await api('lock',{});}finally{forget();window.ScriptNovaaAuth?.clear(token);token='';showLogin();$('devices').replaceChildren();}});
 
-$('pair').onclick=()=>action(async()=>{$('code').textContent=(await api('pairing',{})).code;});
+$('pair').onclick=()=>action(async()=>{$('code').textContent=(await api('pairing',{})).code;$('copy-code').hidden=false;});
 
+$('copy-code').onclick=()=>action(async()=>{const code=$('code').textContent;if(!code)throw Error('Create a pairing code first.');await navigator.clipboard.writeText(code);$('message').textContent='Pairing code copied.';});
 $('test-pair').onclick=()=>action(async()=>{$('test-code').textContent=(await api('pairing',{test:true})).code;$('message').textContent='Test code ready. Paste it into the app’s Test this PC with the website dashboard screen.';});
 
 $('copy-test-code').onclick=()=>action(async()=>{const code=$('test-code').textContent;if(!code)throw Error('Create a test code first.');await navigator.clipboard.writeText(code);$('message').textContent='Test code copied.';});
