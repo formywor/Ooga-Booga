@@ -7,6 +7,10 @@ window.ScriptNovaaControls={build(d,api,refresh,text,button){
  function field(key,label,type,value){const row=text('label',label),el=document.createElement('input');el.type=type;if(type==='checkbox')el.checked=value;else el.value=value;inputs[key]=el;row.append(el);form.append(row);return el;}
  field('screenEnabled','Visual protection','checkbox',p.screenEnabled!==false);
  field('audioEnabled','Playback speech protection','checkbox',p.audioEnabled!==false);
+ field('slursEnabled','Include slur vocabulary (English)','checkbox',p.slursEnabled!==false);
+ field('earlyCaptionPause','Pause before a matching upcoming subtitle (where available)','checkbox',p.earlyCaptionPause===true);
+ field('blockExplicitTracks','Pause Spotify tracks labelled explicit','checkbox',p.blockExplicitTracks===true);
+ form.append(text('p','Early pauses are precautionary and sent for review, not confirmed speech blocks. Subtitles must be available; protected audio cannot be extracted. Desktop Spotify can be reported, but individual-song browser blocks require the web player. App and extension 0.3.5 are required.','small'));
  field('captionsEnabled','Caption corroboration','checkbox',p.captionsEnabled!==false);
  function select(key,label,options,value){const row=text('label',label),el=document.createElement('select');for(const [v,title]of options){const n=text('option',title);n.value=v;el.append(n);}el.value=value;inputs[key]=el;row.append(el);form.append(row);}
  select('visualMode','Visual checks',[['balanced','Balanced: context-sensitive findings go to review'],['strict','Strict: repeated breast-only findings may block']],p.visualMode||'balanced');
@@ -22,7 +26,7 @@ window.ScriptNovaaControls={build(d,api,refresh,text,button){
  const save=text('button','Save this computer’s settings'),status=text('p','','small');save.type='submit';form.append(save,status);
  const list=v=>v.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
  form.onsubmit=async e=>{e.preventDefault();save.disabled=true;status.textContent='Saving…';try{
- const policy={screenEnabled:inputs.screenEnabled.checked,audioEnabled:inputs.audioEnabled.checked,captionsEnabled:inputs.captionsEnabled.checked,visualMode:inputs.visualMode.value,customWords:list(inputs.customWords.value),allowedWords:list(inputs.allowedWords.value),retentionDays:Number(inputs.retentionDays.value),quietHours:{enabled:inputs.scheduled.checked,start:inputs.start.value,end:inputs.end.value,timezone:inputs.timezone.value.trim(),days:list(inputs.days.value).map(Number),domains:list(inputs.domains.value)}};
+ const policy={screenEnabled:inputs.screenEnabled.checked,audioEnabled:inputs.audioEnabled.checked,captionsEnabled:inputs.captionsEnabled.checked,slursEnabled:inputs.slursEnabled.checked,earlyCaptionPause:inputs.earlyCaptionPause.checked,blockExplicitTracks:inputs.blockExplicitTracks.checked,visualMode:inputs.visualMode.value,customWords:list(inputs.customWords.value),allowedWords:list(inputs.allowedWords.value),retentionDays:Number(inputs.retentionDays.value),quietHours:{enabled:inputs.scheduled.checked,start:inputs.start.value,end:inputs.end.value,timezone:inputs.timezone.value.trim(),days:list(inputs.days.value).map(Number),domains:list(inputs.domains.value)}};
  await api('device/settings',{device:d.id,policy});status.textContent='Saved. Applies on the next connection.';
  }catch(e){status.textContent='Not saved: '+e.message;}finally{save.disabled=false;}};
  box.append(form);
