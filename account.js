@@ -116,12 +116,12 @@
       if(user){if(!account||account.uid!==user.uid)throw Error('Your account is still loading. Open your account and try again.');const token=await user.getIdToken();if(auth.currentUser?.uid!==user.uid)throw Error('Your account changed. Please try again.');headers.set('Authorization','Bearer '+token);}
       return fetch(url,{...options,headers});
     },
-    async savePreferences(improve){
+    async savePreferences(patch){
       if(!account||!auth?.currentUser)throw Error('Sign in required');
-      const user=auth.currentUser;const response=await window.NebulaAuth.authorizedFetch(API+'/account',{method:'PATCH',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify({improve}),signal:AbortSignal.timeout(15000)});
-      if(!response.ok||auth.currentUser?.uid!==user.uid)throw Error('Preferences unavailable');const data=await response.json();account=data.account;showAccount();return account;
+      const user=auth.currentUser;const response=await window.NebulaAuth.authorizedFetch(API+'/account',{method:'PATCH',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify(typeof patch==='boolean'?{improve:patch}:patch),signal:AbortSignal.timeout(15000)});
+      if(!response.ok||auth.currentUser?.uid!==user.uid)throw Error('Preferences unavailable');const data=await response.json();account=data.account;showAccount();window.dispatchEvent(new CustomEvent('nebula:account-change',{detail:{account}}));return account;
     },
-    updatePreferenceView(improve){if(account){account.improve=improve;showAccount();}},
+    updatePreferenceView(improve){if(account){account.improve=improve;showAccount();window.dispatchEvent(new CustomEvent('nebula:account-change',{detail:{account}}));}},
   };
   setMode('signin');showAccount();initialize().catch(()=>{});
 })();
