@@ -1,817 +1,200 @@
-"use strict";
-
-const API = "https://api.scriptnovaa.com";
-const LOGIN_KEY = "scriptnovaaLoginToken";
-const TAB_LOGIN_KEY = "scriptnovaaTabLoginToken";
-const LOGIN_EXPIRY_KEY = "scriptnovaaLoginExpiresAt";
-const RECOVERY_DISPLAY_KEY = "scriptnovaaPendingRecoveryCode";
-const $ = (id) => document.getElementById(id);
-const escapeHtml = (value) => String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-function currentLogin() {
-  return window.ScriptNovaaAuth.token();
-}
-
-function saveLogin(loginToken, remember = false) {
-  window.ScriptNovaaAuth.save(loginToken, remember);
-}
-
-function clearLogin(expected) {
-  window.ScriptNovaaAuth.clear(expected);
-}
-
-
-async function request(path, method = "GET", body) {
-  const headers = {"Content-Type": "application/json"};
-  const login = currentLogin();
-  if (login) headers.Authorization = `Bearer ${login}`;
-  const response = await fetch(API + path, {
-    method,
-    headers,
-    cache: "no-store",
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  const result = await response.json().catch(() => ({
-    error: "The server returned an invalid response.",
-  }));
-  if (!response.ok || result.ok === false) {
-    if (result.gate?.type === "RESTRICTION") {
-      location.replace(`/${String(result.gate.status || "banned").toLowerCase()}`);
-    } else if (result.gate?.type === "RECOVERY_CONFIRMATION" &&
-        location.pathname.replace(/\.html$/i, "") !== "/support") {
-      location.replace("/backup-code");
-    }
-    const error = new Error(result.error || "Request failed.");
-    error.status = response.status;
-    error.loginToken = login;
-    error.code = result.code || "";
-    error.gate = result.gate || null;
-    throw error;
-  }
-  return result;
-}
-
-function message(id, text, kind = "") {
-  const node = $(id);
-  if (!node) return;
-  node.textContent = text;
-  node.className = `message ${kind}`;
-}
-
-function requireLogin() {
-  if (!currentLogin()) {
-    location.href = "/signin";
-    return false;
-  }
-  return true;
-}
-
-async function redirectSignedInUser() {
-  const originalLogin = currentLogin();
-  if (!originalLogin) return;
+'use strict';
+(() => {
+  const $ = (selector) => document.querySelector(selector);
+  const KEY = 'nebula.workspace.v1';
+  const SETTINGS_KEY = 'nebula.settings.v1';
+  const MAX_CHATS = 100;
+  const API = 'https://api.scriptnovaa.com/api/nebula';
+  const DATA_KEY = 'nebula.data-token.v1';
+  let archivedView = false, menuId = null, deleteChatId = null;
+  let dataToken = '';
+  try { dataToken = localStorage.getItem(DATA_KEY) || ''; } catch {}
+  if (!/^[a-f0-9]{64}$/.test(dataToken)) { dataToken = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2,'0')).join(''); try { localStorage.setItem(DATA_KEY,dataToken); } catch {} }
+  let chats = [], activeId = null, settings = { improve: false, theme: 'dark' };
+  let pending = null, renameId = null, storageFailed = false;
+  const validMessage = m => m && ['user', 'assistant'].includes(m.role) && typeof m.content === 'string' && m.content.length <= 100000;
   try {
-    const result = await request("/api/account/gate");
-    if (currentLogin() !== originalLogin) return;
-    if (result.gate?.type === "RECOVERY_CONFIRMATION") {
-      location.replace("/backup-code");
-    } else if (result.gate?.type === "RESTRICTION") {
-      location.replace(`/${String(result.gate.status || "banned").toLowerCase()}`);
-    } else {
-      location.replace("/tokens");
-    }
-  } catch (error) {
-    if (error.status === 401) clearLogin(originalLogin);
+    const stored = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (Array.isArray(stored)) chats = stored.filter(c => c && typeof c.id === 'string' && typeof c.title === 'string' && Array.isArray(c.messages)).slice(0, MAX_CHATS).map(c => ({ id: c.id, title: c.title.slice(0, 100), updated: Number(c.updated) || 0, archived: c.archived === true, messages: c.messages.filter(validMessage).slice(-200).map(m => ({...m, trainingEligible: m.trainingEligible === true, id: typeof m.id === 'string' ? m.id : crypto.randomUUID()})) }));
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    if (saved && typeof saved === 'object') settings = { improve: saved.improve === true, theme: ['dark','light','system'].includes(saved.theme) ? saved.theme : 'dark' };
+    // Rewrite old settings so legacy developer fields are removed.
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch { storageFailed = true; settings.improve = false; }
+  function saveChats() {
+    try { localStorage.setItem(KEY, JSON.stringify(chats)); storageFailed = false; }
+    catch { storageFailed = true; notice('Browser storage is unavailable or full. Export your chats to keep a copy.'); }
   }
-}
-
-function bindSignup() {
-  redirectSignedInUser();
-  const signupStartedAt = Date.now();
-  let signupChallengePromise = request("/api/signup/challenge", "POST", {});
-  const solveSignupChallenge = async (challenge) => {
-    if (!window.crypto?.subtle || typeof TextEncoder === "undefined") throw new Error("Your browser cannot complete the account safety check. Update your browser and try again.");
-    const prefix = "0".repeat(Number(challenge.difficulty || 3)); const encoder = new TextEncoder();
-    for (let solution = 0; solution <= 9999999; solution += 1) {
-      const digest = await crypto.subtle.digest("SHA-256", encoder.encode(`${challenge.nonce}:${solution}`));
-      const hex = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-      if (hex.startsWith(prefix)) return String(solution);
-    }
-    throw new Error("Account safety verification failed. Reload the page and try again.");
-  };
-  const referral = new URLSearchParams(location.search).get("ref");
-  if (referral) $("signup-ref").value = referral;
-  $("signup-form").onsubmit = async (event) => {
-    event.preventDefault();
-    try {
-      if ($("signup-pin").value !== $("signup-pin-confirm").value) {
-        throw new Error("The two PIN entries do not match.");
-      }
-      const button = event.submitter || $("signup-form").querySelector("button");
-      button.disabled = true;
-      button.textContent = "Completing safety check…";
-      let challenge = await signupChallengePromise;
-      if (new Date(challenge.expiresAt).getTime() < Date.now() + 5000) {
-        signupChallengePromise = request("/api/signup/challenge", "POST", {});
-        challenge = await signupChallengePromise;
-      }
-      const challengeSolution = await solveSignupChallenge(challenge);
-      button.textContent = "Creating your account…";
-      const result = await request("/api/signup", "POST", {
-        username: $("signup-user").value,
-        pin: $("signup-pin").value,
-        referralUsername: $("signup-ref").value,
-        clientDescription: navigator.userAgent,
-        website: $("signup-website")?.value || "",
-        signupStartedAt,
-        challengeId: challenge.challengeId,
-        challengeBucket: challenge.challengeBucket,
-        challengeSolution,
-      });
-      saveLogin(result.loginToken, false);
-      sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.recoveryCode);
-      location.replace("/backup-code");
-    } catch (error) {
-      if (["SIGNUP_CHALLENGE_REQUIRED", "SIGNUP_CHALLENGE_INVALID"].includes(error.code)) signupChallengePromise = request("/api/signup/challenge", "POST", {});
-      message("signup-message", error.message, "error");
-      const button = $("signup-form").querySelector("button");
-      button.disabled = false;
-      button.textContent = "Create account";
-    }
-  };
-}
-
-function bindSignin() {
-  redirectSignedInUser();
-  $("signin-form").onsubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const result = await request("/api/login", "POST", {
-        username: $("signin-user").value,
-        pin: $("signin-pin").value,
-        clientDescription: navigator.userAgent,
-      });
-      saveLogin(result.loginToken, Boolean($("signin-remember")?.checked));
-      if (result.securityWarning) sessionStorage.setItem("scriptnovaaSecurityWarning", result.securityWarning);
-      if (result.gate?.type === "RECOVERY_CONFIRMATION") {
-        location.replace("/backup-code");
-      } else if (result.gate?.type === "RESTRICTION") {
-        location.replace(`/${String(result.gate.status || "banned").toLowerCase()}`);
-      } else {
-        location.replace("/tokens");
-      }
-    } catch (error) {
-      message("signin-message", error.message, "error");
-    }
-  };
-}
-
-function bindRecovery() {
-  $("recovery-form").onsubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const result = await request("/api/recover", "POST", {
-        username: $("recovery-user").value,
-        recoveryCode: $("recovery-code").value,
-        newPin: $("recovery-pin").value,
-        clientDescription: navigator.userAgent,
-      });
-      clearLogin();
-      saveLogin(result.loginToken, false);
-      sessionStorage.setItem(RECOVERY_DISPLAY_KEY, result.newRecoveryCode);
-      location.replace("/backup-code");
-    } catch (error) {
-      message("recovery-message", error.message, "error");
-    }
-  };
-}
-
-let limitedOfferClock = null;
-let tokenConfiguration = null;
-function renderTokenOptions() {
-  if (!tokenConfiguration) return;
-  const product = $("token-product")?.value || "share";
-  const options = product === "z" ? tokenConfiguration.projectZ?.tokenOptions || [] :
-    product === "galaxy" ? tokenConfiguration.galaxy?.tokenOptions || [] : tokenConfiguration.tokenOptions;
-  const previous = $("duration").value;
-  $("duration").innerHTML = options.map((item) =>
-    `<option value="${escapeHtml(item.id)}">${escapeHtml(item.label)}</option>`).join("");
-  if (options.some((item) => item.id === previous)) $("duration").value = previous;
-  $("create-token").disabled = options.length === 0;
-  if ($("product-notice")) $("product-notice").textContent = product === "z" ?
-    "Z tokens work only in Project Z. Direct connection; no VPN or FAST surcharge." :
-    product === "galaxy" ?
-      "Galaxy tokens power Snova Search, the sponsored demonstration, and managed Chrome or Edge. Multi-use options can reopen on this connected computer until their time expires." :
-      "Share tokens work only in Share Browser. Maximum two unused tokens across all products.";
-}
-
-function tokenProductName(product) {
-  return product === "z" ? "Project Z" : product === "galaxy" ? "Galaxy" : "Share";
-}
-
-function showDeviceWelcome(account) {
-  const welcome = $("device-welcome");
-  if (!welcome) return;
-  welcome.classList.toggle("hidden", !account.deviceSetupNoticePending);
-}
-
-function showLimitedOffer(config, account) {
-  const offer = $("limited-offer");
-  if (!offer) return;
-  if (limitedOfferClock) {
-    clearInterval(limitedOfferClock);
-    limitedOfferClock = null;
+  function current() { return chats.find(c => c.id === activeId); }
+  function notice(text, connectionLink = false) {
+    const el = $('#notice'); el.textContent = text;
+    if (connectionLink) { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Settings'; b.onclick = openSettings; el.append(' ', b); }
   }
-  if (!config.limitedOffer?.active || account.limitedFreeTokenClaimed) {
-    offer.classList.add("hidden");
-    return;
+  function applyTheme() {
+    document.documentElement.dataset.theme = settings.theme === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : settings.theme;
   }
-  const endsAt = new Date(config.limitedOffer.endsAt).getTime();
-  const update = () => {
-    const remaining = Math.max(0, endsAt - Date.now());
-    if (!remaining) {
-      offer.classList.add("hidden");
-      clearInterval(limitedOfferClock);
-      limitedOfferClock = null;
-      return;
-    }
-    const totalMinutes = Math.floor(remaining / 60000);
-    const days = Math.floor(totalMinutes / 1440);
-    const hours = Math.floor((totalMinutes % 1440) / 60);
-    const minutes = totalMinutes % 60;
-    $("limited-countdown").textContent = `${days}d ${hours}h ${minutes}m`;
-  };
-  offer.classList.remove("hidden");
-  update();
-  limitedOfferClock = setInterval(update, 60000);
-}
-
-async function loadTokens() {
-  if (!requireLogin()) return;
-  try {
-    const [accountResult, config, tokenResult] = await Promise.all([
-      request("/api/account"),
-      request("/api/public-config"),
-      request("/api/tokens"),
-    ]);
-    const account = accountResult.account;
-    $("points").textContent = account.pointBalance;
-    $("pending").textContent = account.pendingPointBalance;
-    $("referral").textContent = account.referralCode;
-    $("device").textContent =
-      account.registeredComputer ? "Registered" : "Not registered";
-    $("device").className = account.registeredComputer ?
-      "stat device-connected" : "stat";
-    showDeviceWelcome(account);
-    tokenConfiguration = config;
-    renderTokenOptions();
-    showLimitedOffer(config, account);
-    $("token-list").innerHTML = tokenResult.tokens.length ?
-      `<table><thead><tr><th>Token</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead><tbody>${
-        tokenResult.tokens.map((token) => {
-          const duration = `${tokenProductName(token.product)} · ${token.accessMode === "multi" ? "Multi-use · " : ""}${token.durationLabel || `${token.durationHours}h`}`;
-          const displayToken = token.displayToken || "";
-          const action = displayToken ?
-            `<button class="copy-token light-button" data-token="${escapeHtml(displayToken)}">Copy token</button>` :
-            "";
-          return `<tr><td><code>${escapeHtml(displayToken || "Hidden after use")}</code></td><td>${escapeHtml(duration)}</td><td>${escapeHtml(token.status)}</td><td>${action}</td></tr>`;
-        }).join("")
-      }</tbody></table>` :
-      "<p>You have not created any tokens yet.</p>";
-  } catch (error) {
-    if (/Authentication/i.test(error.message)) {
-      clearLogin(error.loginToken);
-      location.replace("/signin");
-      return;
-    }
-    message("dashboard-message", error.message, "error");
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', applyTheme);
+  function updateConnection(verified = false) {
+    $('#connection-label').textContent = verified ? 'Nebula AI' : 'Early access';
+    $('#connection-button').classList.toggle('verified', verified);
+    $('#footnote-status').textContent = settings.improve ? 'Sharing for future training is on. Change in settings.' : 'Your chats are not shared for training.';
   }
-}
-
-async function detectAdBlocker() {
-  const bait = document.createElement("div");
-  bait.className = "adsbox ad-banner ad-unit sponsored-ad";
-  bait.setAttribute("aria-hidden", "true");
-  bait.style.cssText =
-    "position:absolute;left:-10000px;top:-10000px;width:1px;height:1px;";
-  document.body.appendChild(bait);
-  await new Promise((resolve) => requestAnimationFrame(() =>
-    requestAnimationFrame(resolve)));
-  const baitStyle = getComputedStyle(bait);
-  const baitBlocked =
-    bait.offsetHeight === 0 ||
-    bait.offsetWidth === 0 ||
-    baitStyle.display === "none" ||
-    baitStyle.visibility === "hidden";
-  bait.remove();
-
-  return baitBlocked;
-}
-
-function remainingText(milliseconds) {
-  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${String(seconds).padStart(2, "0")}`;
-}
-
-function renderPendingClaims(attempts) {
-  const list = $("claim-list");
-  if (!attempts.length) {
-    list.innerHTML = "<p class=\"empty-claims\">No sponsored rewards are waiting to be claimed.</p>";
-    return;
+  function closeSidebar() { $('.sidebar').classList.remove('open'); $('.scrim').hidden = true; $('#sidebar-toggle').setAttribute('aria-expanded','false'); }
+  $('#sidebar-toggle').onclick = () => { const open = !$('.sidebar').classList.contains('open'); $('.sidebar').classList.toggle('open', open); $('.scrim').hidden = !open; $('#sidebar-toggle').setAttribute('aria-expanded',String(open)); };
+  $('.scrim').onclick = closeSidebar;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); if (e.altKey && e.key.toLowerCase() === 'n') { e.preventDefault(); newChat(); } });
+  function newChat() { abort(); archivedView = false; activeId = null; $('#prompt').value = ''; resize(); notice(''); render(); closeSidebar(); $('#prompt').focus(); }
+  $('.new-chat').onclick = newChat;
+  function renderHistory() {
+    const nav = $('#conversations'); nav.replaceChildren();
+    const query = $('#search').value.toLowerCase().trim();
+    const filtered = [...chats].sort((a,b) => b.updated-a.updated).filter(c => Boolean(c.archived) === archivedView).filter(c => c.title.toLowerCase().includes(query) || c.messages.some(m => m.content.toLowerCase().includes(query)));
+    $('#chat-count').textContent = String(chats.filter(c => !c.archived).length);
+    $('#archive-count').textContent = String(chats.filter(c => c.archived).length);
+    $('#archive-view').firstChild.textContent = archivedView ? 'Back to conversations ' : 'Archived chats ';
+    $('#archive-view').setAttribute('aria-pressed',String(archivedView));
+    if (!filtered.length) { const p = document.createElement('p'); p.className = 'empty-history'; p.textContent = query ? 'No conversations found.' : archivedView ? 'No archived chats yet.' : 'A fresh start. Your conversations will appear here.'; nav.append(p); }
+    for (const c of filtered) {
+      const row = document.createElement('div'); row.className = 'chat-row' + (c.id === activeId ? ' active' : '');
+      const select = document.createElement('button'); select.className = 'chat-select'; select.textContent = c.title; select.title = c.title; select.setAttribute('aria-current', c.id === activeId ? 'true' : 'false');
+      select.onclick = () => { if(activeId !== c.id) abort(); activeId = c.id; notice(''); render(); closeSidebar(); };
+      const rename = document.createElement('button'); rename.className = 'row-action'; rename.textContent = '✎'; rename.setAttribute('aria-label', `Rename ${c.title}`); rename.onclick = () => { renameId = c.id; $('#chat-name').value = c.title; $('#rename-dialog').showModal(); $('#chat-name').select(); };
+      const archive = document.createElement('button'); archive.className = 'row-action'; archive.textContent = c.archived ? '\u21a9' : '\u25a3'; archive.title = c.archived ? 'Restore chat' : 'Archive chat'; archive.setAttribute('aria-label', `${c.archived ? 'Restore' : 'Archive'} ${c.title}`); archive.onclick = () => toggleArchive(c);
+      row.addEventListener('contextmenu', e => { e.preventDefault(); openChatMenu(c,e.clientX,e.clientY); });
+      select.addEventListener('keydown', e => { if(e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) { e.preventDefault(); const box=select.getBoundingClientRect(); openChatMenu(c,box.left,box.bottom); } });
+      row.append(select, rename, archive); nav.append(row);
+    }
   }
-  list.innerHTML = attempts.map((attempt, index) => {
-    const wait = new Date(attempt.claimableAt).getTime() - Date.now();
-    const state = wait > 0 ? `Ready in ${remainingText(wait)}` : "Ready now";
-    return `<article class="claim-row">
-      <div><strong>Sponsored reward ${index + 1}</strong><span>${state}</span></div>
-      <button class="claim-attempt" data-attempt-id="${attempt.attemptId}">Claim 0.5 point</button>
-    </article>`;
-  }).join("");
-}
-
-async function loadRewardStatus() {
-  const status = await request("/api/redirect/status");
-  $("reward-count").textContent = `${status.openedCount} / ${status.maximumCount}`;
-  $("reward-earned").textContent = `${status.earnedPoints} points`;
-  return status;
-}
-
-async function refreshAccountStatus() {
-  try {
-    const result = await request("/api/account");
-    $("points").textContent = result.account.pointBalance;
-    $("pending").textContent = result.account.pendingPointBalance;
-    $("device").textContent =
-      result.account.registeredComputer ? "Registered" : "Not registered";
-    $("device").className = result.account.registeredComputer ?
-      "stat device-connected" : "stat";
-    showDeviceWelcome(result.account);
-    return result.account;
-  } catch (error) {
-    if (error.status === 401 || /Authentication/i.test(error.message)) {
-      clearLogin(error.loginToken);
-      location.replace("/signin");
+  function renderContent(el, text) {
+    const blocks = text.split(/(```[\s\S]*?```)/g);
+    for (const block of blocks) {
+      if (!block) continue;
+      if (block.startsWith('```') && block.endsWith('```')) { const pre = document.createElement('pre'); const code = document.createElement('code'); code.textContent = block.slice(3,-3).replace(/^[a-zA-Z0-9_+#.-]*\n/, ''); pre.append(code); el.append(pre); }
+      else { const p = document.createElement('p'); p.textContent = block; el.append(p); }
     }
-    return false;
   }
-}
-
-function bindTokens() {
-  if ($("token-product")) {
-    const requestedProduct = new URLSearchParams(location.search).get("product");
-    $("token-product").value = ["z", "galaxy"].includes(requestedProduct) ? requestedProduct : "share";
-    $("token-product").onchange = renderTokenOptions;
+  function render() {
+    renderHistory();
+    const c = current(), thread = $('#thread'); thread.replaceChildren();
+    $('#welcome').hidden = Boolean(c && c.messages.length); thread.hidden = !$('#welcome').hidden;
+    document.title = c ? `${c.title} · Nebula AI` : 'Nebula AI';
+    if (c) c.messages.forEach((m, index) => {
+      const article = document.createElement('article'); article.className = `message message-${m.role}`;
+      const header = document.createElement('div'); header.className = 'message-header';
+      if (m.role === 'assistant') { const img = document.createElement('img'); img.src = 'nebula.svg'; img.alt = ''; header.append(img); }
+      header.append(m.role === 'user' ? 'You' : 'Nebula');
+      const content = document.createElement('div'); content.className = 'message-content'; renderContent(content, m.content);
+      const footer = document.createElement('div'); footer.className = 'message-footer';
+      const copy = document.createElement('button'); copy.textContent = 'Copy'; copy.onclick = async () => { try { await navigator.clipboard.writeText(m.content); copy.textContent = 'Copied'; } catch { notice('Copy is unavailable in this browser. Select the message text to copy it.'); } }; footer.append(copy);
+      if (m.role === 'user' && index === c.messages.length - 1) { const retry = document.createElement('button'); retry.textContent = 'Send to model'; retry.disabled = Boolean(pending); retry.onclick = () => requestReply(c); footer.append(retry); }
+      article.append(header,content,footer); thread.append(article);
+    });
+    $('#stop').hidden = !pending;
+    $('#send').disabled = Boolean(pending) || !$('#prompt').value.trim();
+    $('#prompt').disabled = Boolean(pending);
+    requestAnimationFrame(() => { $('#scroll-area').scrollTop = $('#scroll-area').scrollHeight; });
   }
-  loadTokens();
-  const savedRedirectNotice =
-    sessionStorage.getItem("scriptnovaaRedirectNotice");
-  if (savedRedirectNotice) {
-    sessionStorage.removeItem("scriptnovaaRedirectNotice");
-    message("redirect-message", savedRedirectNotice, "error");
-  }
-  let attempts = [];
-  let pairingPoll = null;
-  const showBetaPairingQuota = (quota) => {
-    const panel = $("beta-pairing-quota");
-    if (!panel) return;
-    if (!quota) { panel.classList.add("hidden"); return; }
-    panel.classList.remove("hidden");
-    panel.textContent = `BETA CONNECTION BENEFIT · ${quota.available}/4 replacement codes available` +
-      (quota.nextRechargeAt ? ` · next used slot returns ${new Date(quota.nextRechargeAt).toLocaleString()}` :
-        " · each used code returns after 28 days");
-  };
-  const stopPairingPoll = () => {
-    if (pairingPoll) clearInterval(pairingPoll);
-    pairingPoll = null;
-  };
-  const beginPairingPoll = (expiresAtValue) => {
-    stopPairingPoll();
-    const expiresAt = new Date(expiresAtValue).getTime();
-    pairingPoll = setInterval(async () => {
-      if (Date.now() >= expiresAt) {
-        stopPairingPoll();
-        $("pairing-result").classList.add("hidden");
-        $("create-pairing").classList.add("hidden");
-        $("pairing-support").classList.remove("hidden");
-        message("pairing-message",
-            "That connection code expired. Submit a replacement request through Support.");
-        return;
-      }
-      const [refreshedAccount, refreshedPairing] = await Promise.all([
-        refreshAccountStatus(), request("/api/device/pairing/current"),
-      ]);
-      showBetaPairingQuota(refreshedPairing.betaReplacement);
-      if (refreshedAccount?.registeredComputer && !refreshedPairing.pairing) {
-        stopPairingPoll();
-        $("pairing-result").classList.add("hidden");
-        $("create-pairing").classList.add("hidden");
-        $("pairing-support").classList.remove("hidden");
-        message("pairing-message",
-            "Connected! The launcher saves this connection across updates and restarts.",
-            "success");
-      }
-    }, 10000);
-  };
-  const displayPairing = (pairing, announcement) => {
-    const displayCode =
-      `${pairing.pairingCode.slice(0, 5)}-${pairing.pairingCode.slice(5)}`;
-    $("pairing-code").textContent = displayCode;
-    $("pairing-expires").textContent =
-      new Date(pairing.expiresAt).toLocaleTimeString();
-    $("pairing-result").classList.remove("hidden");
-    $("create-pairing").classList.add("hidden");
-    $("pairing-support").classList.remove("hidden");
-    if (announcement) {
-      message("pairing-message", announcement, "success");
+  function resize() { const p = $('#prompt'); p.style.height = 'auto'; p.style.height = Math.min(p.scrollHeight,170) + 'px'; $('#char-count').textContent = p.value.length > 14000 ? `${p.value.length}/16000` : ''; $('#send').disabled = Boolean(pending) || !p.value.trim(); }
+  $('#prompt').addEventListener('input', resize);
+  $('#prompt').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !matchMedia('(pointer: coarse)').matches) { e.preventDefault(); $('#composer').requestSubmit(); } });
+  $('.suggestions').addEventListener('click', e => { const b = e.target.closest('button[data-prompt]'); if(b) { $('#prompt').value = b.dataset.prompt; resize(); $('#prompt').focus(); } });
+  $('#search').addEventListener('input', renderHistory);
+  $('#composer').addEventListener('submit', e => {
+    e.preventDefault(); if (pending) return;
+    const text = $('#prompt').value.trim(); if (!text) return;
+    let c = current();
+    if (!c) {
+      if(chats.length >= MAX_CHATS) { notice('You have 100 conversations. Export or delete a chat before starting another.'); return; }
+      c = { id: crypto.randomUUID(), title: text.slice(0,52), updated: Date.now(), messages: [], archived: false }; chats.push(c); activeId = c.id;
     }
-    beginPairingPoll(pairing.expiresAt);
-  };
-  const displayPairingState = (result) => {
-    showBetaPairingQuota(result.betaReplacement);
-    if (result.pairing) {
-      displayPairing(result.pairing,
-          "Your original connection code was restored. It cannot be changed.");
-      return;
-    }
-    $("pairing-result").classList.add("hidden");
-    if (result.canGenerate && result.migrationAvailable) {
-      $("create-pairing").classList.remove("hidden");
-      $("create-pairing").textContent = "Generate launcher-update code";
-      $("pairing-support").classList.add("hidden");
-      message("pairing-message",
-          "Your computer was connected with an older launcher. Generate this one update code so the new launcher can remember the connection.");
-      return;
-    }
-    if (result.betaReplacementAvailable && result.canGenerate) {
-      $("create-pairing").classList.remove("hidden");
-      $("create-pairing").textContent = "Generate Beta replacement code";
-      $("pairing-support").classList.add("hidden");
-      message("pairing-message",
-          "Beta members may successfully use four replacement codes. Each used slot returns 28 days later.",
-          "success");
-      return;
-    }
-    if (result.registeredComputer) {
-      $("create-pairing").classList.add("hidden");
-      $("pairing-support").classList.remove("hidden");
-      message("pairing-message",
-          "Your computer is connected. Share Browser will remember it after launcher updates.",
-          "success");
-      return;
-    }
-    if (result.canGenerate) {
-      $("create-pairing").classList.remove("hidden");
-      $("create-pairing").textContent =
-        result.replacementRequest?.status === "APPROVED" ?
-          "Generate approved connection code" : "Generate connection code";
-      $("pairing-support").classList.add("hidden");
-      if (result.replacementRequest?.status === "APPROVED") {
-        message("pairing-message",
-            "Your replacement request was approved. You may generate one new code.",
-            "success");
-      }
-      return;
-    }
-    $("create-pairing").classList.add("hidden");
-    $("pairing-support").classList.remove("hidden");
-    const requestStatus = result.replacementRequest?.status;
-    if (requestStatus === "PENDING") {
-      message("pairing-message",
-          "Your replacement-code request is pending review.");
-    } else if (requestStatus === "DECLINED") {
-      message("pairing-message",
-          "Your replacement-code request was declined. Read the response on Support.",
-          "error");
-    } else {
-      message("pairing-message",
-          "Connection codes cannot be changed automatically. Request another through Support.");
-    }
-  };
-  renderPendingClaims(attempts);
-  const syncRewards = async () => {
-    const status = await loadRewardStatus();
-    attempts = status.attempts
-        .filter((attempt) => attempt.status === "OPENED")
-        .map((attempt) => ({
-          attemptId: attempt.attemptId,
-          claimableAt: new Date(attempt.claimableAt).toISOString(),
-          claimCode: sessionStorage.getItem(`scriptnovaaRewardProof:${attempt.attemptId}`) || "",
-        }));
-    renderPendingClaims(attempts);
-    return status;
-  };
-  syncRewards().catch((error) =>
-    message("redirect-message", error.message, "error"));
-  request("/api/device/pairing/current")
-      .then(displayPairingState)
-      .catch((error) => {
-        if (error.status !== 401) {
-          message("pairing-message", error.message, "error");
-        }
-      });
-  const claimClock = setInterval(() => renderPendingClaims(attempts), 1000);
-  window.addEventListener("pagehide", () => {
-    clearInterval(claimClock);
-    stopPairingPoll();
-    if (limitedOfferClock) clearInterval(limitedOfferClock);
+    if(c.messages.length >= 200) { notice('This conversation is full. Start a new conversation to continue.'); return; }
+    c.messages.push({role:'user',content:text, id:crypto.randomUUID(), trainingEligible:settings.improve}); c.archived = false; archivedView = false; c.updated = Date.now(); $('#prompt').value = ''; resize(); saveChats(); render(); requestReply(c);
   });
-
-  $("create-token").onclick = async () => {
+  function abort() { if(pending) { pending.controller.abort(); pending = null; } }
+  $('#stop').onclick = () => { abort(); notice('Request stopped. Your message is saved; you can send it again.'); render(); $('#prompt').focus(); };
+  async function requestReply(c) {
+    if(pending || !c.messages.length) return;
+    const request = { controller: new AbortController(), chatId:c.id }; pending = request; render(); notice('Nebula is thinking…');
+    let timeout = false;
+    const timer = setTimeout(() => { timeout = true; request.controller.abort(); }, 90000);
     try {
-      $("create-token").disabled = true;
-      const result = await request("/api/tokens/create", "POST", {
-        optionId: $("duration").value,
-        product: $("token-product")?.value || "share",
-      });
-      message("token-message",
-          `${result.product === "z" ? "Project Z" : result.product === "galaxy" ? "Galaxy Browser" : "Share Browser"} · ${result.durationLabel} token created:\n${result.token}`, "success");
-      await loadTokens();
-    } catch (error) {
-      message("token-message", error.message, "error");
-    } finally {
-      $("create-token").disabled = false;
-    }
-  };
-  $("select-limited-token").onclick = () => {
-    if ($("token-product")) $("token-product").value = "share";
-    renderTokenOptions();
-    $("duration").value = "free-4m-2026";
-    $("token-creator").scrollIntoView({behavior: "smooth", block: "center"});
-    message("token-message",
-        "Your free four-minute token is selected. Press Create token to claim it.",
-        "success");
-  };
-
-  $("start-redirect").onclick = async () => {
-    const adWindow = window.open("about:blank", "_blank");
-    try {
-      $("start-redirect").disabled = true;
-      message("redirect-message", "Preparing your sponsored link…");
-      const adBlockDetected = await detectAdBlocker();
-      const attempt = await request("/api/redirect/start", "POST", {
-        campaignId: "monetag-direct-11795557",
-        adBlockDetected,
-      });
-      if (attempt.claimCode) sessionStorage.setItem(`scriptnovaaRewardProof:${attempt.attemptId}`, attempt.claimCode);
-      await syncRewards();
-      const redirectNotice = attempt.rewardEligible === false ?
-        (attempt.notice ||
-          "Redirect didn't count because an ad blocker was detected.") :
-        "Sponsored page opened. Return after the displayed claim time to collect 0.5 point.";
-      if (adWindow) {
-        adWindow.opener = null;
-        adWindow.location = attempt.redirectUrl;
-        message("redirect-message", redirectNotice,
-            attempt.rewardEligible === false ? "error" : "success");
-      } else {
-        if (attempt.rewardEligible === false) {
-          sessionStorage.setItem(
-              "scriptnovaaRedirectNotice",
-              redirectNotice,
-          );
-        }
-        location.href = attempt.redirectUrl;
+      const response = await fetch(API + '/chat', { method:'POST', credentials:'omit', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({messages:c.messages.map(({role,content}) => ({role,content})), training:{enabled:settings.improve && c.messages.at(-1).trainingEligible === true, consentVersion:1, token:dataToken, chatId:c.id, turnId:c.messages.at(-1).id}}), signal:request.controller.signal });
+      const isJson = response.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await response.json() : {};
+      if(!response.ok) {
+        const messages = { MODEL_NOT_READY:'Nebula is not ready to reply yet. Your message is saved in this browser.', RATE_LIMITED:'You have sent too many messages. Please try again shortly.', INVALID_INPUT:'This conversation is too long to send. Try starting a new chat.' };
+        throw new Error((messages[data.code] || 'Nebula is temporarily unavailable. Please try again later.') + (data.trainingSaved ? ' Your new message was also contributed for future training.' : ''));
       }
-    } catch (error) {
-      if (adWindow) adWindow.close();
-      message("redirect-message", error.message, "error");
-    } finally {
-      $("start-redirect").disabled = false;
-    }
-  };
-
-  $("claim-list").onclick = async (event) => {
-    const button = event.target.closest(".claim-attempt");
-    if (!button) return;
-    const attempt = attempts.find((item) =>
-      item.attemptId === button.dataset.attemptId);
-    if (!attempt) return;
-    const wait = new Date(attempt.claimableAt).getTime() - Date.now();
-    if (wait > 0) {
-      message("redirect-message",
-          `This reward is still being reviewed. Try again in ${remainingText(wait)}.`,
-          "error");
-      return;
-    }
-    try {
-      button.disabled = true;
-      const result = await request("/api/redirect/claim", "POST", {
-        attemptId: attempt.attemptId,
-        claimCode: attempt.claimCode,
-      });
-      sessionStorage.removeItem(`scriptnovaaRewardProof:${attempt.attemptId}`);
-      message("redirect-message",
-          `${result.awardedPoints} point added to your balance.`, "success");
-      await Promise.all([loadTokens(), syncRewards()]);
-    } catch (error) {
-      message("redirect-message", error.message, "error");
-      button.disabled = false;
-    }
-  };
-
-  $("create-pairing").onclick = async () => {
-    try {
-      $("create-pairing").disabled = true;
-      const result = await request("/api/device/pairing/start", "POST");
-      showBetaPairingQuota(result.betaQuota);
-      displayPairing(result,
-          "Enter this code in a ScriptNovaa browser. It works once and expires in 10 minutes.");
-    } catch (error) {
-      message("pairing-message", error.message, "error");
-    } finally {
-      $("create-pairing").disabled = false;
-    }
-  };
-  $("copy-pairing").onclick = (event) =>
-    window.ScriptNovaaSite.copyWithFeedback(
-        event.currentTarget,
-        $("pairing-code").textContent,
-    );
-  $("copy-referral").onclick = (event) =>
-    window.ScriptNovaaSite.copyWithFeedback(
-        event.currentTarget,
-        `https://scriptnovaa.com/signup?ref=${encodeURIComponent($("referral").textContent)}`,
-    );
-  $("token-list").onclick = (event) => {
-    const button = event.target.closest(".copy-token");
-    if (!button) return;
-    window.ScriptNovaaSite.copyWithFeedback(button, button.dataset.token);
-  };
-  $("dismiss-device-welcome").onclick = async () => {
-    $("device-welcome").classList.add("hidden");
-    try {
-      await request("/api/account/device-welcome/acknowledge", "POST");
-    } catch (error) {
-      // The notice can safely reappear if acknowledgement could not be saved.
-    }
-  };
-  $("signout").onclick = async () => {
-    try {
-      await request("/api/logout", "POST");
-    } catch (error) {
-      // Local sign-out still completes if the network is unavailable.
-    }
-    clearLogin();
-    location.replace("/");
-  };
-}
-
-function bindSupport() {
-  if (!requireLogin()) return;
-  let ticketPoll = null;
-  const categoryNames = {
-    CONNECTION_CODE_REPLACEMENT: "Connection code replacement",
-    BROWSER_PROBLEM: "Share Browser problem",
-    ACCOUNT_ACCESS: "Account access",
-    POINTS_OR_REWARDS: "Points or sponsored rewards",
-    REFERRAL_PROBLEM: "Referral problem",
-    CHAT_APPEAL: "Chat ban appeal",
-    DEVELOPER_PROGRAM: "ScriptNova Developer Program",
-    BETA_FEEDBACK: "Beta feature feedback",
-    OTHER: "Other",
-  };
-  const statusNames = {
-    PENDING: "Pending",
-    APPROVED: "Approved",
-    DECLINED: "Declined",
-    FULFILLED: "Code generated",
-    ANSWERED: "Answered",
-    CLOSED: "Closed",
-    DENIED: "Denied",
-  };
-  const categoryGuidance = {
-    CONNECTION_CODE_REPLACEMENT: "Explain why the saved computer connection no longer works and whether Windows or the computer changed.",
-    BROWSER_PROBLEM: "Include Chrome or Edge, the selected mode, the launcher version, the exact message, and the approximate time.",
-    ACCOUNT_ACCESS: "Explain the sign-in or recovery step that failed. Never include the PIN or recovery code itself.",
-    POINTS_OR_REWARDS: "Include the reward or referral action, approximate time, expected balance, and the message shown.",
-    REFERRAL_PROBLEM: "Include both public usernames, which referral link was used, and which required step was completed.",
-    CHAT_APPEAL: "Explain what happened, why the restriction should be reviewed, and what will change if access is restored.",
-    DEVELOPER_PROGRAM: "Describe what you want to build, your audience, relevant experience, and how you will follow ScriptNovaa rules.",
-    BETA_FEEDBACK: "Name the Beta feature, describe the result, and explain what would make it better.",
-    OTHER: "Give a short timeline and include exact on-screen wording where possible.",
-  };
-
-  const renderTickets = (tickets) => {
-    if (!tickets.length) {
-      $("ticket-list").innerHTML =
-        "<p class=\"empty-claims\">You have not submitted any support tickets.</p>";
-      return;
-    }
-    $("ticket-list").innerHTML = `<div class="ticket-stack">${
-      tickets.map((ticket) => {
-        const statusValue = statusNames[ticket.status] ? ticket.status : "PENDING";
-        const response = ticket.adminResponse ?
-          `<p class="ticket-response"><strong>ScriptNovaa response:</strong><br>${escapeHtml(ticket.adminResponse)}</p>` :
-          "";
-        const approvedAction =
-          ticket.category === "CONNECTION_CODE_REPLACEMENT" &&
-          statusValue === "APPROVED" && !ticket.replacementConsumedAt ?
-            "<div class=\"ticket-approved-action\"><a class=\"button\" href=\"/tokens\">Generate approved code</a></div>" :
-            "";
-        return `<article class="ticket-card">
-          <div>
-            <span class="ticket-meta">${escapeHtml(categoryNames[ticket.category] || ticket.category)} • ${escapeHtml(new Date(ticket.createdAt).toLocaleString())} • Ref ${escapeHtml(String(ticket.ticketId || "UNKNOWN").slice(-8).toUpperCase())}</span>
-            <h3>${escapeHtml(ticket.subject)}</h3>
-            <p>${escapeHtml(ticket.message)}</p>
-          </div>
-          <span class="ticket-status ${statusValue.toLowerCase()}">${escapeHtml(statusNames[statusValue])}</span>
-          ${response}
-          ${approvedAction}
-        </article>`;
-      }).join("")
-    }</div>`;
-  };
-
-  const loadTickets = async () => {
-    try {
-      const result = await request("/api/support/tickets");
-      renderTickets(result.tickets);
-      message("ticket-list-message", "");
-    } catch (error) {
-      if (error.status === 401 || /Authentication/i.test(error.message)) {
-        clearLogin(error.loginToken);
-        location.replace("/signin");
-        return;
-      }
-      message("ticket-list-message", error.message, "error");
-    }
-  };
-
-  $("support-category").onchange = () => {
-    $("support-category-guide").textContent = categoryGuidance[$("support-category").value] || categoryGuidance.OTHER;
-    if ($("support-category").value === "CONNECTION_CODE_REPLACEMENT" &&
-        !$("support-subject").value.trim()) {
-      $("support-subject").value = "Request another connection code";
-    }
-    if ($("support-category").value === "CHAT_APPEAL" &&
-        !$("support-subject").value.trim()) {
-      $("support-subject").value = "Appeal my chat restriction";
-    }
-  };
-  $("support-category").onchange();
-  const requestedCategory =
-    new URLSearchParams(location.search).get("category");
-  if (["DEVELOPER_PROGRAM", "CHAT_APPEAL", "BETA_FEEDBACK"].includes(requestedCategory)) {
-    $("support-category").value = requestedCategory;
-    if (!$("support-subject").value.trim()) {
-      $("support-subject").value = requestedCategory === "CHAT_APPEAL" ?
-        "Appeal my chat restriction" : requestedCategory === "BETA_FEEDBACK" ?
-          "Beta feature feedback" : "Developer Program beta application";
-    }
-    $("support-category").onchange();
+      const reply = data.reply;
+      if(typeof reply !== 'string' || !reply.trim() || reply.length > 100000) throw new Error('Nebula could not finish this reply. Please try again.');
+      if(pending !== request) return;
+      c.messages.push({role:'assistant',content:reply,id:crypto.randomUUID(),trainingEligible:false}); c.updated = Date.now(); saveChats(); updateConnection(true); notice(storageFailed ? 'Reply received, but browser storage is full. Export your chats to keep a copy.' : settings.improve && c.messages.at(-2).trainingEligible && !data.trainingSaved ? 'Your reply is ready. This turn was not saved for training.' : '');
+    } catch(e) {
+      if(pending !== request) return;
+      updateConnection(false);
+      notice(timeout ? 'The model took too long to respond. Your message is saved; try again.' : e.name === 'AbortError' ? 'Request stopped.' : e instanceof TypeError ? 'Nebula could not be reached. Check your connection and try again.' : e.message, true);
+    } finally { clearTimeout(timer); if(pending === request) { pending = null; render(); $('#prompt').focus(); } }
   }
-  $("support-message").addEventListener("input", () => {
-    $("support-character-count").textContent = String($("support-message").value.length);
-  });
-
-  $("support-form").onsubmit = async (event) => {
-    event.preventDefault();
-    try {
-      $("submit-ticket").disabled = true;
-      const result = await request("/api/support/tickets", "POST", {
-        category: $("support-category").value,
-        subject: $("support-subject").value,
-        message: $("support-message").value,
-      });
-      message("support-message-result",
-          `Ticket submitted. Status: ${statusNames[result.ticket.status] || result.ticket.status}.`,
-          "success");
-      $("support-form").reset();
-      $("support-character-count").textContent = "0";
-      $("support-category").onchange();
-      await loadTickets();
-    } catch (error) {
-      message("support-message-result", error.message, "error");
-    } finally {
-      $("submit-ticket").disabled = false;
-    }
+  function openSettings() { $('#improve').checked = settings.improve; $('#theme').value = settings.theme; $('#settings-error').textContent = ''; if(!$('#settings').open) $('#settings').showModal(); }
+  $('#settings-button').onclick = openSettings; $('#connection-button').onclick = openSettings;
+  $('#close-settings').onclick = () => $('#settings').close();
+  $('#settings-form').onsubmit = e => {
+    e.preventDefault();
+    if(pending) { $('#settings-error').textContent = 'Stop the current reply before changing your data preferences.'; return; }
+    settings = {improve:$('#improve').checked,theme:$('#theme').value}; applyTheme(); updateConnection();
+    try { localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings)); }
+    catch { notice('Settings applied for this session. Browser storage is unavailable.'); $('#settings').close(); return; }
+    $('#settings').close(); notice(settings.improve ? 'Sharing is on for new messages. Contributions are reviewed before future model training.' : 'Sharing is off. New messages will not be saved for model training.');
   };
-  $("refresh-tickets").onclick = loadTickets;
-  $("support-signout").onclick = async () => {
-    try {
-      await request("/api/logout", "POST");
-    } catch (error) {
-      // Local sign-out still completes if the network is unavailable.
-    }
-    clearLogin();
-    location.replace("/");
-  };
-  loadTickets();
-  ticketPoll = setInterval(loadTickets, 15000);
-  window.addEventListener("pagehide", () => {
-    if (ticketPoll) clearInterval(ticketPoll);
+  function toggleArchive(c) {
+    c.archived = !c.archived;
+    if(c.archived && activeId === c.id) { abort(); activeId = null; }
+    if(!c.archived) { archivedView = false; activeId = c.id; }
+    saveChats(); render(); notice(c.archived ? 'Chat archived. Find it in Archived chats.' : 'Chat restored.');
+  }
+  $('#archive-view').onclick = () => { archivedView = !archivedView; $('#search').value = ''; renderHistory(); };
+  function closeChatMenu() { $('#chat-menu').hidden = true; }
+  function openChatMenu(c,x,y) {
+    menuId = c.id; const menu=$('#chat-menu'); menu.hidden=false;
+    $('#menu-archive').textContent = c.archived ? 'Restore chat' : 'Archive chat';
+    menu.style.left = Math.max(8,Math.min(x,innerWidth-185))+'px'; menu.style.top = Math.max(8,Math.min(y,innerHeight-150))+'px'; $('#menu-archive').focus();
+  }
+  document.addEventListener('click',e => { if(!e.target.closest('#chat-menu')) closeChatMenu(); });
+  document.addEventListener('keydown',e => { if(e.key === 'Escape') closeChatMenu(); });
+  $('#chat-menu').addEventListener('keydown',e => {
+    if(!['ArrowDown','ArrowUp','Tab'].includes(e.key)) return;
+    if(e.key === 'Tab') {closeChatMenu(); return;}
+    e.preventDefault(); const items=Array.from($('#chat-menu').querySelectorAll('button')); const i=items.indexOf(document.activeElement); items[(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();
   });
-}
-
-const page = document.body.dataset.page;
-if (page === "signup") bindSignup();
-if (page === "signin") bindSignin();
-if (page === "recovery") bindRecovery();
-if (page === "tokens") bindTokens();
-if (page === "support") bindSupport();
+  $('#menu-archive').onclick = () => { const c=chats.find(c=>c.id===menuId); if(c)toggleArchive(c); closeChatMenu(); };
+  $('#menu-rename').onclick = () => { const c=chats.find(c=>c.id===menuId); if(c) { renameId=c.id; $('#chat-name').value=c.title; $('#rename-dialog').showModal(); $('#chat-name').select(); } closeChatMenu(); };
+  $('#menu-delete').onclick = () => {deleteChatId=menuId;closeChatMenu();$('#delete-chat-dialog').showModal();};
+  $('#cancel-delete-chat').onclick = () => $('#delete-chat-dialog').close();
+  $('#confirm-delete-chat').onclick = () => {if(activeId===deleteChatId){abort();activeId=null;}chats=chats.filter(c=>c.id!==deleteChatId);saveChats();render();$('#delete-chat-dialog').close();notice('Conversation deleted from this browser.');};
+  $('#delete-training').onclick = () => {$('#delete-training-error').textContent='';$('#delete-training-dialog').showModal();};
+  $('#cancel-delete-training').onclick = () => $('#delete-training-dialog').close();
+  $('#confirm-delete-training').onclick = async () => {
+    if(pending) {$('#delete-training-error').textContent='Stop the current reply before deleting shared data.';return;}
+    const button=$('#confirm-delete-training');button.disabled=true;
+    try {
+      const response=await fetch(API+'/training',{method:'DELETE',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:dataToken}),signal:AbortSignal.timeout(20000)});
+      if(!response.ok)throw new Error('Your shared data could not be deleted right now. Please try again.');
+      settings.improve=false;
+      dataToken=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
+      try{localStorage.setItem(DATA_KEY,dataToken);localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}
+      updateConnection();$('#delete-training-dialog').close();$('#settings').close();notice('Your stored training contributions have been deleted and sharing is off. Completed model training cannot be reversed.');
+    } catch {$('#delete-training-error').textContent='Your shared data could not be deleted right now. Please try again.';}
+    finally {button.disabled=false;}
+  };
+  $('#export').onclick = () => {
+    const data = JSON.stringify({app:'Nebula AI',version:1,exportedAt:new Date().toISOString(),conversations:chats},null,2);
+    const url = URL.createObjectURL(new Blob([data],{type:'application/json'})); const a = document.createElement('a'); a.href = url; a.download = `nebula-conversations-${new Date().toISOString().slice(0,10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
+  };
+  $('#clear').onclick = () => $('#confirm-dialog').showModal();
+  $('#cancel-clear').onclick = () => $('#confirm-dialog').close();
+  $('#confirm-clear').onclick = () => { abort(); chats = []; activeId = null; saveChats(); render(); $('#confirm-dialog').close(); $('#settings').close(); notice(storageFailed ? 'Chats cleared for this session, but browser storage could not be updated.' : 'All conversations deleted from this browser.'); };
+  $('#cancel-rename').onclick = () => $('#rename-dialog').close();
+  $('#rename-form').onsubmit = e => { e.preventDefault(); const title = $('#chat-name').value.trim(); if(!title) return; const c = chats.find(c => c.id === renameId); if(c) { c.title = title; saveChats(); render(); } $('#rename-dialog').close(); };
+  applyTheme(); updateConnection(); render();
+  if(storageFailed) notice('Some saved data could not be loaded. Chats may only persist for this session. Export important conversations.');
+})();
