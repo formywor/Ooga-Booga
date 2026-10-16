@@ -2,7 +2,7 @@
 (() => {
   const API='https://api.scriptnovaa.com/api/nebula';
   const $=selector=>document.querySelector(selector);
-  let sdk,auth,config,initPromise,account=null,mode='signin',busy=false,recaptcha=null,confirmation=null,lastSync=null,revision=0;
+  let sdk,auth,config,initPromise,account=null,mode='signin',busy=false,recaptcha=null,confirmation=null,lastSync=null,syncInFlight=null,revision=0;
   const appleDevice=/Mac|iPhone|iPad|iPod/i.test(navigator.userAgentData?.platform||navigator.platform||navigator.userAgent);
   function feedback(text,error=false){$('#auth-feedback').textContent=text;$('#auth-feedback').classList.toggle('auth-error',error);}
   function setBusy(value){busy=value;$('#account-dialog').setAttribute('aria-busy',String(value));for(const id of ['auth-email-submit','auth-google','auth-apple','open-phone','send-sms','verify-sms','account-signout','send-verification'])$('#'+id).disabled=value||!auth;}
@@ -15,6 +15,9 @@
     if(account){$('#account-identity').textContent=account.email||account.phoneNumber||account.displayName;$('#account-provider').textContent=({password:'Email account','google.com':'Signed in with Google','apple.com':'Signed in with Apple',phone:'Signed in with phone'})[account.provider]||'Signed in to Nebula';$('#account-training-state').textContent=account.improve?'On':'Off';$('#verification-state').textContent=account.provider==='password'?(account.emailVerified?'Email verified':'Verify your email to help protect your account.'):'Your identity is verified by your sign-in provider.';$('#send-verification').hidden=account.provider!=='password'||account.emailVerified;}
   }
   const friendly=error=>({
+    'nebula/session-rejected':'Your sign-in could not be verified. Try again or use another account.',
+    'nebula/account-unavailable':'Your sign-in succeeded, but Nebula cannot load your account right now. Please try again shortly.',
+    'nebula/rate-limited':'Too many account requests. Please wait a moment and try again.',
     'auth/invalid-credential':'That email or password did not work. Try again.',
     'auth/wrong-password':'That email or password did not work. Try again.',
     'auth/user-not-found':'That email or password did not work. Try again.',
@@ -36,22 +39,28 @@
     'auth/unauthorized-domain':'Sign-in is temporarily unavailable on this address.',
     'auth/user-disabled':'This account is unavailable. Please contact the site owner.',
   })[error?.code]||'Sign-in could not be completed. Please try again.';
+  function accountFailure(error){feedback(friendly(error),true);$('#retry-auth').hidden=false;$('#reset-signin').hidden=!auth?.currentUser;}
   async function acceptUser(user){
-    if(!user){revision++;lastSync=null;account=null;showAccount();emit();return;}
-    const token=await user.getIdToken();
-    if(lastSync?.token===token)return lastSync.promise;
+    if(!user){revision++;lastSync=null;syncInFlight=null;account=null;showAccount();emit();$('#reset-signin').hidden=true;return;}
+    if(syncInFlight?.uid===user.uid)return syncInFlight.promise;
     const version=++revision;
     const promise=(async()=>{
-      const response=await fetch(API+'/account',{headers:{Authorization:'Bearer '+token},credentials:'omit',signal:AbortSignal.timeout(20000)});
-      if(!response.ok)throw new Error('Account unavailable');
+      let token=await user.getIdToken();
+      if(lastSync?.token===token)return;
+      const load=token=>fetch(API+'/account',{headers:{Authorization:'Bearer '+token},credentials:'omit',signal:AbortSignal.timeout(20000)});
+      let response=await load(token);
+      // Refresh once. Observer callbacks share syncInFlight, preventing retry loops.
+      if(response.status===401){token=await user.getIdToken(true);if(version!==revision||auth.currentUser?.uid!==user.uid)return;response=await load(token);}
+      if(!response.ok)throw Object.assign(new Error('Account unavailable'),{code:response.status===401?'nebula/session-rejected':response.status===429?'nebula/rate-limited':'nebula/account-unavailable'});
       const data=await response.json();
-      if(!data.account||data.account.uid!==user.uid)throw new Error('Account unavailable');
+      if(!data.account||data.account.uid!==user.uid)throw Object.assign(new Error('Account unavailable'),{code:'nebula/account-unavailable'});
       if(version!==revision||auth.currentUser?.uid!==user.uid)return;
-      account=data.account;showAccount();emit();feedback('You are signed in.');$('#auth-password').value='';
+      lastSync={token};account=data.account;showAccount();emit();feedback('You are signed in.');$('#auth-password').value='';$('#retry-auth').hidden=true;$('#reset-signin').hidden=true;
       if($('#account-dialog').open)$('#account-dialog').close();
     })();
-    lastSync={token,promise};
-    try{await promise;}catch(e){if(lastSync?.promise===promise)lastSync=null;throw e;}
+    const sync={uid:user.uid,promise};syncInFlight=sync;
+    try{await promise;}catch(e){if(version===revision)lastSync=null;throw e;}
+    finally{if(syncInFlight===sync)syncInFlight=null;}
   }
   async function initialize(){
     if(initPromise)return initPromise;
@@ -65,12 +74,12 @@
       sdk.useDeviceLanguage(auth);
       await sdk.setPersistence(auth,sdk.browserLocalPersistence);
       $('#auth-google').hidden=!config.providers.google;$('#auth-apple').hidden=!config.providers.apple||!appleDevice;$('#open-phone').hidden=!config.providers.phone;$('#email-auth-form').hidden=!config.providers.email;$('#email-divider').hidden=!config.providers.email;
-      sdk.onIdTokenChanged(auth,user=>{acceptUser(user).catch(()=>{feedback('Your sign-in is saved, but your Nebula account could not be loaded. Please try again.',true);$('#retry-auth').hidden=false;});});
+      sdk.onIdTokenChanged(auth,user=>{acceptUser(user).catch(accountFailure);});
       setBusy(false);$('#retry-auth').hidden=true;return auth;
     })().catch(e=>{initPromise=null;throw e;});
     return initPromise;
   }
-  async function run(action){if(busy)return;setBusy(true);feedback('');try{await initialize();setBusy(true);await action();}catch(e){feedback(friendly(e),true);}finally{setBusy(false);}}
+  async function run(action){if(busy)return;setBusy(true);feedback('');try{await initialize();setBusy(true);await action();}catch(e){if(e.code?.startsWith('nebula/'))accountFailure(e);else feedback(friendly(e),true);}finally{setBusy(false);}}
   function showMethods(){
     $('#phone-auth-form').hidden=true;$('#code-auth-form').hidden=true;
     $('.social-providers').hidden=false;$('.auth-tabs').hidden=false;
@@ -83,7 +92,8 @@
   $('#account-button').onclick=async()=>{showAccount();$('#account-dialog').showModal();if(!auth){feedback('Getting sign-in ready...');try{await initialize();feedback('');}catch{feedback('Sign-in is temporarily unavailable. You can keep using your guest workspace.',true);$('#retry-auth').hidden=false;}}};
   $('#close-account').onclick=()=>$('#account-dialog').close();
   $('#account-dialog').addEventListener('close',()=>{$('#auth-password').value='';$('#auth-code').value='';if(recaptcha){recaptcha.clear();recaptcha=null;}showMethods();});
-  $('#retry-auth').onclick=async()=>{feedback('Trying again...');try{await initialize();if(auth.currentUser)await acceptUser(auth.currentUser);else feedback('Choose a sign-in method.');$('#retry-auth').hidden=true;}catch{feedback('Sign-in is temporarily unavailable. Please try again later.',true);}};
+  $('#retry-auth').onclick=async()=>{if(busy)return;setBusy(true);feedback('Trying again...');try{await initialize();setBusy(true);if(auth.currentUser)await acceptUser(auth.currentUser);else feedback('Choose a sign-in method.');$('#retry-auth').hidden=true;}catch(e){accountFailure(e);}finally{setBusy(false);}};
+  $('#reset-signin').onclick=()=>run(async()=>{await sdk.signOut(auth);lastSync=null;account=null;showAccount();$('#reset-signin').hidden=true;$('#retry-auth').hidden=true;feedback('Choose a sign-in method to continue.');});
   $('#auth-signin-tab').onclick=()=>setMode('signin');$('#auth-signup-tab').onclick=()=>setMode('signup');
   $('#toggle-password').onclick=()=>{const input=$('#auth-password');input.type=input.type==='password'?'text':'password';$('#toggle-password').textContent=input.type==='password'?'Show':'Hide';$('#toggle-password').setAttribute('aria-label',input.type==='password'?'Show password':'Hide password');};
   $('#email-auth-form').onsubmit=e=>{e.preventDefault();run(async()=>{const email=$('#auth-email').value.trim(),password=$('#auth-password').value;try{const result=mode==='signup'?await sdk.createUserWithEmailAndPassword(auth,email,password):await sdk.signInWithEmailAndPassword(auth,email,password);if(mode==='signup')await sdk.sendEmailVerification(result.user).catch(()=>{});await acceptUser(result.user);}finally{$('#auth-password').value='';}});};
