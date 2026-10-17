@@ -109,6 +109,8 @@
   $('#account-signout').onclick=()=>run(async()=>{await sdk.signOut(auth);account=null;showAccount();$('#account-dialog').close();feedback('');});
   $('#send-verification').onclick=()=>run(async()=>{if(auth.currentUser){await sdk.sendEmailVerification(auth.currentUser);feedback('Verification email sent. Check your inbox.');}});
   window.NebulaAuth={
+    async resetPassword(){if(!auth?.currentUser?.email||account?.provider!=='password')throw Error('Use your sign-in provider to manage your password.');try{await sdk.sendPasswordResetEmail(auth,auth.currentUser.email);}catch(e){if(e.code!=='auth/user-not-found')throw Error('Password reset is unavailable. Please try again.');}},
+    async signOut(){if(auth)await sdk.signOut(auth);account=null;showAccount();emit();},
     async authorizedFetch(url,options={}){
       // An unavailable authentication service must not prevent deliberate guest use.
       if(initPromise)try{await initPromise;}catch{}
