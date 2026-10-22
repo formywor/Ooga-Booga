@@ -40,3 +40,4 @@
 .model-transition{position:relative;padding-right:48px}.notice-dismiss{position:absolute;right:8px;top:8px}
 .cloud-card{border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0;overflow-wrap:anywhere}.cloud-card h3{margin-top:0}.cloud-card input{max-width:100%}.cloud-card button{margin:8px 8px 0 0}.cloud-results a{display:block;color:var(--accent);margin-top:12px}.cloud-results p,.cloud-card p{overflow-wrap:anywhere}
 #schedule-confirm{max-width:520px;width:calc(100% - 32px)}#cloud-status{color:var(--muted);font-size:13px}#schedule-form input{width:100%}
+.cloud-task-result{white-space:pre-wrap;max-height:24rem;overflow:auto}.cloud-card textarea,.cloud-card select{max-width:100%;width:100%}
