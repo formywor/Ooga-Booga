@@ -31,3 +31,12 @@
 .chat-select:before{content:"";display:inline-block;width:11px;height:9px;border:1px solid currentColor;border-radius:3px;flex-shrink:0}
 
 .model-transition{margin:0 24px;padding:14px 18px;border:1px solid var(--border,#ffffff20);border-radius:14px;background:var(--surface,#181822);display:grid;gap:5px;font-size:13px;line-height:1.5}.model-transition strong{font-weight:600}.model-transition span,.model-transition small{opacity:.78}.model-transition small{font-size:11px}.model-option:disabled{opacity:.5;cursor:not-allowed}.appearance-change{display:flex;gap:12px;justify-content:center;align-items:center;padding:8px;font-size:13px}.appearance-change[hidden]{display:none}.appearance-change button{color:inherit;background:transparent;border:1px solid currentColor;border-radius:8px;padding:4px 12px;cursor:pointer}@media(max-width:640px){.model-transition{margin:0 12px;padding:10px 12px;font-size:12px}}
+/* Reversible Ultra appearance and account cloud workspace. */
+:root[data-theme="dim"]{color-scheme:dark;--bg:#252a32;--side:#20252c;--surface:#303742;--hover:#39414c;--line:#ffffff19;--text:#e3e6eb;--muted:#b0b7c3;--input:#2b313b}
+[data-reading-font="plain"] .message-content{font-family:Arial,Helvetica,sans-serif;letter-spacing:normal}
+[data-bubble-style="square"] .message-content{border-radius:5px}
+[data-bubble-style="minimal"] .message-content{border-radius:0;background:transparent!important;box-shadow:none}
+[data-hide-ultra-notice="true"] #model-transition{display:none}
+.model-transition{position:relative;padding-right:48px}.notice-dismiss{position:absolute;right:8px;top:8px}
+.cloud-card{border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0;overflow-wrap:anywhere}.cloud-card h3{margin-top:0}.cloud-card input{max-width:100%}.cloud-card button{margin:8px 8px 0 0}.cloud-results a{display:block;color:var(--accent);margin-top:12px}.cloud-results p,.cloud-card p{overflow-wrap:anywhere}
+#schedule-confirm{max-width:520px;width:calc(100% - 32px)}#cloud-status{color:var(--muted);font-size:13px}#schedule-form input{width:100%}
