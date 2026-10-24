@@ -1,0 +1,20 @@
+(function(root){'use strict';
+ const recovery={denied:'Permission was denied. Use the site controls in your browser address bar to allow this input, then select Retry permissions. Nebula will not ask again automatically.','no-device':'No matching device was found. Connect one and refresh the device list.',busy:'The device is busy or unavailable. Close other camera/microphone apps, check OS privacy settings, and retry.',unsupported:'This browser cannot capture this input. Open Nebula directly in a supported browser.',blocked:'Hardware access is blocked in this embedded preview or Permissions Policy. Open Nebula in a browser tab and allow camera/microphone access.',insecure:'Hardware requires HTTPS or localhost. Open the secure website in your browser.'};
+ function problem(e){return (typeof e?.code==='string'&&Object.hasOwn(recovery,e.code)?e.code:null)||({NotAllowedError:'denied',PermissionDeniedError:'denied',NotFoundError:'no-device',DevicesNotFoundError:'no-device',NotReadableError:'busy',TrackStartError:'busy',AbortError:'busy',OverconstrainedError:'no-device',SecurityError:'blocked',TypeError:'unsupported'})[e?.name]||'unsupported';}
+ class Media{
+  constructor(win){this.w=win;this.denied=new Set();this.generation=0;}
+  check(kind){if(!this.w.isSecureContext)throw Object.assign(Error(recovery.insecure),{code:'insecure'});const policy=this.w.document.permissionsPolicy||this.w.document.featurePolicy;if(policy?.allowsFeature&&!policy.allowsFeature(kind))throw Object.assign(Error(recovery.blocked),{code:'blocked'});if(!this.w.navigator.mediaDevices?.getUserMedia)throw Object.assign(Error(recovery.unsupported),{code:'unsupported'});if(this.denied.has(kind))throw Object.assign(Error(recovery.denied),{code:'denied'});}
+  async acquire(kind,id){this.check(kind);const constraints=kind==='camera'?{video:id?{deviceId:{exact:id}}:{facingMode:{ideal:'environment'}},audio:false}:{audio:id?{deviceId:{exact:id}}:{echoCancellation:true,noiseSuppression:true},video:false};
+   try{const stream=await this.w.navigator.mediaDevices.getUserMedia(constraints),tracks=kind==='camera'?stream.getVideoTracks():stream.getAudioTracks();if(!tracks.some(t=>t.readyState==='live'&&t.enabled)){stream.getTracks().forEach(t=>t.stop());throw Object.assign(Error('No live track'),{name:'NotReadableError'});}return stream;
+   }catch(e){const state=problem(e);if(state==='denied')this.denied.add(kind);throw Object.assign(Error(recovery[state]||recovery.unsupported),{code:state});}
+  }
+  async devices(){return this.w.navigator.mediaDevices?.enumerateDevices?this.w.navigator.mediaDevices.enumerateDevices():[];}
+  retry(){this.denied.clear();}
+  prepareMeter(){const C=this.w.AudioContext||this.w.webkitAudioContext;if(!C||this.pendingContext)return;try{this.pendingContext=new C();this.pendingContext.resume().catch(()=>{});}catch{}}
+  releasePending(){const c=this.pendingContext;this.pendingContext=null;c?.close().catch(()=>{});}
+  meter(stream,update){const AudioContext=this.w.AudioContext||this.w.webkitAudioContext;if(!AudioContext){update(null);return ()=>{};}let context;try{context=this.pendingContext||new AudioContext();this.pendingContext=null;}catch{update(null);return ()=>{};}const source=context.createMediaStreamSource(stream),analyser=context.createAnalyser();analyser.fftSize=256;source.connect(analyser);const data=new Uint8Array(analyser.fftSize);let frame,active=true;
+   context.resume().catch(()=>{});const sample=()=>{if(!active)return;analyser.getByteTimeDomainData(data);let sum=0;for(const x of data)sum+=((x-128)/128)**2;update(Math.min(1,Math.sqrt(sum/data.length)*4));frame=this.w.requestAnimationFrame(sample);};sample();return ()=>{active=false;this.w.cancelAnimationFrame(frame);source.disconnect();analyser.disconnect();context.close().catch(()=>{});update(0);};
+  }
+ }
+ if(typeof module!=='undefined'&&module.exports)module.exports={Media,problem,recovery};else root.NebulaDevicesMedia={Media,problem,recovery};
+})(typeof window!=='undefined'?window:this);
