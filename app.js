@@ -3,6 +3,7 @@
   const $=s=>document.querySelector(s),API='https://api.scriptnovaa.com/api/nebula';
   let chats=[],activeId=null,account=null,epoch=0,pending=null,menuId=null,deleteId=null,loading=false,settings={improve:false,memoryEnabled:false,theme:'dark'},usageState=null;
   let nextPrivateTurn=false,nextInputSource='typed',sendAccepted=false;
+  let lastModelCheck=0;
   let selectedModel='nebula-ultra',catalog=null,lastRenderedTurn='',displayPrefs={...window.NebulaUI.defaults};
   const reviews=new Map(),reviewRetry=new Map();let reviewing=false,reviewCursor=0;
   try{const p=JSON.parse(localStorage.getItem('nebula.display')||'{}');displayPrefs=window.NebulaUI.sanitize(p);}catch{}
@@ -27,14 +28,14 @@
     const list=$('#model-options');list.replaceChildren();
     for(const model of catalog?.models||[{id:'nebula-ultra',name:'Nebula Ultra',description:'Loading model choicesâ€¦'}]){
       const b=document.createElement('button');b.type='button';b.className='model-option';b.disabled=Boolean(pending)||!catalog||model.available===false;b.setAttribute('aria-pressed',String(model.id===selectedModel));
-      const text=document.createElement('span'),strong=document.createElement('strong'),small=document.createElement('small'),check=document.createElement('span');strong.textContent=model.name;small.textContent=model.status==='training'?'Currently in training':model.description;check.className='model-check';check.textContent=model.id===selectedModel?'\u2713':'';text.append(strong,small);b.append(text,check);
+      const text=document.createElement('span'),strong=document.createElement('strong'),small=document.createElement('small'),check=document.createElement('span');strong.textContent=model.name;small.textContent=model.available===false?(model.unavailableReason==='disabled_by_configuration'?'Temporarily disabled':model.description||'Temporarily unavailable'):model.description;check.className='model-check';check.textContent=model.id===selectedModel?'\u2713':'';text.append(strong,small);b.append(text,check);
       b.onclick=()=>{window.dispatchEvent(new CustomEvent('nebula:conversation-change'));selectedModel=model.id;$('#model-picker').open=false;renderModelOptions();$('#prompt').focus();};list.append(b);
     }
     $('#model-caption').textContent=catalog?.models.find(m=>m.id===selectedModel)?.name||'Nebula Ultra';
     $('#view-caption').textContent=({comfortable:'Comfortable',focus:'Focus',wide:'Wide'})[settings.workspaceView]||'Comfortable';
     document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===settings.workspaceView)));
   }
-  async function loadModels(){try{catalog=await api('/models');selectedModel=catalog.defaultModel||'nebula-ultra';renderModelOptions();render();$('#model-transition').hidden=false;if(catalog.models.some(m=>m.status==='experimental')){$('#model-transition strong').textContent='Nebula Ultra is recommended.';$('#model-transition span').textContent='Legacy research checkpoints are available as experiments and may produce unclear answers.';}$('#ultra-availability').textContent=catalog.models.find(m=>m.id==='nebula-ultra')?.available?'Available now':'Temporarily unavailable';window.dispatchEvent(new CustomEvent('nebula:models',{detail:catalog}));}catch{const p=document.createElement('p');p.className='field-help';p.textContent='Model availability could not be loaded. Please refresh before sending.';$('#model-options').replaceChildren(p);catalog=null;render();}}
+  async function loadModels(){try{catalog=await api('/models');lastModelCheck=Date.now();if(!catalog.models.some(m=>m.id===selectedModel&&m.available))selectedModel=catalog.defaultModel||'nebula-ultra';renderModelOptions();render();$('#model-transition').hidden=false;if(catalog.models.some(m=>m.status==='experimental')){$('#model-transition strong').textContent='Nebula Ultra is recommended.';$('#model-transition span').textContent='Legacy research checkpoints are available as experiments and may produce unclear answers.';}$('#ultra-availability').textContent=catalog.models.find(m=>m.id==='nebula-ultra')?.available?'Available now':'Temporarily unavailable';window.dispatchEvent(new CustomEvent('nebula:models',{detail:catalog}));}catch{const p=document.createElement('p');p.className='field-help';p.textContent='Model availability could not be loaded. Please refresh before sending.';$('#model-options').replaceChildren(p);catalog=null;render();}}
   function renderSuggestions(){
     let choices=[['spark','Find a fresh perspective','Turn a spark into something new','Help me brainstorm a creative project. Ask me about my interests first.'],['book','Make something click','Explore a topic, one step at a time','Help me understand a difficult topic. Ask me what I would like to learn.'],['pen','Put it into words','Give your next draft a new direction','Can you help me write an email?'],['code','Build the next thing','Think through code and possibilities','Help me work through a coding problem. Ask me about the language and what I am building.']];
     if(account?.personalizedQuestions!==false&&account?.interests?.trim()){
@@ -147,5 +148,6 @@
   function updateJump(){const el=$('#scroll-area');$('#jump-latest').hidden=$('#thread').hidden||el.scrollHeight-el.scrollTop-el.clientHeight<120;}
   $('#scroll-area').addEventListener('scroll',updateJump,{passive:true});$('#jump-latest').onclick=()=>{$('#scroll-area').scrollTop=$('#scroll-area').scrollHeight;updateJump();};
   $('#dismiss-ultra-notice').onclick=async()=>{const patch={hideUltraNotice:true};window.NebulaWorkspace.setDisplay(patch);if(account)try{await window.NebulaAuth.savePreferences(patch);}catch{notice('Notice dismissed on this device. Account sync is unavailable.');}};
+  $('#model-picker').addEventListener('toggle',()=>{if($('#model-picker').open&&!pending&&Date.now()-lastModelCheck>30000)loadModels();});
   preferences();render();loadModels();
 })();
