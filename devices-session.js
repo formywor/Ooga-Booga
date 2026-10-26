@@ -6,7 +6,7 @@
   constructor(adapters){this.a=adapters;this.epoch=0;this.active=false;this.phase='stopped';this.media={camera:'not-requested',microphone:'not-requested',transcription:'off',ocr:'off'};this.seen=new Set();this.lastResponse=-Infinity;this.clock=adapters.clock||Date.now;}
   emit(message){this.a.render?.({phase:this.phase,active:this.active,media:{...this.media},message});}
   async start(settings){
-   this.stop();this.settings={...settings};this.active=true;this.phase='starting';this.seen.clear();this.lastScene=null;this.lastResponse=-Infinity;
+   this.stop();this.history=[];this.settings={...settings};this.active=true;this.phase='starting';this.seen.clear();this.lastScene=null;this.lastResponse=-Infinity;
    const generation=this.epoch;this.a.prepare?.(settings);this.emit('Starting selected browser inputs. No physical glasses connected.');
    await Promise.allSettled([this.startCamera(generation),this.startMic(generation)]);
    if(!this.active||generation!==this.epoch)return;
@@ -36,18 +36,21 @@
   installRecognition(generation){
    if(!this.active||!this.micStream||!this.a.recognition||this.recognitionFailed)return;
    if(this.rec){this.rec.onend=this.rec.onresult=this.rec.onerror=this.rec.onstart=null;try{this.rec.abort();}catch{}}
-    const rec=this.a.recognition();this.rec=rec;rec.continuous=true;rec.interimResults=false;rec.lang='en-US';
+    const rec=this.a.recognition();this.rec=rec;rec.continuous=true;rec.interimResults=true;rec.lang='en-US';
     rec.onstart=()=>{if(this.rec!==rec||generation!==this.epoch||!this.active){rec.abort();return;}this.media.transcription='active';this.listenPhase();this.emit();};
-    rec.onresult=e=>{if(this.rec!==rec||generation!==this.epoch||!this.active||this.speaking)return;for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)this.hear(e.results[i][0].transcript);};
+    rec.onresult=e=>{if(this.rec!==rec||generation!==this.epoch||!this.active||this.speaking||this.processing)return;if(this.settings.mode==='voice'){if(this.settings.voiceInput==='push'&&!this.pushHeld&&!this.pushReleasing)return;this.a.clearTimeout(this.turnTimer);let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)this.turnText=((this.turnText||'')+' '+t).trim();else interim+=t;}this.turnInterim=!!interim;this.a.transcript?.(((this.turnText||'')+' '+interim).trim());this.phase='listening for you to finish';this.emit();if(!interim&&!this.pushHeld)this.queueTurn();}else for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)this.hear(e.results[i][0].transcript);};
     rec.onerror=e=>{if(this.rec!==rec||generation!==this.epoch||e.error==='aborted')return;this.media.transcription=e.error||'unavailable';if(e.error!=='no-speech'){this.recognitionFailed=true;this.a.clearTimeout(this.restart);rec.onend=null;try{rec.abort();}catch{}}this.emit('Microphone capture and transcription are separate. Transcription failed: '+(e.error||'unavailable')+'. Use typed input or restart after checking browser speech settings.');};
-    rec.onend=()=>{if(this.rec!==rec||generation!==this.epoch||!this.active||this.speaking||this.recognitionFailed)return;this.media.transcription='restarting';this.emit();this.restart=this.a.setTimeout(()=>this.beginRecognition(generation),800);};
+    rec.onend=()=>{if(this.rec!==rec||generation!==this.epoch||!this.active||this.speaking||this.recognitionFailed)return;if(this.settings.mode==='voice'&&this.turnText&&!this.pushHeld&&!this.turnInterim)this.queueTurn();this.media.transcription='restarting';this.emit();this.restart=this.a.setTimeout(()=>this.beginRecognition(generation),800);};
     this.beginRecognition(generation);
   }
   beginRecognition(generation=this.epoch){
-   if(generation!==this.epoch||!this.active||this.speaking||this.recognitionFailed||!this.rec)return;
+   if(generation!==this.epoch||!this.active||this.speaking||this.recognitionFailed||!this.rec||this.settings.mode==='voice'&&this.settings.voiceInput==='push'&&!this.pushHeld)return;
    try{this.rec.start(this.micStream.getAudioTracks()[0]);}catch(e){this.media.transcription='unavailable';this.recognitionFailed=true;this.emit('Browser transcription could not start. Your microphone capture may still be active; type instead.');}
   }
-  listenPhase(){if(!this.active||this.processing||this.speaking)return;this.phase=this.media.transcription==='active'?(this.settings.mode==='wake'?'waiting for wake phrase':'listening'):this.media.camera==='active'&&this.settings.mode==='adaptive'?'camera assistance ready':'ready for typed input';}
+  queueTurn(){this.a.clearTimeout(this.turnTimer);const generation=this.epoch;this.turnTimer=this.a.setTimeout(()=>{if(generation!==this.epoch||!this.active||this.speaking||this.processing)return;const text=this.turnText?.trim();this.turnText='';this.pushReleasing=false;if(text)this.respond(text);},this.pushReleasing?350:(this.settings.silenceMs||1400));}
+  pushStart(){if(!this.active||this.processing||this.speaking||this.settings.mode!=='voice'||this.settings.voiceInput!=='push')return;this.a.clearTimeout(this.turnTimer);this.turnText='';this.turnInterim=false;this.pushHeld=true;this.pushReleasing=false;this.beginRecognition();this.phase='listening - release to send';this.emit();}
+  pushEnd(){if(!this.pushHeld)return;this.pushHeld=false;this.pushReleasing=true;try{this.rec?.stop();}catch{}if(!this.turnInterim)this.queueTurn();else{const g=this.epoch;this.turnTimer=this.a.setTimeout(()=>{if(g===this.epoch&&this.turnInterim){this.turnText='';this.pushReleasing=false;this.emit('Transcription did not finalize. Review the captured text and select Send.');}},4000);}}
+  listenPhase(){if(!this.active||this.processing||this.speaking)return;this.phase=this.media.transcription==='active'?(this.settings.mode==='wake'?'waiting for wake phrase':this.settings.mode==='voice'&&this.settings.voiceInput==='push'?'hold to talk':'listening'):this.media.camera==='active'&&this.settings.mode==='adaptive'?'camera assistance ready':'ready for typed input';}
   async playVoice(text,settings=this.settings){
    const generation=this.epoch,speechVersion=this.speechVersion=(this.speechVersion||0)+1;this.speaking=true;this.a.clearTimeout(this.restart);try{this.rec?.abort();}catch{}if(this.active)this.phase='answering';this.emit();
    try{await this.a.speak?.(text,settings);}finally{if(generation===this.epoch&&speechVersion===this.speechVersion){this.speaking=false;if(this.active){this.listenPhase();this.installRecognition(generation);this.emit();}}}
@@ -98,9 +101,9 @@
    if(automatic&&(this.seen.has(key)||this.clock()-this.lastResponse<this.settings.cooldownSeconds*1000))return;
    const generation=this.epoch;this.processing=true;this.phase='processing';const controller=new AbortController();this.controller=controller;this.emit();
    try{
-    const result=await this.a.request({question,observedText,kind,responseStyle:this.settings.responseStyle,consent:true},controller.signal);
+    const result=await this.a.request({question,observedText,kind,responseStyle:this.settings.responseStyle,consent:true,...(this.settings.mode==='voice'?{history:this.history||[]}: {})},controller.signal);
     if(generation!==this.epoch||!this.active)return;
-    this.seen.add(key);if(this.seen.size>50)this.seen.delete(this.seen.values().next().value);this.lastResponse=this.clock();this.a.answer?.(result);
+    this.seen.add(key);if(this.seen.size>50)this.seen.delete(this.seen.values().next().value);this.lastResponse=this.clock();this.a.answer?.(result);if(this.settings.mode==='voice'){this.history=[...(this.history||[]),{role:'user',content:question},{role:'assistant',content:result.text}].slice(-8);while(JSON.stringify(this.history).length>6000||this.history.some(m=>m.content.length>4000))this.history.splice(0,2);}
     if(this.settings.output!=='text'&&this.a.speak)await this.playVoice(result.text,this.settings);
    }catch(e){if(generation===this.epoch&&!controller.signal.aborted)this.emit(e.message||'Nebula is unavailable. Please try again.');}
    finally{if(generation===this.epoch){this.processing=false;this.controller=null;this.listenPhase();this.emit();}}
@@ -108,7 +111,7 @@
   pause(){this.stop('paused');}
   stop(phase='stopped'){
    this.epoch++;this.active=false;this.phase=phase;this.controller?.abort();this.controller=null;
-   this.a.clearInterval(this.timer);this.a.clearTimeout(this.restart);this.timer=null;this.restart=null;
+   this.a.clearTimeout(this.turnTimer);this.turnText='';this.turnInterim=false;this.pushHeld=false;this.pushReleasing=false;this.history=[];this.a.clearInterval(this.timer);this.a.clearTimeout(this.restart);this.timer=null;this.restart=null;
    if(this.rec){this.rec.onend=null;this.rec.onresult=null;this.rec.onerror=null;this.rec.onstart=null;try{this.rec.abort();}catch{}this.rec=null;}
    this.stopMeter?.();this.stopMeter=null;this.a.releaseMedia?.();this.micStream?.getTracks().forEach(t=>t.stop());this.micStream=null;this.recognitionFailed=false;
    this.stream?.getTracks().forEach(t=>t.stop());this.stream=null;this.a.video?.(null);
