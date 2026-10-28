@@ -3,13 +3,15 @@
   const API='https://api.scriptnovaa.com/api/nebula';
   const $=selector=>document.querySelector(selector);
   let sdk,auth,config,initPromise,account=null,mode='signin',busy=false,recaptcha=null,confirmation=null,lastSync=null,syncInFlight=null,revision=0;
+  let authState='restoring',retryTimer=null,retryCount=0;
+  function state(value){authState=value;showAccount();window.dispatchEvent(new CustomEvent('nebula:auth-state',{detail:{status:value}}));}
   const appleDevice=/Mac|iPhone|iPad|iPod/i.test(navigator.userAgentData?.platform||navigator.platform||navigator.userAgent);
   function feedback(text,error=false){$('#auth-feedback').textContent=text;$('#auth-feedback').classList.toggle('auth-error',error);}
   function setBusy(value){busy=value;$('#account-dialog').setAttribute('aria-busy',String(value));for(const id of ['auth-email-submit','auth-google','auth-apple','open-phone','send-sms','verify-sms','account-signout','send-verification'])$('#'+id).disabled=value||!auth;}
   function emit(){window.dispatchEvent(new CustomEvent('nebula:account-change',{detail:{account}}));}
   function showAccount(){
     $('#signed-out-panel').hidden=Boolean(account);$('#signed-in-panel').hidden=!account;
-    $('#account-label').textContent=account?.displayName||'Sign in to Nebula';
+    $('#account-label').textContent=account?.displayName||(authState==='restoring'?'Restoring your account…':authState==='unavailable'?'Reconnect account':auth?.currentUser?'Account connection paused':'Sign in to Nebula');
     $('#account-caption').textContent=account?(account.email||account.phoneNumber||'Signed in'):'Your own space';
     $('#account-avatar').textContent=(account?.displayName||'N').slice(0,1).toUpperCase();
     if(account){$('#account-identity').textContent=account.email||account.phoneNumber||account.displayName;$('#account-provider').textContent=({password:'Email account','google.com':'Signed in with Google','apple.com':'Signed in with Apple',phone:'Signed in with phone'})[account.provider]||'Signed in to Nebula';$('#account-training-state').textContent=account.improve?'On':'Off';$('#verification-state').textContent=account.provider==='password'?(account.emailVerified?'Email verified':'Verify your email to help protect your account.'):'Your identity is verified by your sign-in provider.';$('#send-verification').hidden=account.provider!=='password'||account.emailVerified;}
@@ -39,14 +41,15 @@
     'auth/unauthorized-domain':'Sign-in is temporarily unavailable on this address.',
     'auth/user-disabled':'This account is unavailable. Please contact the site owner.',
   })[error?.code]||'Sign-in could not be completed. Please try again.';
-  function accountFailure(error){feedback(friendly(error),true);$('#retry-auth').hidden=false;$('#reset-signin').hidden=!auth?.currentUser;}
+  function accountFailure(error){state('unavailable');feedback(friendly(error),true);clearTimeout(retryTimer);if(auth?.currentUser&&retryCount<3){const delay=[5000,15000,45000][retryCount++];retryTimer=setTimeout(()=>{if(auth?.currentUser&&!document.hidden)acceptUser(auth.currentUser).catch(accountFailure);},delay);}$('#retry-auth').hidden=false;$('#reset-signin').hidden=!auth?.currentUser;}
   async function acceptUser(user){
-    if(!user){revision++;lastSync=null;syncInFlight=null;account=null;showAccount();emit();$('#reset-signin').hidden=true;return;}
+    if(!user){clearTimeout(retryTimer);retryCount=0;state('signedout');revision++;lastSync=null;syncInFlight=null;account=null;showAccount();emit();$('#reset-signin').hidden=true;return;}
+    if(account&&account.uid!==user.uid){account=null;lastSync=null;showAccount();emit();}
     if(syncInFlight?.uid===user.uid)return syncInFlight.promise;
-    const version=++revision;
+    state('loading');const version=++revision;
     const promise=(async()=>{
       let token=await user.getIdToken();
-      if(lastSync?.token===token)return;
+      if(lastSync?.token===token&&account?.uid===user.uid){state('ready');return;}
       const load=token=>fetch(API+'/account',{headers:{Authorization:'Bearer '+token},credentials:'omit',signal:AbortSignal.timeout(20000)});
       let response=await load(token);
       // Refresh once. Observer callbacks share syncInFlight, preventing retry loops.
@@ -55,7 +58,7 @@
       const data=await response.json();
       if(!data.account||data.account.uid!==user.uid)throw Object.assign(new Error('Account unavailable'),{code:'nebula/account-unavailable'});
       if(version!==revision||auth.currentUser?.uid!==user.uid)return;
-      lastSync={token};account=data.account;showAccount();emit();feedback('You are signed in.');$('#auth-password').value='';$('#retry-auth').hidden=true;$('#reset-signin').hidden=true;
+      clearTimeout(retryTimer);retryCount=0;lastSync={token};account=data.account;state('ready');emit();feedback('You are signed in.');$('#auth-password').value='';$('#retry-auth').hidden=true;$('#reset-signin').hidden=true;
       if($('#account-dialog').open)$('#account-dialog').close();
     })();
     const sync={uid:user.uid,promise};syncInFlight=sync;
@@ -70,7 +73,7 @@
       config=await response.json();
       if(!config.firebase?.apiKey||!config.firebase?.authDomain||!config.providers)throw new Error('Sign-in unavailable');
       const [appModule,authModule]=await Promise.all([import('https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js')]);
-      sdk=authModule;auth=sdk.getAuth(appModule.initializeApp(config.firebase,'nebula-web'));
+      sdk=authModule;auth=sdk.getAuth(appModule.getApps?.().find(a=>a.name==='nebula-web')||appModule.initializeApp(config.firebase,'nebula-web'));
       sdk.useDeviceLanguage(auth);
       await sdk.setPersistence(auth,sdk.browserLocalPersistence);
       $('#auth-google').hidden=!config.providers.google;$('#auth-apple').hidden=!config.providers.apple||!appleDevice;$('#open-phone').hidden=!config.providers.phone;$('#email-auth-form').hidden=!config.providers.email;$('#email-divider').hidden=!config.providers.email;
@@ -109,13 +112,16 @@
   $('#account-signout').onclick=()=>run(async()=>{await sdk.signOut(auth);account=null;showAccount();$('#account-dialog').close();feedback('');});
   $('#send-verification').onclick=()=>run(async()=>{if(auth.currentUser){await sdk.sendEmailVerification(auth.currentUser);feedback('Verification email sent. Check your inbox.');}});
   window.NebulaAuth={
+    get restoring(){return authState==='restoring'||!!auth?.currentUser&&account?.uid!==auth.currentUser.uid;},get status(){return authState;},
+    async retry(){await initialize();if(auth.currentUser)await acceptUser(auth.currentUser);},
     async resetPassword(){if(!auth?.currentUser?.email||account?.provider!=='password')throw Error('Use your sign-in provider to manage your password.');try{await sdk.sendPasswordResetEmail(auth,auth.currentUser.email);}catch(e){if(e.code!=='auth/user-not-found')throw Error('Password reset is unavailable. Please try again.');}},
     async signOut(){if(auth)await sdk.signOut(auth);account=null;showAccount();emit();},
     async authorizedFetch(url,options={}){
       // An unavailable authentication service must not prevent deliberate guest use.
       if(initPromise)try{await initPromise;}catch{}
+      options.signal?.throwIfAborted();
       const user=auth?.currentUser;const headers=new Headers(options.headers||{});
-      if(user){if(!account||account.uid!==user.uid)throw Error('Your account is still loading. Open your account and try again.');const token=await user.getIdToken();if(auth.currentUser?.uid!==user.uid)throw Error('Your account changed. Please try again.');headers.set('Authorization','Bearer '+token);}
+      if(user){if(!account||account.uid!==user.uid){await acceptUser(user);if(!account||account.uid!==user.uid)throw Error('Your account is reconnecting. Open your account to retry.');}const token=await user.getIdToken();if(auth.currentUser?.uid!==user.uid)throw Error('Your account changed. Please try again.');headers.set('Authorization','Bearer '+token);}
       return fetch(url,{...options,headers});
     },
     async savePreferences(patch){
@@ -125,5 +131,6 @@
     },
     updatePreferenceView(improve){if(account){account.improve=improve;showAccount();window.dispatchEvent(new CustomEvent('nebula:account-change',{detail:{account}}));}},
   };
-  setMode('signin');showAccount();initialize().catch(()=>{});
+  window.addEventListener('online',()=>{if(auth?.currentUser&&authState==='unavailable')acceptUser(auth.currentUser).catch(accountFailure);});
+  setMode('signin');showAccount();initialize().catch(accountFailure);
 })();
