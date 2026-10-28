@@ -3,7 +3,8 @@
   const API='https://api.scriptnovaa.com/api/nebula';
   const $=selector=>document.querySelector(selector);
   let sdk,auth,config,initPromise,account=null,mode='signin',busy=false,recaptcha=null,confirmation=null,lastSync=null,syncInFlight=null,revision=0;
-  let authState='restoring',retryTimer=null,retryCount=0;
+  let authState='restoring',retryTimer=null,retryCount=0,tokenFlight=null;
+  function tokenFor(user,force=false,signal){if(!tokenFlight||tokenFlight.uid!==user.uid){const entry={uid:user.uid};entry.promise=Promise.resolve().then(()=>user.getIdToken(force)).finally(()=>{if(tokenFlight===entry)tokenFlight=null;});tokenFlight=entry;}const task=tokenFlight.promise,deadline=AbortSignal.any([AbortSignal.timeout(15000),...(signal?[signal]:[])]);return new Promise((resolve,reject)=>{const cancel=()=>reject(signal?.aborted?signal.reason:Object.assign(Error('Account connection timed out. Please retry.'),{code:'auth/network-request-failed'}));if(deadline.aborted){cancel();return;}deadline.addEventListener('abort',cancel,{once:true});task.then(resolve,reject).finally(()=>deadline.removeEventListener('abort',cancel));});}
   function state(value){authState=value;showAccount();window.dispatchEvent(new CustomEvent('nebula:auth-state',{detail:{status:value}}));}
   const appleDevice=/Mac|iPhone|iPad|iPod/i.test(navigator.userAgentData?.platform||navigator.platform||navigator.userAgent);
   function feedback(text,error=false){$('#auth-feedback').textContent=text;$('#auth-feedback').classList.toggle('auth-error',error);}
@@ -48,12 +49,12 @@
     if(syncInFlight?.uid===user.uid)return syncInFlight.promise;
     state('loading');const version=++revision;
     const promise=(async()=>{
-      let token=await user.getIdToken();
+      let token=await tokenFor(user);
       if(lastSync?.token===token&&account?.uid===user.uid){state('ready');return;}
       const load=token=>fetch(API+'/account',{headers:{Authorization:'Bearer '+token},credentials:'omit',signal:AbortSignal.timeout(20000)});
       let response=await load(token);
       // Refresh once. Observer callbacks share syncInFlight, preventing retry loops.
-      if(response.status===401){token=await user.getIdToken(true);if(version!==revision||auth.currentUser?.uid!==user.uid)return;response=await load(token);}
+      if(response.status===401){token=await tokenFor(user,true);if(version!==revision||auth.currentUser?.uid!==user.uid)return;response=await load(token);}
       if(!response.ok)throw Object.assign(new Error('Account unavailable'),{code:response.status===401?'nebula/session-rejected':response.status===429?'nebula/rate-limited':'nebula/account-unavailable'});
       const data=await response.json();
       if(!data.account||data.account.uid!==user.uid)throw Object.assign(new Error('Account unavailable'),{code:'nebula/account-unavailable'});
@@ -121,7 +122,7 @@
       if(initPromise)try{await initPromise;}catch{}
       options.signal?.throwIfAborted();
       const user=auth?.currentUser;const headers=new Headers(options.headers||{});
-      if(user){if(!account||account.uid!==user.uid){await acceptUser(user);if(!account||account.uid!==user.uid)throw Error('Your account is reconnecting. Open your account to retry.');}const token=await user.getIdToken();if(auth.currentUser?.uid!==user.uid)throw Error('Your account changed. Please try again.');headers.set('Authorization','Bearer '+token);}
+      if(user){if(!account||account.uid!==user.uid){await acceptUser(user);if(!account||account.uid!==user.uid)throw Error('Your account is reconnecting. Open your account to retry.');}let token;try{token=await tokenFor(user,false,options.signal);}catch(e){if(e.name==='AbortError')throw e;if(e.code==='auth/network-request-failed'){accountFailure(e);throw Object.assign(Error('Your account connection is paused. Please retry shortly.'),{code:'AUTH_UNAVAILABLE'});}throw e;}options.signal?.throwIfAborted();if(auth.currentUser?.uid!==user.uid)throw Error('Your account changed. Please try again.');headers.set('Authorization','Bearer '+token);}
       return fetch(url,{...options,headers});
     },
     async savePreferences(patch){
