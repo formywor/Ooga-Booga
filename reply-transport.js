@@ -1,0 +1,6 @@
+(function(root){'use strict';
+ const retryable=e=>!e.code||['UNAVAILABLE','DUPLICATE_TURN'].includes(e.code)||[408,502,503,504].includes(e.status);
+ const pause=(ms,signal)=>new Promise((resolve,reject)=>{if(signal?.aborted)return reject(signal.reason);const stop=()=>{clearTimeout(timer);reject(signal.reason);};const timer=setTimeout(()=>{signal?.removeEventListener('abort',stop);resolve();},ms);signal?.addEventListener('abort',stop,{once:true});});
+ async function deliverReply({send,recover,signal,onReconnect,wait=pause}){let error;for(let attempt=0;attempt<=3;attempt++){signal?.throwIfAborted();if(attempt){onReconnect?.('Reconnecting '+attempt+'/3…');await wait([0,1500,3000,5000][attempt],signal);signal?.throwIfAborted();if(recover){try{const saved=await recover();if(saved)return saved;}catch(e){if(signal?.aborted)throw e;}}}try{return await send(attempt===0?'stream':'json');}catch(e){if(signal?.aborted||!retryable(e))throw e;error=e;}}throw Object.assign(Error('Disconnected. Your message is saved. Try again to check for an answer.'),{code:'DISCONNECTED',cause:error});}
+ const api={deliverReply,retryable};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.NebulaReplyTransport=api;
+})(typeof window==='undefined'?{}:window);
