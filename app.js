@@ -28,7 +28,7 @@
     if(!modelChosen)selectedModel=account?.defaultModel||selectedModel||'nebula-ultra';
     if(account?.theme)settings.theme=account.theme;applyTheme();applyDisplay();renderModelOptions();renderSuggestions();
     $('#footnote-status').textContent=account?(settings.improve?'Training sharing is on. Change in Settings.':settings.externalReview?'AI reviews are on. Change in Settings.':'Sharing is off.'):'Guest chats are temporary.';
-    
+
   }
   function applyDisplay(){$('#settings-button').textContent=({gear:'⚙',sliders:'☷',spark:'✦'})[settings.settingsIcon||'gear'];document.documentElement.dataset.textSize=settings.textSize||'normal';document.documentElement.dataset.compact=String(settings.compactChat===true);document.documentElement.dataset.reduceMotion=String(settings.reduceMotion===true);for(const key of ['accentColor','readingFont','workspaceView','showStarters','bubbleStyle','settingsIcon','hideUltraNotice'])document.documentElement.dataset[key]=String(settings[key]);}
   function renderModelOptions(){
@@ -95,7 +95,7 @@
     $('#stop').hidden=!pending;$('#prompt').disabled=Boolean(pending)||loading||authRestoring;$('#send').disabled=Boolean(pending)||loading||authRestoring||!catalog?.models.some(m=>m.id===selectedModel&&canUseModel(m))||!$('#prompt').value.trim();
     requestAnimationFrame(()=>{if(follow)scroll.scrollTop=scroll.scrollHeight;updateJump();});
   }
-  async function reviewLast(c,turnId,automatic=false){
+  async function reviewLast(c,turnId,automatic=false){if(automatic&&(!document.hasFocus()||window.NebulaChatInputs?.voiceBusy))return;
     if(!account||!settings.externalReview){if(!automatic)window.NebulaWorkspace.openSettings?.('data');return;}
     if(reviewing||pending||loading)return;
     const version=epoch;reviewing=true;reviews.set(turnId,'Reviewing...');render();
@@ -107,7 +107,7 @@
     finally{reviewing=false;if(version===epoch)render();}
   }
   async function checkReviews(){
-    if(!account||!settings.externalReview||!catalog?.externalReviewAvailable||pending||loading||reviewing||document.hidden||!chats.length)return;
+    if(!account||!settings.externalReview||!catalog?.externalReviewAvailable||pending||loading||reviewing||document.hidden||!document.hasFocus()||window.NebulaChatInputs?.voiceBusy||!chats.length)return;
     // Scan one chat each minute; the server owns eligibility, batching, leases and cooldowns.
     const candidates=[current(),chats[reviewCursor++%chats.length]].filter((c,i,a)=>c&&a.indexOf(c)===i);
     for(const c of candidates){if((reviewRetry.get(c.id)||0)>Date.now())continue;const last=c.messages?.findLast(m=>m.role==='user');await reviewLast(c,last?.id||c.id,true);}
@@ -168,7 +168,7 @@
   };
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=async()=>{const patch={workspaceView:b.dataset.view};try{if(account)await window.NebulaAuth.savePreferences(patch);window.NebulaWorkspace.setDisplay(patch);$('#view-picker').open=false;}catch{notice('Your view could not be saved. Please try again.');}});
   document.addEventListener('click',e=>{for(const id of ['model-picker','view-picker'])if(!$('#'+id).contains(e.target))$('#'+id).open=false;});
-  setInterval(checkReviews,60000);
+  setInterval(checkReviews,300000);
   $('#features-menu').addEventListener('click',e=>{if(e.target.closest('button'))$('#features-menu').open=false;});
   function updateJump(){const el=$('#scroll-area');$('#jump-latest').hidden=$('#thread').hidden||el.scrollHeight-el.scrollTop-el.clientHeight<120;}
   $('#scroll-area').addEventListener('scroll',updateJump,{passive:true});$('#jump-latest').onclick=()=>{$('#scroll-area').scrollTop=$('#scroll-area').scrollHeight;updateJump();};
