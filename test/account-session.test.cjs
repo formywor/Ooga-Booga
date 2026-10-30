@@ -5,7 +5,7 @@ const user={uid:'same-user',getIdToken:async()=>token};const auth={currentUser:u
 const sdk={getAuth:()=>auth,useDeviceLanguage(){},setPersistence:async()=>{},onIdTokenChanged(_,callback){observer=callback;},signOut:async()=>{signouts++;}};
 const fetcher=async url=>{if(url.endsWith('/auth/config'))return Response.json({firebase:{apiKey:'public-test',authDomain:'test',projectId:'test',appId:'test'},providers:{email:true,google:true}});accountCalls++;return new Promise(r=>resolveAccount=r);};
 const window={dispatchEvent:e=>events.push(e),addEventListener(){}};
-const context={window,document:{querySelector:get,hidden:false},navigator:{platform:'Win32'},fetch:fetcher,AbortSignal,Headers,Response,setTimeout:()=>1,clearTimeout(){},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},testImport:async url=>url.includes('firebase-auth')?sdk:{initializeApp:()=>({})}};
+const context={window,document:{querySelector:get,hidden:false,addEventListener(){}},navigator:{platform:'Win32'},fetch:fetcher,AbortSignal,Headers,Response,setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){},localStorage:{getItem:()=>null,setItem(){}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},testImport:async url=>url.includes('firebase-auth')?sdk:{initializeApp:()=>({})}};
 let source=fs.readFileSync(require('node:path').join(__dirname,'../account.js'),'utf8').replaceAll("import('https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js')","testImport('firebase-app')").replaceAll("import('https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js')","testImport('firebase-auth')");
 vm.runInNewContext(source,context);
 const tick=()=>new Promise(r=>setImmediate(r));
