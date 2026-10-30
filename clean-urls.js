@@ -1,0 +1,1 @@
+'use strict';(()=>{const p=location.pathname;if(p==='/index.html'){location.replace('/'+location.search+location.hash);return;}if(/\.html$/.test(p)&&p!=='/404.html'){location.replace(p.slice(0,-5).replace(/\/index$/,'')+'/'+location.search+location.hash);}})();
