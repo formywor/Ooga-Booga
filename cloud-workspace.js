@@ -6,7 +6,7 @@
  function download(value,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([value],{type:'text/plain;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
  function show(result){
   lastResult=result;$('#cloud-export-report').disabled=false;const out=$('#cloud-environment-results');out.replaceChildren();
-  const title=document.createElement('p');title.textContent=result.fallbackUsed?'Source-only recovery succeeded. JavaScript, console and live API activity were not inspected.':result.mode==='rendered-public-page'?'Rendered page inspection completed.':'Public-source analysis completed.';out.append(title);
+  const title=document.createElement('p');title.textContent=result.fallbackUsed?'Source-only recovery succeeded. JavaScript, console and live API activity were not inspected.':result.mode==='rendered-public-page'?'Rendered page inspection completed.':result.exitCode!==undefined?'Isolated code run completed.':'Public-source analysis completed.';out.append(title);
   const copy=document.createElement('button');copy.type='button';copy.textContent='Copy report';copy.onclick=()=>navigator.clipboard.writeText(JSON.stringify(result,null,2)).catch(()=>status('Select the report to copy it.'));out.append(copy);
   for(const [key,value]of Object.entries(result)){const details=document.createElement('details'),summary=document.createElement('summary'),pre=document.createElement('pre');summary.textContent=key;details.open=['stdout','text','title','exitCode','stderr','notice','error','message'].includes(key);pre.textContent=typeof value==='string'?value:JSON.stringify(value,null,2);details.append(summary,pre);out.append(details);}
  }
