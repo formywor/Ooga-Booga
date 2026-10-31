@@ -1,5 +1,5 @@
 {
- "manifest_version":3,"name":"Nebula PC Preview","version":"0.3.0","minimum_chrome_version":"120",
+ "manifest_version":3,"name":"Nebula PC Preview","version":"0.3.1","minimum_chrome_version":"120",
  "description":"Pair your browser with Nebula for 30 days. Observe approved tabs and approve individual browser actions.",
  "permissions":["activeTab","scripting","storage","alarms","webRequest"],
  "host_permissions":["https://api.scriptnovaa.com/*"],"optional_host_permissions":["https://*/*"],
