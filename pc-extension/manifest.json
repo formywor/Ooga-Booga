@@ -1,0 +1,9 @@
+{
+ "manifest_version":3,"name":"Nebula PC Preview","version":"0.1.0","minimum_chrome_version":"120",
+ "description":"Pair your browser with Nebula for one hour. Observe approved tabs and approve individual browser actions.",
+ "permissions":["activeTab","scripting","storage","alarms","webRequest"],
+ "host_permissions":["https://api.scriptnovaa.com/*"],"optional_host_permissions":["https://*/*"],
+ "background":{"service_worker":"background.js","type":"module"},
+ "action":{"default_popup":"popup.html","default_title":"Nebula PC — connect or stop"},
+ "content_security_policy":{"extension_pages":"script-src 'self'; object-src 'none'; connect-src https://api.scriptnovaa.com"}
+}
