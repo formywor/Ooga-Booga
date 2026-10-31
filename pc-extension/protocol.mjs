@@ -3,3 +3,5 @@ export function publicUrl(value){let u;try{u=new URL(value);}catch{throw Error('
 export function safeUrl(value){try{const u=new URL(value);return mask(u.origin+u.pathname);}catch{return '';}}
 export function mask(value){return String(value).replace(/\b(?:gsk_|hf_|sk-|AIza|AQ\.|nb_live_)[A-Za-z0-9_-]{18,}\b/g,'[credential hidden]').replace(/\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,'[token hidden]').replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,'[private key hidden]');}
 export const writes=action=>['click','type','press'].includes(action);
+
+export function sessionAllows(value,origins=[]){const u=publicUrl(value);return origins.includes('https://*/*')||origins.includes(u.origin+'/*');}
