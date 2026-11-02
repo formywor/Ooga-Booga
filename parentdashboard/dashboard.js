@@ -21,9 +21,9 @@ remote.init(api,message=>{$('message').textContent=message;});
 
 async function action(fn){$('message').textContent='';try{await fn();}catch(e){$('message').textContent=e.message;}}
 
-async function unlock(login){const remember=$('remember').checked;if(login){const r=await fetch(API+'/api/family/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$('username').value.trim(),pin:$('pin').value,clientDescription:'ScriptNovaa parent dashboard'})});const b=await r.json();if(!r.ok||!b.loginToken)throw Error(b.error||'Sign-in failed.');token=b.loginToken;window.ScriptNovaaAuth?.save(token,remember);}if(!token)throw Error('Sign in with your account first.');let b;try{b=await api('unlock',{pin:$('pin').value,remember});}finally{$('pin').value='';}grant=b.grant;forget();(remember?localStorage:sessionStorage).setItem(SESSION_KEY,JSON.stringify({token,grant,expires:b.expires}));showDashboard();await refresh();}
-
-$('signin').onclick=()=>action(()=>unlock(true));$('unlock').onclick=()=>action(()=>unlock(false));
+async function unlock(){const remember=$('remember').checked;try{const r=await fetch(API+'/api/family/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:$('pin').value,remember})});const login=await r.json();if(!r.ok||!login.loginToken)throw Error(login.error||'Could not unlock.');token=login.loginToken;window.ScriptNovaaAuth?.save(token,remember);const b=await api('unlock',{pin:$('pin').value,remember});grant=b.grant;forget();(remember?localStorage:sessionStorage).setItem(SESSION_KEY,JSON.stringify({token,grant,expires:b.expires}));showDashboard();await refresh();}finally{$('pin').value='';}}
+$('signin').onclick=()=>action(unlock);
+$('pin').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();action(unlock);}});
 
 $('logout').onclick=()=>action(async()=>{try{await remote.stop();await api('lock',{});}finally{forget();window.ScriptNovaaAuth?.clear(token);token='';showLogin();$('devices').replaceChildren();}});
 
