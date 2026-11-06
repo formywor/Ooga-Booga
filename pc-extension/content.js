@@ -1,6 +1,6 @@
 // This file runs in Chrome's isolated extension world, never the page's JavaScript world.
 (()=>{
- if(globalThis.__nebulaPc?.version==='0.3.2')return;
+ if(globalThis.__nebulaPc?.version==='0.3.3')return;
  document.getElementById('nebula-pc-overlay')?.remove();
  let snapshot=null,controls=new Map(),errors=[];
  let cursor=null,move=null,hideCursor=null,lastPoint=null,cursorEpoch=0;
@@ -34,17 +34,23 @@
   root.append(ring,arrow);
   document.documentElement.append(root);
   cursor=root;
-  hideCursor=setTimeout(clearCursor,1800);
-  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-   move=root.animate([{transform:transform(from)},{transform:transform(position)}],{duration:260,easing:'ease-out'});
-   await move.finished.catch(()=>{});
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reducedMotion){
+   const animation=root.animate([{transform:transform(from)},{transform:transform(position)}],{duration:260,easing:'ease-out'});
+   move=animation;
+   let fallback;
+   await Promise.race([animation.finished.catch(()=>{}),new Promise(resolve=>{fallback=setTimeout(resolve,350);})]);
+   clearTimeout(fallback);
+   animation.cancel();
+   if(move===animation)move=null;
   }
   if(epoch!==cursorEpoch)throw Error('PC_ACTION_INTERRUPTED');
   validate();
+  hideCursor=setTimeout(clearCursor,1400);
   const current=point();
   root.style.transform=transform(current);
   lastPoint=current;
-  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)ring.animate([{opacity:1,transform:'scale(.45)'},{opacity:0,transform:'scale(1.8)'}],{duration:340,easing:'ease-out'});
+  if(!reducedMotion)ring.animate([{opacity:1,transform:'scale(.45)'},{opacity:0,transform:'scale(1.8)'}],{duration:340,easing:'ease-out'});
  }
 
  const mask=s=>String(s).replace(/\b(?:gsk_|hf_|sk-|AIza|AQ\.|nb_live_)[A-Za-z0-9_-]{18,}\b/g,'[credential hidden]').replace(/\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,'[token hidden]').replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,'[private key hidden]');
@@ -72,5 +78,5 @@
   else if(command.action==='press'){e.focus();if(a.key==='Enter'&&e.form)e.form.requestSubmit();else if((a.key==='Enter'||a.key==='Space')&&e.matches('button,a[href],[role=button]'))await click();else{e.dispatchEvent(new KeyboardEvent('keydown',{key:a.key,bubbles:true}));e.dispatchEvent(new KeyboardEvent('keyup',{key:a.key,bubbles:true}));}}
   else throw Error('INVALID_PC_ACTION');return {ok:true,action:command.action,target:mask(label(e)),url:url(location.href),notice:'Action dispatched. Inspect the page again to verify the actual outcome.'};
  }catch(e){return {ok:false,error:/^[A-Z_]+$/.test(e.message)?e.message:'PC_ACTION_FAILED'};}}
- globalThis.__nebulaPc={version:'0.3.2',run,overlay,stop:()=>{clearCursor();snapshot=null;document.getElementById('nebula-pc-overlay')?.remove();}};overlay();
+ globalThis.__nebulaPc={version:'0.3.3',run,overlay,stop:()=>{clearCursor();snapshot=null;document.getElementById('nebula-pc-overlay')?.remove();}};overlay();
 })();
