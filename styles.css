@@ -72,3 +72,12 @@
 @keyframes activity-cursor{0%,100%{transform:translate(-2px,2px) rotate(-12deg);opacity:.55}45%{transform:translate(2px,-3px) rotate(10deg);opacity:1}}
 @media(prefers-reduced-motion:reduce){.activity-cursors i{animation:none}}
 html[data-reduce-motion="true"] .activity-cursors i{animation:none}
+.reset-gifts{margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:14px}
+.reset-gifts h3{margin:0 0 4px}
+.reset-gifts ul{list-style:none;margin:10px 0 0;padding:0}
+.reset-gifts li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.reset-gifts small{display:block;margin-top:3px;color:var(--muted)}
+.reset-gifts button{flex:none}
+.reset-gifts [role=status]:empty{display:none}
+.reset-gift-form fieldset{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:8px}
+.reset-gift-form fieldset label{display:flex;gap:8px;align-items:center}
