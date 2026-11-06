@@ -64,3 +64,11 @@
 #pc-inline-actions:empty{display:none}#pc-inline-actions{max-height:42vh;overflow:auto;margin-bottom:10px}#pc-inline-actions .pc-action{background:var(--surface,#201c2b);border:1px solid #8b72b766;border-radius:14px;padding:12px;margin:8px 0}#pc-inline-actions pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:200px;overflow:auto}#pc-inline-actions button,#pc-mode-hint button{margin:5px 8px 0 0;min-height:40px}#pc-mode-hint{padding:10px;border:1px solid #8b72b766;border-radius:12px;margin-bottom:8px;font-size:14px}
 
 #pc-inline-actions{max-height:none;overflow:visible;margin-bottom:6px}.pc-task-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;border:1px solid #8b72b766;border-radius:10px;padding:0 8px;font-size:13px}.pc-task-bar span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pc-task-body{max-height:28vh;overflow:auto;overscroll-behavior:contain}#pc-inline-actions .pc-task-bar button{margin:0;white-space:nowrap;min-height:36px}#pc-inline-actions .pc-action{padding:8px;margin:6px 0}#pc-inline-actions .pc-action p{font-size:13px;margin:5px 0;overflow-wrap:anywhere}@media(max-width:600px){.pc-task-body{max-height:24dvh}#pc-inline-actions pre{max-height:100px}.pc-task-bar{min-height:38px}.pc-task-bar button{font-size:12px}}
+
+.activity-cursors{display:inline-flex;align-items:center;gap:3px;flex:none;height:17px;margin-inline-start:4px}
+.activity-cursors i{width:10px;height:13px;clip-path:polygon(0 0,100% 63%,62% 69%,46% 100%);background:var(--accent);animation:activity-cursor 1.4s ease-in-out infinite}
+.activity-cursors i:nth-child(2){background:#3faea8;animation-delay:.14s}
+.activity-cursors i:nth-child(3){background:#8585ed;animation-delay:.28s}
+@keyframes activity-cursor{0%,100%{transform:translate(-2px,2px) rotate(-12deg);opacity:.55}45%{transform:translate(2px,-3px) rotate(10deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.activity-cursors i{animation:none}}
+html[data-reduce-motion="true"] .activity-cursors i{animation:none}
