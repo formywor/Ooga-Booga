@@ -53,10 +53,10 @@
       workspace.cancelReply(workspace.activeChat?.messages?.at(-1)?.id);$('#erase-account-error').textContent='Deleting saved data…';
       await workspace.api(eraseMode==='account'?'/account':'/account/data',{method:'DELETE',signal:AbortSignal.timeout(90000)});
       await workspace.clearChats({remote:false});
-      await window.NebulaCallMedia?.eraseLocalGallery(eraseOwner);
+      let localWarning='';try{await window.NebulaCallMedia?.eraseLocalGallery(eraseOwner);}catch{localWarning=' The browser could not clear its local photo gallery; remove those photos from this device separately.';}
       window.dispatchEvent(new CustomEvent('nebula:data-erased',{detail:{uid:eraseOwner}}));
       if(eraseMode==='account')await window.NebulaAuth.signOut();else await window.NebulaAuth.retry();
-      $('#erase-account-dialog').close();status(eraseMode==='account'?'Account deleted.':'Saved account data deleted. Training sharing is off.');
+      $('#erase-account-dialog').close();status((eraseMode==='account'?'Account deleted.':'Saved account data deleted. Training sharing is off.')+localWarning);
     }catch(e){$('#erase-account-error').textContent=e.code?.startsWith('auth/')?'Identity confirmation failed. Check your sign-in and try again.':e.message||'Deletion could not finish. Retry to complete it.';}
     finally{erasing=false;$('#erase-account-password').value='';$('#erase-account-cancel').disabled=false;$('#erase-account-confirm').disabled=$('#erase-account-word').value!=='DELETE';}
   };
