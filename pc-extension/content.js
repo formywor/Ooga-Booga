@@ -1,16 +1,16 @@
 // This file runs in Chrome's isolated extension world, never the page's JavaScript world.
 (()=>{
- if(globalThis.__nebulaPc?.version==='0.3.5')return;
+ if(globalThis.__nebulaPc?.version==='0.3.6')return;
  document.getElementById('nebula-pc-overlay')?.remove();
  let snapshot=null,controls=new Map(),errors=[];
- let cursor=null,move=null,hideCursor=null,lastPoint=null,cursorEpoch=0;
+ let cursor=null,move=null,lastPoint=null,cursorEpoch=0;
  const colors={
   'nebula-ultra':'#a88cff','nebula-open':'#46d9c5','nebula-d2':'#ff8a65',
   'nebula-spark':'#ffcc4d','nebula-duo':'#f18bdd','nebula-classic':'#8de18b',
   'nebula-v4':'#65a9ff','nebula-v1-lite':'#e5e7eb','nebula-v2-1':'#ff9ec2'
  };
  function clearCursor(){
-  cursorEpoch++;move?.cancel();move=null;clearTimeout(hideCursor);
+  cursorEpoch++;move?.cancel();move=null;
   cursor?.remove();cursor=null;
  }
  async function showPointer(element,modelId,validate,isClick=false){
@@ -46,7 +46,7 @@
   }
   if(epoch!==cursorEpoch)throw Error('PC_ACTION_INTERRUPTED');
   validate();
-  hideCursor=setTimeout(clearCursor,1400);
+
   const current=point();
   root.style.transform=transform(current);
   lastPoint=current;
@@ -60,7 +60,7 @@
  const sensitive=e=>e.matches('input[type=password],input[type=file],input[type=hidden]')||/password|passcode|\bpin\b|verification|two.factor|one-time|otp|security.code|\bcc-|credit.card|card.number|cvv|cvc|social.security|ssn|iban|routing.number/i.test([e.type,e.autocomplete,e.name,e.id,label(e)].join(' '));
  const normalize=s=>String(s).toLowerCase().replace(/[:：]/g,'').replace(/\s+/g,' ').trim();
  const fingerprint=e=>[e.tagName,e.getAttribute('role'),label(e),e.getAttribute('href'),e.getAttribute('type')].join('|');
- const overlay=()=>{if(document.getElementById('nebula-pc-overlay'))return;const box=document.createElement('div');box.id='nebula-pc-overlay';box.style.cssText='position:fixed;bottom:14px;right:14px;z-index:2147483647;background:#201b32;color:#fff;border:1px solid #a88cff;border-radius:12px;padding:10px 14px;font:13px system-ui;box-shadow:0 4px 24px #0005;display:flex;gap:12px;align-items:center';const text=document.createElement('span');text.textContent='Nebula PC 0.3.5 connected';const stop=document.createElement('button');stop.textContent='Stop';stop.style.cssText='background:#fff;color:#201b32;border:0;border-radius:6px;padding:6px 10px;cursor:pointer';stop.onclick=()=>chrome.runtime.sendMessage({type:'STOP'});box.append(text,stop);document.documentElement.append(box);};
+ const overlay=()=>{if(document.getElementById('nebula-pc-overlay'))return;const box=document.createElement('div');box.id='nebula-pc-overlay';box.style.cssText='position:fixed;bottom:14px;right:14px;z-index:2147483647;background:#201b32;color:#fff;border:1px solid #a88cff;border-radius:12px;padding:10px 14px;font:13px system-ui;box-shadow:0 4px 24px #0005;display:flex;gap:12px;align-items:center';const text=document.createElement('span');text.textContent='Nebula PC 0.3.6 connected';const stop=document.createElement('button');stop.textContent='Stop';stop.style.cssText='background:#fff;color:#201b32;border:0;border-radius:6px;padding:6px 10px;cursor:pointer';stop.onclick=()=>chrome.runtime.sendMessage({type:'STOP'});box.append(text,stop);document.documentElement.append(box);};
  window.addEventListener('error',e=>{if(errors.length<10)errors.push({message:mask(e.message||'Resource error').slice(0,250),source:url(e.filename||'')});});
  function inspect(query='',record=true){overlay();if(record){controls=new Map();snapshot={id:crypto.randomUUID(),url:location.href,at:Date.now()};}const elements=[];const deadline=Date.now()+200;let controlsVisited=0;const selector='a[href],button,input,textarea,select,[role=button],[role=checkbox],[role=combobox],[role=textbox],[contenteditable=true]';
   const priority=Array.from(document.querySelectorAll('[role=dialog],dialog[open]')).filter(visible).flatMap(dialog=>Array.from(dialog.querySelectorAll?.(selector)||[]));
@@ -82,5 +82,5 @@
   else if(command.action==='press'){await showPointer(e,command.modelId,validate);validate();e.focus();if(a.key==='Enter'&&e.form)e.form.requestSubmit();else if((a.key==='Enter'||a.key==='Space')&&e.matches('button,a[href],[role=button]'))await click();else{e.dispatchEvent(new KeyboardEvent('keydown',{key:a.key,bubbles:true}));e.dispatchEvent(new KeyboardEvent('keyup',{key:a.key,bubbles:true}));}}
   else throw Error('INVALID_PC_ACTION');return {ok:true,action:command.action,target:mask(label(e)),url:url(location.href),notice:'Action dispatched. Inspect the page again to verify the actual outcome.'};
  }catch(e){return {ok:false,error:/^[A-Z_]+$/.test(e.message)?e.message:'PC_ACTION_FAILED'};}}
- globalThis.__nebulaPc={version:'0.3.5',run,overlay,stop:()=>{clearCursor();snapshot=null;document.getElementById('nebula-pc-overlay')?.remove();}};overlay();
+ globalThis.__nebulaPc={version:'0.3.6',run,overlay,finish:clearCursor,stop:()=>{clearCursor();snapshot=null;document.getElementById('nebula-pc-overlay')?.remove();}};overlay();
 })();
