@@ -8,7 +8,7 @@ test('isolated page executor excludes sensitive fields, rejects stale snapshots 
  class Input extends Element{constructor(a,t){super('input',a,t);}}Object.defineProperty(Input.prototype,'value',{get(){return this.inputValue;},set(v){this.inputValue=v;}});class Textarea extends Element{}
  const input=new Input({type:'text',placeholder:'Message'}),password=new Input({type:'password',placeholder:'Password'}),otp=new Input({type:'text',autocomplete:'one-time-code',placeholder:'Code'}),button=new Element('button',{},'Send');input.value='private existing field value';const nodes=[input,password,otp,button],overlay=[];
  const document={readyState:'complete',title:'Inbox',forms:[],scripts:[],querySelectorAll:()=>nodes,createElement:tag=>new Element(tag),getElementById:()=>overlay[0]||null,documentElement:{append:e=>overlay.push(e)},createTreeWalker:()=>{let done=false;return{nextNode:()=>{if(done)return null;done=true;return{parentElement:button,nodeValue:'Public page text gsk_'+'a'.repeat(40)};}};},body:{cloneNode:()=>({textContent:'Public page text gsk_'+'a'.repeat(40),querySelectorAll:()=>[]})}};Object.defineProperty(document,'cookie',{get(){throw Error('Cookie access forbidden');}});
- const context={document,window:{addEventListener(){},scrollBy(){}},location:{href:'https://example.com/mail'},crypto:{randomUUID},HTMLInputElement:Input,HTMLTextAreaElement:Textarea,Event:class{constructor(type){this.type=type;}},KeyboardEvent:class{constructor(type){this.type=type;}},MouseEvent:class{constructor(type){this.type=type;}},getComputedStyle:()=>({visibility:'visible'}),innerHeight:800,chrome:{runtime:{sendMessage(){}}},NodeFilter:{SHOW_TEXT:4},URL,Date};vm.runInNewContext(await readFile(new URL('../pc-extension/content.js',import.meta.url),'utf8'),context);const api=context.__nebulaPc,first=await api.run({action:'inspect'});assert.equal(first.elements.length,2);assert.ok(!JSON.stringify(first).includes('private existing field value'));assert.ok(!JSON.stringify(first).includes('gsk_'));assert.ok(!first.elements.some(e=>/password|code/i.test(e.label)));
+ const context={document,window:{addEventListener(){},scrollBy(){}},location:{href:'https://example.com/mail'},crypto:{randomUUID},HTMLInputElement:Input,HTMLTextAreaElement:Textarea,Event:class{constructor(type){this.type=type;}},KeyboardEvent:class{constructor(type){this.type=type;}},MouseEvent:class{constructor(type){this.type=type;}},getComputedStyle:()=>({visibility:'visible'}),innerHeight:800,chrome:{runtime:{sendMessage(){}}},NodeFilter:{SHOW_TEXT:4},URL,URLSearchParams,Date};vm.runInNewContext(await readFile(new URL('../pc-extension/content.js',import.meta.url),'utf8'),context);const api=context.__nebulaPc,first=await api.run({action:'inspect'});assert.equal(first.elements.length,2);assert.ok(!JSON.stringify(first).includes('private existing field value'));assert.ok(!JSON.stringify(first).includes('gsk_'));assert.ok(!first.elements.some(e=>/password|code/i.test(e.label)));
  const typed=await api.run({action:'type',args:{snapshotId:first.snapshotId,elementId:'e1',text:'Draft message'}});assert.equal(typed.ok,true);assert.equal(input.value,'Draft message');const form=await api.run({action:'inspect_form'});assert.equal(form.elements.find(e=>e.label==='Message').value,'Draft message');assert.ok(!form.elements.some(e=>/Password|Code/.test(e.label)));assert.deepEqual(input.events,['input','change']);input.type='password';const stale=await api.run({action:'type',args:{snapshotId:first.snapshotId,elementId:'e1',text:'Never enter this'}});assert.equal(stale.ok,false);assert.equal(input.value,'Draft message');const next=await api.run({action:'inspect'});assert.notEqual(next.snapshotId,first.snapshotId);assert.equal((await api.run({action:'click',args:{snapshotId:first.snapshotId,elementId:'e2'}})).error,'PC_STALE_SNAPSHOT');assert.equal(button.clicked,undefined);
  const recipient=new Input({type:'text','aria-label':'To recipients'});
  nodes.push(recipient);
@@ -28,6 +28,19 @@ test('isolated page executor excludes sensitive fields, rejects stale snapshots 
 
  assert.equal(recipient.value,'friend@example.com');
  const select=new Element('select',{name:'Color'});select.options=[{label:'Blue',value:'blue'},{label:'Unavailable',value:'disabled',disabled:true}];const checkbox=new Input({type:'checkbox','aria-label':'Show details'});checkbox.checked=false;nodes.push(select,checkbox);const choices=await api.run({action:'inspect'}),option=choices.elements.find(e=>e.role==='select'),check=choices.elements.find(e=>e.type==='checkbox');assert.equal(option.options[0].value,'blue');assert.equal((await api.run({action:'select_option',args:{snapshotId:choices.snapshotId,elementId:option.id,value:'blue'}})).ok,true);assert.equal(select.value,'blue');assert.equal((await api.run({action:'select_option',args:{snapshotId:choices.snapshotId,elementId:option.id,value:'disabled'}})).error,'PC_OPTION_NOT_FOUND');assert.equal((await api.run({action:'set_checked',args:{snapshotId:choices.snapshotId,elementId:check.id,checked:true}})).ok,true);assert.equal(checkbox.checked,true);await api.run({action:'set_checked',args:{snapshotId:choices.snapshotId,elementId:check.id,checked:true}});assert.equal(checkbox.checked,true);assert.equal((await api.run({action:'hover',args:{snapshotId:choices.snapshotId,elementId:option.id}})).ok,true);assert.equal((await api.run({action:'page_status'})).readyState,'complete');assert.ok((await api.run({action:'find_text',args:{text:'Public page'}})).matches.length);
+ const videoLink=new Element('a',{href:'https://www.youtube.com/watch?v=realVideo123&pp=tracking','title':'Playable result'},'Song title');
+ const movie=new Element('video',{},'Video');Object.assign(movie,{paused:false,ended:false,muted:false,currentTime:12,duration:90,readyState:4});
+ const crowded=Array.from({length:100},(_,i)=>new Element('button',{},'Header '+i));
+ document.querySelector=()=>({querySelectorAll:selector=>selector==='a[href]'?[videoLink]:[videoLink,movie]});
+ document.querySelectorAll=selector=>selector==='[role=dialog],dialog[open]'?[]:selector==='video,audio'?[movie]:selector.startsWith('video,audio,')?[movie]:[...crowded,videoLink,movie];
+ const overview=await api.run({action:'inspect'});assert.ok(!overview.elements.some(e=>e.label==='Playable result'));
+ const links=await api.run({action:'inspect',args:{view:'links'}});assert.equal(links.elements[0].label,'Playable result');assert.equal(links.elements[0].url,'https://www.youtube.com/watch?v=realVideo123');
+ assert.equal((await api.run({action:'click',args:{snapshotId:links.snapshotId,elementId:links.elements[0].id}})).ok,true);assert.equal(videoLink.clicked,true);
+ const media=await api.run({action:'inspect',args:{view:'media'}});assert.equal(media.media[0].paused,false);assert.equal(media.media[0].currentTime,12);assert.equal(media.media[0].duration,90);
+ context.window.getSelection=()=>({toString:()=> 'Selected text csk-'+'a'.repeat(40)});
+ const selection=await api.run({action:'inspect',args:{view:'selection'}});assert.match(selection.text,/Selected text/);assert.ok(!selection.text.includes('csk-'));
+ const main=await api.run({action:'inspect',args:{view:'main'}});assert.equal(main.elements[0].label,'Playable result');
+
 
 });
 
@@ -85,4 +98,13 @@ test('rate-limit cooldown blocks alarm retries, honors server delay and clears a
  const w=await worker({rateLimitPolls:1,retryAfterSeconds:75});await w.run();assert.equal(w.pollCalls,1);assert.equal(w.state.error,'RATE_LIMITED');assert.ok(w.delays.some(ms=>ms>=74000));assert.equal(w.executions,0);
  await w.run();w.advance(30000);await w.run();assert.equal(w.pollCalls,1);assert.equal(w.executions,0);
  w.advance(46000);await w.run();assert.equal(w.pollCalls,2);assert.equal(w.executions,1);assert.equal(w.state.error,null);assert.equal(w.state.retryAt,0);await w.run();assert.equal(w.executions,1);
+});
+
+
+test('navigation reuses an approved same-origin tab and preserves explicit new-tab requests',async()=>{
+ const reuse=await worker({jobAction:'navigate',jobArgs:{url:'https://example.com/results?q=music',newTab:false,reuseTab:true}});
+ await reuse.run();assert.equal(reuse.created.length,0);assert.equal(reuse.results[0].result.tabId,7);
+ const requested=await worker({jobAction:'navigate',jobArgs:{url:'https://example.com/results?q=music',newTab:true}});
+ await requested.run();assert.equal(requested.created.length,1);
+ assert.equal(protocol.safeUrl('https://www.youtube.com/watch?v=abc123&pp=tracking&token=secret'),'https://www.youtube.com/watch?v=abc123');
 });

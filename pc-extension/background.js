@@ -36,9 +36,10 @@ async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||
   return {opened};
  }
  if(job.action==='tabs'){const tabs=[];for(const id of s.tabs||[]){try{const t=await allowed(id,s);tabs.push({tabId:id,title:mask(t.title||''),url:safeUrl(t.url),selected:id===s.selectedTab});}catch{}}return {tabs};}
- if(job.action==='navigate'){const u=publicUrl(a.url);if(!sessionAllows(u.href,s.grantedOrigins)||!await chrome.permissions.contains({origins:[u.origin+'/*']}))throw Error('PC_SITE_PERMISSION_REQUIRED');const selected=a.newTab||s.selectedTab==null?null:await allowed(s.selectedTab,s).catch(error=>{if(!['PC_TAB_NOT_APPROVED','PC_SITE_PERMISSION_REQUIRED','PC_URL_BLOCKED'].includes(error.message))throw error;return null;});
+ if(job.action==='navigate'){const u=publicUrl(a.url);if(!sessionAllows(u.href,s.grantedOrigins)||!await chrome.permissions.contains({origins:[u.origin+'/*']}))throw Error('PC_SITE_PERMISSION_REQUIRED');let selected=a.newTab||s.selectedTab==null?null:await allowed(s.selectedTab,s).catch(error=>{if(!['PC_TAB_NOT_APPROVED','PC_SITE_PERMISSION_REQUIRED','PC_URL_BLOCKED'].includes(error.message))throw error;return null;});
+  if(a.reuseTab){selected=null;for(const id of [s.selectedTab,...[...(s.tabs||[])].reverse()]){if(id==null)continue;const candidate=await allowed(id,s).catch(()=>null);if(candidate&&new URL(candidate.url).origin===u.origin){selected=candidate;break;}}}
   let tabId;
-  if(a.newTab||!selected){
+  if(a.newTab&&!a.reuseTab||!selected){
    const existing=(await Promise.all(s.tabs.map(id=>chrome.tabs.get(id).catch(()=>null)))).filter(Boolean);
    if(existing.length>=8)throw Error('PC_TAB_LIMIT');
    const tab=await chrome.tabs.create({url:u.href,active:true});
@@ -47,7 +48,7 @@ async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||
    if(!updated?.enabled||updated.token!==s.token)throw Error('PC_STOPPED');
    s=updated;
   }else{
-   tabId=selected.id;await chrome.tabs.update(tabId,{url:u.href,active:true});
+   tabId=selected.id;await chrome.tabs.update(tabId,{url:u.href,active:true});await mutate(old=>old?.enabled&&old.token===s.token?{...old,selectedTab:tabId}:old);
   }
   const tab=await readyTab(tabId,s,signal);
   return {tabId,url:safeUrl(tab.url),readyState:'complete',notice:'The browser finished loading. Inspect the page for its current controls.'};}
@@ -105,7 +106,7 @@ chrome.runtime.onMessage.addListener((m,sender,respond)=>{if(sender.id!==chrome.
   if(!next?.enabled||next.token!==current.token)throw Error('PC_STOPPED');
   return {ok:true};
  }
- if(m.type==='START'){if((await state())?.enabled)throw Error('PC_ALREADY_CONNECTED');await stop();const p=await api('/pair/start',{name:m.name||'My computer',protocolVersion:5});const pc={...p,name:m.name||'My computer',enabled:true,paired:false,selectedTab:m.tabId,tabs:[m.tabId],grantedOrigins:m.origins,seen:{},network:[]};await chrome.storage.session.setAccessLevel({accessLevel:'TRUSTED_CONTEXTS'});await writeState(pc);await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();return {code:p.code};}throw Error('INVALID_INPUT');};task().then(respond).catch(e=>respond({error:e.message}));return true;});
+ if(m.type==='START'){if((await state())?.enabled)throw Error('PC_ALREADY_CONNECTED');await stop();const p=await api('/pair/start',{name:m.name||'My computer',protocolVersion:6});const pc={...p,name:m.name||'My computer',enabled:true,paired:false,selectedTab:m.tabId,tabs:[m.tabId],grantedOrigins:m.origins,seen:{},network:[]};await chrome.storage.session.setAccessLevel({accessLevel:'TRUSTED_CONTEXTS'});await writeState(pc);await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();return {code:p.code};}throw Error('INVALID_INPUT');};task().then(respond).catch(e=>respond({error:e.message}));return true;});
 chrome.alarms.onAlarm.addListener(a=>{if(a.name==='nebula-pc')poll();});
 chrome.tabs.onUpdated.addListener((id,change)=>{if(change.status==='complete')state().then(async s=>{if(s?.enabled&&s.paired&&s.tabs.includes(id)&&Date.now()<s.expiresAt){try{await allowed(id,s);await chrome.scripting.executeScript({target:{tabId:id},files:['content.js'],world:'ISOLATED'});}catch{}}});});
 let trafficRows=[],trafficTimer=null;
@@ -113,5 +114,5 @@ async function traffic(d,error){trafficRows.push({tabId:d.tabId,url:safeUrl(d.ur
 
 chrome.webRequest.onCompleted.addListener(d=>{traffic(d,false);},{urls:['https://*/*']});chrome.webRequest.onErrorOccurred.addListener(d=>{traffic(d,true);},{urls:['https://*/*']});
 
-async function reconnect(){const s=await state();if(s?.enabled){if(s.expiresAt&&s.expiresAt<=Date.now()){await stop();return;}if(s.paired&&s.protocolVersion>=2&&s.protocolVersion<5){try{await api('/agent/'+s.deviceId+'/upgrade',{protocolVersion:5},s);await mutate(old=>old?.enabled&&old.token===s.token?{...old,protocolVersion:5}:old);}catch{}}await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();}}
+async function reconnect(){const s=await state();if(s?.enabled){if(s.expiresAt&&s.expiresAt<=Date.now()){await stop();return;}if(s.paired&&s.protocolVersion>=2&&s.protocolVersion<6){try{await api('/agent/'+s.deviceId+'/upgrade',{protocolVersion:6},s);await mutate(old=>old?.enabled&&old.token===s.token?{...old,protocolVersion:6}:old);}catch{}}await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();}}
 chrome.runtime.onStartup.addListener(reconnect);reconnect();
