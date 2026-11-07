@@ -86,3 +86,5 @@ html[data-reduce-motion="true"] .activity-cursors i{animation:none}
 @media(max-width:650px){dialog{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}.account-dialog{padding:22px 18px;width:calc(100vw - 24px)}.account-summary{grid-template-columns:1fr}.account-summary strong{text-align:left}.archive-bulk button{flex:1}.archive-bulk span{flex-basis:100%}.confirm-actions{flex-wrap:wrap}.confirm-actions button{flex:1;min-height:44px}.auth-tabs button{font-size:14px}.archive-row{padding:12px 4px}}
 
 .model-option.model-variant{margin-left:12px;width:calc(100% - 12px);border-left:2px solid var(--accent);padding-left:12px}.model-option.model-variant strong:before{content:"↳ ";color:var(--muted)}
+
+#erase-account-dialog{max-width:520px;width:calc(100vw - 24px)}#erase-account-dialog input{box-sizing:border-box;width:100%;font-size:16px;margin:8px 0 16px}#erase-account-error,#clear-chats-error,#archive-bulk-status{overflow-wrap:anywhere}button:disabled{cursor:default}

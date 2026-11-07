@@ -37,7 +37,30 @@
   $('#clear-memory').onclick=()=>run(async()=>{await workspace.api('/memory',{method:'DELETE'});await memory();status('Saved facts cleared.');});
   $('#plan-owner-form').onsubmit=e=>{e.preventDefault();run(async()=>{await workspace.api('/tiers',{method:'PUT',body:JSON.stringify({uid:$('#plan-uid').value.trim(),tier:$('#plan-tier').value,status:$('#plan-standing').value,reason:$('#plan-reason').value.trim()})});status('Reviewed account decision saved.');await workspace.refreshUsage();});};
   $('#refresh-usage').onclick=()=>run(async()=>{if(!await workspace.refreshUsage())throw Error('Usage is unavailable. Please try again.');});
-  $('#export').onclick=()=>run(()=>workspace.exportChats());$('#clear').onclick=()=>$('#confirm-dialog').showModal();$('#cancel-clear').onclick=()=>$('#confirm-dialog').close();$('#confirm-clear').onclick=()=>run(async()=>{await workspace.clearChats();$('#confirm-dialog').close();status('Chats deleted.');});
+  let eraseMode='data',eraseOwner=null,erasing=false;
+  function eraseDialog(mode){eraseMode=mode;eraseOwner=workspace.account?.uid;if(!eraseOwner)return;$('#erase-account-title').textContent=mode==='account'?'Delete your account?':'Delete account data?';$('#erase-account-description').textContent=mode==='account'?'Permanently remove your Nebula sign-in and saved content. Developer keys and connected computers will stop working.':'Erase your saved Nebula content and personalization, revoke developer keys and disconnect computers. Keep your account and current usage limits.';$('#erase-password-row').hidden=workspace.account.provider!=='password';$('#erase-account-word').value='';$('#erase-account-password').value='';$('#erase-account-error').textContent='';$('#erase-account-confirm').disabled=true;$('#erase-account-dialog').showModal();}
+  $('#erase-account-data').onclick=()=>eraseDialog('data');$('#erase-account').onclick=()=>eraseDialog('account');
+  $('#erase-account-word').oninput=()=>{$('#erase-account-confirm').disabled=erasing||$('#erase-account-word').value!=='DELETE';};
+  $('#erase-account-cancel').onclick=()=>$('#erase-account-dialog').close();
+  $('#erase-account-dialog').addEventListener('cancel',e=>{if(erasing)e.preventDefault();});
+  $('#erase-account-dialog').addEventListener('close',()=>{$('#erase-account-password').value='';});
+  $('#erase-account-confirm').onclick=async()=>{
+    if(erasing||$('#erase-account-word').value!=='DELETE'||workspace.account?.uid!==eraseOwner)return;
+    erasing=true;$('#erase-account-confirm').disabled=true;$('#erase-account-cancel').disabled=true;$('#erase-account-error').textContent='Confirming identity…';
+    try{
+      await window.NebulaAuth.confirmIdentity($('#erase-account-password').value);$('#erase-account-password').value='';
+      if(workspace.account?.uid!==eraseOwner)throw Error('Account changed. Close this window and try again.');
+      workspace.cancelReply(workspace.activeChat?.messages?.at(-1)?.id);$('#erase-account-error').textContent='Deleting saved data…';
+      await workspace.api(eraseMode==='account'?'/account':'/account/data',{method:'DELETE',signal:AbortSignal.timeout(90000)});
+      await workspace.clearChats({remote:false});
+      await window.NebulaCallMedia?.eraseLocalGallery(eraseOwner);
+      window.dispatchEvent(new CustomEvent('nebula:data-erased',{detail:{uid:eraseOwner}}));
+      if(eraseMode==='account')await window.NebulaAuth.signOut();else await window.NebulaAuth.retry();
+      $('#erase-account-dialog').close();status(eraseMode==='account'?'Account deleted.':'Saved account data deleted. Training sharing is off.');
+    }catch(e){$('#erase-account-error').textContent=e.code?.startsWith('auth/')?'Identity confirmation failed. Check your sign-in and try again.':e.message||'Deletion could not finish. Retry to complete it.';}
+    finally{erasing=false;$('#erase-account-password').value='';$('#erase-account-cancel').disabled=false;$('#erase-account-confirm').disabled=$('#erase-account-word').value!=='DELETE';}
+  };
+  $('#export').onclick=()=>run(()=>workspace.exportChats());$('#clear').onclick=()=>{$('#clear-chats-error').textContent='';$('#confirm-dialog').showModal();};$('#cancel-clear').onclick=()=>$('#confirm-dialog').close();$('#confirm-clear').onclick=async()=>{if($('#confirm-clear').disabled)return;$('#confirm-clear').disabled=$('#cancel-clear').disabled=true;$('#clear-chats-error').textContent='Deleting chats…';try{await workspace.clearChats();$('#confirm-dialog').close();status('All chats deleted.');}catch(e){$('#clear-chats-error').textContent=e.message+' Try again to finish deletion.';}finally{$('#confirm-clear').disabled=$('#cancel-clear').disabled=false;}};$('#confirm-dialog').addEventListener('cancel',e=>{if($('#confirm-clear').disabled)e.preventDefault();});
   $('#delete-training').onclick=()=>{$('#delete-training-error').textContent='';$('#delete-training-dialog').showModal();};$('#cancel-delete-training').onclick=()=>$('#delete-training-dialog').close();$('#confirm-delete-training').onclick=async()=>{try{await workspace.api('/training',{method:'DELETE'});window.NebulaAuth.updatePreferenceView(false);$('#delete-training-dialog').close();status('Stored training data deleted. Sharing is now off.');}catch(e){$('#delete-training-error').textContent=e.message;}};
   $('#import-legacy').onclick=()=>run(async()=>{const n=await workspace.importLegacy();preferences();status(`${n} older chats moved to your account. Historical messages are excluded from training.`);});
   window.addEventListener('nebula:appearance-change',preferences);

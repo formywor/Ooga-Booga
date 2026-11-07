@@ -136,6 +136,18 @@
     get restoring(){return authState==='restoring'||!!auth?.currentUser&&account?.uid!==auth.currentUser.uid;},get status(){return authState;},
     async retry(){await initialize();if(auth.currentUser)await acceptUser(auth.currentUser);},
     async resetPassword(){if(!auth?.currentUser?.email||account?.provider!=='password')throw Error('Use your sign-in provider to manage your password.');await requestPasswordReset(auth.currentUser.email);},
+    async confirmIdentity(password=''){
+      const user=auth?.currentUser;if(!user)throw Error('Sign in before continuing.');
+      const provider=account?.provider;
+      if(provider==='password'){
+        if(!password)throw Error('Enter your current password to confirm your identity.');
+        await sdk.reauthenticateWithCredential(user,sdk.EmailAuthProvider.credential(user.email,password));
+      }else if(provider==='google.com')await sdk.reauthenticateWithPopup(user,new sdk.GoogleAuthProvider());
+      else if(provider==='apple.com')await sdk.reauthenticateWithPopup(user,new sdk.OAuthProvider('apple.com'));
+      else throw Error('Sign out and sign in again, then retry within five minutes.');
+      if(auth.currentUser?.uid!==user.uid)throw Error('Your account changed. Please try again.');
+      await user.getIdToken(true);
+    },
     async signOut(){if(auth)await sdk.signOut(auth);account=null;showAccount();emit();},
     async authorizedFetch(url,options={}){
       // An unavailable authentication service must not prevent deliberate guest use.
