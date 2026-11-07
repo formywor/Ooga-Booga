@@ -40,7 +40,7 @@
     if(!modelChosen&&catalog&&!catalog.models.some(m=>m.id===selectedModel&&canUseModel(m)))selectedModel=catalog.defaultModel||'nebula-ultra';
     const list=$('#model-options');list.replaceChildren();
     for(const model of catalog?.models||[{id:'nebula-ultra',name:'Nebula Ultra',description:'Loading model choicesâ€¦'}]){
-      const b=document.createElement('button');b.type='button';b.className='model-option';b.disabled=Boolean(pending)||!catalog||!canUseModel(model);b.setAttribute('aria-pressed',String(model.id===selectedModel));
+      const b=document.createElement('button');b.type='button';b.className='model-option';b.disabled=Boolean(pending)||loading||!catalog||!canUseModel(model);b.setAttribute('aria-pressed',String(model.id===selectedModel));
       const text=document.createElement('span'),strong=document.createElement('strong'),small=document.createElement('small'),check=document.createElement('span');strong.textContent=model.name;small.textContent=model.minimumTier&&!canUseModel(model)&&model.available!==false?'Unlocks at Medium account level':model.available===false?(model.unavailableReason==='disabled_by_configuration'?'Temporarily disabled':model.description||'Temporarily unavailable'):model.description;check.className='model-check';check.textContent=model.id===selectedModel?'\u2713':'';text.append(strong,small);b.append(text,check);
       b.onclick=()=>{modelChosen=true;window.dispatchEvent(new CustomEvent('nebula:conversation-change'));selectedModel=model.id;rememberWorkspace();$('#model-picker').open=false;renderModelOptions();$('#prompt').focus();};list.append(b);
     }
