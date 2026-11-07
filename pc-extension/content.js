@@ -1,6 +1,6 @@
 // This file runs in Chrome's isolated extension world, never the page's JavaScript world.
 (()=>{
- if(globalThis.__nebulaPc?.version==='0.3.8')return;
+ if(globalThis.__nebulaPc?.version==='0.3.9')return;
  document.getElementById('nebula-pc-overlay')?.remove();
  let snapshot=null,controls=new Map(),errors=[];
  let cursor=null,move=null,lastPoint=null,cursorEpoch=0;
@@ -10,7 +10,7 @@
   'nebula-v4':'#65a9ff','nebula-v1-lite':'#e5e7eb','nebula-v2-1':'#ff9ec2'
  };
  function clearCursor(){
-  cursorEpoch++;move?.cancel();move=null;
+  cursorEpoch++;try{move?.cancel();}catch{}move=null;
   cursor?.remove();cursor=null;
  }
  async function showPointer(element,modelId,validate,isClick=false){
@@ -60,7 +60,7 @@
  const sensitive=e=>e.matches('input[type=password],input[type=file],input[type=hidden]')||/password|passcode|\bpin\b|verification|two.factor|one-time|otp|security.code|\bcc-|credit.card|card.number|cvv|cvc|social.security|ssn|iban|routing.number/i.test([e.type,e.autocomplete,e.name,e.id,label(e)].join(' '));
  const normalize=s=>String(s).toLowerCase().replace(/[:：]/g,'').replace(/\s+/g,' ').trim();
  const fingerprint=e=>[e.tagName,e.getAttribute('role'),label(e),e.getAttribute('href'),e.getAttribute('type')].join('|');
- const overlay=()=>{if(document.getElementById('nebula-pc-overlay'))return;const box=document.createElement('div');box.id='nebula-pc-overlay';box.style.cssText='position:fixed;bottom:14px;right:14px;z-index:2147483647;background:#201b32;color:#fff;border:1px solid #a88cff;border-radius:12px;padding:10px 14px;font:13px system-ui;box-shadow:0 4px 24px #0005;display:flex;gap:12px;align-items:center';const text=document.createElement('span');text.textContent='Nebula PC 0.3.8 connected';const stop=document.createElement('button');stop.textContent='Stop';stop.style.cssText='background:#fff;color:#201b32;border:0;border-radius:6px;padding:6px 10px;cursor:pointer';stop.onclick=()=>chrome.runtime.sendMessage({type:'STOP'});box.append(text,stop);document.documentElement.append(box);};
+ const overlay=()=>{if(document.getElementById('nebula-pc-overlay'))return;const box=document.createElement('div');box.id='nebula-pc-overlay';box.style.cssText='position:fixed;bottom:14px;right:14px;z-index:2147483647;background:#201b32;color:#fff;border:1px solid #a88cff;border-radius:12px;padding:10px 14px;font:13px system-ui;box-shadow:0 4px 24px #0005;display:flex;gap:12px;align-items:center';const text=document.createElement('span');text.textContent='Nebula PC 0.3.9 connected';const stop=document.createElement('button');stop.textContent='Stop';stop.style.cssText='background:#fff;color:#201b32;border:0;border-radius:6px;padding:6px 10px;cursor:pointer';stop.onclick=()=>chrome.runtime.sendMessage({type:'STOP'});box.append(text,stop);document.documentElement.append(box);};
  window.addEventListener('error',e=>{if(errors.length<10)errors.push({message:mask(e.message||'Resource error').slice(0,250),source:url(e.filename||'')});});
  function inspect(query='',record=true){overlay();if(record){controls=new Map();snapshot={id:crypto.randomUUID(),url:location.href,at:Date.now()};}const elements=[];const deadline=Date.now()+200;let controlsVisited=0;const selector='a[href],button,input,textarea,select,[role=button],[role=checkbox],[role=combobox],[role=textbox],[contenteditable=true]';
   const priority=Array.from(document.querySelectorAll('[role=dialog],dialog[open]')).filter(visible).flatMap(dialog=>Array.from(dialog.querySelectorAll?.(selector)||[]));
@@ -73,7 +73,17 @@
  }
  async function run(command){try{overlay();const a=command.args||{};if(command.action==='page_status')return {ok:true,url:url(location.href),title:mask(document.title),readyState:document.readyState,text:inspect('',false).text};if(command.action==='find_text'){const text=inspect('',false).text,query=String(a.text||'').toLowerCase();let offset=0,matches=[];while(query&&matches.length<10){const at=text.toLowerCase().indexOf(query,offset);if(at<0)break;matches.push(text.slice(Math.max(0,at-80),at+query.length+120));offset=at+query.length;}return {ok:true,url:url(location.href),matches,notice:'Bounded visible page text search. No match does not prove the text is absent from unloaded content.'};}if(command.action==='inspect_form'){const data=inspect(a.query||'');const dialogs=[...document.querySelectorAll('[role=dialog],dialog[open]')].filter(visible);return {ok:true,...data,elements:data.elements.map(item=>{const e=controls.get(item.id)?.element,dialog=e?.closest('[role=dialog],dialog[open]');return {...item,...(dialog?{formGroup:'dialog-'+(dialogs.indexOf(dialog)+1)}:{}),...(e&&(e instanceof HTMLInputElement||e instanceof HTMLTextAreaElement||e.isContentEditable)&&!sensitive(e)?{value:mask(e.isContentEditable?e.innerText:e.value||'').slice(0,1000)}:{})};}),notice:'Visible non-sensitive form values only. Group IDs identify the same compose dialog. Match recipient and body before Send. No passwords, hidden values or cookies.'};}if(command.action==='inspect')return {ok:true,...inspect(a.query||'')};if(command.action==='scroll'){window.scrollBy({top:a.direction==='up'?-Math.round(innerHeight*.75):Math.round(innerHeight*.75),behavior:'instant'});return {ok:true,scrolled:a.direction,url:url(location.href)};}
   if(!snapshot||snapshot?.id!==a.snapshotId||snapshot.url!==location.href||Date.now()-snapshot.at>180000)throw Error('PC_STALE_SNAPSHOT');const entry=controls.get(a.elementId),e=entry?.element;const validate=()=>{if(!e?.isConnected||snapshot?.id!==a.snapshotId||snapshot.url!==location.href||!visible(e)||fingerprint(e)!==entry.fingerprint)throw Error('PC_STALE_SNAPSHOT');if(sensitive(e))throw Error('PC_SENSITIVE_INPUT_BLOCKED');};validate();
-  const click=async()=>{await showPointer(e,command.modelId,validate,true);validate();e.click();};
+  const click=async()=>{
+   if(e.disabled||e.getAttribute('aria-disabled')==='true')throw Error('PC_TARGET_DISABLED');
+   // Cosmetic animation must never prevent an otherwise valid browser action.
+   try{await showPointer(e,command.modelId,validate,true);}catch(error){if(/^PC_/.test(error.message||''))throw error;clearCursor();}
+   validate();
+   if(typeof e.click!=='function'&&typeof e.dispatchEvent!=='function')throw Error('PC_TARGET_NOT_CLICKABLE');
+   try{
+    if(typeof e.click==='function')e.click();
+    else e.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));
+   }catch{throw Error('PC_CLICK_UNCONFIRMED');}
+  };
   if(command.action==='hover'){await showPointer(e,command.modelId,validate);e.scrollIntoView?.({block:'nearest'});for(const type of ['mouseover','mouseenter','mousemove'])e.dispatchEvent(new MouseEvent(type,{bubbles:true}));}
   else if(command.action==='select_option'){if(e.tagName!=='SELECT'||![...e.options].some(o=>o.value===a.value&&!o.disabled))throw Error('PC_OPTION_NOT_FOUND');e.value=a.value;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));}
   else if(command.action==='set_checked'){if(!(e instanceof HTMLInputElement)||!['checkbox','radio'].includes(e.type))throw Error('PC_NOT_CHECKABLE');if(Boolean(e.checked)!==a.checked)await click();}
@@ -82,5 +92,5 @@
   else if(command.action==='press'){await showPointer(e,command.modelId,validate);validate();e.focus();if(a.key==='Enter'&&e.form)e.form.requestSubmit();else if((a.key==='Enter'||a.key==='Space')&&e.matches('button,a[href],[role=button]'))await click();else{e.dispatchEvent(new KeyboardEvent('keydown',{key:a.key,bubbles:true}));e.dispatchEvent(new KeyboardEvent('keyup',{key:a.key,bubbles:true}));}}
   else throw Error('INVALID_PC_ACTION');return {ok:true,action:command.action,target:mask(label(e)),url:url(location.href),notice:'Action dispatched. Inspect the page again to verify the actual outcome.'};
  }catch(e){return {ok:false,error:/^[A-Z_]+$/.test(e.message)?e.message:'PC_ACTION_FAILED'};}}
- globalThis.__nebulaPc={version:'0.3.8',run,overlay,finish:clearCursor,stop:()=>{clearCursor();snapshot=null;document.getElementById('nebula-pc-overlay')?.remove();}};overlay();
+ globalThis.__nebulaPc={version:'0.3.9',run,overlay,finish:clearCursor,stop:()=>{clearCursor();snapshot=null;document.getElementById('nebula-pc-overlay')?.remove();}};overlay();
 })();

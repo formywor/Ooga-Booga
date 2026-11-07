@@ -16,6 +16,16 @@ test('isolated page executor excludes sensitive fields, rejects stale snapshots 
  assert.equal(recipientSnapshot.elements.length,1);
  assert.equal(recipientSnapshot.elements[0].label,'To recipients');
  assert.equal((await api.run({action:'type',args:{snapshotId:recipientSnapshot.snapshotId,elementId:recipientSnapshot.elements[0].id,text:'friend@example.com'}})).ok,true);
+ const svg=new Element('svg',{'role':'button','aria-label':'Play song'});svg.click=undefined;nodes.push(svg);
+ let play=await api.run({action:'inspect',args:{query:'Play song'}});
+ assert.equal((await api.run({action:'click',args:{snapshotId:play.snapshotId,elementId:play.elements[0].id}})).ok,true);
+ assert.deepEqual(svg.events,['click']);
+ svg.disabled=true;assert.equal((await api.run({action:'click',args:{snapshotId:play.snapshotId,elementId:play.elements[0].id}})).error,'PC_TARGET_DISABLED');assert.deepEqual(svg.events,['click']);
+ svg.disabled=false;svg.animate=()=>{};svg.scrollIntoView=()=>{throw Error('Animation unavailable');};
+ assert.equal((await api.run({action:'click',args:{snapshotId:play.snapshotId,elementId:play.elements[0].id}})).ok,true);assert.equal(svg.events.length,2);
+ svg.click=()=>{throw Error('Unknown click failure');};
+ assert.equal((await api.run({action:'click',args:{snapshotId:play.snapshotId,elementId:play.elements[0].id}})).error,'PC_CLICK_UNCONFIRMED');assert.equal(svg.events.length,2);
+
  assert.equal(recipient.value,'friend@example.com');
  const select=new Element('select',{name:'Color'});select.options=[{label:'Blue',value:'blue'},{label:'Unavailable',value:'disabled',disabled:true}];const checkbox=new Input({type:'checkbox','aria-label':'Show details'});checkbox.checked=false;nodes.push(select,checkbox);const choices=await api.run({action:'inspect'}),option=choices.elements.find(e=>e.role==='select'),check=choices.elements.find(e=>e.type==='checkbox');assert.equal(option.options[0].value,'blue');assert.equal((await api.run({action:'select_option',args:{snapshotId:choices.snapshotId,elementId:option.id,value:'blue'}})).ok,true);assert.equal(select.value,'blue');assert.equal((await api.run({action:'select_option',args:{snapshotId:choices.snapshotId,elementId:option.id,value:'disabled'}})).error,'PC_OPTION_NOT_FOUND');assert.equal((await api.run({action:'set_checked',args:{snapshotId:choices.snapshotId,elementId:check.id,checked:true}})).ok,true);assert.equal(checkbox.checked,true);await api.run({action:'set_checked',args:{snapshotId:choices.snapshotId,elementId:check.id,checked:true}});assert.equal(checkbox.checked,true);assert.equal((await api.run({action:'hover',args:{snapshotId:choices.snapshotId,elementId:option.id}})).ok,true);assert.equal((await api.run({action:'page_status'})).readyState,'complete');assert.ok((await api.run({action:'find_text',args:{text:'Public page'}})).matches.length);
 
