@@ -81,3 +81,6 @@ html[data-reduce-motion="true"] .activity-cursors i{animation:none}
 .reset-gifts [role=status]:empty{display:none}
 .reset-gift-form fieldset{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:8px}
 .reset-gift-form fieldset label{display:flex;gap:8px;align-items:center}
+
+.archive-bulk{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:12px 0}.archive-bulk span{margin-right:auto;color:var(--muted);font-size:12px}.archive-bulk button{padding:10px 14px;border:1px solid var(--line);border-radius:9px}.archive-bulk button:disabled{opacity:.45}.account-dialog input,.account-dialog select,#archive-search{font-size:16px}.account-dialog button,.archive-dialog button{min-height:40px}.account-dialog{overscroll-behavior:contain}#cloud-environment-results{overflow-wrap:anywhere}#cloud-environment-results pre{overflow:auto;max-width:100%}
+@media(max-width:650px){dialog{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}.account-dialog{padding:22px 18px;width:calc(100vw - 24px)}.account-summary{grid-template-columns:1fr}.account-summary strong{text-align:left}.archive-bulk button{flex:1}.archive-bulk span{flex-basis:100%}.confirm-actions{flex-wrap:wrap}.confirm-actions button{flex:1;min-height:44px}.auth-tabs button{font-size:14px}.archive-row{padding:12px 4px}}

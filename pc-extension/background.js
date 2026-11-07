@@ -23,7 +23,7 @@ async function readyTab(tabId,s,signal,timeoutMs=10000){
  throw Error('PC_PAGE_LOAD_TIMEOUT');
 }
 async function content(tabId,command,signal){signal?.throwIfAborted();await chrome.scripting.executeScript({target:{tabId},files:['content.js'],world:'ISOLATED'});signal?.throwIfAborted();const r=await chrome.scripting.executeScript({target:{tabId},world:'ISOLATED',func:command=>globalThis.__nebulaPc.run(command),args:[command]});const result=r[0]?.result;if(!result?.ok)throw Error(result?.error||'PC_ACTION_FAILED');return result;}
-async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||{};if(writes(job.action)&&!job.approvedAt)throw Error('PC_APPROVAL_REQUIRED');await api('/agent/'+s.deviceId+'/validate',{jobId:job.id,lease:job.lease},s);signal?.throwIfAborted();
+async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||{};if((writes(job.action)||job.action==='close_tab')&&!job.approvedAt)throw Error('PC_APPROVAL_REQUIRED');await api('/agent/'+s.deviceId+'/validate',{jobId:job.id,lease:job.lease},s);signal?.throwIfAborted();
  if(job.action==='open_tabs'){
   if(!Number.isInteger(a.count)||a.count<1||a.count>8)throw Error('INVALID_PC_ACTION');
   let opened=0;
@@ -52,7 +52,9 @@ async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||
   const tab=await readyTab(tabId,s,signal);
   return {tabId,url:safeUrl(tab.url),readyState:'complete',notice:'The browser finished loading. Inspect the page for its current controls.'};}
  const tabId=a.tabId??s.selectedTab;signal?.throwIfAborted();
- if(!['wait_for_page','inspect','find_text'].includes(job.action))await allowed(tabId,s);if(job.action==='select_tab'){await chrome.tabs.update(tabId,{active:true});s.selectedTab=tabId;await mutate(old=>old?.enabled&&old.token===s.token?{...old,selectedTab:tabId}:old);return {selectedTab:tabId};}
+ if(!['wait_for_page','inspect','find_text'].includes(job.action))await allowed(tabId,s);if(job.action==='close_tab'){await chrome.tabs.remove(tabId);const remaining=(s.tabs||[]).filter(id=>id!==tabId);await mutate(old=>old?.enabled&&old.token===s.token?{...old,tabs:remaining,selectedTab:old.selectedTab===tabId?null:old.selectedTab}:old);return {closed:true,tabId,notice:'The approved tab was closed. This does not prove any earlier form was submitted.'};}
+ if(job.action==='reload'){await chrome.tabs.reload(tabId);const tab=await readyTab(tabId,s,signal);return {tabId,url:safeUrl(tab.url),readyState:'complete',reloaded:true};}
+ if(job.action==='select_tab'){await chrome.tabs.update(tabId,{active:true});s.selectedTab=tabId;await mutate(old=>old?.enabled&&old.token===s.token?{...old,selectedTab:tabId}:old);return {selectedTab:tabId};}
  if(job.action==='wait_for_page'){
   const timeout=a.timeoutMs||6000,until=Date.now()+timeout;
   await readyTab(tabId,s,signal,timeout);
@@ -64,14 +66,14 @@ async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||
   }while(Date.now()<until);
   return {tabId,...result,matched:false,notice:'The page loaded, but the requested text did not appear.'};
  }
- if(job.action==='inspect'||job.action==='find_text')await readyTab(tabId,s,signal);
+ if(job.action==='inspect'||job.action==='inspect_form'||job.action==='find_text')await readyTab(tabId,s,signal);
  if(writes(job.action)||job.action==='hover'){
   await chrome.tabs.update(tabId,{active:true});
   const current=await mutate(old=>old?.enabled&&old.token===s.token?{...old,selectedTab:tabId}:old);
   if(!current?.enabled||current.token!==s.token)throw Error('PC_STOPPED');
   signal?.throwIfAborted();
  }
- const result=await content(tabId,job,signal);if(job.action==='inspect'){const latest=await state();result.tabId=tabId;result.network=(latest?.network||[]).filter(n=>n.tabId===tabId).slice(-40);result.networkNotice='Only requests observed since connection and allowed by Chrome permissions. No headers or bodies. This is your signed-in browser traffic, not other users or hidden server calls.';}return result;
+ const result=await content(tabId,job,signal);if(['inspect','inspect_form'].includes(job.action)){const latest=await state();result.tabId=tabId;result.network=(latest?.network||[]).filter(n=>n.tabId===tabId).slice(-40);result.networkNotice='Only requests observed since connection and allowed by Chrome permissions. No headers or bodies. This is your signed-in browser traffic, not other users or hidden server calls.';}return result;
 }
 async function executeBounded(job,s){const control=new AbortController();let timeout;try{return await Promise.race([execute(job,s,control.signal),new Promise((_,reject)=>{timeout=setTimeout(()=>{control.abort();reject(Error('PC_ACTION_TIMEOUT'));},20000);})]);}finally{clearTimeout(timeout);}}
 async function poll(){if(busy)return;busy=true;let s=await state();try{if(!s?.enabled||!s.token)return;if(!s.paired){const status=await api('/agent/'+s.deviceId+'/status',undefined,s);if(!status.paired)return;s={...s,paired:true,expiresAt:status.expiresAt};await mutate(old=>old?.enabled&&old.token===s.token?{...old,paired:true,expiresAt:status.expiresAt}:old);}if(Date.now()>=s.expiresAt){await stop();return;}for(const [id,prior]of Object.entries(s.seen||{})){if(prior.pendingDelivery){try{await api('/agent/'+s.deviceId+'/result',{jobId:id,lease:prior.lease,result:prior.result||null,error:prior.error||null},s);await mutate(old=>old?.token===s.token?{...old,seen:{...old.seen,[id]:{...prior,pendingDelivery:false}}}:old);}catch{}}}const d=await api('/agent/'+s.deviceId+'/poll',{},s);await badge('ON');
@@ -103,7 +105,7 @@ chrome.runtime.onMessage.addListener((m,sender,respond)=>{if(sender.id!==chrome.
   if(!next?.enabled||next.token!==current.token)throw Error('PC_STOPPED');
   return {ok:true};
  }
- if(m.type==='START'){if((await state())?.enabled)throw Error('PC_ALREADY_CONNECTED');await stop();const p=await api('/pair/start',{name:m.name||'My computer',protocolVersion:4});const pc={...p,name:m.name||'My computer',enabled:true,paired:false,selectedTab:m.tabId,tabs:[m.tabId],grantedOrigins:m.origins,seen:{},network:[]};await chrome.storage.session.setAccessLevel({accessLevel:'TRUSTED_CONTEXTS'});await writeState(pc);await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();return {code:p.code};}throw Error('INVALID_INPUT');};task().then(respond).catch(e=>respond({error:e.message}));return true;});
+ if(m.type==='START'){if((await state())?.enabled)throw Error('PC_ALREADY_CONNECTED');await stop();const p=await api('/pair/start',{name:m.name||'My computer',protocolVersion:5});const pc={...p,name:m.name||'My computer',enabled:true,paired:false,selectedTab:m.tabId,tabs:[m.tabId],grantedOrigins:m.origins,seen:{},network:[]};await chrome.storage.session.setAccessLevel({accessLevel:'TRUSTED_CONTEXTS'});await writeState(pc);await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();return {code:p.code};}throw Error('INVALID_INPUT');};task().then(respond).catch(e=>respond({error:e.message}));return true;});
 chrome.alarms.onAlarm.addListener(a=>{if(a.name==='nebula-pc')poll();});
 chrome.tabs.onUpdated.addListener((id,change)=>{if(change.status==='complete')state().then(async s=>{if(s?.enabled&&s.paired&&s.tabs.includes(id)&&Date.now()<s.expiresAt){try{await allowed(id,s);await chrome.scripting.executeScript({target:{tabId:id},files:['content.js'],world:'ISOLATED'});}catch{}}});});
 let trafficRows=[],trafficTimer=null;
@@ -111,5 +113,5 @@ async function traffic(d,error){trafficRows.push({tabId:d.tabId,url:safeUrl(d.ur
 
 chrome.webRequest.onCompleted.addListener(d=>{traffic(d,false);},{urls:['https://*/*']});chrome.webRequest.onErrorOccurred.addListener(d=>{traffic(d,true);},{urls:['https://*/*']});
 
-async function reconnect(){const s=await state();if(s?.enabled){if(s.expiresAt&&s.expiresAt<=Date.now()){await stop();return;}if(s.paired&&s.protocolVersion>=2&&s.protocolVersion<4){try{await api('/agent/'+s.deviceId+'/upgrade',{protocolVersion:4},s);await mutate(old=>old?.enabled&&old.token===s.token?{...old,protocolVersion:4}:old);}catch{}}await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();}}
+async function reconnect(){const s=await state();if(s?.enabled){if(s.expiresAt&&s.expiresAt<=Date.now()){await stop();return;}if(s.paired&&s.protocolVersion>=2&&s.protocolVersion<5){try{await api('/agent/'+s.deviceId+'/upgrade',{protocolVersion:5},s);await mutate(old=>old?.enabled&&old.token===s.token?{...old,protocolVersion:5}:old);}catch{}}await chrome.alarms.create('nebula-pc',{periodInMinutes:.5});poll();}}
 chrome.runtime.onStartup.addListener(reconnect);reconnect();

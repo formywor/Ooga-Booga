@@ -1,6 +1,7 @@
 'use strict';
 (async()=>{
  const $=id=>document.getElementById(id),policy=window.NebulaVerification,params=new URLSearchParams(location.search),code=params.get('oobCode'),mode=params.get('mode'),next=policy.returnPath(params.get('continueUrl'));
+ if(mode==='resetPassword'){location.replace('/reset-password/?'+params.toString());return;}
  // Action codes never remain in the address bar, referrers or app logs.
  history.replaceState(null,'','/verify/');$('verify-open').href=next;
  const say=(title,text)=>{$('verify-title').textContent=title;$('verify-message').textContent=text;};
