@@ -65,6 +65,12 @@ async function execute(job,s,signal){signal?.throwIfAborted();const a=job.args||
   return {tabId,...result,matched:false,notice:'The page loaded, but the requested text did not appear.'};
  }
  if(job.action==='inspect'||job.action==='find_text')await readyTab(tabId,s,signal);
+ if(writes(job.action)||job.action==='hover'){
+  await chrome.tabs.update(tabId,{active:true});
+  const current=await mutate(old=>old?.enabled&&old.token===s.token?{...old,selectedTab:tabId}:old);
+  if(!current?.enabled||current.token!==s.token)throw Error('PC_STOPPED');
+  signal?.throwIfAborted();
+ }
  const result=await content(tabId,job,signal);if(job.action==='inspect'){const latest=await state();result.tabId=tabId;result.network=(latest?.network||[]).filter(n=>n.tabId===tabId).slice(-40);result.networkNotice='Only requests observed since connection and allowed by Chrome permissions. No headers or bodies. This is your signed-in browser traffic, not other users or hidden server calls.';}return result;
 }
 async function executeBounded(job,s){const control=new AbortController();let timeout;try{return await Promise.race([execute(job,s,control.signal),new Promise((_,reject)=>{timeout=setTimeout(()=>{control.abort();reject(Error('PC_ACTION_TIMEOUT'));},20000);})]);}finally{clearTimeout(timeout);}}
