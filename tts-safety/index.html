@@ -12,7 +12,7 @@
   <main class="tts-main">
     <span class="tts-kicker">LIVE CHAT SAFETY</span>
     <h1>Let chat speak.<br><span>Keep the stream safe.</span></h1>
-    <p class="tts-lead">Nebula checks TikTok LIVE comments before they reach speech. Add the secure browser-source overlay to OBS or LIVE Studio, then send TikFinity chat events to Nebula. No extra app to install.</p>
+    <p class="tts-lead">Nebula checks TikTok LIVE comments before they reach speech. Use TikFinity Desktop’s built-in Event API and a Nebula browser connector, then add the private speech overlay to OBS or LIVE Studio. No separate helper app to install.</p>
     <div class="tts-note"><strong>Important setup detail</strong><p>This uses Nebula’s speech overlay. Turn off TikFinity’s direct comment-to-speech action so unfiltered audio cannot play separately. TikFinity remains your event source.</p></div>
     <section class="tts-card" aria-labelledby="setup-heading">
       <div class="tts-step"><span>01</span><div><h2 id="setup-heading">Create your private connection</h2><p>A one-time key connects TikFinity to your private overlay. Keep it secret.</p></div></div>
@@ -29,24 +29,17 @@
       </div>
     </section>
     <section class="tts-card">
-      <div class="tts-step"><span>02</span><div><h2>Connect TikFinity</h2><p>In TikFinity, create an action that sends a chat webhook to Nebula.</p></div></div>
+      <div class="tts-step"><span>02</span><div><h2>Connect TikFinity</h2><p>Use TikFinity Desktop’s local Event API. The browser Actions “Trigger Webhook” effect is for sending events to other services and cannot send Nebula the required secure JSON request.</p></div></div>
       <ol class="tts-instructions">
-        <li>Open <strong>Actions &amp; Events</strong> and create a webhook action for chat comments.</li>
-        <li>Set its URL to <code>https://api.scriptnovaa.com/v1/tts/events</code> and method to <strong>POST</strong>.</li>
-        <li>Send JSON using TikFinity’s <code>{username}</code> and <code>{comment}</code> placeholders:</li>
+        <li>Open TikFinity <a href="https://tikfinity.com/app/setup" target="_blank" rel="noopener"><strong>Setup</strong></a>, enter your TikTok <strong>@username</strong>, and save it. Connect TikFinity while your LIVE is running.</li>
+        <li>Keep the <strong>TikFinity Desktop app</strong> open on the same computer. The browser-only TikFinity dashboard does not provide its local Event API.</li>
+        <li>Open the Nebula connector and paste your private webhook key. It stays in this browser tab’s memory and is sent only to Nebula’s API over HTTPS.</li>
       </ol>
-      <pre><code>{
-  "apiKey": "PASTE_YOUR_PRIVATE_KEY",
-  "event": "chat",
-  "data": {
-    "username": "{username}",
-    "comment": "{comment}"
-  }
-}</code></pre>
-      <p class="tts-small">If your TikFinity webhook editor labels the payload differently, map the username and comment into the same JSON fields. Send one test comment and check the response before enabling live speech.</p>
+      <a class="tts-primary tts-link-button" href="/tts-safety/tikfinity/">Open TikFinity connector</a>
+      <p class="tts-small">The connector listens only for chat events and forwards them to Nebula. Keep the connector tab open while streaming. Do not create a TikFinity “Trigger Webhook” action for this connection.</p>
     </section>
     <section class="tts-card">
-      <div class="tts-step"><span>03</span><div><h2>Add the Nebula voice overlay</h2><p>Paste the private overlay URL above into OBS or LIVE Studio as a browser source. Allow audio and set the source size to match your canvas. It can be transparent and does not need to be visible.</p></div></div>
+      <div class="tts-step"><span>03</span><div><h2>Add the Nebula voice overlay</h2><p>Paste the private overlay URL above into OBS or LIVE Studio as a browser source. Allow audio and set the source size to match your canvas. It can be transparent and does not need to be visible. Then use the harmless test button in step 01 to confirm audio before going LIVE.</p></div></div>
       <p>Approved English dictionary text is spoken. Non-English text, unknown words, and blocked language are withheld. For a blocked message, the overlay says only: <em>“Moderators, please review a flagged chat message.”</em></p><p class="tts-small">Filters can miss context or new evasion patterns and may hold back names or slang. Keep TikTok’s own safeguards and a human moderator enabled.</p>
     </section>
     <section class="tts-card tts-privacy">
