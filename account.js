@@ -133,7 +133,7 @@
   window.addEventListener('storage',e=>{if(e.key?.startsWith('nebula.verification.cooldown.'))updateVerificationButton();});
   window.addEventListener('pagehide',()=>{clearInterval(verificationTimer);verificationTimer=null;});
   window.NebulaAuth={
-    get restoring(){return authState==='restoring'||!!auth?.currentUser&&account?.uid!==auth.currentUser.uid;},get status(){return authState;},
+    get restoring(){return authState==='restoring'||!!auth?.currentUser&&account?.uid!==auth.currentUser.uid;},get status(){return authState;},get account(){return account;},
     async retry(){await initialize();lastSync=null;if(auth.currentUser)await acceptUser(auth.currentUser);},
     async resetPassword(){if(!auth?.currentUser?.email||account?.provider!=='password')throw Error('Use your sign-in provider to manage your password.');await requestPasswordReset(auth.currentUser.email);},
     async confirmIdentity(password=''){
