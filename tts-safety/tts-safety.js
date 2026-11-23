@@ -18,9 +18,9 @@ $('tts-test')?.addEventListener('click',async event=>{
  testButton.disabled=true;status.textContent='Sending a harmless test message to your overlay…';
  try{
   const response=await fetch(api+'/v1/tts/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiKey,event:'chat',data:{username:'Nebula test',comment:'This is a harmless Nebula TTS connection test.'}})});
-  const result=await response.json();if(!response.ok)throw new Error(result.code||'TEST_FAILED');
+  const result=await response.json();if(!response.ok)throw new Error('HTTP '+response.status+' · '+(typeof result.code==='string'?result.code:'UNKNOWN_ERROR'));
   status.textContent='Test queued. Check that your overlay speaks the harmless test message.';
- }catch{status.textContent='The test could not be queued. Check the connection and try again.';}
+ }catch(error){status.textContent=error instanceof TypeError?'Could not reach Nebula’s API. Check your connection and retry.':'Test failed: '+error.message+'.';}
  finally{testButton.disabled=false;}
 });
 $('tts-revoke')?.addEventListener('click',async()=>{const apiKey=$('tts-key').value;if(!apiKey||!confirm('Revoke this key and disconnect its voice overlay? This cannot be undone.'))return;try{const response=await fetch(api+'/v1/tts/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiKey})});if(!response.ok)throw new Error('REVOKE_FAILED');$('tts-credentials').hidden=true;button.hidden=false;button.disabled=false;status.textContent='Connection revoked. Create a new one when you are ready.';}catch{status.textContent='Could not revoke the connection. Retry or use the revoke API from your saved key.';}});
