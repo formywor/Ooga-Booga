@@ -10,7 +10,7 @@ button?.addEventListener('click',async()=>{
   const data=await response.json();if(!response.ok)throw new Error(data.code||'SETUP_FAILED');
   $('tts-key').value=data.apiKey;$('tts-overlay-url').value=data.overlayUrl;$('tts-credentials').hidden=false;button.hidden=true;
   status.textContent='Connection created. Copy both values now; the webhook key will not be shown again.';
- }catch(error){status.textContent=error.message==='ANONYMOUS_SETUP_LIMIT'?'Too many setup attempts from this network today. Try again tomorrow.':'Could not create the connection. Please try again shortly.';button.disabled=false;}
+ }catch(error){status.textContent=error.message==='SETUP_BURST_LIMIT'?'A lot of connections were created just now. Wait about a minute and try again.':'Could not create the connection. Please try again shortly.';button.disabled=false;}
 });
 $('tts-test')?.addEventListener('click',async event=>{
  const testButton=event.currentTarget,apiKey=$('tts-key').value;
