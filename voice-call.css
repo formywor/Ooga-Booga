@@ -1,0 +1,79 @@
+#voice-chat.voice-call-dialog{width:min(940px,calc(100vw - 32px));max-width:none;max-height:min(92dvh,900px);padding:0;overflow:auto;border:1px solid #ffffff18;border-radius:28px;background:radial-gradient(ellipse at 23% 28%,#34236570,transparent 48%),linear-gradient(145deg,#17151f,#101016 72%);color:var(--text);box-shadow:0 30px 120px #000b;overscroll-behavior:contain}
+#voice-chat.voice-call-dialog[open]{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(290px,.88fr);grid-template-rows:auto 1fr;gap:0 22px}
+#voice-chat.voice-call-dialog::backdrop{background:#060511c9;backdrop-filter:blur(13px)}
+#voice-chat .voice-topbar{grid-column:1/-1;position:sticky;top:0;z-index:4;align-items:center;padding:20px 24px 15px;background:#15131deF;border-bottom:1px solid #ffffff12;backdrop-filter:blur(16px)}
+#voice-chat .voice-brand-row{display:flex;align-items:center;gap:12px;min-width:0}
+#voice-chat .voice-brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#b69aff,#6754d9);color:white;font-size:23px;box-shadow:0 0 24px #8b65e955}
+#voice-chat .voice-eyebrow{font-size:10px;letter-spacing:.18em;color:#b9a0f2}
+#voice-chat .voice-topbar h2{margin:2px 0 0;font-size:20px;line-height:1.2;font-weight:650}
+#voice-chat .voice-model-caption{margin:0 0 0 8px;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;letter-spacing:0;color:var(--muted)!important}
+#voice-chat .voice-end{border:1px solid #ffffff20;border-radius:20px;padding:9px 14px;background:#ffffff08;color:#e9e3f7;white-space:nowrap}
+#voice-chat .voice-end:hover{border-color:#bb80a0;background:#b74f6922}
+#voice-chat .voice-call-main{min-width:0;display:flex;flex-direction:column;gap:12px;padding:16px 0 22px 24px}
+#voice-chat .voice-stage{position:relative;display:flex;min-height:330px;flex:1;flex-direction:column;justify-content:center;align-items:center;padding:6px 14px 0;text-align:center;border:1px solid #ffffff10;border-radius:24px;background:radial-gradient(ellipse at center,#35255448,transparent 70%),#0e0d14a6;overflow:hidden}
+#voice-chat .voice-stage[data-live="true"] .voice-aura{display:none}
+#voice-chat .voice-aura{width:245px;height:245px;flex:none;display:grid;place-items:center;margin:0 auto 4px}
+#voice-chat .voice-orb{width:164px;height:170px}
+#voice-chat .voice-live-panel{position:relative;width:min(100%,570px);height:275px;margin:auto;border:1px solid #ffffff25;border-radius:19px;background:#050509;overflow:hidden}
+#voice-chat .voice-live-panel[hidden]{display:none}
+#voice-chat #voice-live-preview{width:100%;height:100%;object-fit:contain;display:block;background:#050509}
+#voice-chat .voice-live-panel[data-source="camera"] #voice-live-preview{object-fit:cover}
+#voice-chat .voice-live-badge{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid #ffffff25;border-radius:99px;background:#08080dbd;color:#f4f0ff;font-size:11px;backdrop-filter:blur(8px)}
+#voice-chat .voice-live-badge i,#voice-chat .voice-live-status:before{display:inline-block;width:7px;height:7px;border-radius:50%;background:#72dfb0;content:""}
+#voice-chat #voice-chat-status{min-height:42px;margin:8px auto 7px;max-width:440px;color:#d8d1e7;font-size:13px}
+#voice-chat .voice-live-tools{padding:14px 15px;border:1px solid #ffffff13;border-radius:18px;background:#ffffff06}
+#voice-chat .voice-live-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#voice-chat .voice-live-heading h3{margin:0;font-size:14px}
+#voice-chat .voice-live-heading p{margin:3px 0 0;font-size:11px;line-height:1.4}
+#voice-chat .voice-private-badge{flex:none;padding:5px 8px;border:1px solid #6ed7aa39;border-radius:99px;background:#52c89012;color:#9fe8c6;font-size:10px}
+#voice-chat .voice-live-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+#voice-chat .voice-live-actions button{min-height:40px;padding:8px 11px;border:1px solid #ffffff18;border-radius:12px;background:#211e2a;color:var(--text);font-size:12px}
+#voice-chat .voice-live-actions button:hover{border-color:#a18ce6;background:#292438}
+#voice-chat .voice-live-actions button[hidden]{display:none}
+#voice-chat .voice-live-status{margin:9px 0 0;font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+#voice-chat .voice-live-status:before{width:6px;height:6px;margin:0 7px 1px 0;background:#8c88a0}
+#voice-chat .voice-live-status[data-active="true"]:before{background:#72dfb0;box-shadow:0 0 10px #72dfb0}
+#voice-chat .voice-consent{margin:0;padding:10px 12px;border:1px solid #ffffff11;border-radius:12px;background:#ffffff04;font-size:11px;line-height:1.45}
+#voice-chat .voice-primary-controls{display:flex;align-items:center;justify-content:center;gap:9px;margin:0}
+#voice-chat .voice-primary-controls button{min-height:46px;padding:10px 15px;border:1px solid #ffffff1b;border-radius:15px;background:#24212d;color:#f5f2fc;font-size:13px}
+#voice-chat .voice-primary-controls .primary{border-color:#b69aff;background:linear-gradient(135deg,#9979ed,#755ad8);color:white;box-shadow:0 8px 25px #8062dc3b}
+#voice-chat .voice-primary-controls #voice-chat-stop{border-color:#8b53634b;background:#552a382e;color:#ffced5}
+#voice-chat .voice-call-side{min-width:0;display:flex;flex-direction:column;gap:10px;padding:16px 24px 22px 0}
+#voice-chat .voice-photos,#voice-chat .voice-transcript,#voice-chat .voice-options{margin:0;padding:0 14px 13px;border:1px solid #ffffff14;border-radius:16px;background:#ffffff05;font-size:12px}
+#voice-chat .voice-call-side summary{padding:14px 0 3px;color:#eee8fb;font-weight:600;cursor:pointer;list-style:none}
+#voice-chat .voice-call-side summary::-webkit-details-marker{display:none}
+#voice-chat .voice-call-side summary:after{content:"＋";float:right;color:#a99bcc}
+#voice-chat .voice-call-side details[open] summary:after{content:"−"}
+#voice-chat .voice-call-side p{font-size:11px;line-height:1.5}
+#voice-chat .voice-chat-settings{grid-template-columns:1fr;gap:8px}
+#voice-chat .voice-chat-settings label{font-size:11px;margin:9px 0 4px}
+#voice-chat .voice-chat-settings select,#voice-chat .voice-chat-settings textarea,#voice-chat .voice-transcript textarea{font-size:16px;min-height:42px}
+#voice-chat .voice-chat-settings input[type=range]{margin:8px 0}
+#voice-chat #voice-chat-transcript{min-height:86px}
+#voice-chat .voice-photos button,#voice-chat .voice-transcript button,#voice-chat .voice-options button{min-height:40px;border-radius:10px}
+#voice-chat #voice-camera{width:100%;max-height:200px;object-fit:cover}
+@media(max-width:760px){
+  #voice-chat.voice-call-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:23px}
+  #voice-chat.voice-call-dialog[open]{display:flex;flex-direction:column;gap:0}
+  #voice-chat .voice-topbar{padding:13px 14px 11px;gap:8px}
+  #voice-chat .voice-brand-mark{width:34px;height:34px;border-radius:12px}
+  #voice-chat .voice-topbar h2{font-size:18px}
+  #voice-chat .voice-model-caption{max-width:95px;font-size:10px;margin-left:2px}
+  #voice-chat .voice-end{padding:8px 10px;font-size:12px}
+  #voice-chat .voice-call-main{gap:9px;padding:10px 12px 12px}
+  #voice-chat .voice-stage{min-height:250px;padding:6px 9px;border-radius:19px}
+  #voice-chat .voice-aura{width:190px;height:190px}
+  #voice-chat .voice-orb{width:137px;height:143px}
+  #voice-chat .voice-live-panel{height:min(35dvh,250px);min-height:150px}
+  #voice-chat .voice-live-tools{padding:11px;border-radius:15px}
+  #voice-chat .voice-live-heading{align-items:flex-start}
+  #voice-chat .voice-live-actions{gap:6px;margin-top:8px}
+  #voice-chat .voice-live-actions button{flex:1 1 38%;min-height:42px;padding:8px 6px}
+  #voice-chat .voice-consent{padding:8px 9px}
+  #voice-chat .voice-primary-controls{gap:6px;flex-wrap:wrap}
+  #voice-chat .voice-primary-controls button{flex:1 1 27%;min-height:48px;padding:8px 6px;font-size:12px}
+  #voice-chat .voice-call-side{gap:8px;padding:0 12px 14px}
+  #voice-chat .voice-call-side details{padding-inline:12px}
+}
+@media(prefers-reduced-motion:reduce){#voice-chat .voice-orb,#voice-chat .voice-orbit,#voice-chat .voice-wave i{animation:none!important}}
+html[data-reduce-motion=true] #voice-chat .voice-orb,html[data-reduce-motion=true] #voice-chat .voice-orbit,html[data-reduce-motion=true] #voice-chat .voice-wave i{animation:none!important}
