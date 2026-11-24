@@ -1,0 +1,30 @@
+.model-recommendation{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(950px,100%);margin:0 auto 8px;padding:9px 12px;border:1px solid color-mix(in srgb,var(--accent) 32%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--accent) 7%,var(--surface));font-size:12px;color:var(--muted)}
+.model-recommendation button{flex:none;min-height:36px;padding:7px 11px;border:1px solid var(--line);border-radius:9px;color:var(--text);background:var(--surface)}
+.model-recommendation button:hover{border-color:var(--accent)}
+@media(max-width:650px){
+  .topbar{height:auto;min-height:58px;padding:6px 8px;gap:5px}
+  .topbar-left{min-width:0;flex:1;flex-wrap:nowrap;gap:4px}
+  #model-picker{min-width:0}
+  #model-picker>summary{max-width:142px;padding:8px 5px;white-space:nowrap}
+  #model-caption{display:inline-block;max-width:112px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;white-space:nowrap}
+  #model-picker .model-popover{max-width:calc(100vw - 20px)}
+  .tool-mode-picker{flex-wrap:nowrap;gap:4px}
+  .tool-mode-picker select{max-width:88px;padding:7px 4px}
+  .tool-mode-picker button{max-width:82px;padding:7px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topbar .connection{max-width:92px;padding:6px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .composer-region{padding:8px 10px max(10px,env(safe-area-inset-bottom))}
+  #prompt{font-size:16px;line-height:1.45}
+  .composer{padding:10px;border-radius:15px}
+  .composer-tools{align-items:center;gap:6px;flex-wrap:wrap}
+  .composer-tools>div:first-child{flex:1 1 100%;gap:6px;flex-wrap:wrap}
+  .composer-tools>div:last-child{display:flex;align-items:center;gap:6px;margin-left:auto}
+  .composer-tools button,.composer-tools select{min-height:40px}
+  .model-recommendation{align-items:flex-start;gap:8px;margin-bottom:7px;padding:8px 10px;font-size:12px;line-height:1.4}
+  .model-recommendation button{min-height:38px;padding:6px 9px}
+}
+@media(max-width:380px){
+  #model-picker>summary{max-width:122px}
+  #model-caption{max-width:94px}
+  .topbar .connection{max-width:76px}
+  .tool-mode-picker select{max-width:74px}
+}
