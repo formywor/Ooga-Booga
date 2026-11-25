@@ -15,11 +15,13 @@
     <p class="tts-lead">Nebula checks TikTok LIVE comments before they reach speech. Use TikFinity Desktop’s built-in Event API and a Nebula browser connector, then add the private speech overlay to OBS or LIVE Studio. No separate helper app to install.</p>
     <div class="tts-note"><strong>Important setup detail</strong><p>This uses Nebula’s speech overlay. Turn off TikFinity’s direct comment-to-speech action so unfiltered audio cannot play separately. TikFinity remains your event source.</p></div>
     <section class="tts-card" aria-labelledby="setup-heading">
-      <div class="tts-step"><span>01</span><div><h2 id="setup-heading">Create your private connection</h2><p>A private key connects TikFinity to your overlay. It is kept in this tab so an accidental refresh can restore it. Keep it secret.</p></div></div>
+      <div class="tts-step"><span>01</span><div><h2 id="setup-heading">Create your private connection</h2><p>A private key connects TikFinity to your overlay. It is kept in this tab for refresh recovery and can be restored on another device when linked to a verified Nebula account. Keep it secret.</p></div></div>
       <button id="tts-create" class="tts-primary">Create connection</button>
+      <button id="tts-restore" class="tts-secondary" hidden>Restore saved connection to this device</button>
+      <p class="tts-small">Sign in with a verified Nebula account before creating a connection to save it to your account. Restoring on another device creates a fresh webhook key; update that key in TikFinity.</p>
       <p id="tts-status" role="status" aria-live="polite"></p>
       <div id="tts-credentials" hidden>
-        <label for="tts-key">TikFinity webhook key <span>Private to this browser tab</span></label>
+        <label for="tts-key">TikFinity webhook key <span>Private · restore from your verified account</span></label>
         <div class="tts-copy-row"><input id="tts-key" readonly autocomplete="off"><button data-copy="tts-key">Copy</button></div>
         <label for="tts-overlay-url">OBS / LIVE Studio browser-source URL</label>
         <div class="tts-copy-row"><input id="tts-overlay-url" readonly autocomplete="off"><button data-copy="tts-overlay-url">Copy</button></div>
@@ -68,6 +70,6 @@
     <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p><button type="button" id="retry-auth" class="text-action" hidden>Try again</button><button type="button" id="reset-signin" class="text-action" hidden>Use another account</button>
   </dialog>
   <script src="/tts-safety/tts-account.js?v=refresh-2" defer></script>
-  <script src="/tts-safety/tts-safety.js?v=refresh-2" defer></script>
+  <script src="/tts-safety/tts-safety.js?v=account-recovery-1" defer></script>
 </body>
 </html>
