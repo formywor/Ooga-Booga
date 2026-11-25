@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Live TTS Safety · Nebula</title>
   <meta name="description" content="Filter TikTok LIVE chat before speech, with a browser-source overlay and no extra desktop download.">
-  <link rel="icon" href="/nebula.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/tts-safety/tts-safety.css">
+  <link rel="icon" href="/nebula.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/tts-safety/tts-safety.css?v=reports-1">
   <script src="/verification-policy.js?v=email-1" defer></script><script src="/account.js?v=email-1" defer></script>
 </head>
 <body class="tts-page">
@@ -54,7 +54,7 @@
       <p>Link a verified Nebula account to retrieve flagged event records and manage TTS preferences. <a href="/?settings=tts">Open TTS settings ↗</a></p>
       <label for="tts-claim-key">Connection key</label><input id="tts-claim-key" class="tts-claim-key" autocomplete="off" placeholder="Paste the private key you saved">
       <button id="tts-claim" class="tts-primary tts-inline">Link connection</button><button id="tts-load-events" class="tts-secondary" disabled>Load flagged events</button>
-      <p id="tts-account-status" role="status" aria-live="polite"></p><div id="tts-events" class="tts-events"></div>
+      <p id="tts-account-status" role="status" aria-live="polite"></p><div id="tts-events-summary" class="tts-events-summary" hidden></div><button id="tts-export-events" class="tts-secondary" type="button" disabled>Download 7-day moderation report</button><div id="tts-events" class="tts-events"></div>
       <div id="tts-ai-settings" class="tts-ai-settings" hidden><h3>Nebula+ review for uncertain comments</h3><label class="tts-ai-toggle"><input id="tts-ai-enabled" type="checkbox"> Ask one eligible Nebula model to review uncertain English comments</label><label for="tts-ai-model">Review model</label><select id="tts-ai-model" class="tts-claim-key"></select><button id="tts-ai-save" class="tts-secondary">Save review settings</button><p class="tts-small">Review adds latency and uses your normal Nebula allowance. If it times out or reaches a limit, that comment stays muted.</p></div>
     </section>
     <p class="tts-footer">TikFinity’s own TTS is separate from this overlay. Nebula filters only events sent to this service. <a href="https://tikfinity.zerody.one/tiktok/actionsandevents" target="_blank" rel="noopener">TikFinity Actions &amp; Events guide</a></p>
@@ -69,7 +69,7 @@
     <section id="signed-in-panel" hidden><h2>Your Nebula account</h2><p id="account-identity" class="account-identity"></p><p id="account-provider" class="field-help"></p><div class="account-summary"><span>Chat history</span><strong>Saved to your account</strong><span>Training sharing</span><strong id="account-training-state">Off</strong></div><p class="field-help" id="verification-state"></p><button type="button" id="send-verification" class="text-action" hidden>Send verification email</button><button id="check-verification" type="button" hidden>Check verification</button><button type="button" id="account-signout" class="provider-button">Sign out</button></section>
     <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p><button type="button" id="retry-auth" class="text-action" hidden>Try again</button><button type="button" id="reset-signin" class="text-action" hidden>Use another account</button>
   </dialog>
-  <script src="/tts-safety/tts-account.js?v=account-recovery-2" defer></script>
+  <script src="/tts-safety/tts-account.js?v=reports-1" defer></script>
   <script src="/tts-safety/tts-safety.js?v=account-recovery-1" defer></script>
 </body>
 </html>
