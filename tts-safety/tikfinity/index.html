@@ -11,27 +11,27 @@
   <main class="tts-main">
     <span class="tts-kicker">TIKFINITY DESKTOP</span>
     <h1>Connect your LIVE chat.<br><span>Keep the key private.</span></h1>
-    <p class="tts-lead">This tab listens to TikFinity Desktop on this computer and sends chat messages to Nebula for filtering. It does not store your key or save clean comments.</p>
+    <p class="tts-lead">This tab listens to TikFinity Desktop on this computer and sends chat messages to Nebula for filtering. Your key stays in this tab’s session storage so refresh can restore the connection. It is cleared when you choose Disconnect or close the tab.</p>
     <section class="tts-card">
       <h2>Before you connect</h2>
       <ol class="tts-instructions">
         <li>Have TikFinity Desktop running on this same computer and connect it to your LIVE. The browser dashboard alone does not expose the local Event API.</li>
         <li>Create a Nebula connection on the <a href="/tts-safety/">Live TTS Safety page</a>, then copy its webhook key.</li>
         <li>Paste the key below and select <strong>Connect TikFinity</strong>. If Chrome asks to let ScriptNovaa connect to devices on your local network, allow it for the local TikFinity connection.</li>
-        <li>Keep this tab open while streaming. The private voice overlay must also be added to OBS or TikTok LIVE Studio.</li>
+        <li>Keep this tab open while streaming. If TikFinity disconnects after connecting, Nebula reconnects automatically. The private voice overlay must also be added to OBS or TikTok LIVE Studio.</li>
       </ol>
       <label for="bridge-key">Nebula webhook key</label>
       <input id="bridge-key" class="tts-claim-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste the key shown on the setup page">
       <div class="tts-bridge-actions"><button id="bridge-connect" class="tts-primary tts-inline">Connect TikFinity</button><button id="bridge-disconnect" class="tts-secondary" disabled>Disconnect</button></div>
-      <p id="bridge-status" role="status" aria-live="polite">Not connected. Your key stays in this tab’s memory and is cleared when you disconnect or close the tab.</p>
+      <p id="bridge-status" role="status" aria-live="polite">Not connected. A previously connected tab reconnects after a refresh if its session key is still valid.</p>
       <p class="tts-small">Only chat events are forwarded. Nebula receives the username and comment over HTTPS. TikFinity and the browser source do not receive your flagged-word history.</p>
     </section>
     <section class="tts-card">
       <h2>Test safely</h2>
       <p>After connecting, return to the setup page and send its harmless test message. Confirm it plays through your browser-source overlay before enabling the stream.</p>
-      <p>If the status says “Could not connect,” check that TikFinity Desktop is open on this PC, is connected to your live room, and that local-network access was allowed in Chrome.</p>
+      <p>If the first connection says “Could not connect,” check that TikFinity Desktop is open on this PC, is connected to your live room, and that local-network access was allowed in Chrome. Automatic retry begins only after a connection has succeeded at least once and then drops.</p><p><a href="/?settings=tts">Change your voice and moderation settings in Nebula ↗</a></p>
     </section>
   </main>
-  <script src="/tts-safety/tikfinity/connector.js" defer></script>
+  <script src="/tts-safety/tikfinity/connector.js?v=reconnect-2" defer></script>
 </body>
 </html>

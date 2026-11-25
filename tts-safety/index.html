@@ -15,11 +15,11 @@
     <p class="tts-lead">Nebula checks TikTok LIVE comments before they reach speech. Use TikFinity Desktop’s built-in Event API and a Nebula browser connector, then add the private speech overlay to OBS or LIVE Studio. No separate helper app to install.</p>
     <div class="tts-note"><strong>Important setup detail</strong><p>This uses Nebula’s speech overlay. Turn off TikFinity’s direct comment-to-speech action so unfiltered audio cannot play separately. TikFinity remains your event source.</p></div>
     <section class="tts-card" aria-labelledby="setup-heading">
-      <div class="tts-step"><span>01</span><div><h2 id="setup-heading">Create your private connection</h2><p>A one-time key connects TikFinity to your private overlay. Keep it secret.</p></div></div>
+      <div class="tts-step"><span>01</span><div><h2 id="setup-heading">Create your private connection</h2><p>A private key connects TikFinity to your overlay. It is kept in this tab so an accidental refresh can restore it. Keep it secret.</p></div></div>
       <button id="tts-create" class="tts-primary">Create connection</button>
       <p id="tts-status" role="status" aria-live="polite"></p>
       <div id="tts-credentials" hidden>
-        <label for="tts-key">TikFinity webhook key <span>Shown only here</span></label>
+        <label for="tts-key">TikFinity webhook key <span>Private to this browser tab</span></label>
         <div class="tts-copy-row"><input id="tts-key" readonly autocomplete="off"><button data-copy="tts-key">Copy</button></div>
         <label for="tts-overlay-url">OBS / LIVE Studio browser-source URL</label>
         <div class="tts-copy-row"><input id="tts-overlay-url" readonly autocomplete="off"><button data-copy="tts-overlay-url">Copy</button></div>
@@ -40,7 +40,7 @@
     </section>
     <section class="tts-card">
       <div class="tts-step"><span>03</span><div><h2>Add the Nebula voice overlay</h2><p>Paste the private overlay URL above into OBS or LIVE Studio as a browser source. Allow audio and set the source size to match your canvas. It can be transparent and does not need to be visible. Then use the harmless test button in step 01 to confirm audio before going LIVE.</p></div></div>
-      <p>Approved English dictionary text is spoken. Non-English text, unknown words, and blocked language are withheld. For a blocked message, the overlay says only: <em>“Moderators, please review a flagged chat message.”</em></p><p class="tts-small">Filters can miss context or new evasion patterns and may hold back names or slang. Keep TikTok’s own safeguards and a human moderator enabled.</p>
+      <p>English dictionary words and common slang can be spoken. Known slurs and profanity stay blocked. Emoji and other languages follow your TTS settings. You can change strictness, add extra blocked phrases, choose an overlay voice, and customize the spoken moderation notice in Settings → TTS.</p><p class="tts-small">No word filter catches every context or evasion pattern. Keep TikTok’s own safeguards and a human moderator enabled.</p>
     </section>
     <section class="tts-card tts-privacy">
       <h2>What is stored?</h2>
@@ -49,7 +49,7 @@
     </section>
     <section class="tts-card">
       <h2>Private review history</h2>
-      <p>Link a verified Nebula account to retrieve flagged event records from your connections.</p>
+      <p>Link a verified Nebula account to retrieve flagged event records and manage TTS preferences. <a href="/?settings=tts">Open TTS settings ↗</a></p>
       <label for="tts-claim-key">Connection key</label><input id="tts-claim-key" class="tts-claim-key" autocomplete="off" placeholder="Paste the private key you saved">
       <button id="tts-claim" class="tts-primary tts-inline">Link connection</button><button id="tts-load-events" class="tts-secondary" disabled>Load flagged events</button>
       <p id="tts-account-status" role="status" aria-live="polite"></p><div id="tts-events" class="tts-events"></div>
@@ -67,7 +67,7 @@
     <section id="signed-in-panel" hidden><h2>Your Nebula account</h2><p id="account-identity" class="account-identity"></p><p id="account-provider" class="field-help"></p><div class="account-summary"><span>Chat history</span><strong>Saved to your account</strong><span>Training sharing</span><strong id="account-training-state">Off</strong></div><p class="field-help" id="verification-state"></p><button type="button" id="send-verification" class="text-action" hidden>Send verification email</button><button id="check-verification" type="button" hidden>Check verification</button><button type="button" id="account-signout" class="provider-button">Sign out</button></section>
     <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p><button type="button" id="retry-auth" class="text-action" hidden>Try again</button><button type="button" id="reset-signin" class="text-action" hidden>Use another account</button>
   </dialog>
-  <script src="/tts-safety/tts-account.js" defer></script>
-  <script src="/tts-safety/tts-safety.js" defer></script>
+  <script src="/tts-safety/tts-account.js?v=refresh-2" defer></script>
+  <script src="/tts-safety/tts-safety.js?v=refresh-2" defer></script>
 </body>
 </html>
