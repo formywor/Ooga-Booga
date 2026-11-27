@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Live TTS Safety · Nebula</title>
   <meta name="description" content="Filter TikTok LIVE chat before speech, with a browser-source overlay and no extra desktop download.">
-  <link rel="icon" href="/nebula.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/tts-safety/tts-safety.css?v=reports-1">
+  <link rel="icon" href="/nebula.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/tts-safety/tts-safety.css?v=ai-review-switch-1">
   <script src="/verification-policy.js?v=email-1" defer></script><script src="/account.js?v=email-1" defer></script>
 </head>
 <body class="tts-page">
@@ -47,7 +47,7 @@
     <section class="tts-card tts-privacy">
       <h2>What is stored?</h2>
       <p>Clean comments are not saved. For blocked comments, Nebula stores the detected term, username, time, event ID, and a one-way hash for up to 7 days so the creator can review what happened. The public overlay never receives the detected term. Anonymous connections receive 11,000 events per rolling 120 hours; a connection lasts 30 days.</p>
-      <p>Nebula+ AI review is optional for unknown English slang and uncertain comments and is only available after an eligible account entitlement is enabled. D2 is not used for this review. If AI review is unavailable or out of allowance, uncertain text stays blocked. This preview has no purchase flow yet.</p>
+      <p>Nebula+ AI review is optional and off by default. When enabled, every comment rejected by a content filter is sent to your selected eligible Nebula model; if it cannot return a clear verdict, Nebula tries other available models allowed for your account. D2 is never used. The comment is held while review runs and stays muted if no reviewer returns a clear safe verdict. Each model attempt uses your normal Nebula allowance. The model may allow ordinary slang or names, but it cannot override explicit blocked terms, your custom blocked phrases, or language, emoji, and link restrictions. TikFinity cooldown and duplicate-message drops are not sent for AI review.</p>
     </section>
     <section class="tts-card">
       <h2>Private review history</h2>
@@ -55,7 +55,7 @@
       <label for="tts-claim-key">Connection key</label><input id="tts-claim-key" class="tts-claim-key" autocomplete="off" placeholder="Paste the private key you saved">
       <button id="tts-claim" class="tts-primary tts-inline">Link connection</button><button id="tts-load-events" class="tts-secondary" disabled>Load flagged events</button>
       <p id="tts-account-status" role="status" aria-live="polite"></p><div id="tts-events-summary" class="tts-events-summary" hidden></div><button id="tts-export-events" class="tts-secondary" type="button" disabled>Download 7-day moderation report</button><div id="tts-events" class="tts-events"></div>
-      <div id="tts-ai-settings" class="tts-ai-settings" hidden><h3>Nebula+ review for uncertain comments</h3><label class="tts-ai-toggle"><input id="tts-ai-enabled" type="checkbox"> Ask one eligible Nebula model to review uncertain English comments</label><label for="tts-ai-model">Review model</label><select id="tts-ai-model" class="tts-claim-key"></select><button id="tts-ai-save" class="tts-secondary">Save review settings</button><p class="tts-small">Review adds latency and uses your normal Nebula allowance. If it times out or reaches a limit, that comment stays muted.</p></div>
+      <div id="tts-ai-settings" class="tts-ai-settings" hidden><h3>Nebula+ review for filtered comments</h3><label class="tts-ai-toggle"><input id="tts-ai-enabled" type="checkbox" role="switch"> Ask Nebula AI to review every comment rejected by content filters</label><label for="tts-ai-model">First review model</label><select id="tts-ai-model" class="tts-claim-key"></select><button id="tts-ai-save" class="tts-secondary">Save review settings</button><p class="tts-small">Off by default. When on, the selected model runs first, followed by available account-eligible models if it times out, is busy, or returns no clear verdict. Nebula waits up to 8 seconds per model. Comments stay muted if review cannot finish safely. Each attempt uses your normal Nebula allowance. TikFinity duplicate and cooldown drops are not sent for review. Filtered comments are shared with the model service to make this decision; D2 is never used.</p></div>
     </section>
     <p class="tts-footer">TikFinity’s own TTS is separate from this overlay. Nebula filters only events sent to this service. <a href="https://tikfinity.zerody.one/tiktok/actionsandevents" target="_blank" rel="noopener">TikFinity Actions &amp; Events guide</a></p>
   </main>
@@ -69,7 +69,7 @@
     <section id="signed-in-panel" hidden><h2>Your Nebula account</h2><p id="account-identity" class="account-identity"></p><p id="account-provider" class="field-help"></p><div class="account-summary"><span>Chat history</span><strong>Saved to your account</strong><span>Training sharing</span><strong id="account-training-state">Off</strong></div><p class="field-help" id="verification-state"></p><button type="button" id="send-verification" class="text-action" hidden>Send verification email</button><button id="check-verification" type="button" hidden>Check verification</button><button type="button" id="account-signout" class="provider-button">Sign out</button></section>
     <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p><button type="button" id="retry-auth" class="text-action" hidden>Try again</button><button type="button" id="reset-signin" class="text-action" hidden>Use another account</button>
   </dialog>
-  <script src="/tts-safety/tts-account.js?v=reports-1" defer></script>
+  <script src="/tts-safety/tts-account.js?v=review-all-filters-1" defer></script>
   <script src="/tts-safety/tts-safety.js?v=account-recovery-1" defer></script>
 </body>
 </html>
